@@ -1,5 +1,63 @@
 # Changelog
 
+## Sprint 07G — Tasks Dashboard Load Orchestration
+
+### Objective
+- Complete the centralized Home dashboard dispatcher so the Tasks tab uses an explicit executable load action instead of the generic Home route or the existing no-op placeholder.
+
+### Changed
+- Routed Tasks dashboard requests from `btnHome_RequestDashboardLoad` to the explicit `LOAD_TASKS` action.
+- Replaced the `LOAD_TASKS` timer placeholder with the existing `btnHome_LoadHive_1` loader that supplies the Tasks discipline and subsystem dashboard.
+- Preserved the Tasks-specific loading title and subtitle while the shared Hive loader executes.
+- Preserved all Flow calls, collections, project selection behavior, dashboard contracts, and Punch Dashboard routing.
+
+### Files modified
+- `screens/Home/scr_Home_1.pa.yaml`
+- `CHANGELOG.md`
+
+### Validation
+- Parsed the complete Power Apps YAML with PyYAML `BaseLoader`.
+- Verified control-name uniqueness across the complete screen source.
+- Verified the dispatcher emits `LOAD_TASKS` exactly once and the timer executes `Select(btnHome_LoadHive_1)` for that action.
+- Verified the obsolete no-op `LOAD_TASKS` branch is absent.
+- Verified Flow-call references and counts are unchanged.
+- Verified the differential ZIP opens successfully and contains only the two modified files.
+
+### Limitations
+- Power Apps Studio import/compile is not available in the execution environment; validation is structural and static.
+
+### Open issues
+- None identified within Sprint 07G scope.
+
+## Sprint 07G — Tasks Dashboard Load Orchestration
+
+### Objective
+- Complete the centralized Home dashboard dispatcher so the Tasks tab uses an explicit executable load action instead of the generic Home route or the existing no-op placeholder.
+
+### Changed
+- Routed Tasks dashboard requests from `btnHome_RequestDashboardLoad` to the explicit `LOAD_TASKS` action.
+- Replaced the `LOAD_TASKS` timer placeholder with the existing `btnHome_LoadHive_1` loader that supplies the Tasks discipline and subsystem dashboard.
+- Preserved the Tasks-specific loading title and subtitle while the shared Hive loader executes.
+- Preserved all Flow calls, collections, project selection behavior, dashboard contracts, and Punch Dashboard routing.
+
+### Files modified
+- `screens/Home/scr_Home_1.pa.yaml`
+- `CHANGELOG.md`
+
+### Validation
+- Parsed the complete Power Apps YAML with PyYAML `BaseLoader`.
+- Verified control-name uniqueness across the complete screen source.
+- Verified the dispatcher emits `LOAD_TASKS` exactly once and the timer executes `Select(btnHome_LoadHive_1)` for that action.
+- Verified the obsolete no-op `LOAD_TASKS` branch is absent.
+- Verified Flow-call references and counts are unchanged.
+- Verified the differential ZIP opens successfully and contains only the two modified files.
+
+### Limitations
+- Power Apps Studio import/compile is not available in the execution environment; validation is structural and static.
+
+### Open issues
+- None identified within Sprint 07G scope.
+
 ## Sprint 07F — Centralized Dashboard Load Request
 
 ### Objective

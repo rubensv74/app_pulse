@@ -277,7 +277,7 @@ Screens:
                   Set(varProjectSwitching, false);
                   Set(
                       varGlobalLoadAction,
-                      If(varHomeDashboard = "PUNCHES", "LOAD_PUNCH_DASHBOARD", "LOAD_HOME")
+                      If(varHomeDashboard = "PUNCHES", "LOAD_PUNCH_DASHBOARD", "LOAD_TASKS")
                   );
                   Set(varGlobalLoadPending, false);
                   Set(varGlobalLoadPending, true)
@@ -324,12 +324,7 @@ Screens:
                           Select(btnHome_LoadPunchDashboard),
 
                       "LOAD_TASKS",
-                          Set(varGlobalLoading, false);
-                          Set(varGlobalLoadingMsg, "");
-                          Set(varGlobalLoadingSubMsg, "");
-                          Set(varGlobalLoadingScope, "");
-                          Set(varGlobalLoadAction, "");
-                          Set(varGlobalLoadPending, false),
+                          Select(btnHome_LoadHive_1),
 
                       Notify(
                           "Home cannot execute action: " & Coalesce(varGlobalLoadAction, "-"),
@@ -4541,8 +4536,18 @@ Screens:
               =
 
               Set(varGlobalLoading, true);
-              Set(varGlobalLoadingMsg, "Loading Home...");
-              Set(varGlobalLoadingSubMsg, "Loading selected project dashboard");
+              Set(
+                  varGlobalLoadingMsg,
+                  If(varHomeDashboard = "TASKS", "Loading Tasks Dashboard...", "Loading Home...")
+              );
+              Set(
+                  varGlobalLoadingSubMsg,
+                  If(
+                      varHomeDashboard = "TASKS",
+                      "Preparing discipline and subsystem overview",
+                      "Loading selected project dashboard"
+                  )
+              );
               Set(varGlobalLoadingScope, "HOME");
 
               If(
