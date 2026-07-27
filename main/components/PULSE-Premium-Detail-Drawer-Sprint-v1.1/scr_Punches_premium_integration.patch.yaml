@@ -1,0 +1,258 @@
+# PULSE — scr_Punches integration patch
+# Replace only the indicated blocks in the current screen source.
+
+# ============================================================
+# 1. Replace conLayer_Drawer_4 and its component instance with:
+# ============================================================
+
+      - conLayer_Drawer_Premium:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =RGBA(0,0,0,0)
+            Height: =App.Height
+            Visible: =varShowDetailDrawer
+            Width: =App.Width
+          Children:
+            - comp_DetailDrawer_Premium_Punches:
+                Control: CanvasComponent
+                ComponentName: cmp_DetailDrawer_Premium
+                Properties:
+                  AppColors: =gblAppColors
+                  CloseAction: |-
+                    =
+                    Set(varShowDetailDrawer,false);
+                    Set(varDrawerIsLoading,false);
+                    Set(varDrawerTab,"Summary");
+                    Set(varCT_LoadKey,"");
+                    Clear(colCT_Merged);
+                    Clear(colCT_Quick);
+                    Clear(colCT_Dirty)
+                  EntityType: =varDrawerEntityType
+                  Height: =App.Height
+                  HostHeight: =App.Height
+                  HostWidth: =App.Width
+                  IsLoading: =varDrawerIsLoading
+                  IsOpen: =varShowDetailDrawer
+                  NormalizedRecord: =varDrawerNormalized
+                  OnDeleteComment: =Select(btnDrawerDeleteComment_Punches)
+                  OnManageFieldsRequested: |-
+                    =
+                    Set(varCT_ShowManageFields,true);
+                    Set(varCT_DefsSearch,"");
+                    Set(varCT_DefsError,"");
+                    Select(btnCT_LoadDefs_4)
+                  OnPostComment: =Select(btnDrawerPostComment_Punches)
+                  OnRefreshRequested: =Select(btnDrawerLoad_Punches_1)
+                  OnSaveFields: =Select(btnDrawerSaveFields_Punches)
+                  OnTabChanged: =Select(btnDrawerLoad_Punches_1)
+                  ProjectId: =varProjectId
+                  RecordId: =varDrawerRecordId
+                  SelectedRecord: =varDrawerSelectedRecord
+                  UserEmail: =varUserEmail
+                  UserName: =varUserName
+                  UserRole: =varUserRole
+                  Visible: =varShowDetailDrawer
+                  Width: =App.Width
+
+# Keep the existing hidden loaders and custom-field administration controls.
+# Update references from comp_DetailDrawer_4 to comp_DetailDrawer_Premium_Punches.
+
+# ============================================================
+# 2. Replace btnDrawerLoad_Punches_1.OnSelect with:
+# ============================================================
+
+=
+If(
+    !varShowDetailDrawer,
+    Exit()
+);
+
+If(
+    IsBlank(varDrawerRecordId),
+    Set(varDrawerIsLoading,false);
+    Notify("No record selected.",NotificationType.Warning);
+    Exit()
+);
+
+Switch(
+    varDrawerTab,
+
+    "Summary",
+        Set(varDrawerIsLoading,false),
+
+    "Activity",
+        Set(varDrawerIsLoading,false),
+
+    "Comments",
+        Set(varDrawerIsLoading,true);
+        Select(btnDrawerLoad_Comments_4),
+
+    "Fields",
+        Set(varDrawerIsLoading,true);
+        Select(btnDrawerLoad_Custom_4),
+
+    Set(varDrawerIsLoading,false)
+);
+
+# IMPORTANT:
+# At the end of btnDrawerLoad_Comments_4.OnSelect and
+# btnDrawerLoad_Custom_4.OnSelect retain:
+#
+# Set(varDrawerIsLoading,false);
+
+# ============================================================
+# 3. Replace galPunches_2.OnSelect with:
+# ============================================================
+
+=
+Set(varShowDetailDrawer,true);
+Set(varDrawerIsLoading,false);
+
+Set(varDrawerTab,"Summary");
+Set(varCommentsPageSize,20);
+Set(varCommentsPage,1);
+
+Set(varDrawerProjectId,varProjectId);
+Set(varDrawerEntityType,"PUNCH");
+Set(varDrawerRecordId,ThisItem.PunchId);
+Set(varDrawerSelectedRecord,ThisItem);
+
+Set(
+    varDrawerNormalized,
+    {
+        EntityType: "PUNCH",
+        ProjectId: varProjectId,
+        RecordId: ThisItem.PunchId,
+
+        AreaCode: Coalesce(Text(ThisItem.AreaCode),""),
+        UnitCode: Coalesce(Text(ThisItem.UnitCode),""),
+        SystemCode: Coalesce(Text(ThisItem.SystemCode),""),
+        SubsystemCode: Coalesce(Text(ThisItem.SubsystemCode),""),
+        ElementCode: Coalesce(Text(ThisItem.ElementCode),""),
+        TypeCode: Coalesce(Text(ThisItem.TypeCode),""),
+
+        TitleLabel: "Punch Code",
+        TitleValue: Coalesce(Text(ThisItem.PunchCode),Text(ThisItem.PunchId),"-"),
+
+        DescLabel: "Punch Description",
+        DescValue: Coalesce(Text(ThisItem.PunchDescription),"-"),
+
+        StatusLabel: "Punch Status",
+        StatusValue: Coalesce(Text(ThisItem.PunchStatus),"-"),
+
+        CategoryLabel: "Category",
+        CategoryValue: Coalesce(
+            Text(ThisItem.PunchCategory),
+            Text(ThisItem.Category),
+            Text(ThisItem.CategoryCode),
+            "-"
+        ),
+
+        DisciplineLabel: "Discipline",
+        DisciplineValue: Coalesce(Text(ThisItem.PunchDiscipline),"-"),
+
+        SecondaryLabel: "Inspection",
+        SecondaryValue: Coalesce(Text(ThisItem.InspectionName),""),
+
+        ResponsibleSubcontractorLabel: "Responsible Subcontractor",
+        ResponsibleSubcontractorValue: Coalesce(
+            Text(ThisItem.ResponsibleSubcontractor),
+            Text(ThisItem.SubcontractorName),
+            Text(ThisItem.Subcontractor),
+            "-"
+        ),
+
+        ActionByLabel: "Action By",
+        ActionByValue: Coalesce(
+            Text(ThisItem.ActionBy),
+            Text(ThisItem.ResponsibleTR),
+            "-"
+        )
+    }
+);
+
+Set(varCT_LoadKey,"");
+Clear(colCT_Merged);
+Clear(colCT_Quick);
+Clear(colCT_Dirty);
+Clear(colComments);
+
+Reset(comp_DetailDrawer_Premium_Punches);
+
+# ============================================================
+# 4. Add hidden host buttons to scr_Punches:
+# ============================================================
+
+      - btnDrawerPostComment_Punches:
+          Control: Button@0.0.45
+          Properties:
+            OnSelect: |-
+              =
+              If(
+                  IsBlank(Trim(varDrawerCommentDraft)),
+                  Notify("Enter a comment before posting.",NotificationType.Warning);
+                  Exit()
+              );
+
+              Set(varIsPostingComment,true);
+
+              IfError(
+                  Set(
+                      varPostCommentResp,
+                      Warroom_AddTaskComment.Run(
+                          varProjectId,
+                          varDrawerRecordId,
+                          varDrawerEntityType,
+                          varDrawerCommentDraft,
+                          "General",
+                          varUserEmail,
+                          varUserName
+                      )
+                  );
+
+                  Set(varDrawerCommentDraft,"");
+                  Reset(comp_DetailDrawer_Premium_Punches);
+                  Set(varCommentsPage,1);
+                  Select(btnDrawerLoad_Comments_4),
+
+                  Notify(
+                      "The comment could not be posted: " & FirstError.Message,
+                      NotificationType.Error
+                  )
+              );
+
+              Set(varIsPostingComment,false)
+            Visible: =false
+
+      - btnDrawerDeleteComment_Punches:
+          Control: Button@0.0.45
+          Properties:
+            OnSelect: |-
+              =
+              Notify(
+                  "Comment deletion is not connected in this sprint.",
+                  NotificationType.Information
+              )
+            Visible: =false
+
+      - btnDrawerSaveFields_Punches:
+          Control: Button@0.0.45
+          Properties:
+            OnSelect: |-
+              =
+              If(
+                  CountRows(colCT_Dirty)=0,
+                  Notify("There are no field changes to save.",NotificationType.Information),
+                  Select(btnCT_SaveAll_4)
+              )
+            Visible: =false
+
+# ============================================================
+# 5. Rename tab values in any remaining formulas:
+# ============================================================
+# Overview -> Summary
+# Custom   -> Fields
+# History  -> Activity
+#
+# Do not rename colComments, colCT_Merged, colCT_Dirty or existing Flow names.
