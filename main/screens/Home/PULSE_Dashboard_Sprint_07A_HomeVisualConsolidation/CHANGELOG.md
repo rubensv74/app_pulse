@@ -1,5 +1,31 @@
 # Changelog
 
+## Sprint 07B — Dashboard Tab State Visibility
+
+### Objective
+- Restore the active Punches/Tasks tab indicator after the Sprint 07A selector bar height reduction.
+
+### Changed
+- Moved both active-tab indicator rectangles inside the 48 px selector bar so they are no longer clipped.
+- Aligned the Tasks tab vertically with the Punches tab.
+- Preserved all dashboard loading logic, Flow calls, collections, and SQL contracts.
+
+### Files modified
+- `screens/Home/scr_Home_1.pa.yaml`
+- `CHANGELOG.md`
+
+### Validation
+- Parsed the complete Power Apps source with PyYAML `BaseLoader`.
+- Verified both indicators use `Y = 45` with `Height = 3` inside a 48 px parent.
+- Verified both tab buttons use `Y = 6` and `Height = 36`.
+- Confirmed the differential contains no changes to formulas, Flow references, data collections, or SQL contracts.
+
+### Limitations
+- Power Apps Studio import/compile is not available in the execution environment; validation is structural and static.
+
+### Open issues
+- None identified within Sprint 07B scope.
+
 ## Sprint 07A — Home Visual Consolidation
 
 ### Objective
