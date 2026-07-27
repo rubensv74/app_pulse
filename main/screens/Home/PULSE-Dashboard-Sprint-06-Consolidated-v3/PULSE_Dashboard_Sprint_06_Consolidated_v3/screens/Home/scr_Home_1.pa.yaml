@@ -3120,7 +3120,7 @@ Screens:
                                                   =If(
                                                       CountRows(colPunchDashboardTimeline) < 2,
                                                       varTheme_TextMuted,
-                                                      If(Last(colPunchDashboardTimeline).OpenDelta < 0, varTheme_Success, If(Last(colPunchDashboardTimeline).OpenDelta > 0, varTheme_Danger, varTheme_TextMuted))
+                                                      If(Last(colPunchDashboardTimeline).OpenDelta < 0, varTheme_Green, If(Last(colPunchDashboardTimeline).OpenDelta > 0, varTheme_Red, varTheme_TextMuted))
                                                   )
                                                 FontWeight: =FontWeight.Semibold
                                                 Height: =22
@@ -3297,6 +3297,163 @@ Screens:
                                                 Width: =52
                                                 X: =Parent.Width - 90
                                                 Y: =42
+                                    - conPunchExecutiveInsightsCard:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: ManualLayout
+                                        Properties:
+                                          BorderColor: =varTheme_Border
+                                          BorderThickness: =1
+                                          DropShadow: =DropShadow.None
+                                          Fill: =varTheme_Surface
+                                          FillPortions: =0
+                                          Height: =286
+                                          LayoutMinHeight: =286
+                                          RadiusBottomLeft: =16
+                                          RadiusBottomRight: =16
+                                          RadiusTopLeft: =16
+                                          RadiusTopRight: =16
+                                          Width: =Parent.Width
+                                        Children:
+                                          - lblPunchInsightsTitle:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =varTheme_Text
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =24
+                                                Size: =14
+                                                Text: ="Executive Insights"
+                                                Width: =260
+                                                X: =18
+                                                Y: =14
+                                          - lblPunchInsightsSubtitle:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =varTheme_TextMuted
+                                                Height: =18
+                                                Size: =9
+                                                Text: ="Prioritized signals derived from the latest snapshot and recent trend"
+                                                Width: =520
+                                                X: =18
+                                                Y: =39
+                                          - galPunchExecutiveInsights:
+                                              Control: Gallery@2.15.0
+                                              Variant: Vertical
+                                              Properties:
+                                                BorderColor: =RGBA(0,0,0,0)
+                                                Height: =208
+                                                Items: =FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 5)
+                                                ShowScrollbar: =false
+                                                TemplatePadding: =4
+                                                TemplateSize: =62
+                                                Visible: =CountRows(colPunchDashboardInsights) > 0
+                                                Width: =Parent.Width - 24
+                                                X: =12
+                                                Y: =64
+                                              Children:
+                                                - conPunchInsightRow:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: ManualLayout
+                                                    Properties:
+                                                      BorderColor: =varTheme_Border
+                                                      BorderThickness: =1
+                                                      DropShadow: =DropShadow.None
+                                                      Fill: =If(Mod(ThisItem.Priority, 2) = 0, varTheme_SurfaceAlt, varTheme_Surface)
+                                                      Height: =54
+                                                      RadiusBottomLeft: =10
+                                                      RadiusBottomRight: =10
+                                                      RadiusTopLeft: =10
+                                                      RadiusTopRight: =10
+                                                      Width: =Parent.TemplateWidth - 8
+                                                      X: =4
+                                                      Y: =2
+                                                    Children:
+                                                      - recPunchInsightSeverity:
+                                                          Control: Rectangle@2.3.0
+                                                          Properties:
+                                                            BorderColor: =RGBA(0,0,0,0)
+                                                            BorderStyle: =BorderStyle.None
+                                                            Fill: =Switch(ThisItem.Severity, "CRITICAL", varTheme_Red, "WARNING", varTheme_Amber, "SUCCESS", varTheme_Green, varTheme_PulseBlueDark)
+                                                            Height: =Parent.Height
+                                                            Width: =4
+                                                      - lblPunchInsightTitle:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =20
+                                                            Size: =10
+                                                            Text: =ThisItem.Title
+                                                            Width: =Parent.Width - 190
+                                                            Wrap: =false
+                                                            X: =16
+                                                            Y: =7
+                                                      - lblPunchInsightMessage:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Color: =varTheme_TextMuted
+                                                            Height: =18
+                                                            Size: =9
+                                                            Text: =ThisItem.Message
+                                                            Width: =Parent.Width - 190
+                                                            Wrap: =false
+                                                            X: =16
+                                                            Y: =29
+                                                      - lblPunchInsightMetric:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Align: =Align.Right
+                                                            Color: =Switch(ThisItem.Severity, "CRITICAL", varTheme_Red, "WARNING", varTheme_Amber, "SUCCESS", varTheme_Green, varTheme_PulseBlueDark)
+                                                            FontWeight: =FontWeight.Bold
+                                                            Height: =22
+                                                            Size: =11
+                                                            Text: =If(IsBlank(ThisItem.MetricLabel), "", Text(ThisItem.MetricValue, "[$-en-US]#,##0.0") & " " & ThisItem.MetricLabel)
+                                                            Width: =150
+                                                            X: =Parent.Width - 166
+                                                            Y: =7
+                                                      - btnPunchInsightDrill:
+                                                          Control: Classic/Button@2.2.0
+                                                          Properties:
+                                                            BorderColor: =RGBA(0,0,0,0)
+                                                            BorderStyle: =BorderStyle.None
+                                                            BorderThickness: =0
+                                                            DisplayMode: =If(IsBlank(ThisItem.StatusCode) && IsBlank(ThisItem.CategoryCode) && IsBlank(ThisItem.SubsystemCode) && ThisItem.SubcontractorId < 0, DisplayMode.Disabled, DisplayMode.Edit)
+                                                            Fill: =RGBA(0,0,0,0)
+                                                            Height: =Parent.Height
+                                                            HoverFill: =RGBA(22,119,255,0.035)
+                                                            OnSelect: |-
+                                                              =
+                                                              Set(varPunches_ReturnView, "Home");
+                                                              Set(varPunches_ContextSource, "ExecutiveInsights");
+                                                              Set(varPunches_FilterSource, "Dashboard");
+                                                              Set(varPunchCustomFiltersJson, "[]");
+                                                              Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId));
+                                                              Set(varFilter_PunchStatusCode, Text(ThisItem.StatusCode));
+                                                              Set(varFilter_PunchCategoryCode, Text(ThisItem.CategoryCode));
+                                                              Set(varFilter_SubsystemsCsv, Text(ThisItem.SubsystemCode));
+                                                              Set(varFilter_Subsystem, If(IsBlank(ThisItem.SubsystemCode), Blank(), Text(ThisItem.SubsystemCode)));
+                                                              Set(varFilter_Subcontractor, If(ThisItem.SubcontractorId < 0, Blank(), Text(ThisItem.SubcontractorId)));
+                                                              Set(varFilter_PunchDiscipline, Text(ThisItem.DisciplineCode));
+                                                              Set(varPunches_Page, 1);
+                                                              Set(varPunches_HasSearched, true);
+                                                              Set(varPunches_AutoLoad, true);
+                                                              Clear(colPunches);
+                                                              Set(varAppView, "Punches");
+                                                              Navigate(scr_Punches, ScreenTransition.None)
+                                                            PressedFill: =RGBA(22,119,255,0.07)
+                                                            Text: =""
+                                                            Width: =Parent.Width
+                                          - lblPunchInsightsEmpty:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Align: =Align.Center
+                                                Color: =varTheme_TextMuted
+                                                Height: =72
+                                                Size: =10
+                                                Text: ="No material executive insight was detected for this snapshot."
+                                                Visible: =CountRows(colPunchDashboardInsights) = 0
+                                                Width: =Parent.Width - 36
+                                                X: =18
+                                                Y: =104
                                     - conPunchMatrixCard:
                                         Control: GroupContainer@1.5.0
                                         Variant: ManualLayout
@@ -3938,6 +4095,8 @@ Screens:
               Clear(colPunchDashboardSnapshotInfo);
               Clear(colPunchDashboardSummary);
               Clear(colPunchDashboardMatrix);
+              Clear(colPunchDashboardTimeline);
+              Clear(colPunchDashboardInsights);
               Clear(colPunchDashboardSubsystems);
               Clear(colPunchDashboardSubcontractors);
 
@@ -4092,6 +4251,28 @@ Screens:
                                           TotalCount: Value(Coalesce(Text(Value.Total), "0")),
                                           OpenDelta: Value(Coalesce(Text(Value.OpenDelta), "0")),
                                           OpenDeltaPercent: Value(Coalesce(Text(Value.OpenDeltaPercent), "0"))
+                                      }
+                                  )
+                              );
+
+                              ClearCollect(
+                                  colPunchDashboardInsights,
+                                  ForAll(
+                                      Table(_bundle.insights),
+                                      {
+                                          InsightId: Value(Coalesce(Text(Value.InsightId), "0")),
+                                          Priority: Value(Coalesce(Text(Value.Priority), "99")),
+                                          Severity: Coalesce(Text(Value.Severity), "INFO"),
+                                          InsightType: Coalesce(Text(Value.InsightType), "GENERAL"),
+                                          Title: Coalesce(Text(Value.Title), "Executive insight"),
+                                          Message: Coalesce(Text(Value.Message), ""),
+                                          MetricValue: Value(Coalesce(Text(Value.MetricValue), "0")),
+                                          MetricLabel: Coalesce(Text(Value.MetricLabel), ""),
+                                          StatusCode: Coalesce(Text(Value.StatusCode), ""),
+                                          CategoryCode: Coalesce(Text(Value.CategoryCode), ""),
+                                          SubsystemCode: Coalesce(Text(Value.SubsystemCode), ""),
+                                          SubcontractorId: Value(Coalesce(Text(Value.SubcontractorId), "-1")),
+                                          DisciplineCode: Coalesce(Text(Value.DisciplineCode), "")
                                       }
                                   )
                               );
@@ -4719,6 +4900,8 @@ Screens:
               Clear(colPunchDashboardSnapshotInfo);
               Clear(colPunchDashboardSummary);
               Clear(colPunchDashboardMatrix);
+              Clear(colPunchDashboardTimeline);
+              Clear(colPunchDashboardInsights);
               Clear(colPunchDashboardSubsystems);
               Clear(colPunchDashboardSubcontractors);
 

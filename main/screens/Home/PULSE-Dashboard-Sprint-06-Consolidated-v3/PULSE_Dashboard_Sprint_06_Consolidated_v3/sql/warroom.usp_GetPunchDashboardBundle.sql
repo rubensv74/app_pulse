@@ -1,6 +1,6 @@
 /*
     PULSE - Punch Dashboard
-    Sprint 05.3 - Seven-snapshot Timeline vertical for Power Automate / Power Apps
+    Sprint 06 - Consolidated Executive Dashboard v3 for Power Automate / Power Apps
 
     Prerequisites:
       - PULSE_PunchDashboard_Entregable_01_ModeloDatos.sql
@@ -37,6 +37,7 @@ BEGIN
     DECLARE @Timeline NVARCHAR(MAX) = N'[]';
     DECLARE @Subsystems NVARCHAR(MAX) = N'[]';
     DECLARE @Subcontractors NVARCHAR(MAX) = N'[]';
+    DECLARE @Insights NVARCHAR(MAX) = N'[]';
     DECLARE @Result NVARCHAR(MAX);
 
     SELECT TOP (1)
@@ -65,7 +66,7 @@ BEGIN
                 GeneratedOn = r.CompletedOn,
                 r.SourcePunchCount,
                 r.DurationMs,
-                DataVersion = N'2.3'
+                DataVersion = N'3.0'
             FROM warroom.PunchDashboardSnapshotRun r
             WHERE r.SnapshotRunId = @SnapshotRunId
             FOR JSON PATH
@@ -302,6 +303,163 @@ BEGIN
             ORDER BY s.SubcontractorName, s.DisciplineCode, s.CategoryOrder, s.StatusOrder
             FOR JSON PATH
         );
+
+        /*
+            Executive insights are intentionally deterministic and derived only
+            from the snapshot contract already consumed by Power Apps.
+        */
+        ;WITH CurrentStatus AS
+        (
+            SELECT
+                cs.StatusCode,
+                StatusName = MAX(cs.StatusName),
+                PunchCount = SUM(cs.PunchCount)
+            FROM warroom.PunchDashboardSnapshotCategoryStatus cs
+            WHERE cs.SnapshotRunId = @SnapshotRunId
+            GROUP BY cs.StatusCode
+        ),
+        PreviousStatus AS
+        (
+            SELECT
+                cs.StatusCode,
+                PunchCount = SUM(cs.PunchCount)
+            FROM warroom.PunchDashboardSnapshotCategoryStatus cs
+            WHERE cs.SnapshotRunId = @PreviousSnapshotRunId
+            GROUP BY cs.StatusCode
+        ),
+        OpenTrend AS
+        (
+            SELECT TOP (1)
+                c.StatusCode,
+                c.StatusName,
+                CurrentCount = c.PunchCount,
+                PreviousCount = COALESCE(p.PunchCount, c.PunchCount),
+                Delta = c.PunchCount - COALESCE(p.PunchCount, c.PunchCount),
+                DeltaPercent = CONVERT(DECIMAL(10,2),
+                    CASE WHEN COALESCE(p.PunchCount, 0) = 0 THEN 0
+                         ELSE ((c.PunchCount - p.PunchCount) * 100.0) / NULLIF(p.PunchCount, 0) END)
+            FROM CurrentStatus c
+            LEFT JOIN PreviousStatus p ON p.StatusCode = c.StatusCode
+            WHERE UPPER(c.StatusCode) IN ('OPEN','O') OR UPPER(c.StatusName) = 'OPEN'
+        ),
+        ClosedTrend AS
+        (
+            SELECT TOP (1)
+                c.StatusCode,
+                c.StatusName,
+                CurrentCount = c.PunchCount,
+                PreviousCount = COALESCE(p.PunchCount, c.PunchCount),
+                Delta = c.PunchCount - COALESCE(p.PunchCount, c.PunchCount),
+                DeltaPercent = CONVERT(DECIMAL(10,2),
+                    CASE WHEN COALESCE(p.PunchCount, 0) = 0 THEN 0
+                         ELSE ((c.PunchCount - p.PunchCount) * 100.0) / NULLIF(p.PunchCount, 0) END)
+            FROM CurrentStatus c
+            LEFT JOIN PreviousStatus p ON p.StatusCode = c.StatusCode
+            WHERE UPPER(c.StatusCode) IN ('CLOSED','CLOSE','CL') OR UPPER(c.StatusName) = 'CLOSED'
+        ),
+        TopHotspot AS
+        (
+            SELECT TOP (1)
+                cs.CategoryCode, cs.CategoryName, cs.StatusCode, cs.StatusName, cs.PunchCount
+            FROM warroom.PunchDashboardSnapshotCategoryStatus cs
+            WHERE cs.SnapshotRunId = @SnapshotRunId
+              AND cs.PunchCount > 0
+            ORDER BY cs.PunchCount DESC, cs.CategoryOrder, cs.StatusOrder
+        ),
+        TopSubsystem AS
+        (
+            SELECT TOP (1)
+                s.SubsystemCode, s.SubsystemName, s.CategoryCode, s.CategoryName,
+                s.StatusCode, s.StatusName, s.PunchCount
+            FROM warroom.PunchDashboardSnapshotSubsystem s
+            WHERE s.SnapshotRunId = @SnapshotRunId
+              AND s.PunchCount > 0
+            ORDER BY s.PunchCount DESC, s.SubsystemCode, s.CategoryOrder, s.StatusOrder
+        ),
+        TopSubcontractor AS
+        (
+            SELECT TOP (1)
+                s.SubcontractorId, s.SubcontractorName, s.DisciplineCode, s.DisciplineName,
+                s.CategoryCode, s.CategoryName, s.StatusCode, s.StatusName, s.PunchCount
+            FROM warroom.PunchDashboardSnapshotSubcontractor s
+            WHERE s.SnapshotRunId = @SnapshotRunId
+              AND s.PunchCount > 0
+            ORDER BY s.PunchCount DESC, s.SubcontractorName, s.DisciplineCode, s.CategoryOrder, s.StatusOrder
+        ),
+        InsightRows AS
+        (
+            SELECT
+                InsightId = 1,
+                Priority = CASE WHEN o.Delta > 0 THEN 1 WHEN o.Delta < 0 THEN 3 ELSE 8 END,
+                Severity = CASE WHEN o.Delta > 0 THEN N'CRITICAL' WHEN o.Delta < 0 THEN N'SUCCESS' ELSE N'INFO' END,
+                InsightType = N'OPEN_TREND',
+                Title = CASE WHEN o.Delta > 0 THEN N'Open punches are increasing'
+                             WHEN o.Delta < 0 THEN N'Open punch backlog is reducing'
+                             ELSE N'Open punch backlog is stable' END,
+                [Message] = N'Latest snapshot contains ' + FORMAT(o.CurrentCount, 'N0', 'en-US') +
+                    N' open punches; change versus the previous snapshot: ' +
+                    CASE WHEN o.Delta > 0 THEN N'+' ELSE N'' END + FORMAT(o.Delta, 'N0', 'en-US') + N'.',
+                MetricValue = CONVERT(DECIMAL(18,2), o.DeltaPercent),
+                MetricLabel = N'%',
+                StatusCode = o.StatusCode,
+                CategoryCode = CONVERT(NVARCHAR(100), N''),
+                SubsystemCode = CONVERT(NVARCHAR(100), N''),
+                SubcontractorId = CONVERT(BIGINT, -1),
+                DisciplineCode = CONVERT(NVARCHAR(100), N'')
+            FROM OpenTrend o
+
+            UNION ALL
+
+            SELECT
+                2, 2, N'WARNING', N'HOTSPOT',
+                N'Largest category/status hotspot',
+                COALESCE(h.CategoryName, h.CategoryCode) + N' / ' + COALESCE(h.StatusName, h.StatusCode) +
+                    N' is the largest matrix cell with ' + FORMAT(h.PunchCount, 'N0', 'en-US') + N' punches.',
+                CONVERT(DECIMAL(18,2), h.PunchCount), N'punches', h.StatusCode, h.CategoryCode, N'', -1, N''
+            FROM TopHotspot h
+
+            UNION ALL
+
+            SELECT
+                3, 4, N'WARNING', N'SUBSYSTEM',
+                N'Highest-volume TOP Code',
+                COALESCE(s.SubsystemCode, N'Unassigned') + N' carries ' + FORMAT(s.PunchCount, 'N0', 'en-US') +
+                    N' punches in ' + COALESCE(s.CategoryName, s.CategoryCode) + N' / ' + COALESCE(s.StatusName, s.StatusCode) + N'.',
+                CONVERT(DECIMAL(18,2), s.PunchCount), N'punches', s.StatusCode, s.CategoryCode, s.SubsystemCode, -1, N''
+            FROM TopSubsystem s
+
+            UNION ALL
+
+            SELECT
+                4, 5, N'INFO', N'SUBCONTRACTOR',
+                N'Highest subcontractor workload',
+                COALESCE(NULLIF(s.SubcontractorName, N''), N'Unassigned') + N' has the largest visible workload with ' +
+                    FORMAT(s.PunchCount, 'N0', 'en-US') + N' punches.',
+                CONVERT(DECIMAL(18,2), s.PunchCount), N'punches', s.StatusCode, s.CategoryCode, N'',
+                COALESCE(s.SubcontractorId, -1), COALESCE(s.DisciplineCode, N'')
+            FROM TopSubcontractor s
+
+            UNION ALL
+
+            SELECT
+                5, CASE WHEN c.Delta > 0 THEN 3 ELSE 7 END,
+                CASE WHEN c.Delta > 0 THEN N'SUCCESS' ELSE N'INFO' END, N'CLOSED_TREND',
+                CASE WHEN c.Delta > 0 THEN N'Closure output improved' ELSE N'Closure output is stable' END,
+                N'Closed punches changed by ' + CASE WHEN c.Delta > 0 THEN N'+' ELSE N'' END +
+                    FORMAT(c.Delta, 'N0', 'en-US') + N' versus the previous snapshot.',
+                CONVERT(DECIMAL(18,2), c.DeltaPercent), N'%', c.StatusCode, N'', N'', -1, N''
+            FROM ClosedTrend c
+        )
+        SELECT @Insights =
+        (
+            SELECT TOP (5)
+                InsightId, Priority, Severity, InsightType, Title, [Message],
+                MetricValue, MetricLabel, StatusCode, CategoryCode, SubsystemCode,
+                SubcontractorId, DisciplineCode
+            FROM InsightRows
+            ORDER BY Priority, InsightId
+            FOR JSON PATH
+        );
     END;
 
     SELECT @Result =
@@ -318,9 +476,10 @@ BEGIN
             summary = JSON_QUERY(COALESCE(@Summary, N'[]')),
             matrix = JSON_QUERY(COALESCE(@Matrix, N'[]')),
             timeline = JSON_QUERY(COALESCE(@Timeline, N'[]')),
+            insights = JSON_QUERY(COALESCE(@Insights, N'[]')),
             subsystems = JSON_QUERY(COALESCE(@Subsystems, N'[]')),
             subcontractors = JSON_QUERY(COALESCE(@Subcontractors, N'[]')),
-            contractVersion = N'2.3'
+            contractVersion = N'3.0'
         FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
     );
 
