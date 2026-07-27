@@ -1,5 +1,63 @@
 # Changelog
 
+## Sprint 07D — Responsive Dashboard Empty States
+
+### Objective
+- Keep Punches and Tasks dashboard empty/error messages readable and visually aligned across narrow desktop and tablet widths without changing data-loading behavior.
+
+### Changed
+- Made the Punch Dashboard state title and detail text responsive to their parent width.
+- Enabled `AutoHeight` on the two compatible Punch Dashboard state text controls to prevent message clipping.
+- Consolidated the Tasks no-data state into a bordered dashboard card consistent with the Home visual language.
+- Centered and made the Tasks no-data title and description responsive, with dynamic vertical positioning to avoid overlap.
+- Preserved all Flow calls, collections, navigation, filters, SQL contracts, and action formulas.
+
+### Files modified
+- `screens/Home/scr_Home_1.pa.yaml`
+- `CHANGELOG.md`
+
+### Validation
+- Parsed the complete Power Apps YAML with PyYAML `BaseLoader`.
+- Verified control-name uniqueness across the complete screen source.
+- Verified the responsive width and dynamic-position formulas are present exactly once.
+- Compared every `OnSelect` property between the original and modified YAML; no action formula changed.
+- Verified the differential ZIP opens successfully and contains only the two modified files.
+
+### Limitations
+- Power Apps Studio import/compile is not available in the execution environment; validation is structural and static.
+
+### Open issues
+- None identified within Sprint 07D scope.
+
+## Sprint 07C — Responsive Executive Header
+
+### Objective
+- Prevent the consolidated Home executive header from overflowing or overlapping on narrower desktop and tablet widths while preserving all existing dashboard behavior.
+
+### Changed
+- Made the executive header gap and horizontal padding responsive below 1000 px.
+- Reduced the title block minimum width so the project and refresh cards can remain visible without clipping.
+- Added responsive widths to the project selector and refresh cards.
+- Made the refresh timestamp and button share the available width without overlap.
+- Preserved all dashboard loading logic, Flow calls, collections, navigation, and SQL contracts.
+
+### Files modified
+- `screens/Home/scr_Home_1.pa.yaml`
+- `CHANGELOG.md`
+
+### Validation
+- Parsed the complete Power Apps YAML with PyYAML `BaseLoader`.
+- Verified all eight responsive formulas are present exactly once.
+- Verified control-name uniqueness across the complete screen source.
+- Confirmed no Flow, collection, navigation, SQL contract, or `OnSelect` formula was changed.
+- Verified the differential ZIP opens successfully and contains only the two modified files.
+
+### Limitations
+- Power Apps Studio import/compile is not available in the execution environment; validation is structural and static.
+
+### Open issues
+- None identified within Sprint 07C scope.
+
 ## Sprint 07B — Dashboard Tab State Visibility
 
 ### Objective

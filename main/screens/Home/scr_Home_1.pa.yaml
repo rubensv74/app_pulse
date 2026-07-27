@@ -702,12 +702,12 @@ Screens:
                               Height: =82
                               LayoutAlignItems: =LayoutAlignItems.Center
                               LayoutDirection: =LayoutDirection.Horizontal
-                              LayoutGap: =16
+                              LayoutGap: =If(Self.Width < 1000, 10, 16)
                               LayoutMinHeight: =82
                               LayoutMinWidth: =16
                               PaddingBottom: =8
-                              PaddingLeft: =18
-                              PaddingRight: =18
+                              PaddingLeft: =If(Self.Width < 1000, 12, 18)
+                              PaddingRight: =If(Self.Width < 1000, 12, 18)
                               PaddingTop: =8
                               RadiusBottomLeft: =12
                               RadiusBottomRight: =12
@@ -726,7 +726,7 @@ Screens:
                                     LayoutDirection: =LayoutDirection.Vertical
                                     LayoutJustifyContent: =LayoutJustifyContent.Center
                                     LayoutMinHeight: =64
-                                    LayoutMinWidth: =260
+                                    LayoutMinWidth: =200
                                     PaddingBottom: =6
                                     PaddingRight: =8
                                     PaddingTop: =6
@@ -776,7 +776,7 @@ Screens:
                                     RadiusBottomRight: =10
                                     RadiusTopLeft: =10
                                     RadiusTopRight: =10
-                                    Width: =440
+                                    Width: =If(Parent.Width >= 1200, 440, Parent.Width >= 980, 360, 300)
                                   Children:
                                     - cmbHome_ProjectSelector_1:
                                         Control: ModernCombobox@1.1.1
@@ -874,7 +874,7 @@ Screens:
                                     RadiusBottomRight: =12
                                     RadiusTopLeft: =12
                                     RadiusTopRight: =12
-                                    Width: =280
+                                    Width: =If(Parent.Width >= 1100, 280, 260)
                                   Children:
                                     - lblExecLastRefresh_1:
                                         Control: ModernText@1.0.0
@@ -897,7 +897,7 @@ Screens:
                                                     Text(varHomeLastRefresh, "dd/mm/yyyy hh:mm")
                                                 )
                                             )
-                                          Width: =130
+                                          Width: =btnHomeRefreshData_1.X - Self.X - 8
                                           X: =16
                                           Y: =28
                                     - btnHomeRefreshData_1:
@@ -927,7 +927,7 @@ Screens:
                                                 "Refresh"
                                             )
                                           Visible: =!varGlobalLoading
-                                          Width: =110
+                                          Width: =If(Parent.Width < 280, 96, 110)
                                           X: =Parent.Width - Self.Width - 16
                                           Y: =19
                                     - lblOverviewRefreshTitle_2:
@@ -3975,7 +3975,7 @@ Screens:
                                           Align: =Align.Center
                                           Color: =varTheme_Text
                                           FontWeight: =FontWeight.Semibold
-                                          Height: =28
+                                          AutoHeight: =true
                                           Size: =16
                                           Text: |-
                                             =
@@ -3990,7 +3990,7 @@ Screens:
                                                 "No snapshot available",
                                                 "Punch Dashboard"
                                             )
-                                          Width: =520
+                                          Width: =Max(160, Min(520, Parent.Width - 48))
                                           X: =(Parent.Width - Self.Width) / 2
                                           Y: =icoPunchDashboardState.Y + icoPunchDashboardState.Height + 14
                                     - lblPunchDashboardStateText:
@@ -3998,7 +3998,7 @@ Screens:
                                         Properties:
                                           Align: =Align.Center
                                           Color: =varTheme_TextMuted
-                                          Height: =54
+                                          AutoHeight: =true
                                           Size: =10
                                           Text: |-
                                             =
@@ -4013,16 +4013,23 @@ Screens:
                                                 Coalesce(varPunchDashboardMessage, "Generate a snapshot before loading this dashboard."),
                                                 ""
                                             )
-                                          Width: =640
+                                          Width: =Max(160, Min(640, Parent.Width - 48))
                                           X: =(Parent.Width - Self.Width) / 2
                                           Y: =lblPunchDashboardStateTitle.Y + lblPunchDashboardStateTitle.Height + 6
                         - conHome_NoDataState_1:
                             Control: GroupContainer@1.5.0
                             Variant: ManualLayout
                             Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
                               Fill: =varTheme_Surface
                               LayoutMinHeight: =16
                               LayoutMinWidth: =16
+                              RadiusBottomLeft: =16
+                              RadiusBottomRight: =16
+                              RadiusTopLeft: =16
+                              RadiusTopRight: =16
                               Visible: |-
                                 =
                                 !varHomeLoading &&
@@ -4032,17 +4039,26 @@ Screens:
                               - Text13_1:
                                   Control: ModernText@1.0.0
                                   Properties:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    Color: =varTheme_Text
+                                    FontWeight: =FontWeight.Semibold
+                                    Size: =16
                                     Text: ="No dashboard data configured"
-                                    Width: =400
-                                    X: =40
-                                    Y: =40
+                                    Width: =Max(160, Min(520, Parent.Width - 48))
+                                    X: =(Parent.Width - Self.Width) / 2
+                                    Y: =Max(40, (Parent.Height - 110) / 2)
                               - Text14_1:
                                   Control: ModernText@1.0.0
                                   Properties:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    Color: =varTheme_TextMuted
+                                    Size: =10
                                     Text: ="This project is available, but no discipline dashboard data has been configured yet."
-                                    Width: =600
-                                    X: =40
-                                    Y: =102
+                                    Width: =Max(160, Min(640, Parent.Width - 48))
+                                    X: =(Parent.Width - Self.Width) / 2
+                                    Y: =Text13_1.Y + Text13_1.Height + 8
       - btnHome_LoadPunchDashboard:
           Control: ModernButton@1.0.0
           Properties:
