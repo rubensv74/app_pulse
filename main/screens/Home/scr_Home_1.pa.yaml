@@ -2882,17 +2882,27 @@ Screens:
                                           OnChange: |-
                                             =
                                             If(
-                                                !IsBlank(Self.Selected.TemplateId),
+                                                !IsBlank(Self.Selected.TemplateId) &&
+                                                Value(Self.Selected.TemplateId) <> Value(Coalesce(varPunchDashboardTemplateId, 0)),
+
                                                 Set(varPunchDashboardTemplateId, Value(Self.Selected.TemplateId));
                                                 Set(varPunchDashboardLoaded, false);
+                                                Set(varPunchDashboardHasSnapshot, false);
                                                 Set(varPunchDashboardError, "");
+                                                Set(varPunchDashboardMessage, "");
+                                                Set(varPunchDashboardSnapshotId, Blank());
+                                                Set(varPunchDashboardLastRefresh, Blank());
 
-                                                Set(varGlobalLoading, true);
-                                                Set(varGlobalLoadingMsg, "Loading Punch Dashboard...");
-                                                Set(varGlobalLoadingSubMsg, "Loading selected punch template");
-                                                Set(varGlobalLoadingScope, "HOME");
-                                                Set(varGlobalLoadAction, "LOAD_PUNCH_DASHBOARD");
-                                                Set(varGlobalLoadPending, true)
+                                                Clear(colPunchDashboardSnapshotInfo);
+                                                Clear(colPunchDashboardSummary);
+                                                Clear(colPunchDashboardMatrix);
+                                                Clear(colPunchDashboardTimeline);
+                                                Clear(colPunchDashboardInsights);
+                                                Clear(colPunchDashboardSubsystems);
+                                                Clear(colPunchDashboardSubcontractors);
+
+                                                Set(varHomeDashboard, "PUNCHES");
+                                                Select(btnHome_RequestDashboardLoad)
                                             )
                                           SelectMultiple: =false
                                           X: =Parent.Width - 340
