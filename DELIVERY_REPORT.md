@@ -26,3 +26,9 @@
 ## Required target validation
 
 Power Apps Studio must import and compile the source files. Test project selection, refresh, retry/dismiss, KPI navigation, insight navigation, loading, no-data and error states at the target resolutions.
+
+
+## Corrección PA1001
+
+- Eliminada una declaración duplicada y vacía de `conHomeDashboardTabs` que Power Apps interpretaba como un objeto nombrado con valor nulo.
+- Línea afectada en el entregable anterior: 1181.

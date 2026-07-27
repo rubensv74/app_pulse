@@ -1019,7 +1019,8 @@ Screens:
                                           X: =16
                                           Y: =10
                         - cmpHomeExecutiveAlert:
-                            Control: cmp_ExecutiveAlertBanner
+                            Control: CanvasComponent
+                            ComponentName: cmp_ExecutiveAlertBanner
                             Properties:
                               ActionText: ="Retry"
                               DangerColor: =varTheme_Red
@@ -1057,7 +1058,8 @@ Screens:
                               Width: =Parent.Width - 18
                             Children:
                               - cmpHomeKpiSectionHeader:
-                                  Control: cmp_DashboardSectionHeader
+                                  Control: CanvasComponent
+                                  ComponentName: cmp_DashboardSectionHeader
                                   Properties:
                                     AccentColor: =varTheme_PulseBlueDark
                                     Height: =36
@@ -1071,7 +1073,8 @@ Screens:
                                     X: =14
                                     Y: =0
                               - cmpHomeKpiProgress:
-                                  Control: cmp_ExecutiveKpiCard
+                                  Control: CanvasComponent
+                                  ComponentName: cmp_ExecutiveKpiCard
                                   Properties:
                                     AccentColor: =varTheme_PulseBlueDark
                                     BorderColor: =varTheme_Border
@@ -1091,7 +1094,8 @@ Screens:
                                     X: =10
                                     Y: =36
                               - cmpHomeKpiTasks:
-                                  Control: cmp_ExecutiveKpiCard
+                                  Control: CanvasComponent
+                                  ComponentName: cmp_ExecutiveKpiCard
                                   Properties:
                                     AccentColor: =varTheme_PulseBlueDark
                                     BorderColor: =varTheme_Border
@@ -1111,7 +1115,8 @@ Screens:
                                     X: =cmpHomeKpiProgress.X + cmpHomeKpiProgress.Width + 12
                                     Y: =36
                               - cmpHomeKpiPunches:
-                                  Control: cmp_ExecutiveKpiCard
+                                  Control: CanvasComponent
+                                  ComponentName: cmp_ExecutiveKpiCard
                                   Properties:
                                     AccentColor: =varTheme_Amber
                                     BorderColor: =varTheme_Border
@@ -1131,7 +1136,8 @@ Screens:
                                     X: =cmpHomeKpiTasks.X + cmpHomeKpiTasks.Width + 12
                                     Y: =36
                               - cmpHomeKpiPendingSubsystems:
-                                  Control: cmp_ExecutiveKpiCard
+                                  Control: CanvasComponent
+                                  ComponentName: cmp_ExecutiveKpiCard
                                   Properties:
                                     AccentColor: =varTheme_Red
                                     BorderColor: =varTheme_Border
@@ -1151,7 +1157,8 @@ Screens:
                                     X: =cmpHomeKpiPunches.X + cmpHomeKpiPunches.Width + 12
                                     Y: =36
                         - cmpHomeDashboardSkeleton:
-                            Control: cmp_SkeletonLoader
+                            Control: CanvasComponent
+                            ComponentName: cmp_SkeletonLoader
                             Properties:
                               BackgroundColor: =varTheme_Surface
                               BorderColor: =varTheme_Border
@@ -1161,7 +1168,8 @@ Screens:
                               VisibleState: =!IsBlank(varProjectId) && (varExecutiveDashboardStatus = "LOADING" || varGlobalLoading || varHomeLoading || varPunchDashboardLoading)
                               Width: =Parent.Width - 18
                         - cmpHomeDashboardEmptyState:
-                            Control: cmp_EmptyState
+                            Control: CanvasComponent
+                            ComponentName: cmp_EmptyState
                             Properties:
                               AccentColor: =varTheme_PulseBlueDark
                               ActionText: =If(IsBlank(varProjectId), "Select project", "Refresh")
@@ -1178,7 +1186,6 @@ Screens:
                               Title: =If(IsBlank(varProjectId), "Select a project", If(varExecutiveDashboardStatus = "ERROR", "Dashboard unavailable", If(varHomeNoData, "No data available", "Access restricted")))
                               Visible: =IsBlank(varProjectId) || varExecutiveDashboardStatus = "ERROR" || (!varGlobalLoading && !varHomeLoading && !varPunchDashboardLoading && varHomeNoData)
                               Width: =Parent.Width - 18
-                        - conHomeDashboardTabs:
                         - conHomeDashboardTabs:
                             Control: GroupContainer@1.5.0
                             Variant: ManualLayout
@@ -3532,7 +3539,8 @@ Screens:
                                           Width: =Parent.Width
                                         Children:
                                           - cmpPunchInsightsHeader:
-                                              Control: cmp_DashboardSectionHeader
+                                              Control: CanvasComponent
+                                              ComponentName: cmp_DashboardSectionHeader
                                               Properties:
                                                 AccentColor: =varTheme_PulseBlueDark
                                                 Height: =54
@@ -3547,7 +3555,8 @@ Screens:
                                                 X: =18
                                                 Y: =8
                                           - cmpPunchInsightPrimary:
-                                              Control: cmp_ExecutiveInsightCard
+                                              Control: CanvasComponent
+                                              ComponentName: cmp_ExecutiveInsightCard
                                               Properties:
                                                 BorderColor: =varTheme_Border
                                                 Category: =If(CountRows(colPunchDashboardInsights) > 0, Coalesce(First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).InsightType, "Top Risk"), "Status")
@@ -3567,7 +3576,8 @@ Screens:
                                                 X: =18
                                                 Y: =72
                                           - cmpPunchInsightSecondary:
-                                              Control: cmp_ExecutiveInsightCard
+                                              Control: CanvasComponent
+                                              ComponentName: cmp_ExecutiveInsightCard
                                               Properties:
                                                 BorderColor: =varTheme_Border
                                                 Category: =If(CountRows(colPunchDashboardInsights) > 1, Coalesce(Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).InsightType, "Hotspot"), "Recommendation")

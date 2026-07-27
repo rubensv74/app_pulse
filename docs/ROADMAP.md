@@ -12,7 +12,7 @@ Each epic is closed with one functional deliverable. Micro-sprints are reserved 
 
 | Epic | Name | Status | Exit criterion |
 |---|---|---|---|
-| EPIC-01 | Executive Home | In progress | Home provides project context, KPI strip, alerts, insights, loading states, empty states and contextual navigation. |
+| EPIC-01 | Executive Home | Completed | Home provides project context, KPI strip, alerts, insights, loading states, empty states and contextual navigation. |
 | EPIC-02 | Tasks Intelligence | Planned | Tasks dashboard provides configurable operational KPIs, drill-through and executive trends. |
 | EPIC-03 | Punch Intelligence | Planned | Punch dashboard provides template-aware analytics, status mapping and drill-through at scale. |
 | EPIC-04 | Overview Premium | Planned | PHR overview is responsive, performant and governed by published report configuration. |
