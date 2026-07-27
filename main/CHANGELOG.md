@@ -1,5 +1,35 @@
 # Changelog
 
+## Sprint 07H — Pending Subsystem Task Navigation
+
+### Objective
+- Make the Home pending-subsystem operation open the filtered Tasks screen instead of incorrectly reloading the Home Tasks dashboard.
+
+### Changed
+- Reworked `btnHome_OpenNodeOperations_1` to use the same Tasks navigation contract as the visible pending-subsystem row action.
+- Added the Home return context, subsystem and discipline filters, automatic Tasks loading, and task collection reset before navigation.
+- Added the Tasks page metadata required by the application shell.
+- Cleared any stale Home global-loader state before leaving the screen.
+- Removed the incorrect `LOAD_TASKS` dispatch from this operation; `LOAD_TASKS` remains reserved for refreshing the Home Tasks dashboard.
+
+### Files modified
+- `screens/Home/scr_Home_1.pa.yaml`
+- `CHANGELOG.md`
+
+### Validation
+- Parsed the complete Power Apps YAML with PyYAML `BaseLoader`.
+- Verified control-name uniqueness across the complete screen source.
+- Verified `btnHome_OpenNodeOperations_1` now navigates to `scr_Tasks` with `varTasks_AutoLoad = true`.
+- Verified the operation no longer assigns `varGlobalLoadAction = "LOAD_TASKS"`.
+- Verified the Home dashboard dispatcher and existing Flow references remain unchanged.
+- Verified the differential ZIP opens successfully and contains only the two modified files.
+
+### Limitations
+- Power Apps Studio import/compile is not available in the execution environment; validation is structural and static.
+
+### Open issues
+- None identified within Sprint 07H scope.
+
 ## Sprint 07G — Tasks Dashboard Load Orchestration
 
 ### Objective

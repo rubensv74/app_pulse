@@ -4379,26 +4379,35 @@ Screens:
 
                   Notify("Select a pending subsystem first.", NotificationType.Warning),
 
-                  Set(varAppView, "Tasks");
-
+                  Set(varTasks_ReturnView, "Home");
                   Set(varTasks_ContextSource, "Hive");
-                  Set(varTasks_Filter_Subsystem, varSelectedHiveSubsystem.SubsystemCode);
-                  Set(varFilter_ElementDiscipline, varSelectedHiveSubsystem.Discipline);
+
+                  Set(varTasks_Filter_Subsystem, Text(varSelectedHiveSubsystem.SubsystemCode));
+                  Set(varFilter_ElementDiscipline, Text(varSelectedHiveSubsystem.Discipline));
                   Set(varFilter_Subcontractor, "");
 
                   Set(varTasks_Page, 1);
                   Set(varTasks_PageSize, 50);
                   Set(varTasks_HasSearched, true);
 
+                  Set(varApplySubsystemDefault, true);
+                  Set(varTasks_AutoLoad, true);
 
+                  Clear(colTasks);
 
-                  Set(varGlobalLoading, true);
-                  Set(varGlobalLoadingMsg, "Loading Tasks...");
-                  Set(varGlobalLoadingSubMsg, "Opening subsystem task list");
-                  Set(varGlobalLoadingScope, "TASKS");
+                  Set(varGlobalLoading, false);
+                  Set(varGlobalLoadingMsg, "");
+                  Set(varGlobalLoadingSubMsg, "");
+                  Set(varGlobalLoadingScope, "");
+                  Set(varGlobalLoadAction, "");
+                  Set(varGlobalLoadPending, false);
 
-                  Set(varGlobalLoadAction, "LOAD_TASKS");
-                  Set(varGlobalLoadPending, true)
+                  Set(varAppView, "Tasks");
+                  Set(varPageKey, "TASKS");
+                  Set(varPageTitle, "Tasks");
+                  Set(varPageSubtitle, "Inspection task management");
+
+                  Navigate(scr_Tasks, ScreenTransition.None)
               )
             Visible: =false
             X: =140
