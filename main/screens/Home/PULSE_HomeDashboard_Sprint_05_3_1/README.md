@@ -21,3 +21,15 @@
 
 ## Observación sobre estados
 El SQL identifica Open, Cleared y Closed por `StatusCode` o `StatusName`. Si el proyecto utiliza códigos distintos, deben incorporarse en los bloques `IN (...)` del procedimiento.
+
+
+## Revisión 05.3.1 — Corrección PA2108
+
+Se han eliminado `RadiusTopLeft` y `RadiusTopRight` únicamente de las barras
+`Rectangle@2.3.0` del Timeline:
+
+- `recPunchTimelineOpen`
+- `recPunchTimelineCleared`
+- `recPunchTimelineClosed`
+
+El resto de controles y la funcionalidad del Sprint 05.3 permanecen sin cambios.

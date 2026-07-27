@@ -1,5 +1,5 @@
 Screens:
-  scr_Home:
+  scr_Home_1:
     Properties:
       Fill: =varTheme_PageBg
       LoadingSpinnerColor: =RGBA(0, 120, 212, 1)
@@ -239,7 +239,7 @@ Screens:
 
 
     Children:
-      - tmrGlobalLoader:
+      - tmrGlobalLoader_1:
           Control: Timer@2.1.0
           Properties:
             AutoStart: =varGlobalLoadPending
@@ -269,10 +269,10 @@ Screens:
                       varGlobalLoadAction,
 
                       "PROJECT_CHANGE",
-                          Select(btnHome_ProjectChange_Commit),
+                          Select(btnHome_ProjectChange_Commit_1),
 
                       "LOAD_HOME",
-                          Select(btnHome_LoadHive),
+                          Select(btnHome_LoadHive_1),
 
                       "LOAD_PUNCH_DASHBOARD",
                           Select(btnHome_LoadPunchDashboard),
@@ -306,16 +306,16 @@ Screens:
             Visible: =false
             X: =100
             Y: =100
-      - conLayer_Drawer:
+      - conLayer_Drawer_3:
           Control: GroupContainer@1.5.0
           Variant: ManualLayout
           Properties:
             Fill: =RGBA(0,0,0,0.25)
             Height: =App.Height
-            Visible: =comp_DetailDrawer.IsOpen
+            Visible: =comp_DetailDrawer_3.IsOpen
             Width: =App.Width
           Children:
-            - comp_DetailDrawer:
+            - comp_DetailDrawer_3:
                 Control: CanvasComponent
                 ComponentName: cmp_DetailDrawer_old
                 Properties:
@@ -344,10 +344,10 @@ Screens:
 
                     Set(varCT_DefsError, "");
 
-                    Select(btnCT_LoadDefs)
-                  OnSaveCustomField: =Select(btnCT_SaveFieldDef);
+                    Select(btnCT_LoadDefs_3)
+                  OnSaveCustomField: =Select(btnCT_SaveFieldDef_3);
                   OnSaved: =
-                  OnToggleFieldActiveRequested: =Select(btnCT_SetActive)
+                  OnToggleFieldActiveRequested: =Select(btnCT_SetActive_3)
                   ProjectId: =varProjectId
                   RecordId: =varDrawerRecordId
                   SelectedRecord: =varDrawerSelectedRecord
@@ -361,7 +361,7 @@ Screens:
                   UserRole: =varUserRole
                   Visible: =varShowDetailDrawer
                   Width: =App.Width
-            - btnDrawerLoad_Custom:
+            - btnDrawerLoad_Custom_3:
                 Control: Button@0.0.45
                 Properties:
                   OnSelect: |-
@@ -379,9 +379,9 @@ Screens:
                     With(
                         {
                             resp: WarRoom_GetCustomBundle.Run(
-                                comp_DetailDrawer.ProjectId,
-                                comp_DetailDrawer.EntityType,
-                                comp_DetailDrawer.RecordId
+                                comp_DetailDrawer_3.ProjectId,
+                                comp_DetailDrawer_3.EntityType,
+                                comp_DetailDrawer_3.RecordId
                             )
                         },
 
@@ -433,7 +433,7 @@ Screens:
                         colCT_Quick,
                         AddColumns(
                             colCT_Merged_Base,
-                            'CurrentValue',
+                            CurrentValue,
                             LookUp(colCT_Merged_UI, FieldKey = ThisRecord.FieldKey)
                         )
                     );
@@ -442,7 +442,7 @@ Screens:
                   Visible: =false
                   X: =60
                   Y: =60
-            - btnDrawerLoad_Comments:
+            - btnDrawerLoad_Comments_3:
                 Control: Button@0.0.45
                 Properties:
                   OnSelect: |-
@@ -494,7 +494,7 @@ Screens:
                   Visible: =false
                   X: =80
                   Y: =80
-            - btnDrawerLoad:
+            - btnDrawerLoad_1:
                 Control: Button@0.0.45
                 Properties:
                   OnSelect: |-
@@ -502,8 +502,8 @@ Screens:
 
                     Switch(
                         varDrawerTab,
-                        "Comments", Select(btnDrawerLoad_Comments),
-                        "Custom", Select(btnDrawerLoad_Custom),
+                        "Comments", Select(btnDrawerLoad_Comments_3),
+                        "Custom", Select(btnDrawerLoad_Custom_3),
                         "Overview", Set(varDrawerIsLoading, false),
                         "History", Set(varDrawerIsLoading, false),
                         Set(varDrawerIsLoading, false)
@@ -511,15 +511,15 @@ Screens:
                   Visible: =false
                   X: =40
                   Y: =40
-            - btnDrawerRefreshFromTab:
+            - btnDrawerRefreshFromTab_3:
                 Control: Button@0.0.45
                 Properties:
                   OnSelect: |-
                     =
                     Set(varDrawerTab, "Custom");
-                    Select(btnDrawerLoad_Custom)
+                    Select(btnDrawerLoad_Custom_3)
                   Visible: =false
-            - btnCT_LoadDefs:
+            - btnCT_LoadDefs_3:
                 Control: Button@0.0.45
                 Properties:
                   OnSelect: |-
@@ -532,8 +532,8 @@ Screens:
                     Set(
                         varCT_DefsResp,
                         WarRoom_ListCustomFieldDefs.Run(
-                            comp_DetailDrawer.ProjectId,
-                            comp_DetailDrawer.EntityType,
+                            comp_DetailDrawer_3.ProjectId,
+                            comp_DetailDrawer_3.EntityType,
                             If(varCT_ShowInactiveDefs, 1, 0)
                         )
                     );
@@ -596,7 +596,7 @@ Screens:
                   Visible: =false
                   X: =100
                   Y: =100
-            - btnCT_SetActive:
+            - btnCT_SetActive_3:
                 Control: Button@0.0.45
                 Properties:
                   OnSelect: |-
@@ -605,27 +605,27 @@ Screens:
                     With(
                         {
                             resp: WarRoom_SetCustomFieldActive.Run(
-                                comp_DetailDrawer.ProjectId,
-                                comp_DetailDrawer.EntityType,
+                                comp_DetailDrawer_3.ProjectId,
+                                comp_DetailDrawer_3.EntityType,
                                 varCT_Toggle_FieldKey,
                                 varCT_Toggle_IsActive,
-                                comp_DetailDrawer.UserEmail
+                                comp_DetailDrawer_3.UserEmail
                             )
                         },
-                        Select(btnCT_LoadDefs);
-                        Select(btnDrawerLoad_Custom)
+                        Select(btnCT_LoadDefs_3);
+                        Select(btnDrawerLoad_Custom_3)
                     );
                   Visible: =false
                   X: =140
                   Y: =140
-            - btnCT_SaveFieldDef:
+            - btnCT_SaveFieldDef_3:
                 Control: Button@0.0.45
                 Properties:
-                  OnSelect: "=\r\nIf(\r\n    IsBlank(Trim(varCT_Edit_Label)),\r\n    Set(varCT_SaveField_Error, \"Label is required.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    IsBlank(Trim(varCT_Edit_FieldKey)),\r\n    Set(varCT_SaveField_Error, \"Field key is required.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    !IsBlank(\r\n        LookUp(\r\n            colCT_Defs_Admin,\r\n            Lower(Trim(FieldKey)) = Lower(Trim(varCT_Edit_FieldKey)) &&\r\n            FieldDefId <> Coalesce(varCT_Edit_FieldDefId, 0)\r\n        )\r\n    ),\r\n\r\n    Set(varCT_SaveField_Error, \"This Field Key already exists.\");\r\n    Set(varCT_SaveField_IsLoading, false);\r\n    Notify(\"This Field Key already exists. Use another key or edit the existing field.\", NotificationType.Error),\r\n\r\n    Value(varCT_Edit_SortOrder) <= 0,\r\n    Set(varCT_SaveField_Error, \"Sort order must be greater than zero.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    (varCT_Edit_FieldType = \"Choice\" || varCT_Edit_FieldType = \"MultiChoice\") && IsBlank(Trim(varCT_Edit_OptionsJson)),\r\n    Set(varCT_SaveField_Error, \"OptionsJson is required for Choice and MultiChoice fields.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    With(\r\n        {\r\n            resp: WarRoom_UpsertCustomFieldDef.Run(\r\n                Coalesce(varCT_Edit_FieldDefId, 0),\r\n                comp_DetailDrawer.ProjectId,\r\n                comp_DetailDrawer.EntityType,\r\n                Trim(varCT_Edit_Label),\r\n                varCT_Edit_FieldType,\r\n                Trim(varCT_Edit_HelpText),\r\n                Value(varCT_Edit_SortOrder),\r\n                If(IsBlank(Trim(varCT_Edit_OptionsJson)), \" \", Trim(varCT_Edit_OptionsJson)),\r\n                comp_DetailDrawer.UserEmail,\r\n                Lower(Trim(varCT_Edit_FieldKey)),\r\n                varCT_Edit_IsRequired,\r\n                varCT_Edit_IsPinned,\r\n                varCT_Edit_IsActive,\r\n                varCT_Edit_IsFilterable,\r\nvarCT_Edit_ShowInQuickFilters,\r\nCoalesce(varCT_Edit_FilterOrder, varCT_Edit_SortOrder, 1000),\r\nCoalesce(varCT_Edit_FilterMode, \"Equals\")\r\n            )\r\n        },\r\n        \r\n        Set(varShowCustomAddFields, false);\r\n        Set(varCT_SaveField_Error, \"\");\r\n        Set(varCT_SaveField_IsLoading, false);\r\n\r\n        Select(btnCT_LoadDefs);\r\n\r\n        Set(varCT_LoadKey, \"\");\r\n        Select(btnDrawerLoad_Custom);\r\n\r\n        Notify(\"Field definition saved successfully.\", NotificationType.Success)\r\n    )\r\n)"
+                  OnSelect: "=\r\nIf(\r\n    IsBlank(Trim(varCT_Edit_Label)),\r\n    Set(varCT_SaveField_Error, \"Label is required.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    IsBlank(Trim(varCT_Edit_FieldKey)),\r\n    Set(varCT_SaveField_Error, \"Field key is required.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    !IsBlank(\r\n        LookUp(\r\n            colCT_Defs_Admin,\r\n            Lower(Trim(FieldKey)) = Lower(Trim(varCT_Edit_FieldKey)) &&\r\n            FieldDefId <> Coalesce(varCT_Edit_FieldDefId, 0)\r\n        )\r\n    ),\r\n\r\n    Set(varCT_SaveField_Error, \"This Field Key already exists.\");\r\n    Set(varCT_SaveField_IsLoading, false);\r\n    Notify(\"This Field Key already exists. Use another key or edit the existing field.\", NotificationType.Error),\r\n\r\n    Value(varCT_Edit_SortOrder) <= 0,\r\n    Set(varCT_SaveField_Error, \"Sort order must be greater than zero.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    (varCT_Edit_FieldType = \"Choice\" || varCT_Edit_FieldType = \"MultiChoice\") && IsBlank(Trim(varCT_Edit_OptionsJson)),\r\n    Set(varCT_SaveField_Error, \"OptionsJson is required for Choice and MultiChoice fields.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    With(\r\n        {\r\n            resp: WarRoom_UpsertCustomFieldDef.Run(\r\n                Coalesce(varCT_Edit_FieldDefId, 0),\r\n                comp_DetailDrawer_3.ProjectId,\r\n                comp_DetailDrawer_3.EntityType,\r\n                Trim(varCT_Edit_Label),\r\n                varCT_Edit_FieldType,\r\n                Trim(varCT_Edit_HelpText),\r\n                Value(varCT_Edit_SortOrder),\r\n                If(IsBlank(Trim(varCT_Edit_OptionsJson)), \" \", Trim(varCT_Edit_OptionsJson)),\r\n                comp_DetailDrawer_3.UserEmail,\r\n                Lower(Trim(varCT_Edit_FieldKey)),\r\n                varCT_Edit_IsRequired,\r\n                varCT_Edit_IsPinned,\r\n                varCT_Edit_IsActive,\r\n                varCT_Edit_IsFilterable,\r\nvarCT_Edit_ShowInQuickFilters,\r\nCoalesce(varCT_Edit_FilterOrder, varCT_Edit_SortOrder, 1000),\r\nCoalesce(varCT_Edit_FilterMode, \"Equals\")\r\n            )\r\n        },\r\n        \r\n        Set(varShowCustomAddFields, false);\r\n        Set(varCT_SaveField_Error, \"\");\r\n        Set(varCT_SaveField_IsLoading, false);\r\n\r\n        Select(btnCT_LoadDefs_3);\r\n\r\n        Set(varCT_LoadKey, \"\");\r\n        Select(btnDrawerLoad_Custom_3);\r\n\r\n        Notify(\"Field definition saved successfully.\", NotificationType.Success)\r\n    )\r\n)"
                   Visible: =false
                   X: =160
                   Y: =160
-      - conHomeScreenRoot:
+      - conHomeScreenRoot_1:
           Control: GroupContainer@1.5.0
           Variant: AutoLayout
           Properties:
@@ -638,7 +638,7 @@ Screens:
             RadiusTopRight: =0
             Width: =App.Width
           Children:
-            - cmp_NavApp:
+            - cmp_NavApp_1:
                 Control: CanvasComponent
                 ComponentName: cmp_SidebarNav
                 Properties:
@@ -650,13 +650,13 @@ Screens:
                   IsCollapsed: =true
                   Items: =colSidebarNavItems
                   NavItems: =colSidebarNavItems
-                  OnSelectItem: "=\n\nWith(\n    {\n        _key: Lower(Trim(Self.SelectedItemKey)),\n        _hasProject: !IsBlank(varProjectId),\n        _hasConfig: varProjectHasReportConfig || varHomeHiveLoaded || varProjectHasPHRData\n    },\n\n    If(\n        _key = \"superadmin\",\n\n        Set(varGlobalLoading, false);\n        Set(varGlobalLoadingMsg, \"\");\n        Set(varGlobalLoadingSubMsg, \"\");\n        Set(varGlobalLoadingScope, \"\");\n        Set(varGlobalLoadAction, \"\");\n        Set(varGlobalLoadPending, false);\n\n        Set(varPHR_IsLoading, false);\n        Set(varOps_IsLoading, false);\n        Set(varTasks_IsLoading, false);\n        Set(varPunches_IsLoading, false);\n        Set(varCfg_IsLoading, false);\n\n        Set(varAppView, \"SuperAdmin\");\n        Set(varPageKey, \"SUPERADMIN\");\n        Set(varPageTitle, \"Administration\");\n        Set(varPageSubtitle, \"Platform configuration and governance\");\n\n        Navigate(scr_SuperAdmin, ScreenTransition.None),\n\n        If(\n            _key <> \"home\" && !_hasProject,\n\n            Notify(\"Please select a project first.\", NotificationType.Warning);\n\n            Set(varAppView, \"Home\");\n            Set(varPageKey, \"HOME\");\n            Set(varPageTitle, \"Home\");\n            Set(varPageSubtitle, \"Project command center\");\n\n            Navigate(scr_Home, ScreenTransition.None),\n\n            If(\n                _key in [\"overview\", \"tasks\", \"punches\", \"briefing\", \"config\", \"skyline\"] && !_hasConfig,\n\n                Notify(\n                    \"This project has no published report configuration yet.\",\n                    NotificationType.Warning\n                );\n\n                Set(varAppView, \"Home\");\n                Set(varPageKey, \"HOME\");\n                Set(varPageTitle, \"Home\");\n                Set(varPageSubtitle, \"Project command center\");\n\n                Navigate(scr_Home, ScreenTransition.None),\n\n                Switch(\n                    _key,\n\n                    \"skyline\",\n                    Set(varAppView, \"Skyline\");\n                    Set(varPageKey, \"SKYLINE\");\n                    Set(varPageTitle, \"Delivery Skyline\");\n                    Set(varPageSubtitle, \"Weekly subsystem delivery risk and workload forecast\");\n                    Set(varSkylineLoaded, false);\n                    Set(varSkylineError, \"\");\n                    Clear(colSkylineRaw);\n                    Clear(colSkylineWeeks);\n                    Clear(colSkylineSelectedWeek);\n\n                    Navigate(scr_Skyline, ScreenTransition.None),\n\n                    \n                    \"home\",\n                        Set(varGlobalLoading, false);\n                        Set(varGlobalLoadingMsg, \"\");\n                        Set(varGlobalLoadingSubMsg, \"\");\n                        Set(varGlobalLoadingScope, \"\");\n                        Set(varGlobalLoadAction, \"\");\n                        Set(varGlobalLoadPending, false);\n\n                        Set(varPHR_IsLoading, false);\n                        Set(varOps_IsLoading, false);\n                        Set(varTasks_IsLoading, false);\n                        Set(varPunches_IsLoading, false);\n                        Set(varCfg_IsLoading, false);\n\n                        Set(varAppView, \"Home\");\n                        Set(varPageKey, \"HOME\");\n                        Set(varPageTitle, \"Home\");\n                        Set(varPageSubtitle, \"Project command center\");\n                        Set(varHomeViewMode, \"DASHBOARD\");\n\n                        Navigate(scr_Home, ScreenTransition.None),\n\n                    \"overview\",\n                        Set(varAppView, \"Overview\");\n                        Set(varPageKey, \"OVERVIEW\");\n                        Set(varPageTitle, \"Overview\");\n                        Set(varPageSubtitle, \"Project Handover Report by subsystem, discipline and form family\");\n                        Set(varOps_ViewMode, \"OVERVIEW\");\n\n                        Navigate(scr_Overview, ScreenTransition.None),\n\n\n\n                    \"tasks\",\n                        Set(varAppView, \"Tasks\");\n                        Set(varPageKey, \"TASKS\");\n                        Set(varPageTitle, \"Tasks\");\n                        Set(varPageSubtitle, \"Inspection task management\");\n\n                        Navigate(scr_Tasks, ScreenTransition.None),\n\n                    \"punches\",\n                        Set(varAppView, \"Punches\");\n                        Set(varPageKey, \"PUNCHES\");\n                        Set(varPageTitle, \"Punch List\");\n                        Set(varPageSubtitle, \"Punch item management\");\n\n                        Navigate(scr_Punches, ScreenTransition.None),\n\n                    \"briefing\",\n                        Set(varAppView, \"Briefing\");\n                        Set(varPageKey, \"BRIEFING\");\n                        Set(varPageTitle, \"Briefing\");\n                        Set(varPageSubtitle, \"Project reporting and communication\");\n\n                        Navigate(scr_Briefing, ScreenTransition.None),\n\n                    \"config\",\n                        Set(varAppView, \"Config\");\n                        Set(varPageKey, \"CONFIG\");\n                        Set(varPageTitle, \"Configuration\");\n                        Set(varPageSubtitle, \"Report structure and scope management\");\n\n                        Navigate(scr_Config_NEW, ScreenTransition.None),\n\n                    Notify(\"Key not mapped: [\" & _key & \"]\", NotificationType.Error)\n                )\n            )\n        )\n    )\n)"
+                  OnSelectItem: "=\n\nWith(\n    {\n        _key: Lower(Trim(Self.SelectedItemKey)),\n        _hasProject: !IsBlank(varProjectId),\n        _hasConfig: varProjectHasReportConfig || varHomeHiveLoaded || varProjectHasPHRData\n    },\n\n    If(\n        _key = \"superadmin\",\n\n        Set(varGlobalLoading, false);\n        Set(varGlobalLoadingMsg, \"\");\n        Set(varGlobalLoadingSubMsg, \"\");\n        Set(varGlobalLoadingScope, \"\");\n        Set(varGlobalLoadAction, \"\");\n        Set(varGlobalLoadPending, false);\n\n        Set(varPHR_IsLoading, false);\n        Set(varOps_IsLoading, false);\n        Set(varTasks_IsLoading, false);\n        Set(varPunches_IsLoading, false);\n        Set(varCfg_IsLoading, false);\n\n        Set(varAppView, \"SuperAdmin\");\n        Set(varPageKey, \"SUPERADMIN\");\n        Set(varPageTitle, \"Administration\");\n        Set(varPageSubtitle, \"Platform configuration and governance\");\n\n        Navigate(scr_SuperAdmin, ScreenTransition.None),\n\n        If(\n            _key <> \"home\" && !_hasProject,\n\n            Notify(\"Please select a project first.\", NotificationType.Warning);\n\n            Set(varAppView, \"Home\");\n            Set(varPageKey, \"HOME\");\n            Set(varPageTitle, \"Home\");\n            Set(varPageSubtitle, \"Project command center\");\n\n            Navigate(scr_Home_1, ScreenTransition.None),\n\n            If(\n                _key in [\"overview\", \"tasks\", \"punches\", \"briefing\", \"config\", \"skyline\"] && !_hasConfig,\n\n                Notify(\n                    \"This project has no published report configuration yet.\",\n                    NotificationType.Warning\n                );\n\n                Set(varAppView, \"Home\");\n                Set(varPageKey, \"HOME\");\n                Set(varPageTitle, \"Home\");\n                Set(varPageSubtitle, \"Project command center\");\n\n                Navigate(scr_Home_1, ScreenTransition.None),\n\n                Switch(\n                    _key,\n\n                    \"skyline\",\n                    Set(varAppView, \"Skyline\");\n                    Set(varPageKey, \"SKYLINE\");\n                    Set(varPageTitle, \"Delivery Skyline\");\n                    Set(varPageSubtitle, \"Weekly subsystem delivery risk and workload forecast\");\n                    Set(varSkylineLoaded, false);\n                    Set(varSkylineError, \"\");\n                    Clear(colSkylineRaw);\n                    Clear(colSkylineWeeks);\n                    Clear(colSkylineSelectedWeek);\n\n                    Navigate(scr_Skyline, ScreenTransition.None),\n\n                    \n                    \"home\",\n                        Set(varGlobalLoading, false);\n                        Set(varGlobalLoadingMsg, \"\");\n                        Set(varGlobalLoadingSubMsg, \"\");\n                        Set(varGlobalLoadingScope, \"\");\n                        Set(varGlobalLoadAction, \"\");\n                        Set(varGlobalLoadPending, false);\n\n                        Set(varPHR_IsLoading, false);\n                        Set(varOps_IsLoading, false);\n                        Set(varTasks_IsLoading, false);\n                        Set(varPunches_IsLoading, false);\n                        Set(varCfg_IsLoading, false);\n\n                        Set(varAppView, \"Home\");\n                        Set(varPageKey, \"HOME\");\n                        Set(varPageTitle, \"Home\");\n                        Set(varPageSubtitle, \"Project command center\");\n                        Set(varHomeViewMode, \"DASHBOARD\");\n\n                        Navigate(scr_Home_1, ScreenTransition.None),\n\n                    \"overview\",\n                        Set(varAppView, \"Overview\");\n                        Set(varPageKey, \"OVERVIEW\");\n                        Set(varPageTitle, \"Overview\");\n                        Set(varPageSubtitle, \"Project Handover Report by subsystem, discipline and form family\");\n                        Set(varOps_ViewMode, \"OVERVIEW\");\n\n                        Navigate(scr_Overview, ScreenTransition.None),\n\n\n\n                    \"tasks\",\n                        Set(varAppView, \"Tasks\");\n                        Set(varPageKey, \"TASKS\");\n                        Set(varPageTitle, \"Tasks\");\n                        Set(varPageSubtitle, \"Inspection task management\");\n\n                        Navigate(scr_Tasks, ScreenTransition.None),\n\n                    \"punches\",\n                        Set(varAppView, \"Punches\");\n                        Set(varPageKey, \"PUNCHES\");\n                        Set(varPageTitle, \"Punch List\");\n                        Set(varPageSubtitle, \"Punch item management\");\n\n                        Navigate(scr_Punches, ScreenTransition.None),\n\n                    \"briefing\",\n                        Set(varAppView, \"Briefing\");\n                        Set(varPageKey, \"BRIEFING\");\n                        Set(varPageTitle, \"Briefing\");\n                        Set(varPageSubtitle, \"Project reporting and communication\");\n\n                        Navigate(scr_Briefing, ScreenTransition.None),\n\n                    \"config\",\n                        Set(varAppView, \"Config\");\n                        Set(varPageKey, \"CONFIG\");\n                        Set(varPageTitle, \"Configuration\");\n                        Set(varPageSubtitle, \"Report structure and scope management\");\n\n                        Navigate(scr_Config_NEW, ScreenTransition.None),\n\n                    Notify(\"Key not mapped: [\" & _key & \"]\", NotificationType.Error)\n                )\n            )\n        )\n    )\n)"
                   OnToggleCollapse: =
                   ProjectCode: =Coalesce(Text(varSelectedProject.ProjectCode), "")
                   ProjectName: =Coalesce(varSelectedProject.ProjectName, "")
                   UserRole: ="Text"
                   Width: =154
-            - conHomeContent:
+            - conHomeContent_1:
                 Control: GroupContainer@1.5.0
                 Variant: AutoLayout
                 Properties:
@@ -671,9 +671,9 @@ Screens:
                   RadiusBottomRight: =0
                   RadiusTopLeft: =0
                   RadiusTopRight: =0
-                  Width: =App.Width - cmp_NavApp.Width
+                  Width: =App.Width - cmp_NavApp_1.Width
                 Children:
-                  - con_Home:
+                  - con_Home_1:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
                       Properties:
@@ -689,7 +689,7 @@ Screens:
                         RadiusTopRight: =0
                         Visible: =varView_Home
                       Children:
-                        - conView_Home_Header:
+                        - conView_Home_Header_1:
                             Control: GroupContainer@1.5.0
                             Variant: AutoLayout
                             Properties:
@@ -714,7 +714,7 @@ Screens:
                               X: =40
                               Y: =40
                             Children:
-                              - lblHomeTitle:
+                              - lblHomeTitle_1:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     Color: =varTheme_Text
@@ -736,7 +736,7 @@ Screens:
                                     Width: =90
                                     X: =40
                                     Y: =40
-                        - conExecutiveHeader:
+                        - conExecutiveHeader_1:
                             Control: GroupContainer@1.5.0
                             Variant: AutoLayout
                             Properties:
@@ -761,7 +761,7 @@ Screens:
                               RadiusTopRight: =0
                               Width: =Parent.Width
                             Children:
-                              - conProjectSelectorCard:
+                              - conProjectSelectorCard_1:
                                   Control: GroupContainer@1.5.0
                                   Variant: ManualLayout
                                   Properties:
@@ -781,7 +781,7 @@ Screens:
                                     RadiusTopRight: =10
                                     Width: =440
                                   Children:
-                                    - cmbHome_ProjectSelector:
+                                    - cmbHome_ProjectSelector_1:
                                         Control: ModernCombobox@1.1.1
                                         Properties:
                                           BorderThickness: =0
@@ -831,7 +831,7 @@ Screens:
                                           Width: = Parent.Width - 64
                                           X: =47
                                           Y: =25
-                                    - Icon16:
+                                    - Icon16_1:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
                                           BorderColor: =RGBA(0, 0, 0, 0)
@@ -851,7 +851,7 @@ Screens:
                                           Width: =24
                                           X: =18
                                           Y: =25
-                                    - Text38:
+                                    - Text38_1:
                                         Control: ModernText@1.0.0
                                         Properties:
                                           Color: =varTheme_TextMuted
@@ -861,7 +861,7 @@ Screens:
                                           Width: =220
                                           X: =56
                                           Y: =8
-                              - conHome_RefreshCard:
+                              - conHome_RefreshCard_1:
                                   Control: GroupContainer@1.5.0
                                   Variant: ManualLayout
                                   Properties:
@@ -879,7 +879,7 @@ Screens:
                                     RadiusTopRight: =12
                                     Width: =280
                                   Children:
-                                    - lblExecLastRefresh:
+                                    - lblExecLastRefresh_1:
                                         Control: ModernText@1.0.0
                                         Properties:
                                           Color: =varTheme_Text
@@ -903,7 +903,7 @@ Screens:
                                           Width: =130
                                           X: =16
                                           Y: =28
-                                    - btnHomeRefreshData:
+                                    - btnHomeRefreshData_1:
                                         Control: ModernButton@1.0.0
                                         Properties:
                                           Appearance: ='ButtonCanvas.Appearance'.Secondary
@@ -933,7 +933,7 @@ Screens:
                                           Width: =110
                                           X: =Parent.Width - Self.Width - 16
                                           Y: =19
-                                    - lblOverviewRefreshTitle_1:
+                                    - lblOverviewRefreshTitle_2:
                                         Control: ModernText@1.0.0
                                         Properties:
                                           Color: =varTheme_TextMuted
@@ -966,7 +966,7 @@ Screens:
                                     FontWeight: =FontWeight.Semibold
                                     Height: =22
                                     Size: =12
-                                    Text: ="Operational Dashboard"
+                                    Text: ="Executive Dashboard"
                                     Width: =190
                                     X: =18
                                     Y: =8
@@ -976,14 +976,14 @@ Screens:
                                     Color: =varTheme_TextMuted
                                     Height: =18
                                     Size: =9
-                                    Text: =If(varHomeDashboard = "PUNCHES", "Punch analytics and drill-through", "Inspection task delivery and pending scope")
+                                    Text: =If(varHomeDashboard = "PUNCHES", "Punch analytics, hotspots and drill-through", "Inspection task delivery and pending scope")
                                     Width: =300
                                     X: =18
                                     Y: =30
                               - btnHomeTabPunches:
                                   Control: ModernButton@1.0.0
                                   Properties:
-                                    Appearance: =If(varHomeDashboard = "PUNCHES", 'ButtonCanvas.Appearance'.Primary, 'ButtonCanvas.Appearance'.Secondary)
+                                    Appearance: ='ButtonCanvas.Appearance'.Transparent
                                     BasePaletteColor: =varTheme_PulseBlueDark
                                     DisplayMode: =If(varGlobalLoading || varProjectSwitching, DisplayMode.Disabled, DisplayMode.Edit)
                                     Height: =36
@@ -1014,13 +1014,13 @@ Screens:
                                     RadiusTopLeft: =9
                                     RadiusTopRight: =9
                                     Text: ="Punches"
-                                    Width: =128
-                                    X: =Parent.Width - 276
-                                    Y: =11
+                                    Width: =118
+                                    X: =Parent.Width - 252
+                                    Y: =8
                               - btnHomeTabTasks:
                                   Control: ModernButton@1.0.0
                                   Properties:
-                                    Appearance: =If(varHomeDashboard = "TASKS", 'ButtonCanvas.Appearance'.Primary, 'ButtonCanvas.Appearance'.Secondary)
+                                    Appearance: ='ButtonCanvas.Appearance'.Transparent
                                     BasePaletteColor: =varTheme_PulseBlueDark
                                     DisplayMode: =If(varGlobalLoading || varProjectSwitching, DisplayMode.Disabled, DisplayMode.Edit)
                                     Height: =36
@@ -1050,16 +1050,37 @@ Screens:
                                     RadiusTopLeft: =9
                                     RadiusTopRight: =9
                                     Text: ="Tasks"
-                                    Width: =128
-                                    X: =Parent.Width - 140
-                                    Y: =11
-                        - conHomeShell:
+                                    Width: =118
+                                    X: =Parent.Width - 126
+                                    Y: =8
+                              - recHomeTabPunchesIndicator:
+                                  Control: Rectangle@2.3.0
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    BorderStyle: =BorderStyle.None
+                                    Fill: =varTheme_PulseBlue
+                                    Height: =3
+                                    Visible: =varHomeDashboard = "PUNCHES"
+                                    Width: =96
+                                    X: =Parent.Width - 241
+                                    Y: =53
+                              - recHomeTabTasksIndicator:
+                                  Control: Rectangle@2.3.0
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    BorderStyle: =BorderStyle.None
+                                    Fill: =varTheme_PulseBlue
+                                    Height: =3
+                                    Visible: =varHomeDashboard = "TASKS"
+                                    Width: =96
+                                    X: =Parent.Width - 115
+                                    Y: =53
+                        - conHomeShell_1:
                             Control: GroupContainer@1.5.0
                             Variant: AutoLayout
                             Properties:
                               DropShadow: =DropShadow.None
                               Fill: =varTheme_PageBg
-                              FillPortions: =1
                               Height: =100
                               LayoutAlignItems: =LayoutAlignItems.Center
                               LayoutDirection: =LayoutDirection.Horizontal
@@ -1076,7 +1097,7 @@ Screens:
                               RadiusTopRight: =0
                               Visible: =varHomeDashboard = "TASKS"
                             Children:
-                              - conHomeMain:
+                              - conHomeMain_1:
                                   Control: GroupContainer@1.5.0
                                   Variant: ManualLayout
                                   Properties:
@@ -1088,7 +1109,7 @@ Screens:
                                     LayoutMinWidth: =16
                                     Width: =Parent.Width - 380
                                   Children:
-                                    - cntHome_HiveGridArea:
+                                    - cntHome_HiveGridArea_1:
                                         Control: GroupContainer@1.5.0
                                         Variant: ManualLayout
                                         Properties:
@@ -1097,7 +1118,7 @@ Screens:
                                           Height: =Parent.Height
                                           Width: =Parent.Width
                                         Children:
-                                          - galHomeHiveNodes:
+                                          - galHomeHiveNodes_1:
                                               Control: Gallery@2.15.0
                                               Variant: Vertical
                                               Properties:
@@ -1130,9 +1151,9 @@ Screens:
                                                       2,
                                                       1
                                                   )
-                                                Y: =conHome_DisciplinesOverview.Y + conHome_DisciplinesOverview.Height + 18
+                                                Y: =conHome_DisciplinesOverview_1.Y + conHome_DisciplinesOverview_1.Height + 18
                                               Children:
-                                                - conNodeCard:
+                                                - conNodeCard_1:
                                                     Control: GroupContainer@1.5.0
                                                     Variant: ManualLayout
                                                     Properties:
@@ -1169,7 +1190,7 @@ Screens:
                                                       X: =(Parent.TemplateWidth - Self.Width) / 2
                                                       Y: =8
                                                     Children:
-                                                      - recNodeHeaderBg:
+                                                      - recNodeHeaderBg_1:
                                                           Control: Rectangle@2.3.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1182,7 +1203,7 @@ Screens:
                                                             HoverFill: =RGBA(0, 120, 212, 1)
                                                             PressedFill: =RGBA(0, 120, 212, 1)
                                                             Width: =Parent.Width
-                                                      - Text10:
+                                                      - Text10_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             Align: =Align.Center
@@ -1199,7 +1220,7 @@ Screens:
                                                             Width: =44
                                                             X: =16
                                                             Y: =15
-                                                      - Text21:
+                                                      - Text21_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             AutoHeight: =true
@@ -1217,7 +1238,7 @@ Screens:
                                                             Wrap: =false
                                                             X: =68
                                                             Y: =9
-                                                      - Text19:
+                                                      - Text19_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             Align: =Align.Center
@@ -1262,7 +1283,7 @@ Screens:
                                                             Width: =96
                                                             X: =Parent.Width - 112
                                                             Y: =16
-                                                      - Text20:
+                                                      - Text20_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             AutoHeight: =true
@@ -1280,7 +1301,7 @@ Screens:
                                                             Width: =Parent.Width - 146
                                                             X: =132
                                                             Y: =82
-                                                      - Text32:
+                                                      - Text32_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             AutoHeight: =true
@@ -1298,7 +1319,7 @@ Screens:
                                                             Width: =Parent.Width - 146
                                                             X: =132
                                                             Y: =108
-                                                      - Text37:
+                                                      - Text37_3:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             Align: =Align.Center
@@ -1310,7 +1331,7 @@ Screens:
                                                             Text: ="TOTAL"
                                                             Width: =Parent.Width / 3
                                                             Y: =175
-                                                      - Text33:
+                                                      - Text33_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             Align: =Align.Center
@@ -1323,7 +1344,7 @@ Screens:
                                                             Text: =Text(ThisItem.Total, "[$-en-US]#,##0")
                                                             Width: =Parent.Width / 3
                                                             Y: =158
-                                                      - Text37_1:
+                                                      - Text37_4:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             Align: =Align.Center
@@ -1336,7 +1357,7 @@ Screens:
                                                             Width: =Parent.Width / 3
                                                             X: =Parent.Width / 3
                                                             Y: =175
-                                                      - Text34:
+                                                      - Text34_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             Align: =Align.Center
@@ -1349,7 +1370,7 @@ Screens:
                                                             Width: =Parent.Width / 3
                                                             X: =Parent.Width / 3
                                                             Y: =158
-                                                      - Text37_2:
+                                                      - Text37_5:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             Align: =Align.Center
@@ -1362,7 +1383,7 @@ Screens:
                                                             Width: =Parent.Width / 3
                                                             X: = Parent.Width * 2 / 3
                                                             Y: =175
-                                                      - Text35:
+                                                      - Text35_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             Align: =Align.Center
@@ -1381,7 +1402,7 @@ Screens:
                                                             Width: =Parent.Width / 3
                                                             X: = Parent.Width * 2 / 3
                                                             Y: =158
-                                                      - imgNodeDonut:
+                                                      - imgNodeDonut_1:
                                                           Control: Image@2.2.3
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1417,7 +1438,7 @@ Screens:
                                                             Width: =82
                                                             X: =20
                                                             Y: =72
-                                                      - Rectangle7:
+                                                      - Rectangle7_1:
                                                           Control: Rectangle@2.3.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1432,7 +1453,7 @@ Screens:
                                                             Width: =Parent.Width - 32
                                                             X: =16
                                                             Y: =158
-                                                      - btnSelectNode:
+                                                      - btnSelectNode_1:
                                                           Control: Classic/Button@2.2.0
                                                           Properties:
                                                             BorderColor: =
@@ -1476,7 +1497,7 @@ Screens:
                                                               Set(varHomePendingError, "");
                                                               Set(varPendingSubsystemsLoading, false);
 
-                                                              Select(btnHome_LoadPendingSubsystems)
+                                                              Select(btnHome_LoadPendingSubsystems_1)
                                                             PressedBorderColor: =RGBA(0, 69, 120, 1)
                                                             PressedColor: =RGBA(255, 255, 255, 1)
                                                             PressedFill: =RGBA(0,200,255,0.06)
@@ -1486,7 +1507,7 @@ Screens:
                                                             RadiusTopRight: =18
                                                             Text: =
                                                             Width: =Parent.Width
-                                                      - recNodeAccent:
+                                                      - recNodeAccent_1:
                                                           Control: Rectangle@2.3.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1508,7 +1529,7 @@ Screens:
                                                             PressedFill: =RGBA(0, 120, 212, 1)
                                                             Width: =48
                                                             X: =18
-                                                      - recNodeHeaderDivider:
+                                                      - recNodeHeaderDivider_1:
                                                           Control: Rectangle@2.3.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1523,7 +1544,7 @@ Screens:
                                                             Width: =Parent.Width - 32
                                                             X: =16
                                                             Y: =56
-                                                      - recNodeBodyDivider:
+                                                      - recNodeBodyDivider_1:
                                                           Control: Rectangle@2.3.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1538,7 +1559,7 @@ Screens:
                                                             Width: =1
                                                             X: =116
                                                             Y: =74
-                                                      - recNodeProgressTrack:
+                                                      - recNodeProgressTrack_1:
                                                           Control: Rectangle@2.3.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1553,7 +1574,7 @@ Screens:
                                                             Width: =Parent.Width - 36
                                                             X: =18
                                                             Y: =198
-                                                      - recNodeProgressValue:
+                                                      - recNodeProgressValue_1:
                                                           Control: Rectangle@2.3.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1573,7 +1594,7 @@ Screens:
                                                             Width: = Max(4, (Parent.Width - 36) * Value(ThisItem.Progress) / 100)
                                                             X: =18
                                                             Y: =198
-                                                      - Icon2:
+                                                      - Icon2_1:
                                                           Control: Classic/Icon@2.5.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1608,7 +1629,7 @@ Screens:
                                                             Width: =22
                                                             X: =18
                                                             Y: =168
-                                                      - txtNodeProgressInline:
+                                                      - txtNodeProgressInline_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             Color: =ColorValue(ThisItem.ProgressColor)
@@ -1619,7 +1640,7 @@ Screens:
                                                             Width: =Parent.Width - 150
                                                             X: =132
                                                             Y: =134
-                                          - conHomeSkeleton:
+                                          - conHomeSkeleton_1:
                                               Control: GroupContainer@1.5.0
                                               Variant: ManualLayout
                                               Properties:
@@ -1628,7 +1649,7 @@ Screens:
                                                 Visible: =varHomeLoading || varProjectSwitching
                                                 Width: =Parent.Width
                                               Children:
-                                                - Container13:
+                                                - Container13_8:
                                                     Control: GroupContainer@1.5.0
                                                     Variant: ManualLayout
                                                     Properties:
@@ -1642,7 +1663,7 @@ Screens:
                                                       X: =40
                                                       Y: =176
                                                     Children:
-                                                      - Rectangle8:
+                                                      - Rectangle8_8:
                                                           Control: Rectangle@2.3.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1655,7 +1676,7 @@ Screens:
                                                             HoverFill: =RGBA(0, 120, 212, 1)
                                                             PressedFill: =RGBA(0, 120, 212, 1)
                                                             Width: =Parent.Width
-                                                - Container13_1:
+                                                - Container13_9:
                                                     Control: GroupContainer@1.5.0
                                                     Variant: ManualLayout
                                                     Properties:
@@ -1669,7 +1690,7 @@ Screens:
                                                       X: =230
                                                       Y: =176
                                                     Children:
-                                                      - Rectangle8_1:
+                                                      - Rectangle8_9:
                                                           Control: Rectangle@2.3.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1682,7 +1703,7 @@ Screens:
                                                             HoverFill: =RGBA(0, 120, 212, 1)
                                                             PressedFill: =RGBA(0, 120, 212, 1)
                                                             Width: =Parent.Width
-                                                - Container13_2:
+                                                - Container13_10:
                                                     Control: GroupContainer@1.5.0
                                                     Variant: ManualLayout
                                                     Properties:
@@ -1696,7 +1717,7 @@ Screens:
                                                       X: =420
                                                       Y: =176
                                                     Children:
-                                                      - Rectangle8_2:
+                                                      - Rectangle8_10:
                                                           Control: Rectangle@2.3.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1709,7 +1730,7 @@ Screens:
                                                             HoverFill: =RGBA(0, 120, 212, 1)
                                                             PressedFill: =RGBA(0, 120, 212, 1)
                                                             Width: =Parent.Width
-                                                - Container13_3:
+                                                - Container13_11:
                                                     Control: GroupContainer@1.5.0
                                                     Variant: ManualLayout
                                                     Properties:
@@ -1723,7 +1744,7 @@ Screens:
                                                       X: =610
                                                       Y: =176
                                                     Children:
-                                                      - Rectangle8_3:
+                                                      - Rectangle8_11:
                                                           Control: Rectangle@2.3.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1736,7 +1757,7 @@ Screens:
                                                             HoverFill: =RGBA(0, 120, 212, 1)
                                                             PressedFill: =RGBA(0, 120, 212, 1)
                                                             Width: =Parent.Width
-                                                - Container13_4:
+                                                - Container13_12:
                                                     Control: GroupContainer@1.5.0
                                                     Variant: ManualLayout
                                                     Properties:
@@ -1750,7 +1771,7 @@ Screens:
                                                       X: =610
                                                       Y: =350
                                                     Children:
-                                                      - Rectangle8_4:
+                                                      - Rectangle8_12:
                                                           Control: Rectangle@2.3.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1763,7 +1784,7 @@ Screens:
                                                             HoverFill: =RGBA(0, 120, 212, 1)
                                                             PressedFill: =RGBA(0, 120, 212, 1)
                                                             Width: =Parent.Width
-                                                - Container13_5:
+                                                - Container13_13:
                                                     Control: GroupContainer@1.5.0
                                                     Variant: ManualLayout
                                                     Properties:
@@ -1777,7 +1798,7 @@ Screens:
                                                       X: =420
                                                       Y: =350
                                                     Children:
-                                                      - Rectangle8_5:
+                                                      - Rectangle8_13:
                                                           Control: Rectangle@2.3.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1790,7 +1811,7 @@ Screens:
                                                             HoverFill: =RGBA(0, 120, 212, 1)
                                                             PressedFill: =RGBA(0, 120, 212, 1)
                                                             Width: =Parent.Width
-                                                - Container13_6:
+                                                - Container13_14:
                                                     Control: GroupContainer@1.5.0
                                                     Variant: ManualLayout
                                                     Properties:
@@ -1804,7 +1825,7 @@ Screens:
                                                       X: =230
                                                       Y: =350
                                                     Children:
-                                                      - Rectangle8_6:
+                                                      - Rectangle8_14:
                                                           Control: Rectangle@2.3.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1817,7 +1838,7 @@ Screens:
                                                             HoverFill: =RGBA(0, 120, 212, 1)
                                                             PressedFill: =RGBA(0, 120, 212, 1)
                                                             Width: =Parent.Width
-                                                - Container13_7:
+                                                - Container13_15:
                                                     Control: GroupContainer@1.5.0
                                                     Variant: ManualLayout
                                                     Properties:
@@ -1831,7 +1852,7 @@ Screens:
                                                       X: =40
                                                       Y: =350
                                                     Children:
-                                                      - Rectangle8_7:
+                                                      - Rectangle8_15:
                                                           Control: Rectangle@2.3.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1844,7 +1865,7 @@ Screens:
                                                             HoverFill: =RGBA(0, 120, 212, 1)
                                                             PressedFill: =RGBA(0, 120, 212, 1)
                                                             Width: =Parent.Width
-                                          - conHome_DisciplinesOverview:
+                                          - conHome_DisciplinesOverview_1:
                                               Control: GroupContainer@1.5.0
                                               Variant: ManualLayout
                                               Properties:
@@ -1864,7 +1885,7 @@ Screens:
                                                   CountRows(colHomeHiveNodesSorted) > 0
                                                 Width: =Parent.Width
                                               Children:
-                                                - lblDiscOverviewTitle:
+                                                - lblDiscOverviewTitle_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       AutoHeight: =true
@@ -1875,7 +1896,7 @@ Screens:
                                                       Width: =175
                                                       X: =17
                                                       Y: =17
-                                                - recOverviewDivider:
+                                                - recOverviewDivider_1:
                                                     Control: Rectangle@2.3.0
                                                     Properties:
                                                       BorderColor: =RGBA(0, 0, 0, 0)
@@ -1890,7 +1911,7 @@ Screens:
                                                       Width: =1
                                                       X: =196
                                                       Y: =24
-                                                - lblDiscOverviewSubtitle:
+                                                - lblDiscOverviewSubtitle_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       Color: =varTheme_TextMuted
@@ -1900,7 +1921,7 @@ Screens:
                                                       Width: =175
                                                       X: =17
                                                       Y: =46
-                                                - conKpiRemaining:
+                                                - conKpiRemaining_1:
                                                     Control: GroupContainer@1.5.0
                                                     Variant: ManualLayout
                                                     Properties:
@@ -1913,10 +1934,10 @@ Screens:
                                                       RadiusTopLeft: =12
                                                       RadiusTopRight: =12
                                                       Width: =150
-                                                      X: =conKpiCompleted.X + conKpiCompleted.Width + 12
+                                                      X: =conKpiCompleted_1.X + conKpiCompleted_1.Width + 12
                                                       Y: =22
                                                     Children:
-                                                      - Text66:
+                                                      - Text66_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             AutoHeight: =true
@@ -1934,7 +1955,7 @@ Screens:
                                                             Width: =84
                                                             X: =58
                                                             Y: =10
-                                                      - Icon14:
+                                                      - Icon14_1:
                                                           Control: Classic/Icon@2.5.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -1955,7 +1976,7 @@ Screens:
                                                             Width: =36
                                                             X: =12
                                                             Y: =12
-                                                      - Text70:
+                                                      - Text70_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             AutoHeight: =true
@@ -1965,7 +1986,7 @@ Screens:
                                                             Width: =84
                                                             X: =58
                                                             Y: =34
-                                                - conKpiCompleted:
+                                                - conKpiCompleted_1:
                                                     Control: GroupContainer@1.5.0
                                                     Variant: ManualLayout
                                                     Properties:
@@ -1978,10 +1999,10 @@ Screens:
                                                       RadiusTopLeft: =12
                                                       RadiusTopRight: =12
                                                       Width: =150
-                                                      X: =conKpiTotalTasks.X + conKpiTotalTasks.Width + 12
+                                                      X: =conKpiTotalTasks_1.X + conKpiTotalTasks_1.Width + 12
                                                       Y: =22
                                                     Children:
-                                                      - Text65:
+                                                      - Text65_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             AutoHeight: =true
@@ -2000,7 +2021,7 @@ Screens:
                                                             Width: =84
                                                             X: =58
                                                             Y: =10
-                                                      - Icon12:
+                                                      - Icon12_1:
                                                           Control: Classic/Icon@2.5.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -2021,7 +2042,7 @@ Screens:
                                                             Width: =36
                                                             X: =12
                                                             Y: =12
-                                                      - Text69:
+                                                      - Text69_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             AutoHeight: =true
@@ -2031,7 +2052,7 @@ Screens:
                                                             Width: =84
                                                             X: =58
                                                             Y: =34
-                                                - conKpiTotalTasks:
+                                                - conKpiTotalTasks_1:
                                                     Control: GroupContainer@1.5.0
                                                     Variant: ManualLayout
                                                     Properties:
@@ -2044,10 +2065,10 @@ Screens:
                                                       RadiusTopLeft: =12
                                                       RadiusTopRight: =12
                                                       Width: =150
-                                                      X: =conKpiDisciplines.X + conKpiDisciplines.Width + 12
+                                                      X: =conKpiDisciplines_1.X + conKpiDisciplines_1.Width + 12
                                                       Y: =22
                                                     Children:
-                                                      - Text64:
+                                                      - Text64_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             AutoHeight: =true
@@ -2066,7 +2087,7 @@ Screens:
                                                             Width: =84
                                                             X: =58
                                                             Y: =10
-                                                      - Icon13:
+                                                      - Icon13_1:
                                                           Control: Classic/Icon@2.5.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -2087,7 +2108,7 @@ Screens:
                                                             Width: =36
                                                             X: =12
                                                             Y: =12
-                                                      - Text68:
+                                                      - Text68_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             AutoHeight: =true
@@ -2098,7 +2119,7 @@ Screens:
                                                             Width: =84
                                                             X: =58
                                                             Y: =34
-                                                - conKpiDisciplines:
+                                                - conKpiDisciplines_1:
                                                     Control: GroupContainer@1.5.0
                                                     Variant: ManualLayout
                                                     Properties:
@@ -2114,7 +2135,7 @@ Screens:
                                                       X: =220
                                                       Y: =22
                                                     Children:
-                                                      - Text61:
+                                                      - Text61_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             AutoHeight: =true
@@ -2131,7 +2152,7 @@ Screens:
                                                             Width: =84
                                                             X: =58
                                                             Y: =10
-                                                      - Icon11:
+                                                      - Icon11_1:
                                                           Control: Classic/Icon@2.5.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -2152,7 +2173,7 @@ Screens:
                                                             Width: =36
                                                             X: =12
                                                             Y: =12
-                                                      - Text67:
+                                                      - Text67_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             AutoHeight: =true
@@ -2162,7 +2183,7 @@ Screens:
                                                             Width: =84
                                                             X: =58
                                                             Y: =34
-                              - conHomeSidebar:
+                              - conHomeSidebar_1:
                                   Control: GroupContainer@1.5.0
                                   Variant: ManualLayout
                                   Properties:
@@ -2175,7 +2196,7 @@ Screens:
                                     Visible: =varHomeShowRightPanel
                                     Width: =340
                                   Children:
-                                    - cntHome_RightPanelArea:
+                                    - cntHome_RightPanelArea_1:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
@@ -2192,7 +2213,7 @@ Screens:
                                           PaddingTop: =8
                                           Width: =Parent.Width
                                         Children:
-                                          - cntHome_SelectedNode:
+                                          - cntHome_SelectedNode_1:
                                               Control: GroupContainer@1.5.0
                                               Variant: ManualLayout
                                               Properties:
@@ -2208,7 +2229,7 @@ Screens:
                                                 RadiusTopRight: =16
                                                 Width: =Parent.Width
                                               Children:
-                                                - lblSelectedPanelTitle:
+                                                - lblSelectedPanelTitle_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       AutoHeight: =true
@@ -2220,7 +2241,7 @@ Screens:
                                                       Width: =Parent.Width - 48
                                                       X: =18
                                                       Y: =14
-                                                - Icon15:
+                                                - Icon15_1:
                                                     Control: Classic/Icon@2.5.0
                                                     Properties:
                                                       BorderColor: =RGBA(0, 0, 0, 1)
@@ -2242,7 +2263,7 @@ Screens:
                                                       Width: =20
                                                       X: =Parent.Width - 36
                                                       Y: =23
-                                                - lblSelectedNodeNo:
+                                                - lblSelectedNodeNo_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       Align: =Align.Center
@@ -2264,7 +2285,7 @@ Screens:
                                                       Width: =42
                                                       X: =18
                                                       Y: =58
-                                                - lblSelectedNodeTitle:
+                                                - lblSelectedNodeTitle_2:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       AutoHeight: =true
@@ -2281,7 +2302,7 @@ Screens:
                                                       Width: =Parent.Width - 100
                                                       X: =72
                                                       Y: =56
-                                                - lblSelectedNodeSubtitle:
+                                                - lblSelectedNodeSubtitle_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       AutoHeight: =true
@@ -2296,7 +2317,7 @@ Screens:
                                                       Width: =Parent.Width - 100
                                                       X: =72
                                                       Y: =82
-                                                - imgSelectedProgressRing:
+                                                - imgSelectedProgressRing_1:
                                                     Control: Image@2.2.3
                                                     Properties:
                                                       BorderColor: =RGBA(0, 0, 0, 0)
@@ -2333,7 +2354,7 @@ Screens:
                                                       Width: =110
                                                       X: =24
                                                       Y: =116
-                                                - lblSelectedStatusCaption:
+                                                - lblSelectedStatusCaption_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       AutoHeight: =true
@@ -2344,7 +2365,7 @@ Screens:
                                                       Width: =100
                                                       X: =160
                                                       Y: =130
-                                                - lblSelectedStatusPill:
+                                                - lblSelectedStatusPill_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       Align: =Align.Center
@@ -2384,7 +2405,7 @@ Screens:
                                                       Width: =92
                                                       X: =160
                                                       Y: =152
-                                                - recSelectedMetricsDivider:
+                                                - recSelectedMetricsDivider_1:
                                                     Control: Rectangle@2.3.0
                                                     Properties:
                                                       BorderColor: =RGBA(0, 0, 0, 0)
@@ -2399,7 +2420,7 @@ Screens:
                                                       Width: =Parent.Width - 36
                                                       X: =18
                                                       Y: =236
-                                                - lblSelectedTotalValue:
+                                                - lblSelectedTotalValue_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       Align: =Align.Center
@@ -2416,7 +2437,7 @@ Screens:
                                                       Width: =(Parent.Width - 36) / 4
                                                       X: =18
                                                       Y: =244
-                                                - lblSelectedTotalLabel:
+                                                - lblSelectedTotalLabel_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       Align: =Align.Center
@@ -2425,10 +2446,10 @@ Screens:
                                                       Height: =16
                                                       Size: =10
                                                       Text: ="Total"
-                                                      Width: =lblSelectedTotalValue.Width
-                                                      X: =lblSelectedTotalValue.X
+                                                      Width: =lblSelectedTotalValue_1.Width
+                                                      X: =lblSelectedTotalValue_1.X
                                                       Y: =268
-                                                - lblSelectedDoneValue:
+                                                - lblSelectedDoneValue_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       Align: =Align.Center
@@ -2446,7 +2467,7 @@ Screens:
                                                       Width: =(Parent.Width - 36) / 4
                                                       X: =18 + ((Parent.Width - 36) / 4)
                                                       Y: =244
-                                                - lblSelectedDoneLabel:
+                                                - lblSelectedDoneLabel_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       Align: =Align.Center
@@ -2455,10 +2476,10 @@ Screens:
                                                       Height: =16
                                                       Size: =10
                                                       Text: ="Done"
-                                                      Width: = lblSelectedDoneValue.Width
-                                                      X: =lblSelectedDoneValue.X
+                                                      Width: = lblSelectedDoneValue_1.Width
+                                                      X: =lblSelectedDoneValue_1.X
                                                       Y: =268
-                                                - lblSelectedRemainingValue:
+                                                - lblSelectedRemainingValue_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       Align: =Align.Center
@@ -2480,7 +2501,7 @@ Screens:
                                                       Width: =(Parent.Width - 36) / 4
                                                       X: =18 + (((Parent.Width - 36) / 4) * 2)
                                                       Y: =244
-                                                - lblSelectedRemainingLabel:
+                                                - lblSelectedRemainingLabel_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       Align: =Align.Center
@@ -2489,10 +2510,10 @@ Screens:
                                                       Height: =16
                                                       Size: =10
                                                       Text: ="Remaining"
-                                                      Width: =lblSelectedRemainingValue.Width
-                                                      X: = lblSelectedRemainingValue.X
+                                                      Width: =lblSelectedRemainingValue_1.Width
+                                                      X: = lblSelectedRemainingValue_1.X
                                                       Y: =268
-                                                - lblSelectedProgressValue:
+                                                - lblSelectedProgressValue_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       Align: =Align.Center
@@ -2509,7 +2530,7 @@ Screens:
                                                       Width: =(Parent.Width - 36) / 4
                                                       X: =18 + (((Parent.Width - 36) / 4) * 3)
                                                       Y: =244
-                                                - lblSelectedProgressLabel:
+                                                - lblSelectedProgressLabel_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       Align: =Align.Center
@@ -2517,10 +2538,10 @@ Screens:
                                                       Color: =varTheme_TextMuted
                                                       Size: =10
                                                       Text: ="Progress"
-                                                      Width: = lblSelectedProgressValue.Width
-                                                      X: =lblSelectedProgressValue.X
+                                                      Width: = lblSelectedProgressValue_1.Width
+                                                      X: =lblSelectedProgressValue_1.X
                                                       Y: =268
-                                          - cntHome_PendingSubsystems:
+                                          - cntHome_PendingSubsystems_1:
                                               Control: GroupContainer@1.5.0
                                               Variant: ManualLayout
                                               Properties:
@@ -2537,13 +2558,13 @@ Screens:
                                                 Width: =Parent.Width
                                                 Y: =
                                               Children:
-                                                - galHomePendingSubsystems:
+                                                - galHomePendingSubsystems_1:
                                                     Control: Gallery@2.15.0
                                                     Variant: Vertical
                                                     Properties:
                                                       BorderColor: =RGBA(245, 245, 245, 1)
                                                       Height: =198
-                                                      Items: |+
+                                                      Items: |
                                                         =
                                                             colHomePendingSubsystems
                                                       ShowScrollbar: =false
@@ -2557,7 +2578,7 @@ Screens:
                                                       X: =18
                                                       Y: =76
                                                     Children:
-                                                      - lbl_Dt:
+                                                      - lbl_Dt_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             AutoHeight: =true
@@ -2573,7 +2594,7 @@ Screens:
                                                             Width: =Parent.TemplateWidth - 110
                                                             X: =48
                                                             Y: =28
-                                                      - lbl_Ss:
+                                                      - lbl_Ss_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             AutoHeight: =true
@@ -2586,7 +2607,7 @@ Screens:
                                                             Width: =Parent.TemplateWidth - 110
                                                             X: =48
                                                             Y: =6
-                                                      - lbl_Ranking:
+                                                      - lbl_Ranking_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             Align: =Align.Center
@@ -2604,7 +2625,7 @@ Screens:
                                                             Text: =ThisItem.RowNo
                                                             Width: =28
                                                             Y: =10
-                                                      - Button2:
+                                                      - Button2_1:
                                                           Control: Classic/Button@2.2.0
                                                           Properties:
                                                             BorderColor: =RGBA(0, 0, 0, 0)
@@ -2644,7 +2665,7 @@ Screens:
                                                             RadiusTopRight: =0
                                                             Text: =
                                                             Width: =Parent.TemplateWidth
-                                                      - btnPendingRowTasks:
+                                                      - btnPendingRowTasks_1:
                                                           Control: ModernButton@1.0.0
                                                           Properties:
                                                             BasePaletteColor: =ColorValue("#0B5ED7")
@@ -2691,7 +2712,7 @@ Screens:
                                                             Width: =90
                                                             X: =Parent.TemplateWidth - 92
                                                             Y: =15
-                                                - Text57:
+                                                - Text57_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       AutoHeight: =true
@@ -2707,7 +2728,7 @@ Screens:
                                                       Width: =Parent.Width - 36
                                                       X: =18
                                                       Y: =42
-                                                - Text56:
+                                                - Text56_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       AutoHeight: =true
@@ -2719,7 +2740,7 @@ Screens:
                                                       Width: =Parent.Width - 36
                                                       X: =18
                                                       Y: =16
-                                                - Text60:
+                                                - Text60_1:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       Align: =Align.Center
@@ -2742,7 +2763,7 @@ Screens:
                                                       Width: =Parent.Width - 48
                                                       X: =24
                                                       Y: =110
-                                                - conPendingSubsystemsLoading:
+                                                - conPendingSubsystemsLoading_1:
                                                     Control: GroupContainer@1.5.0
                                                     Variant: ManualLayout
                                                     Properties:
@@ -2752,7 +2773,7 @@ Screens:
                                                       Width: =Parent.Width
                                                       Y: =70
                                                     Children:
-                                                      - Spinner5:
+                                                      - Spinner5_1:
                                                           Control: Spinner@1.4.6
                                                           Properties:
                                                             BasePaletteColor: =varTheme_PulseBlueDark
@@ -2760,7 +2781,7 @@ Screens:
                                                             Width: =32
                                                             X: =(Parent.Width - Self.Width) / 2
                                                             Y: =54
-                                                      - Text11:
+                                                      - Text11_1:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             Align: =Align.Center
@@ -2777,7 +2798,6 @@ Screens:
                             Properties:
                               DropShadow: =DropShadow.None
                               Fill: =varTheme_PageBg
-                              FillPortions: =1
                               Height: =100
                               LayoutDirection: =LayoutDirection.Vertical
                               LayoutGap: =12
@@ -2839,7 +2859,6 @@ Screens:
                                           Height: =18
                                           Size: =9
                                           Text: ="Punch template"
-                                          Width: =150
                                           X: =Parent.Width - 360
                                           Y: =10
                                     - cmbHomePunchTemplate:
@@ -2869,7 +2888,6 @@ Screens:
                                                 Set(varGlobalLoadPending, true)
                                             )
                                           SelectMultiple: =false
-                                          Width: =320
                                           X: =Parent.Width - 340
                                           Y: =30
                               - conPunchDashboardBody:
@@ -2878,7 +2896,6 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     Fill: =varTheme_PageBg
-                                    FillPortions: =1
                                     Height: =100
                                     LayoutDirection: =LayoutDirection.Vertical
                                     LayoutGap: =12
@@ -2886,9 +2903,6 @@ Screens:
                                     LayoutMinWidth: =16
                                     LayoutOverflowY: =LayoutOverflow.Scroll
                                     PaddingBottom: =4
-                                    PaddingLeft: =0
-                                    PaddingRight: =0
-                                    PaddingTop: =0
                                     RadiusBottomLeft: =0
                                     RadiusBottomRight: =0
                                     RadiusTopLeft: =0
@@ -2917,7 +2931,6 @@ Screens:
                                                 Text: ="Status Overview"
                                                 Width: =240
                                                 X: =2
-                                                Y: =0
                                           - lblPunchSnapshotInfo:
                                               Control: ModernText@1.0.0
                                               Properties:
@@ -2944,7 +2957,7 @@ Screens:
                                               Variant: Horizontal
                                               Properties:
                                                 BorderColor: =RGBA(0,0,0,0)
-                                                Height: =98
+                                                Height: =112
                                                 Items: =SortByColumns(colPunchDashboardSummary, "StatusOrder", SortOrder.Ascending)
                                                 ShowScrollbar: =false
                                                 TemplatePadding: =6
@@ -2960,7 +2973,7 @@ Screens:
                                                       BorderThickness: =If(varPunchDrillStatusCode = ThisItem.StatusCode, 2, 1)
                                                       DropShadow: =DropShadow.Semilight
                                                       Fill: =varTheme_Surface
-                                                      Height: =84
+                                                      Height: =98
                                                       RadiusBottomLeft: =14
                                                       RadiusBottomRight: =14
                                                       RadiusTopLeft: =14
@@ -2999,7 +3012,31 @@ Screens:
                                                             Width: =Parent.Width - 28
                                                             Wrap: =false
                                                             X: =14
-                                                            Y: =52
+                                                            Y: =50
+                                                      - lblPunchKpiTrend:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Align: =Align.Right
+                                                            Color: |-
+                                                              =Switch(
+                                                                  ThisItem.Trend,
+                                                                  "Up", If(Lower(ThisItem.StatusCode) = "closed", varTheme_Green, varTheme_Red),
+                                                                  "Down", If(Lower(ThisItem.StatusCode) = "closed", varTheme_Red, varTheme_Green),
+                                                                  varTheme_TextMuted
+                                                              )
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =18
+                                                            Size: =9
+                                                            Text: |-
+                                                              =If(
+                                                                  ThisItem.Trend = "Neutral",
+                                                                  "— 0.0%",
+                                                                  If(ThisItem.Trend = "Up", "↑ ", "↓ ") &
+                                                                  Text(Abs(ThisItem.DeltaPercent), "0.0") & "%"
+                                                              )
+                                                            Width: =74
+                                                            X: =Parent.Width - Self.Width - 14
+                                                            Y: =50
                                                       - btnPunchKpiDrill:
                                                           Control: Classic/Button@2.2.0
                                                           Properties:
@@ -3015,12 +3052,15 @@ Screens:
                                                               Set(varPunchDrillCategoryCode, "");
                                                               Set(varPunches_ReturnView, "Home");
                                                               Set(varPunches_ContextSource, "Dashboard");
-                                                              Set(varPunches_Filter_TemplateId, Value(varPunchDashboardTemplateId));
-                                                              Set(varPunches_Filter_StatusCode, Text(ThisItem.StatusCode));
-                                                              Set(varPunches_Filter_CategoryCode, "");
-                                                              Set(varPunches_Filter_Subsystem, "");
-                                                              Set(varPunches_Filter_SubcontractorId, Blank());
-                                                              Set(varPunches_Filter_Discipline, "");
+                                                              Set(varPunches_FilterSource, "Dashboard");
+                                                              Set(varPunchCustomFiltersJson, "[]");
+                                                              Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId));
+                                                              Set(varFilter_PunchStatusCode, Text(ThisItem.StatusCode));
+                                                              Set(varFilter_PunchCategoryCode, "");
+                                                              Set(varFilter_SubsystemsCsv, "");
+                                                              Set(varFilter_Subsystem, Blank());
+                                                              Set(varFilter_Subcontractor, Blank());
+                                                              Set(varFilter_PunchDiscipline, "");
                                                               Set(varPunches_Page, 1);
                                                               Set(varPunches_HasSearched, true);
                                                               Set(varPunches_AutoLoad, true);
@@ -3034,6 +3074,229 @@ Screens:
                                                             RadiusTopRight: =14
                                                             Text: =""
                                                             Width: =Parent.Width
+                                    - conPunchTimelineCard:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: ManualLayout
+                                        Properties:
+                                          BorderColor: =varTheme_Border
+                                          BorderThickness: =1
+                                          DropShadow: =DropShadow.None
+                                          Fill: =varTheme_Surface
+                                          FillPortions: =0
+                                          Height: =252
+                                          LayoutMinHeight: =252
+                                          RadiusBottomLeft: =16
+                                          RadiusBottomRight: =16
+                                          RadiusTopLeft: =16
+                                          RadiusTopRight: =16
+                                          Width: =Parent.Width
+                                        Children:
+                                          - lblPunchTimelineTitle:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =varTheme_Text
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =24
+                                                Size: =14
+                                                Text: ="7-Snapshot Timeline"
+                                                Width: =260
+                                                X: =18
+                                                Y: =14
+                                          - lblPunchTimelineSubtitle:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =varTheme_TextMuted
+                                                Height: =18
+                                                Size: =9
+                                                Text: ="Evolution of Open, Cleared and Closed punches"
+                                                Width: =390
+                                                X: =18
+                                                Y: =39
+                                          - lblPunchTimelineCurrentTrend:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Align: =Align.Right
+                                                Color: |-
+                                                  =If(
+                                                      CountRows(colPunchDashboardTimeline) < 2,
+                                                      varTheme_TextMuted,
+                                                      If(Last(colPunchDashboardTimeline).OpenDelta < 0, varTheme_Success, If(Last(colPunchDashboardTimeline).OpenDelta > 0, varTheme_Danger, varTheme_TextMuted))
+                                                  )
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =22
+                                                Size: =10
+                                                Text: |-
+                                                  =If(
+                                                      CountRows(colPunchDashboardTimeline) < 2,
+                                                      "Not enough snapshots",
+                                                      If(
+                                                          Last(colPunchDashboardTimeline).OpenDelta < 0,
+                                                          "▼ " & Text(Abs(Last(colPunchDashboardTimeline).OpenDelta), "[$-en-US]#,##0") & " Open",
+                                                          If(
+                                                              Last(colPunchDashboardTimeline).OpenDelta > 0,
+                                                              "▲ " & Text(Last(colPunchDashboardTimeline).OpenDelta, "[$-en-US]#,##0") & " Open",
+                                                              "= No change"
+                                                          )
+                                                      )
+                                                  )
+                                                Width: =260
+                                                X: =Parent.Width - 278
+                                                Y: =16
+                                          - galPunchTimeline:
+                                              Control: Gallery@2.15.0
+                                              Variant: Horizontal
+                                              Properties:
+                                                BorderColor: =RGBA(0,0,0,0)
+                                                Height: =166
+                                                Items: =SortByColumns(colPunchDashboardTimeline, "SnapshotDate", SortOrder.Ascending)
+                                                ShowScrollbar: =false
+                                                TemplatePadding: =6
+                                                TemplateSize: =Max(112, (Parent.Width - 24) / Max(1, CountRows(colPunchDashboardTimeline)))
+                                                Visible: =CountRows(colPunchDashboardTimeline) > 0
+                                                Width: =Parent.Width - 24
+                                                X: =12
+                                                Y: =68
+                                              Children:
+                                                - lblPunchTimelineDate:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      Color: =varTheme_TextMuted
+                                                      Height: =18
+                                                      Size: =8
+                                                      Text: =Text(ThisItem.SnapshotDate, "dd mmm")
+                                                      Width: =Parent.TemplateWidth - 12
+                                                      X: =6
+                                                      Y: =140
+                                                - recPunchTimelineOpen:
+                                                    Control: Rectangle@2.3.0
+                                                    Properties:
+                                                      BorderColor: =RGBA(0,0,0,0)
+                                                      BorderStyle: =BorderStyle.None
+                                                      Fill: =ColorValue("#EF4444")
+                                                      Height: |-
+                                                        =If(
+                                                            Max(colPunchDashboardTimeline, OpenCount) = 0,
+                                                            2,
+                                                            Max(2, 104 * ThisItem.OpenCount / Max(colPunchDashboardTimeline, OpenCount))
+                                                        )
+                                                      Width: =18
+                                                      X: =(Parent.TemplateWidth / 2) - 31
+                                                      Y: =132 - Self.Height
+                                                - recPunchTimelineCleared:
+                                                    Control: Rectangle@2.3.0
+                                                    Properties:
+                                                      BorderColor: =RGBA(0,0,0,0)
+                                                      BorderStyle: =BorderStyle.None
+                                                      Fill: =ColorValue("#F59E0B")
+                                                      Height: |-
+                                                        =If(
+                                                            Max(colPunchDashboardTimeline, ClearedCount) = 0,
+                                                            2,
+                                                            Max(2, 104 * ThisItem.ClearedCount / Max(colPunchDashboardTimeline, ClearedCount))
+                                                        )
+                                                      Width: =18
+                                                      X: =(Parent.TemplateWidth / 2) - 9
+                                                      Y: =132 - Self.Height
+                                                - recPunchTimelineClosed:
+                                                    Control: Rectangle@2.3.0
+                                                    Properties:
+                                                      BorderColor: =RGBA(0,0,0,0)
+                                                      BorderStyle: =BorderStyle.None
+                                                      Fill: =ColorValue("#22C55E")
+                                                      Height: |-
+                                                        =If(
+                                                            Max(colPunchDashboardTimeline, ClosedCount) = 0,
+                                                            2,
+                                                            Max(2, 104 * ThisItem.ClosedCount / Max(colPunchDashboardTimeline, ClosedCount))
+                                                        )
+                                                      Width: =18
+                                                      X: =(Parent.TemplateWidth / 2) + 13
+                                                      Y: =132 - Self.Height
+                                                - lblPunchTimelineOpenValue:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      Color: =varTheme_Text
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =16
+                                                      Size: =7
+                                                      Text: =Text(ThisItem.OpenCount, "[$-en-US]#,##0")
+                                                      Width: =48
+                                                      X: =(Parent.TemplateWidth / 2) - 46
+                                                      Y: =Max(0, 114 - recPunchTimelineOpen.Height)
+                                          - lblPunchTimelineEmpty:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Align: =Align.Center
+                                                Color: =varTheme_TextMuted
+                                                Height: =72
+                                                Size: =10
+                                                Text: ="No snapshot history is available yet."
+                                                Visible: =CountRows(colPunchDashboardTimeline) = 0
+                                                Width: =Parent.Width - 36
+                                                X: =18
+                                                Y: =96
+                                          - recPunchTimelineLegendOpen:
+                                              Control: Rectangle@2.3.0
+                                              Properties:
+                                                BorderColor: =RGBA(0,0,0,0)
+                                                BorderStyle: =BorderStyle.None
+                                                Fill: =ColorValue("#EF4444")
+                                                Height: =10
+                                                Width: =10
+                                                X: =Parent.Width - 252
+                                                Y: =46
+                                          - lblPunchTimelineLegendOpen:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =varTheme_TextMuted
+                                                Height: =16
+                                                Size: =8
+                                                Text: ="Open"
+                                                Width: =38
+                                                X: =Parent.Width - 238
+                                                Y: =42
+                                          - recPunchTimelineLegendCleared:
+                                              Control: Rectangle@2.3.0
+                                              Properties:
+                                                BorderColor: =RGBA(0,0,0,0)
+                                                BorderStyle: =BorderStyle.None
+                                                Fill: =ColorValue("#F59E0B")
+                                                Height: =10
+                                                Width: =10
+                                                X: =Parent.Width - 184
+                                                Y: =46
+                                          - lblPunchTimelineLegendCleared:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =varTheme_TextMuted
+                                                Height: =16
+                                                Size: =8
+                                                Text: ="Cleared"
+                                                Width: =52
+                                                X: =Parent.Width - 170
+                                                Y: =42
+                                          - recPunchTimelineLegendClosed:
+                                              Control: Rectangle@2.3.0
+                                              Properties:
+                                                BorderColor: =RGBA(0,0,0,0)
+                                                BorderStyle: =BorderStyle.None
+                                                Fill: =ColorValue("#22C55E")
+                                                Height: =10
+                                                Width: =10
+                                                X: =Parent.Width - 104
+                                                Y: =46
+                                          - lblPunchTimelineLegendClosed:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =varTheme_TextMuted
+                                                Height: =16
+                                                Size: =8
+                                                Text: ="Closed"
+                                                Width: =52
+                                                X: =Parent.Width - 90
+                                                Y: =42
                                     - conPunchMatrixCard:
                                         Control: GroupContainer@1.5.0
                                         Variant: ManualLayout
@@ -3043,8 +3306,8 @@ Screens:
                                           DropShadow: =DropShadow.None
                                           Fill: =varTheme_Surface
                                           FillPortions: =0
-                                          Height: =286
-                                          LayoutMinHeight: =286
+                                          Height: =318
+                                          LayoutMinHeight: =318
                                           RadiusBottomLeft: =16
                                           RadiusBottomRight: =16
                                           RadiusTopLeft: =16
@@ -3058,7 +3321,7 @@ Screens:
                                                 FontWeight: =FontWeight.Semibold
                                                 Height: =24
                                                 Size: =14
-                                                Text: ="Category × Status"
+                                                Text: ="Punch Heat Map"
                                                 Width: =240
                                                 X: =18
                                                 Y: =14
@@ -3068,7 +3331,7 @@ Screens:
                                                 Color: =varTheme_TextMuted
                                                 Height: =18
                                                 Size: =9
-                                                Text: ="Select any cell to open the Punch List with both filters applied"
+                                                Text: ="Intensity highlights operational hotspots. Select a cell to drill through."
                                                 Width: =460
                                                 X: =18
                                                 Y: =39
@@ -3097,7 +3360,6 @@ Screens:
                                                       "CategoryOrder",
                                                       SortOrder.Ascending
                                                   )
-                                                ShowScrollbar: =true
                                                 TemplatePadding: =2
                                                 TemplateSize: =44
                                                 Width: =Parent.Width - 24
@@ -3150,10 +3412,17 @@ Screens:
                                                           Control: ModernText@1.0.0
                                                           Properties:
                                                             Align: =Align.Center
-                                                            Color: =If(ThisItem.PunchCount > 0, ColorValue(ThisItem.StatusColor), varTheme_TextSoft)
-                                                            Fill: =If(ThisItem.PunchCount > 0, ColorFade(ColorValue(ThisItem.StatusColor), 88%), Color.Transparent)
-                                                            FontWeight: =FontWeight.Semibold
-                                                            Height: =32
+                                                            Color: =If(ThisItem.Intensity >= 65, Color.White, If(ThisItem.PunchCount > 0, varTheme_Text, varTheme_TextSoft))
+                                                            Fill: |-
+                                                              =Switch(
+                                                                  ThisItem.IntensityBand,
+                                                                  "CRITICAL", ColorValue("#DC2626"),
+                                                                  "HIGH", ColorValue("#F97316"),
+                                                                  "MEDIUM", ColorValue("#FACC15"),
+                                                                  "LOW", ColorValue("#DCFCE7"),
+                                                                  ColorValue("#F8FAFC")
+                                                              )
+                                                            FontWeight: =FontWeight.Bold
                                                             RadiusBottomLeft: =8
                                                             RadiusBottomRight: =8
                                                             RadiusTopLeft: =8
@@ -3179,12 +3448,15 @@ Screens:
                                                               Set(varPunchDrillCategoryCode, Text(ThisItem.CategoryCode));
                                                               Set(varPunches_ReturnView, "Home");
                                                               Set(varPunches_ContextSource, "Dashboard");
-                                                              Set(varPunches_Filter_TemplateId, Value(varPunchDashboardTemplateId));
-                                                              Set(varPunches_Filter_StatusCode, Text(ThisItem.StatusCode));
-                                                              Set(varPunches_Filter_CategoryCode, Text(ThisItem.CategoryCode));
-                                                              Set(varPunches_Filter_Subsystem, "");
-                                                              Set(varPunches_Filter_SubcontractorId, Blank());
-                                                              Set(varPunches_Filter_Discipline, "");
+                                                              Set(varPunches_FilterSource, "Dashboard");
+                                                              Set(varPunchCustomFiltersJson, "[]");
+                                                              Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId));
+                                                              Set(varFilter_PunchStatusCode, Text(ThisItem.StatusCode));
+                                                              Set(varFilter_PunchCategoryCode, Text(ThisItem.CategoryCode));
+                                                              Set(varFilter_SubsystemsCsv, "");
+                                                              Set(varFilter_Subsystem, Blank());
+                                                              Set(varFilter_Subcontractor, Blank());
+                                                              Set(varFilter_PunchDiscipline, "");
                                                               Set(varPunches_Page, 1);
                                                               Set(varPunches_HasSearched, true);
                                                               Set(varPunches_AutoLoad, true);
@@ -3200,6 +3472,96 @@ Screens:
                                                             Width: =104
                                                             X: =2
                                                             Y: =4
+                                          - lblPunchHeatLegend:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =varTheme_TextMuted
+                                                Height: =18
+                                                Size: =9
+                                                Text: ="Intensity"
+                                                Width: =58
+                                                X: =18
+                                                Y: =289
+                                          - recPunchHeatLow:
+                                              Control: Rectangle@2.3.0
+                                              Properties:
+                                                BorderColor: =RGBA(0,0,0,0)
+                                                BorderStyle: =BorderStyle.None
+                                                Fill: =ColorValue("#DCFCE7")
+                                                Height: =12
+                                                Width: =26
+                                                X: =76
+                                                Y: =292
+                                          - lblPunchHeatLow:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =varTheme_TextMuted
+                                                Height: =18
+                                                Size: =8
+                                                Text: ="Low"
+                                                Width: =34
+                                                X: =108
+                                                Y: =288
+                                          - recPunchHeatMedium:
+                                              Control: Rectangle@2.3.0
+                                              Properties:
+                                                BorderColor: =RGBA(0,0,0,0)
+                                                BorderStyle: =BorderStyle.None
+                                                Fill: =ColorValue("#FACC15")
+                                                Height: =12
+                                                Width: =26
+                                                X: =148
+                                                Y: =292
+                                          - lblPunchHeatMedium:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =varTheme_TextMuted
+                                                Height: =18
+                                                Size: =8
+                                                Text: ="Medium"
+                                                Width: =50
+                                                X: =180
+                                                Y: =288
+                                          - recPunchHeatHigh:
+                                              Control: Rectangle@2.3.0
+                                              Properties:
+                                                BorderColor: =RGBA(0,0,0,0)
+                                                BorderStyle: =BorderStyle.None
+                                                Fill: =ColorValue("#F97316")
+                                                Height: =12
+                                                Width: =26
+                                                X: =236
+                                                Y: =292
+                                          - lblPunchHeatHigh:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =varTheme_TextMuted
+                                                Height: =18
+                                                Size: =8
+                                                Text: ="High"
+                                                Width: =34
+                                                X: =268
+                                                Y: =288
+                                          - recPunchHeatCritical:
+                                              Control: Rectangle@2.3.0
+                                              Properties:
+                                                BorderColor: =RGBA(0,0,0,0)
+                                                BorderStyle: =BorderStyle.None
+                                                Fill: =ColorValue("#DC2626")
+                                                Height: =12
+                                                Width: =26
+                                                X: =308
+                                                Y: =292
+                                          - lblPunchHeatCritical:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =varTheme_TextMuted
+                                                Height: =18
+                                                Size: =8
+                                                Text: ="Critical"
+                                                Width: =48
+                                                X: =340
+                                                Y: =288
                                     - conPunchOperationalSummaries:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
@@ -3221,7 +3583,6 @@ Screens:
                                                 BorderThickness: =1
                                                 DropShadow: =DropShadow.None
                                                 Fill: =varTheme_Surface
-                                                FillPortions: =1
                                                 Height: =Parent.Height
                                                 LayoutMinWidth: =420
                                                 RadiusBottomLeft: =16
@@ -3257,7 +3618,6 @@ Screens:
                                                       BorderColor: =RGBA(0,0,0,0)
                                                       Height: =270
                                                       Items: =FirstN(SortByColumns(colPunchDashboardSubsystems, "PunchCount", SortOrder.Descending), 20)
-                                                      ShowScrollbar: =true
                                                       TemplatePadding: =3
                                                       TemplateSize: =52
                                                       Width: =Parent.Width - 24
@@ -3272,7 +3632,6 @@ Screens:
                                                             Height: =20
                                                             Size: =10
                                                             Text: =ThisItem.SubsystemCode
-                                                            Width: =150
                                                             X: =8
                                                             Y: =6
                                                       - lblPunchTopCodeCategory:
@@ -3310,12 +3669,15 @@ Screens:
                                                               =
                                                               Set(varPunches_ReturnView, "Home");
                                                               Set(varPunches_ContextSource, "Dashboard");
-                                                              Set(varPunches_Filter_TemplateId, Value(varPunchDashboardTemplateId));
-                                                              Set(varPunches_Filter_StatusCode, Text(ThisItem.StatusCode));
-                                                              Set(varPunches_Filter_CategoryCode, Text(ThisItem.CategoryCode));
-                                                              Set(varPunches_Filter_Subsystem, Text(ThisItem.SubsystemCode));
-                                                              Set(varPunches_Filter_SubcontractorId, Blank());
-                                                              Set(varPunches_Filter_Discipline, "");
+                                                              Set(varPunches_FilterSource, "Dashboard");
+                                                              Set(varPunchCustomFiltersJson, "[]");
+                                                              Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId));
+                                                              Set(varFilter_PunchStatusCode, Text(ThisItem.StatusCode));
+                                                              Set(varFilter_PunchCategoryCode, Text(ThisItem.CategoryCode));
+                                                              Set(varFilter_SubsystemsCsv, Text(ThisItem.SubsystemCode));
+                                                              Set(varFilter_Subsystem, Text(ThisItem.SubsystemCode));
+                                                              Set(varFilter_Subcontractor, Blank());
+                                                              Set(varFilter_PunchDiscipline, "");
                                                               Set(varPunches_Page, 1);
                                                               Set(varPunches_HasSearched, true);
                                                               Set(varPunches_AutoLoad, true);
@@ -3333,7 +3695,6 @@ Screens:
                                                 BorderThickness: =1
                                                 DropShadow: =DropShadow.None
                                                 Fill: =varTheme_Surface
-                                                FillPortions: =1
                                                 Height: =Parent.Height
                                                 LayoutMinWidth: =420
                                                 RadiusBottomLeft: =16
@@ -3369,7 +3730,6 @@ Screens:
                                                       BorderColor: =RGBA(0,0,0,0)
                                                       Height: =270
                                                       Items: =FirstN(SortByColumns(colPunchDashboardSubcontractors, "PunchCount", SortOrder.Descending), 20)
-                                                      ShowScrollbar: =true
                                                       TemplatePadding: =3
                                                       TemplateSize: =52
                                                       Width: =Parent.Width - 24
@@ -3422,12 +3782,15 @@ Screens:
                                                               =
                                                               Set(varPunches_ReturnView, "Home");
                                                               Set(varPunches_ContextSource, "Dashboard");
-                                                              Set(varPunches_Filter_TemplateId, Value(varPunchDashboardTemplateId));
-                                                              Set(varPunches_Filter_StatusCode, Text(ThisItem.StatusCode));
-                                                              Set(varPunches_Filter_CategoryCode, Text(ThisItem.CategoryCode));
-                                                              Set(varPunches_Filter_Subsystem, "");
-                                                              Set(varPunches_Filter_SubcontractorId, Value(ThisItem.SubcontractorId));
-                                                              Set(varPunches_Filter_Discipline, Text(ThisItem.DisciplineCode));
+                                                              Set(varPunches_FilterSource, "Dashboard");
+                                                              Set(varPunchCustomFiltersJson, "[]");
+                                                              Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId));
+                                                              Set(varFilter_PunchStatusCode, Text(ThisItem.StatusCode));
+                                                              Set(varFilter_PunchCategoryCode, Text(ThisItem.CategoryCode));
+                                                              Set(varFilter_SubsystemsCsv, "");
+                                                              Set(varFilter_Subsystem, Blank());
+                                                              Set(varFilter_Subcontractor, Text(ThisItem.SubcontractorId));
+                                                              Set(varFilter_PunchDiscipline, Text(ThisItem.DisciplineCode));
                                                               Set(varPunches_Page, 1);
                                                               Set(varPunches_HasSearched, true);
                                                               Set(varPunches_AutoLoad, true);
@@ -3445,7 +3808,6 @@ Screens:
                                     BorderThickness: =1
                                     DropShadow: =DropShadow.None
                                     Fill: =varTheme_Surface
-                                    FillPortions: =1
                                     Height: =100
                                     LayoutMinHeight: =260
                                     RadiusBottomLeft: =16
@@ -3521,7 +3883,7 @@ Screens:
                                           Width: =640
                                           X: =(Parent.Width - Self.Width) / 2
                                           Y: =lblPunchDashboardStateTitle.Y + lblPunchDashboardStateTitle.Height + 6
-                        - conHome_NoDataState:
+                        - conHome_NoDataState_1:
                             Control: GroupContainer@1.5.0
                             Variant: ManualLayout
                             Properties:
@@ -3534,14 +3896,14 @@ Screens:
                                 varHomeNoData &&
                                 !IsBlank(varProjectId)
                             Children:
-                              - Text13:
+                              - Text13_1:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     Text: ="No dashboard data configured"
                                     Width: =400
                                     X: =40
                                     Y: =40
-                              - Text14:
+                              - Text14_1:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     Text: ="This project is available, but no discipline dashboard data has been configured yet."
@@ -3683,7 +4045,11 @@ Screens:
                                           StatusName: Text(Value.StatusName),
                                           StatusOrder: Value(Coalesce(Text(Value.StatusOrder), "0")),
                                           StatusColor: Coalesce(Text(Value.StatusColor), "#64748B"),
-                                          PunchCount: Value(Coalesce(Text(Value.PunchCount), "0"))
+                                          PunchCount: Value(Coalesce(Text(Value.PunchCount), "0")),
+                                          PreviousPunchCount: Value(Coalesce(Text(Value.PreviousPunchCount), Text(Value.PunchCount), "0")),
+                                          Delta: Value(Coalesce(Text(Value.Delta), "0")),
+                                          DeltaPercent: Value(Coalesce(Text(Value.DeltaPercent), "0")),
+                                          Trend: Coalesce(Text(Value.Trend), "Neutral")
                                       }
                                   )
                               );
@@ -3700,7 +4066,32 @@ Screens:
                                           StatusName: Text(Value.StatusName),
                                           StatusOrder: Value(Coalesce(Text(Value.StatusOrder), "0")),
                                           StatusColor: Coalesce(Text(Value.StatusColor), "#64748B"),
-                                          PunchCount: Value(Coalesce(Text(Value.PunchCount), "0"))
+                                          PunchCount: Value(Coalesce(Text(Value.PunchCount), "0")),
+                                          Intensity: Value(Coalesce(Text(Value.Intensity), "0")),
+                                          IntensityBand: Coalesce(Text(Value.IntensityBand), "NONE")
+                                      }
+                                  )
+                              );
+
+                              ClearCollect(
+                                  colPunchDashboardTimeline,
+                                  ForAll(
+                                      Table(_bundle.timeline),
+                                      {
+                                          SnapshotRunId: Value(Coalesce(Text(Value.SnapshotRunId), "0")),
+                                          SnapshotDate:
+                                              If(
+                                                  IsBlank(Text(Value.SnapshotDate)) || Text(Value.SnapshotDate) = "null",
+                                                  Blank(),
+                                                  DateTimeValue(Text(Value.SnapshotDate))
+                                              ),
+                                          SnapshotSequence: Value(Coalesce(Text(Value.SnapshotSequence), "0")),
+                                          OpenCount: Value(Coalesce(Text(Value.Open), "0")),
+                                          ClearedCount: Value(Coalesce(Text(Value.Cleared), "0")),
+                                          ClosedCount: Value(Coalesce(Text(Value.Closed), "0")),
+                                          TotalCount: Value(Coalesce(Text(Value.Total), "0")),
+                                          OpenDelta: Value(Coalesce(Text(Value.OpenDelta), "0")),
+                                          OpenDeltaPercent: Value(Coalesce(Text(Value.OpenDeltaPercent), "0"))
                                       }
                                   )
                               );
@@ -3773,7 +4164,7 @@ Screens:
             Visible: =false
             X: =180
             Y: =180
-      - btnHome_OpenNodeOperations:
+      - btnHome_OpenNodeOperations_1:
           Control: ModernButton@1.0.0
           Properties:
             OnSelect: |-
@@ -3808,7 +4199,7 @@ Screens:
             Visible: =false
             X: =140
             Y: =140
-      - btnHome_LoadPendingSubsystems:
+      - btnHome_LoadPendingSubsystems_1:
           Control: ModernButton@1.0.0
           Properties:
             OnSelect: |-
@@ -3934,7 +4325,7 @@ Screens:
             Visible: =false
             X: =80
             Y: =80
-      - btnHome_LoadHive:
+      - btnHome_LoadHive_1:
           Control: ModernButton@1.0.0
           Properties:
             OnSelect: |-
@@ -4176,7 +4567,7 @@ Screens:
             Visible: =false
             X: =60
             Y: =60
-      - btnHome_ProjectChange_Commit:
+      - btnHome_ProjectChange_Commit_1:
           Control: ModernButton@1.0.0
           Properties:
             OnSelect: |-
@@ -4362,7 +4753,7 @@ Screens:
             Visible: =false
             X: =120
             Y: =120
-      - conGlobalOverlay_Home:
+      - conGlobalOverlay_Home_1:
           Control: GroupContainer@1.5.0
           Variant: ManualLayout
           Properties:
@@ -4375,7 +4766,7 @@ Screens:
               varGlobalLoadPending
             Width: =App.Width
           Children:
-            - conGlobalLoadingCard:
+            - conGlobalLoadingCard_5:
                 Control: GroupContainer@1.5.0
                 Variant: ManualLayout
                 Properties:
@@ -4392,7 +4783,7 @@ Screens:
                   X: =(Parent.Width - Self.Width) / 2
                   Y: =(Parent.Height - Self.Height) / 2
                 Children:
-                  - Spinner3:
+                  - Spinner3_5:
                       Control: Spinner@1.4.6
                       Properties:
                         Height: =32
@@ -4400,7 +4791,7 @@ Screens:
                         Width: =32
                         X: =24
                         Y: =86
-                  - Text31:
+                  - Text31_5:
                       Control: ModernText@1.0.0
                       Properties:
                         AutoHeight: =true
@@ -4412,7 +4803,7 @@ Screens:
                         Width: =Parent.Width - 48
                         X: =24
                         Y: =52
-                  - Text36:
+                  - Text36_5:
                       Control: ModernText@1.0.0
                       Properties:
                         AutoHeight: =true
@@ -4426,7 +4817,7 @@ Screens:
                         Width: =Parent.Width - 48
                         X: =24
                         Y: =24
-                  - Rectangle2:
+                  - Rectangle2_5:
                       Control: Rectangle@2.3.0
                       Properties:
                         BorderColor: =RGBA(0, 0, 0, 0)
@@ -4441,7 +4832,7 @@ Screens:
                         Width: =Parent.Width - 88
                         X: =94
                         Y: =98
-                  - Rectangle6:
+                  - Rectangle6_5:
                       Control: Rectangle@2.3.0
                       Properties:
                         BorderColor: =RGBA(0, 0, 0, 0)
