@@ -1,5 +1,37 @@
 # Changelog
 
+## EPIC-01 — Executive Home · Increment 01 — Runtime Status
+
+### Objective
+- Establish a single, observable runtime status for the Executive Home dashboard so users can distinguish idle, updating, ready, and failed states from the header.
+
+### Changed
+- Added the executive dashboard runtime variables `varExecutiveDashboardStatus`, `varExecutiveDashboardError`, `varExecutiveDashboardRequestedAt`, and `varExecutiveDashboardCompletedAt`.
+- Centralized the transition to `LOADING` in `btnHome_RequestDashboardLoad` for both Punches and Tasks dashboard requests.
+- Added completion transitions to `READY` or `ERROR` in the existing Punch Dashboard and Tasks/Hive loaders without changing their Flow calls or collection contracts.
+- Added explicit error-state handling for unsupported dashboard actions in `tmrGlobalLoader_1`.
+- Added a live status indicator to the Executive Dashboard refresh card showing `IDLE`, `UPDATING`, `READY`, or `FAILED`.
+- Preserved project switching, current load actions, existing collections, navigation, SQL contracts, and Power Automate integrations.
+
+### Files modified
+- `screens/Home/scr_Home_1.pa.yaml`
+- `CHANGELOG.md`
+
+### Validation
+- Parsed the complete Power Apps YAML with PyYAML `BaseLoader`.
+- Verified 230 controls with unique names.
+- Verified the executive runtime status is initialized, enters `LOADING`, and resolves to `READY` or `ERROR` in both dashboard load paths.
+- Verified the unsupported-action branch records a concrete failure status and message.
+- Verified the new header status control exists exactly once.
+- Verified existing Flow invocation counts remain unchanged.
+- Verified the differential ZIP opens successfully and contains only the two modified files.
+
+### Limitations
+- Power Apps Studio import/compile is not available in the execution environment; validation is structural and static.
+
+### Open issues
+- None identified within this increment.
+
 ## Sprint 07I — Punch Template Reload Orchestration
 
 ### Objective

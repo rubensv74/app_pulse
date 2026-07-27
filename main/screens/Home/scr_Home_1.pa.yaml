@@ -93,6 +93,12 @@ Screens:
         Set(varDash_IsLoading, false);
         Set(varExecDashboardLoading, false);
 
+        // Executive dashboard runtime status
+        If(IsBlank(varExecutiveDashboardStatus), Set(varExecutiveDashboardStatus, "IDLE"));
+        If(IsBlank(varExecutiveDashboardError), Set(varExecutiveDashboardError, ""));
+        If(IsBlank(varExecutiveDashboardRequestedAt), Set(varExecutiveDashboardRequestedAt, Blank()));
+        If(IsBlank(varExecutiveDashboardCompletedAt), Set(varExecutiveDashboardCompletedAt, Blank()));
+
         // Error states
         Set(varAppError, "");
         Set(varAppWarning, "");
@@ -274,6 +280,9 @@ Screens:
                   );
                   Set(varGlobalLoadingScope, "HOME");
                   Set(varHomeError, "");
+                  Set(varExecutiveDashboardStatus, "LOADING");
+                  Set(varExecutiveDashboardError, "");
+                  Set(varExecutiveDashboardRequestedAt, Now());
                   Set(varProjectSwitching, false);
                   Set(
                       varGlobalLoadAction,
@@ -326,6 +335,9 @@ Screens:
                       "LOAD_TASKS",
                           Select(btnHome_LoadHive_1),
 
+                      Set(varExecutiveDashboardStatus, "ERROR");
+                      Set(varExecutiveDashboardError, "Unsupported dashboard load action: " & Coalesce(varGlobalLoadAction, "-"));
+                      Set(varExecutiveDashboardCompletedAt, Now());
                       Notify(
                           "Home cannot execute action: " & Coalesce(varGlobalLoadAction, "-"),
                           NotificationType.Warning
@@ -971,6 +983,31 @@ Screens:
                                           Width: =If(Parent.Width < 280, 96, 110)
                                           X: =Parent.Width - Self.Width - 16
                                           Y: =19
+                                    - lblExecutiveDashboardStatus_1:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Align: ='TextCanvas.Align'.End
+                                          Color: |-
+                                            =Switch(
+                                                varExecutiveDashboardStatus,
+                                                "READY", varTheme_Green,
+                                                "LOADING", varTheme_PulseBlueDark,
+                                                "ERROR", varTheme_Red,
+                                                varTheme_TextMuted
+                                            )
+                                          FontWeight: =FontWeight.Semibold
+                                          Size: =9
+                                          Text: |-
+                                            =Switch(
+                                                varExecutiveDashboardStatus,
+                                                "READY", "READY",
+                                                "LOADING", "UPDATING",
+                                                "ERROR", "FAILED",
+                                                "IDLE"
+                                            )
+                                          Width: =96
+                                          X: =Parent.Width - Self.Width - 16
+                                          Y: =4
                                     - lblOverviewRefreshTitle_2:
                                         Control: ModernText@1.0.0
                                         Properties:
@@ -4363,6 +4400,12 @@ Screens:
               );
               Set(varPunchDashboardLoaded, IsBlank(varPunchDashboardError));
               Set(varPunchDashboardLoading, false);
+              Set(varExecutiveDashboardCompletedAt, Now());
+              Set(
+                  varExecutiveDashboardStatus,
+                  If(IsBlank(varPunchDashboardError), "READY", "ERROR")
+              );
+              Set(varExecutiveDashboardError, Coalesce(varPunchDashboardError, ""));
 
               If(
                   !IsBlank(varPunchDashboardError),
@@ -4791,6 +4834,12 @@ Screens:
 
               Set(varHomeLoading, false);
               Set(varProjectSwitching, false);
+              Set(varExecutiveDashboardCompletedAt, Now());
+              Set(
+                  varExecutiveDashboardStatus,
+                  If(IsBlank(varHomeError) && IsBlank(varAppError), "READY", "ERROR")
+              );
+              Set(varExecutiveDashboardError, Coalesce(varHomeError, varAppError, ""));
               Set(varGlobalLoading, false);
               Set(varGlobalLoadingMsg, "");
               Set(varGlobalLoadingSubMsg, "");
