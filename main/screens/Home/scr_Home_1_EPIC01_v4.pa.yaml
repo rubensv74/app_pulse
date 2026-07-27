@@ -4349,9 +4349,11 @@ Screens:
                                   "DisplayOrder",
                                   SortOrder.Ascending
                               )
-                          )
+                          );
+                          true
                       ),
-                      Set(varPunchDashboardError, FirstError.Message)
+                      Set(varPunchDashboardError, FirstError.Message);
+                      false
                   )
               );
 
@@ -4522,9 +4524,11 @@ Screens:
                                       }
                                   )
                               )
-                          )
+                          );
+                          true
                       ),
-                      Set(varPunchDashboardError, FirstError.Message)
+                      Set(varPunchDashboardError, FirstError.Message);
+                      false
                   )
               );
 
