@@ -3080,12 +3080,41 @@ Screens:
                                         Properties:
                                           BorderThickness: =1
                                           Color: =varTheme_Text
-                                          DefaultSelectedItems: =If(IsBlank(varPunchDashboardTemplateId), [], Filter(colPunchTemplates_Filter, Value(TemplateId) = Value(varPunchDashboardTemplateId)))
+                                          DefaultSelectedItems: |-
+                                            =
+                                            If(
+                                                IsBlank(varPunchDashboardTemplateId),
+                                                [],
+                                                Filter(
+                                                    AddColumns(
+                                                        colPunchTemplates_Filter,
+                                                        TemplateDisplayText,
+                                                        Coalesce(
+                                                            TemplateDisplayName,
+                                                            TemplateName,
+                                                            TemplateCode,
+                                                            Text(TemplateId)
+                                                        )
+                                                    ),
+                                                    Value(TemplateId) = Value(varPunchDashboardTemplateId)
+                                                )
+                                            )
                                           Fill: =varTheme_Surface
                                           InputTextPlaceholder: ="Select template"
                                           IsSearchable: =false
-                                          ItemDisplayText: =Coalesce(ThisItem.TemplateDisplayName, ThisItem.TemplateName, ThisItem.TemplateCode, Text(ThisItem.TemplateId))
-                                          Items: =colPunchTemplates_Filter
+                                          ItemDisplayText: =ThisItem.TemplateDisplayText
+                                          Items: |-
+                                            =
+                                            AddColumns(
+                                                colPunchTemplates_Filter,
+                                                TemplateDisplayText,
+                                                Coalesce(
+                                                    TemplateDisplayName,
+                                                    TemplateName,
+                                                    TemplateCode,
+                                                    Text(TemplateId)
+                                                )
+                                            )
                                           OnChange: |-
                                             =
                                             If(
@@ -3710,7 +3739,17 @@ Screens:
                                                     Properties:
                                                       BorderColor: =RGBA(0,0,0,0)
                                                       Height: =40
-                                                      Items: =SortByColumns(ThisItem.CategoryRows, "StatusOrder", SortOrder.Ascending)
+                                                      Items: |-
+                                                        =
+                                                        SortByColumns(
+                                                            AddColumns(
+                                                                ThisItem.CategoryRows,
+                                                                ParentCategoryCode,
+                                                                ThisItem.CategoryCode
+                                                            ),
+                                                            "StatusOrder",
+                                                            SortOrder.Ascending
+                                                        )
                                                       ShowScrollbar: =false
                                                       TemplatePadding: =2
                                                       TemplateSize: =112
@@ -3754,14 +3793,14 @@ Screens:
                                                             OnSelect: |-
                                                               =
                                                               Set(varPunchDrillStatusCode, Text(ThisItem.StatusCode));
-                                                              Set(varPunchDrillCategoryCode, Text(ThisItem.CategoryCode));
+                                                              Set(varPunchDrillCategoryCode, Text(ThisItem.ParentCategoryCode));
                                                               Set(varPunches_ReturnView, "Home");
                                                               Set(varPunches_ContextSource, "Dashboard");
                                                               Set(varPunches_FilterSource, "Dashboard");
                                                               Set(varPunchCustomFiltersJson, "[]");
                                                               Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId));
                                                               Set(varFilter_PunchStatusCode, Text(ThisItem.StatusCode));
-                                                              Set(varFilter_PunchCategoryCode, Text(ThisItem.CategoryCode));
+                                                              Set(varFilter_PunchCategoryCode, Text(ThisItem.ParentCategoryCode));
                                                               Set(varFilter_SubsystemsCsv, "");
                                                               Set(varFilter_Subsystem, Blank());
                                                               Set(varFilter_Subcontractor, Blank());
@@ -4098,6 +4137,7 @@ Screens:
                                                               Set(varFilter_PunchCategoryCode, Text(ThisItem.CategoryCode));
                                                               Set(varFilter_SubsystemsCsv, "");
                                                               Set(varFilter_Subsystem, Blank());
+                                                              Set(varPunchDrillSubcontractorId, Value(ThisItem.SubcontractorId));
                                                               Set(varFilter_Subcontractor, Text(ThisItem.SubcontractorId));
                                                               Set(varFilter_PunchDiscipline, Text(ThisItem.DisciplineCode));
                                                               Set(varPunches_Page, 1);
@@ -4138,7 +4178,7 @@ Screens:
                                           HoverBorderColor: =RGBA(0,0,0,0)
                                           HoverColor: =varTheme_PulseBlueDark
                                           HoverFill: =RGBA(0,0,0,0)
-                                          Icon: =If(!IsBlank(varPunchDashboardError), Icon.Warning, Icon.BarChart4)
+                                          Icon: =If(!IsBlank(varPunchDashboardError), Icon.Warning, Icon.BarChart)
                                           PressedBorderColor: =RGBA(0,0,0,0)
                                           PressedColor: =varTheme_PulseBlueDark
                                           PressedFill: =RGBA(0,0,0,0)
@@ -5093,7 +5133,7 @@ Screens:
               Set(varPunchDrillStatusCode, "");
               Set(varPunchDrillCategoryCode, "");
               Set(varPunchDrillSubsystemCode, "");
-              Set(varPunchDrillSubcontractorId, Blank());
+              Set(varPunchDrillSubcontractorId, -1);
               Set(varPunchDrillDisciplineCode, "");
 
               Clear(colPunchDashboardSnapshotInfo);
