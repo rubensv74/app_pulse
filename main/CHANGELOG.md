@@ -1,5 +1,62 @@
 # Changelog
 
+## Sprint 07F — Centralized Dashboard Load Request
+
+### Objective
+- Centralize Home dashboard load requests so refresh and tab activation use one consistent runtime entry point without changing existing Flow calls or data contracts.
+
+### Changed
+- Added the hidden `btnHome_RequestDashboardLoad` dispatcher as the single request point for Punches and Tasks dashboard loads.
+- Reused the dispatcher from the Home refresh button and both dashboard tab selectors.
+- Standardized project validation, loading messages, loading scope, action selection, and timer retrigger behavior.
+- Preserved the existing `btnHome_LoadPunchDashboard`, `btnHome_LoadHive_1`, timer routing, Flow calls, collections, and SQL contracts.
+
+### Files modified
+- `screens/Home/scr_Home_1.pa.yaml`
+- `CHANGELOG.md`
+
+### Validation
+- Parsed the complete Power Apps YAML with PyYAML `BaseLoader`.
+- Verified control-name uniqueness across the complete screen source.
+- Verified the new dispatcher exists exactly once and all three intended callers reference it.
+- Verified existing Flow-call counts and data collection references are unchanged.
+- Compared the differential to confirm changes are limited to load-request orchestration and changelog documentation.
+- Verified the differential ZIP opens successfully and contains only the two modified files.
+
+### Limitations
+- Power Apps Studio import/compile is not available in the execution environment; validation is structural and static.
+
+### Open issues
+- None identified within Sprint 07F scope.
+
+## Sprint 07E — Responsive Dashboard Tab Selector
+
+### Objective
+- Keep the Punches/Tasks dashboard selector usable and visually aligned at narrow Home content widths without changing its navigation or loading behavior.
+
+### Changed
+- Made both dashboard tab buttons share the available width when the selector becomes narrower than 420 px.
+- Linked the Tasks tab position to the Punches tab geometry, removing duplicated hard-coded offsets.
+- Linked both active-tab indicators to their corresponding button width and horizontal center.
+- Preserved all tab `OnSelect` formulas, Flow calls, collections, filters, navigation, and dashboard contracts.
+
+### Files modified
+- `screens/Home/scr_Home_1.pa.yaml`
+- `CHANGELOG.md`
+
+### Validation
+- Parsed the complete Power Apps YAML with PyYAML `BaseLoader`.
+- Verified control-name uniqueness across the complete screen source.
+- Verified the four responsive tab geometry formulas are present exactly once.
+- Compared every `OnSelect` property between the original and modified YAML; no action formula changed.
+- Verified the differential ZIP opens successfully and contains only the two modified files.
+
+### Limitations
+- Power Apps Studio import/compile is not available in the execution environment; validation is structural and static.
+
+### Open issues
+- None identified within Sprint 07E scope.
+
 ## Sprint 07D — Responsive Dashboard Empty States
 
 ### Objective

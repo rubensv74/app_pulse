@@ -239,6 +239,52 @@ Screens:
 
 
     Children:
+      - btnHome_RequestDashboardLoad:
+          Control: ModernButton@1.0.0
+          Properties:
+            OnSelect: |-
+              =
+              If(
+                  IsBlank(varProjectId),
+
+                  Notify("Please select a project first.", NotificationType.Warning);
+                  Set(varGlobalLoading, false);
+                  Set(varGlobalLoadingMsg, "");
+                  Set(varGlobalLoadingSubMsg, "");
+                  Set(varGlobalLoadingScope, "");
+                  Set(varGlobalLoadAction, "");
+                  Set(varGlobalLoadPending, false),
+
+                  Set(varGlobalLoading, true);
+                  Set(
+                      varGlobalLoadingMsg,
+                      If(
+                          varHomeDashboard = "PUNCHES",
+                          "Loading Punch Dashboard...",
+                          "Loading Tasks Dashboard..."
+                      )
+                  );
+                  Set(
+                      varGlobalLoadingSubMsg,
+                      If(
+                          varHomeDashboard = "PUNCHES",
+                          "Preparing project punch analytics",
+                          "Preparing discipline and subsystem overview"
+                      )
+                  );
+                  Set(varGlobalLoadingScope, "HOME");
+                  Set(varHomeError, "");
+                  Set(varProjectSwitching, false);
+                  Set(
+                      varGlobalLoadAction,
+                      If(varHomeDashboard = "PUNCHES", "LOAD_PUNCH_DASHBOARD", "LOAD_HOME")
+                  );
+                  Set(varGlobalLoadPending, false);
+                  Set(varGlobalLoadPending, true)
+              )
+            Visible: =false
+            X: =140
+            Y: =140
       - tmrGlobalLoader_1:
           Control: Timer@2.1.0
           Properties:
@@ -915,7 +961,7 @@ Screens:
                                             )
                                           Height: =36
                                           Icon: ="ArrowClockwise"
-                                          OnSelect: "=\r\n\r\nIf(\r\n    IsBlank(varProjectId),\r\n\r\n    Notify(\"Please select a project first.\", NotificationType.Warning),\r\n\r\n    Set(varGlobalLoading, true);\r\n    Set(varGlobalLoadingMsg, \"Refreshing dashboard...\");\r\n    Set(varGlobalLoadingSubMsg, If(varHomeDashboard = \"PUNCHES\", \"Updating punch dashboard snapshot\", \"Updating task dashboard data\"));\r\n    \r\n    Set(varGlobalLoadingScope, \"HOME\");\r\n\r\n    Set(varHomeLoading, false);\r\n    Set(varProjectSwitching, false);\r\n\r\n    Set(varGlobalLoadAction, If(varHomeDashboard = \"PUNCHES\", \"LOAD_PUNCH_DASHBOARD\", \"LOAD_HOME\"));\r\n    Set(varGlobalLoadPending, true)\r\n)"
+                                          OnSelect: =Select(btnHome_RequestDashboardLoad)
                                           RadiusBottomLeft: =10
                                           RadiusBottomRight: =10
                                           RadiusTopLeft: =10
@@ -977,12 +1023,7 @@ Screens:
                                               !varPunchDashboardLoaded &&
                                               !varPunchDashboardLoading,
 
-                                              Set(varGlobalLoading, true);
-                                              Set(varGlobalLoadingMsg, "Loading Punch Dashboard...");
-                                              Set(varGlobalLoadingSubMsg, "Preparing project punch analytics");
-                                              Set(varGlobalLoadingScope, "HOME");
-                                              Set(varGlobalLoadAction, "LOAD_PUNCH_DASHBOARD");
-                                              Set(varGlobalLoadPending, true)
+                                              Select(btnHome_RequestDashboardLoad)
                                           )
                                       )
                                     RadiusBottomLeft: =9
@@ -990,8 +1031,8 @@ Screens:
                                     RadiusTopLeft: =9
                                     RadiusTopRight: =9
                                     Text: ="Punches"
-                                    Width: =118
-                                    X: =Parent.Width - 252
+                                    Width: =If(Parent.Width < 420, (Parent.Width - 28) / 2, 118)
+                                    X: =If(Parent.Width < 420, 10, Parent.Width - 252)
                                     Y: =6
                               - btnHomeTabTasks:
                                   Control: ModernButton@1.0.0
@@ -1013,12 +1054,7 @@ Screens:
                                               !varHomeHiveLoaded &&
                                               !varHomeLoading,
 
-                                              Set(varGlobalLoading, true);
-                                              Set(varGlobalLoadingMsg, "Loading Tasks Dashboard...");
-                                              Set(varGlobalLoadingSubMsg, "Preparing discipline and subsystem overview");
-                                              Set(varGlobalLoadingScope, "HOME");
-                                              Set(varGlobalLoadAction, "LOAD_HOME");
-                                              Set(varGlobalLoadPending, true)
+                                              Select(btnHome_RequestDashboardLoad)
                                           )
                                       )
                                     RadiusBottomLeft: =9
@@ -1026,8 +1062,8 @@ Screens:
                                     RadiusTopLeft: =9
                                     RadiusTopRight: =9
                                     Text: ="Tasks"
-                                    Width: =118
-                                    X: =Parent.Width - 126
+                                    Width: =btnHomeTabPunches.Width
+                                    X: =btnHomeTabPunches.X + btnHomeTabPunches.Width + 8
                                     Y: =6
                               - recHomeTabPunchesIndicator:
                                   Control: Rectangle@2.3.0
@@ -1037,8 +1073,8 @@ Screens:
                                     Fill: =varTheme_PulseBlue
                                     Height: =3
                                     Visible: =varHomeDashboard = "PUNCHES"
-                                    Width: =96
-                                    X: =Parent.Width - 241
+                                    Width: =Max(24, btnHomeTabPunches.Width - 22)
+                                    X: =btnHomeTabPunches.X + (btnHomeTabPunches.Width - Self.Width) / 2
                                     Y: =45
                               - recHomeTabTasksIndicator:
                                   Control: Rectangle@2.3.0
@@ -1048,8 +1084,8 @@ Screens:
                                     Fill: =varTheme_PulseBlue
                                     Height: =3
                                     Visible: =varHomeDashboard = "TASKS"
-                                    Width: =96
-                                    X: =Parent.Width - 115
+                                    Width: =Max(24, btnHomeTabTasks.Width - 22)
+                                    X: =btnHomeTabTasks.X + (btnHomeTabTasks.Width - Self.Width) / 2
                                     Y: =45
                         - conHomeShell_1:
                             Control: GroupContainer@1.5.0
