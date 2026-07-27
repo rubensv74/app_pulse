@@ -1,5 +1,36 @@
 # Changelog
 
+## EPIC-01 — Executive Home · Increment 02 — Executive Alert Banner
+
+### Objective
+- Surface dashboard failures and operational warnings directly below the Executive Home header, with an immediate retry path and dismissible notice state.
+
+### Changed
+- Added the runtime flag `varExecutiveAlertDismissed`, preserved across screen revisits and reset automatically for each new dashboard load request.
+- Added a unified Executive Alert banner that becomes visible for dashboard errors, loader failures, and existing Home warnings.
+- Added severity-aware styling for error and warning states using the existing theme tokens.
+- Added an inline `Retry` action wired to the centralized `btnHome_RequestDashboardLoad` dispatcher.
+- Added a dismiss action that hides the current notice without clearing the underlying error or warning state.
+- Preserved all existing Flow calls, collection contracts, tab navigation, project switching, and dashboard data-loading behavior.
+
+### Files modified
+- `screens/Home/scr_Home_1.pa.yaml`
+- `CHANGELOG.md`
+
+### Validation
+- Parsed the complete Power Apps YAML with PyYAML `BaseLoader`.
+- Verified all control names remain unique after adding the alert banner and its five child controls.
+- Verified the banner is driven only by existing runtime error/warning variables.
+- Verified the retry action delegates to the centralized dashboard dispatcher and introduces no new Flow invocation.
+- Verified the dismiss flag is initialized and reset on each new load request.
+- Verified the differential ZIP opens successfully and contains only the two modified files.
+
+### Limitations
+- Power Apps Studio import/compile is not available in the execution environment; validation is structural and static.
+
+### Open issues
+- None identified within this increment.
+
 ## EPIC-01 — Executive Home · Increment 01 — Runtime Status
 
 ### Objective

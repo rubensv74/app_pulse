@@ -98,6 +98,7 @@ Screens:
         If(IsBlank(varExecutiveDashboardError), Set(varExecutiveDashboardError, ""));
         If(IsBlank(varExecutiveDashboardRequestedAt), Set(varExecutiveDashboardRequestedAt, Blank()));
         If(IsBlank(varExecutiveDashboardCompletedAt), Set(varExecutiveDashboardCompletedAt, Blank()));
+        If(IsBlank(varExecutiveAlertDismissed), Set(varExecutiveAlertDismissed, false));
 
         // Error states
         Set(varAppError, "");
@@ -283,6 +284,7 @@ Screens:
                   Set(varExecutiveDashboardStatus, "LOADING");
                   Set(varExecutiveDashboardError, "");
                   Set(varExecutiveDashboardRequestedAt, Now());
+                  Set(varExecutiveAlertDismissed, false);
                   Set(varProjectSwitching, false);
                   Set(
                       varGlobalLoadAction,
@@ -1016,6 +1018,78 @@ Screens:
                                           Text: ="Last Refresh"
                                           X: =16
                                           Y: =10
+                        - conExecutiveAlertBanner_1:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =If(varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError), ColorFade(varTheme_Red, 55%), ColorFade(varTheme_Amber, 45%))
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =If(varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError), ColorFade(varTheme_Red, 92%), ColorFade(varTheme_Amber, 90%))
+                              FillPortions: =0
+                              Height: =52
+                              LayoutMinHeight: =52
+                              LayoutMinWidth: =16
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                              Visible: =!varExecutiveAlertDismissed && (varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError) || !IsBlank(varAppWarning))
+                              Width: =Parent.Width - 18
+                            Children:
+                              - icoExecutiveAlert_1:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =If(varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError), varTheme_Red, varTheme_Amber)
+                                    Height: =20
+                                    Icon: =If(varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError), Icon.Warning, Icon.Information)
+                                    Width: =20
+                                    X: =14
+                                    Y: =16
+                              - lblExecutiveAlertTitle_1:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Color: =varTheme_Text
+                                    FontWeight: =FontWeight.Semibold
+                                    Size: =10
+                                    Text: =If(varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError), "Dashboard update failed", "Executive dashboard notice")
+                                    Width: =Max(160, Parent.Width - 250)
+                                    X: =44
+                                    Y: =7
+                              - lblExecutiveAlertMessage_1:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Color: =varTheme_TextMuted
+                                    Size: =9
+                                    Text: =Coalesce(varExecutiveDashboardError, varAppWarning, "Review the dashboard status before continuing.")
+                                    Width: =Max(160, Parent.Width - 250)
+                                    X: =44
+                                    Y: =27
+                              - btnExecutiveAlertRetry_1:
+                                  Control: ModernButton@1.0.0
+                                  Properties:
+                                    Appearance: ='ButtonCanvas.Appearance'.Secondary
+                                    DisplayMode: =If(varGlobalLoading || IsBlank(varProjectId), DisplayMode.Disabled, DisplayMode.Edit)
+                                    Height: =32
+                                    Icon: ="ArrowClockwise"
+                                    OnSelect: =Select(btnHome_RequestDashboardLoad)
+                                    Text: ="Retry"
+                                    Visible: =varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError)
+                                    Width: =82
+                                    X: =Parent.Width - 126
+                                    Y: =10
+                              - icoExecutiveAlertDismiss_1:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_TextMuted
+                                    Height: =18
+                                    Icon: =Icon.Cancel
+                                    OnSelect: =Set(varExecutiveAlertDismissed, true)
+                                    Width: =18
+                                    X: =Parent.Width - 32
+                                    Y: =17
                         - conHomeDashboardTabs:
                             Control: GroupContainer@1.5.0
                             Variant: ManualLayout
