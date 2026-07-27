@@ -1090,6 +1090,283 @@ Screens:
                                     Width: =18
                                     X: =Parent.Width - 32
                                     Y: =17
+                        - conExecutiveKpiStrip_1:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_Surface
+                              FillPortions: =0
+                              Height: =118
+                              LayoutMinHeight: =118
+                              LayoutMinWidth: =16
+                              RadiusBottomLeft: =12
+                              RadiusBottomRight: =12
+                              RadiusTopLeft: =12
+                              RadiusTopRight: =12
+                              Visible: =!IsBlank(varProjectId)
+                              Width: =Parent.Width - 18
+                            Children:
+                              - lblExecutiveKpiStripTitle_1:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Color: =varTheme_Text
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =22
+                                    Size: =12
+                                    Text: ="Project pulse"
+                                    Width: =180
+                                    X: =14
+                                    Y: =9
+                              - lblExecutiveKpiStripHint_1:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Align: =Align.Right
+                                    Color: =varTheme_TextMuted
+                                    Height: =20
+                                    Size: =9
+                                    Text: ="Select a KPI to open its operational view"
+                                    Width: =Min(320, Parent.Width - 220)
+                                    X: =Parent.Width - Self.Width - 14
+                                    Y: =10
+                              - conExecutiveKpiProgress_1:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: =varTheme_Border
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_SurfaceAlt
+                                    Height: =72
+                                    RadiusBottomLeft: =10
+                                    RadiusBottomRight: =10
+                                    RadiusTopLeft: =10
+                                    RadiusTopRight: =10
+                                    Width: =(Parent.Width - 58) / 4
+                                    X: =10
+                                    Y: =36
+                                  Children:
+                                    - recExecutiveKpiProgressAccent_1:
+                                        Control: Rectangle@2.3.0
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          BorderStyle: =BorderStyle.None
+                                          Fill: =If(Sum(colHomeHiveNodesSorted, Total) = 0, varTheme_TextSoft, If(Sum(colHomeHiveNodesSorted, Done) / Sum(colHomeHiveNodesSorted, Total) >= 0.9, varTheme_Green, If(Sum(colHomeHiveNodesSorted, Done) / Sum(colHomeHiveNodesSorted, Total) >= 0.7, varTheme_Amber, varTheme_Red)))
+                                          Height: =4
+                                          Width: =Parent.Width
+                                    - lblExecutiveKpiProgressValue_1:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Color: =varTheme_Text
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =30
+                                          Size: =20
+                                          Text: =If(Sum(colHomeHiveNodesSorted, Total) = 0, "—", Text(100 * Sum(colHomeHiveNodesSorted, Done) / Sum(colHomeHiveNodesSorted, Total), "0.0") & "%")
+                                          Width: =Parent.Width - 24
+                                          X: =12
+                                          Y: =10
+                                    - lblExecutiveKpiProgressLabel_1:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Color: =varTheme_TextMuted
+                                          Height: =20
+                                          Size: =9
+                                          Text: ="Overall progress"
+                                          Width: =Parent.Width - 24
+                                          X: =12
+                                          Y: =43
+                                    - btnExecutiveKpiProgressOpen_1:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          BorderStyle: =BorderStyle.None
+                                          BorderThickness: =0
+                                          Fill: =RGBA(0,0,0,0)
+                                          Height: =Parent.Height
+                                          HoverFill: =RGBA(22,119,255,0.035)
+                                          OnSelect: =Set(varAppView, "Overview"); Set(varPageKey, "OVERVIEW"); Set(varPageTitle, "Overview"); Set(varPageSubtitle, "Project Handover Report by subsystem, discipline and form family"); Set(varOps_ViewMode, "OVERVIEW"); Navigate(scr_Overview, ScreenTransition.None)
+                                          Text: =""
+                                          Tooltip: ="Open project Overview"
+                                          Width: =Parent.Width
+                              - conExecutiveKpiTasks_1:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: =varTheme_Border
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_SurfaceAlt
+                                    Height: =72
+                                    RadiusBottomLeft: =10
+                                    RadiusBottomRight: =10
+                                    RadiusTopLeft: =10
+                                    RadiusTopRight: =10
+                                    Width: =(Parent.Width - 58) / 4
+                                    X: =conExecutiveKpiProgress_1.X + conExecutiveKpiProgress_1.Width + 12
+                                    Y: =36
+                                  Children:
+                                    - recExecutiveKpiTasksAccent_1:
+                                        Control: Rectangle@2.3.0
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          BorderStyle: =BorderStyle.None
+                                          Fill: =If(Sum(colHomeHiveNodesSorted, Remaining) = 0 && Sum(colHomeHiveNodesSorted, Total) > 0, varTheme_Green, varTheme_PulseBlueDark)
+                                          Height: =4
+                                          Width: =Parent.Width
+                                    - lblExecutiveKpiTasksValue_1:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Color: =varTheme_Text
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =30
+                                          Size: =20
+                                          Text: =Text(Sum(colHomeHiveNodesSorted, Remaining), "[$-en-US]#,##0")
+                                          Width: =Parent.Width - 24
+                                          X: =12
+                                          Y: =10
+                                    - lblExecutiveKpiTasksLabel_1:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Color: =varTheme_TextMuted
+                                          Height: =20
+                                          Size: =9
+                                          Text: ="Remaining tasks"
+                                          Width: =Parent.Width - 24
+                                          X: =12
+                                          Y: =43
+                                    - btnExecutiveKpiTasksOpen_1:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          BorderStyle: =BorderStyle.None
+                                          BorderThickness: =0
+                                          Fill: =RGBA(0,0,0,0)
+                                          Height: =Parent.Height
+                                          HoverFill: =RGBA(22,119,255,0.035)
+                                          OnSelect: =Set(varTasks_ReturnView, "Home"); Set(varTasks_ContextSource, "ExecutiveKpi"); Set(varTasks_AutoLoad, true); Navigate(scr_Tasks, ScreenTransition.None)
+                                          Text: =""
+                                          Tooltip: ="Open Tasks"
+                                          Width: =Parent.Width
+                              - conExecutiveKpiPunches_1:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: =varTheme_Border
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_SurfaceAlt
+                                    Height: =72
+                                    RadiusBottomLeft: =10
+                                    RadiusBottomRight: =10
+                                    RadiusTopLeft: =10
+                                    RadiusTopRight: =10
+                                    Width: =(Parent.Width - 58) / 4
+                                    X: =conExecutiveKpiTasks_1.X + conExecutiveKpiTasks_1.Width + 12
+                                    Y: =36
+                                  Children:
+                                    - recExecutiveKpiPunchesAccent_1:
+                                        Control: Rectangle@2.3.0
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          BorderStyle: =BorderStyle.None
+                                          Fill: =If(Sum(Filter(colPunchDashboardSummary, !(Lower(StatusCode) in ["closed", "done"])), PunchCount) = 0 && CountRows(colPunchDashboardSummary) > 0, varTheme_Green, varTheme_Amber)
+                                          Height: =4
+                                          Width: =Parent.Width
+                                    - lblExecutiveKpiPunchesValue_1:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Color: =varTheme_Text
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =30
+                                          Size: =20
+                                          Text: =Text(Sum(Filter(colPunchDashboardSummary, !(Lower(StatusCode) in ["closed", "done"])), PunchCount), "[$-en-US]#,##0")
+                                          Width: =Parent.Width - 24
+                                          X: =12
+                                          Y: =10
+                                    - lblExecutiveKpiPunchesLabel_1:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Color: =varTheme_TextMuted
+                                          Height: =20
+                                          Size: =9
+                                          Text: ="Open punches"
+                                          Width: =Parent.Width - 24
+                                          X: =12
+                                          Y: =43
+                                    - btnExecutiveKpiPunchesOpen_1:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          BorderStyle: =BorderStyle.None
+                                          BorderThickness: =0
+                                          Fill: =RGBA(0,0,0,0)
+                                          Height: =Parent.Height
+                                          HoverFill: =RGBA(22,119,255,0.035)
+                                          OnSelect: =Set(varPunches_ReturnView, "Home"); Set(varPunches_ContextSource, "ExecutiveKpi"); Set(varPunches_FilterSource, "Dashboard"); Set(varPunchCustomFiltersJson, "[]"); Navigate(scr_Punches, ScreenTransition.None)
+                                          Text: =""
+                                          Tooltip: ="Open Punch List"
+                                          Width: =Parent.Width
+                              - conExecutiveKpiRisk_1:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: =varTheme_Border
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_SurfaceAlt
+                                    Height: =72
+                                    RadiusBottomLeft: =10
+                                    RadiusBottomRight: =10
+                                    RadiusTopLeft: =10
+                                    RadiusTopRight: =10
+                                    Width: =(Parent.Width - 58) / 4
+                                    X: =conExecutiveKpiPunches_1.X + conExecutiveKpiPunches_1.Width + 12
+                                    Y: =36
+                                  Children:
+                                    - recExecutiveKpiRiskAccent_1:
+                                        Control: Rectangle@2.3.0
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          BorderStyle: =BorderStyle.None
+                                          Fill: =If(CountRows(colHomePendingSubsystems) = 0, varTheme_Green, If(CountRows(colHomePendingSubsystems) <= 5, varTheme_Amber, varTheme_Red))
+                                          Height: =4
+                                          Width: =Parent.Width
+                                    - lblExecutiveKpiRiskValue_1:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Color: =varTheme_Text
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =30
+                                          Size: =20
+                                          Text: =Text(CountRows(colHomePendingSubsystems), "[$-en-US]#,##0")
+                                          Width: =Parent.Width - 24
+                                          X: =12
+                                          Y: =10
+                                    - lblExecutiveKpiRiskLabel_1:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Color: =varTheme_TextMuted
+                                          Height: =20
+                                          Size: =9
+                                          Text: ="Pending subsystems"
+                                          Width: =Parent.Width - 24
+                                          X: =12
+                                          Y: =43
+                                    - btnExecutiveKpiRiskOpen_1:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          BorderStyle: =BorderStyle.None
+                                          BorderThickness: =0
+                                          Fill: =RGBA(0,0,0,0)
+                                          Height: =Parent.Height
+                                          HoverFill: =RGBA(22,119,255,0.035)
+                                          OnSelect: =Set(varHomeDashboard, "TASKS"); Set(varHomeShowRightPanel, true); Set(varHomeShowCards, true)
+                                          Text: =""
+                                          Tooltip: ="Show pending subsystems"
+                                          Width: =Parent.Width
                         - conHomeDashboardTabs:
                             Control: GroupContainer@1.5.0
                             Variant: ManualLayout

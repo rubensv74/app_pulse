@@ -1,3 +1,33 @@
+## EPIC-01 · Increment 03 — Executive KPI Strip
+
+### Objective
+- Add a compact executive KPI layer to Home so project health and operational backlog can be assessed before entering the detailed dashboards.
+
+### Changed
+- Added a responsive four-card `Project pulse` strip below the executive alert banner.
+- Added live KPIs for overall task progress, remaining tasks, open punches, and pending subsystems.
+- Added threshold-driven accent states using the existing theme tokens.
+- Added direct navigation from every KPI to Overview, Tasks, Punches, or the pending-subsystem context.
+- Added contextual tooltips without introducing new Flow calls or changing backend contracts.
+- Preserved all existing dashboard loading orchestration, collections, filters, and SQL/Flow contracts.
+
+### Files modified
+- `screens/Home/scr_Home_1.pa.yaml`
+- `CHANGELOG.md`
+
+### Validation
+- Parsed the complete Power Apps YAML with PyYAML `BaseLoader`.
+- Verified control-name uniqueness across the complete screen source.
+- Verified all four KPI cards, values, accent bars, and navigation overlays are present exactly once.
+- Confirmed no new Flow invocation was introduced.
+- Verified the differential ZIP opens successfully and contains only the two modified files.
+
+### Limitations
+- Power Apps Studio import/compile is not available in the execution environment; validation is structural and static.
+
+### Open issues
+- Final visual and formula validation must be completed after importing the screen into Power Apps Studio.
+
 # Changelog
 
 ## EPIC-01 — Executive Home · Increment 02 — Executive Alert Banner
