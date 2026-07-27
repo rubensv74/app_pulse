@@ -1,3 +1,24 @@
+# CHANGELOG
+
+## 2026-07-27 — EPIC-01 Executive Home component integration
+
+### Changed
+- Replaced the manual Executive Alert controls with `cmp_ExecutiveAlertBanner`, preserving retry and dismiss behavior.
+- Replaced the four duplicated KPI card implementations with `cmp_ExecutiveKpiCard` instances bound to Progress, Open Tasks, Open Punches and Pending Subsystems.
+- Added KPI status, trend, tooltip and contextual navigation bindings.
+- Added `cmp_SkeletonLoader` as the unified executive loading state.
+- Replaced the Executive Insights gallery presentation with fixed reusable `cmp_ExecutiveInsightCard` instances for the two highest-priority signals.
+- Integrated `cmp_DashboardSectionHeader` in the KPI and Executive Insights sections.
+- Added `cmp_EmptyState` for no-project, no-data, error and restricted-access scenarios.
+- Consolidated the executive runtime status around `varExecutiveDashboardStatus`.
+- Increased the KPI strip height to support the reusable card dimensions and responsive four-column layout.
+
+### Validation
+- Source YAML parsed successfully.
+- Duplicate legacy controls removed from the integrated sections.
+- Component references and event bindings verified statically.
+- Power Apps Studio import and formula compilation remain required in the target environment.
+
 ## EPIC-01 · Increment 03 — Executive KPI Strip
 
 ### Objective

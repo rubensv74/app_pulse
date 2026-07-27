@@ -1018,78 +1018,25 @@ Screens:
                                           Text: ="Last Refresh"
                                           X: =16
                                           Y: =10
-                        - conExecutiveAlertBanner_1:
-                            Control: GroupContainer@1.5.0
-                            Variant: ManualLayout
+                        - cmpHomeExecutiveAlert:
+                            Control: cmp_ExecutiveAlertBanner
                             Properties:
-                              BorderColor: =If(varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError), ColorFade(varTheme_Red, 55%), ColorFade(varTheme_Amber, 45%))
-                              BorderThickness: =1
-                              DropShadow: =DropShadow.None
-                              Fill: =If(varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError), ColorFade(varTheme_Red, 92%), ColorFade(varTheme_Amber, 90%))
-                              FillPortions: =0
-                              Height: =52
-                              LayoutMinHeight: =52
-                              LayoutMinWidth: =16
-                              RadiusBottomLeft: =10
-                              RadiusBottomRight: =10
-                              RadiusTopLeft: =10
-                              RadiusTopRight: =10
+                              ActionText: ="Retry"
+                              DangerColor: =varTheme_Red
+                              Height: =64
+                              InfoColor: =varTheme_PulseBlueDark
+                              Message: =Coalesce(varExecutiveDashboardError, varAppWarning, "Review the dashboard status before continuing.")
+                              OnAction: =Select(btnHome_RequestDashboardLoad)
+                              OnDismiss: =Set(varExecutiveAlertDismissed, true)
+                              Severity: =If(varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError), "ERROR", If(!IsBlank(varAppWarning), "WARNING", "INFO"))
+                              ShowAction: =varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError)
+                              ShowDismiss: =true
+                              TextColor: =varTheme_Text
+                              Title: =If(varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError), "Dashboard update failed", "Executive dashboard notice")
                               Visible: =!varExecutiveAlertDismissed && (varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError) || !IsBlank(varAppWarning))
+                              VisibleState: =!varExecutiveAlertDismissed && (varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError) || !IsBlank(varAppWarning))
+                              WarningColor: =varTheme_Amber
                               Width: =Parent.Width - 18
-                            Children:
-                              - icoExecutiveAlert_1:
-                                  Control: Classic/Icon@2.5.0
-                                  Properties:
-                                    BorderColor: =RGBA(0,0,0,0)
-                                    Color: =If(varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError), varTheme_Red, varTheme_Amber)
-                                    Height: =20
-                                    Icon: =If(varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError), Icon.Warning, Icon.Information)
-                                    Width: =20
-                                    X: =14
-                                    Y: =16
-                              - lblExecutiveAlertTitle_1:
-                                  Control: ModernText@1.0.0
-                                  Properties:
-                                    Color: =varTheme_Text
-                                    FontWeight: =FontWeight.Semibold
-                                    Size: =10
-                                    Text: =If(varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError), "Dashboard update failed", "Executive dashboard notice")
-                                    Width: =Max(160, Parent.Width - 250)
-                                    X: =44
-                                    Y: =7
-                              - lblExecutiveAlertMessage_1:
-                                  Control: ModernText@1.0.0
-                                  Properties:
-                                    Color: =varTheme_TextMuted
-                                    Size: =9
-                                    Text: =Coalesce(varExecutiveDashboardError, varAppWarning, "Review the dashboard status before continuing.")
-                                    Width: =Max(160, Parent.Width - 250)
-                                    X: =44
-                                    Y: =27
-                              - btnExecutiveAlertRetry_1:
-                                  Control: ModernButton@1.0.0
-                                  Properties:
-                                    Appearance: ='ButtonCanvas.Appearance'.Secondary
-                                    DisplayMode: =If(varGlobalLoading || IsBlank(varProjectId), DisplayMode.Disabled, DisplayMode.Edit)
-                                    Height: =32
-                                    Icon: ="ArrowClockwise"
-                                    OnSelect: =Select(btnHome_RequestDashboardLoad)
-                                    Text: ="Retry"
-                                    Visible: =varExecutiveDashboardStatus = "ERROR" || !IsBlank(varExecutiveDashboardError)
-                                    Width: =82
-                                    X: =Parent.Width - 126
-                                    Y: =10
-                              - icoExecutiveAlertDismiss_1:
-                                  Control: Classic/Icon@2.5.0
-                                  Properties:
-                                    BorderColor: =RGBA(0,0,0,0)
-                                    Color: =varTheme_TextMuted
-                                    Height: =18
-                                    Icon: =Icon.Cancel
-                                    OnSelect: =Set(varExecutiveAlertDismissed, true)
-                                    Width: =18
-                                    X: =Parent.Width - 32
-                                    Y: =17
                         - conExecutiveKpiStrip_1:
                             Control: GroupContainer@1.5.0
                             Variant: ManualLayout
@@ -1099,8 +1046,8 @@ Screens:
                               DropShadow: =DropShadow.None
                               Fill: =varTheme_Surface
                               FillPortions: =0
-                              Height: =118
-                              LayoutMinHeight: =118
+                              Height: =158
+                              LayoutMinHeight: =158
                               LayoutMinWidth: =16
                               RadiusBottomLeft: =12
                               RadiusBottomRight: =12
@@ -1109,264 +1056,129 @@ Screens:
                               Visible: =!IsBlank(varProjectId)
                               Width: =Parent.Width - 18
                             Children:
-                              - lblExecutiveKpiStripTitle_1:
-                                  Control: ModernText@1.0.0
+                              - cmpHomeKpiSectionHeader:
+                                  Control: cmp_DashboardSectionHeader
                                   Properties:
-                                    Color: =varTheme_Text
-                                    FontWeight: =FontWeight.Semibold
-                                    Height: =22
-                                    Size: =12
-                                    Text: ="Project pulse"
-                                    Width: =180
+                                    AccentColor: =varTheme_PulseBlueDark
+                                    Height: =36
+                                    MutedTextColor: =varTheme_TextMuted
+                                    OnAction: =Select(btnHome_RequestDashboardLoad)
+                                    ShowAction: =false
+                                    Subtitle: ="Select a KPI to open its operational view"
+                                    TextColor: =varTheme_Text
+                                    Title: ="Project pulse"
+                                    Width: =Parent.Width - 28
                                     X: =14
-                                    Y: =9
-                              - lblExecutiveKpiStripHint_1:
-                                  Control: ModernText@1.0.0
+                                    Y: =0
+                              - cmpHomeKpiProgress:
+                                  Control: cmp_ExecutiveKpiCard
                                   Properties:
-                                    Align: =Align.Right
-                                    Color: =varTheme_TextMuted
-                                    Height: =20
-                                    Size: =9
-                                    Text: ="Select a KPI to open its operational view"
-                                    Width: =Min(320, Parent.Width - 220)
-                                    X: =Parent.Width - Self.Width - 14
-                                    Y: =10
-                              - conExecutiveKpiProgress_1:
-                                  Control: GroupContainer@1.5.0
-                                  Variant: ManualLayout
-                                  Properties:
+                                    AccentColor: =varTheme_PulseBlueDark
                                     BorderColor: =varTheme_Border
-                                    BorderThickness: =1
-                                    DropShadow: =DropShadow.None
-                                    Fill: =varTheme_SurfaceAlt
-                                    Height: =72
-                                    RadiusBottomLeft: =10
-                                    RadiusBottomRight: =10
-                                    RadiusTopLeft: =10
-                                    RadiusTopRight: =10
+                                    Height: =112
+                                    Icon: ="Chart"
+                                    MutedTextColor: =varTheme_TextMuted
+                                    OnSelect: =Set(varAppView, "Overview"); Set(varPageKey, "OVERVIEW"); Set(varPageTitle, "Overview"); Set(varPageSubtitle, "Project Handover Report by subsystem, discipline and form family"); Set(varOps_ViewMode, "OVERVIEW"); Navigate(scr_Overview, ScreenTransition.None)
+                                    Status: =If(Sum(colHomeHiveNodesSorted, Total) = 0, "NEUTRAL", If(Sum(colHomeHiveNodesSorted, Done) / Sum(colHomeHiveNodesSorted, Total) >= 0.9, "SUCCESS", If(Sum(colHomeHiveNodesSorted, Done) / Sum(colHomeHiveNodesSorted, Total) >= 0.7, "WARNING", "CRITICAL")))
+                                    SupportingText: =If(IsBlank(varHomeLastRefresh), "Current snapshot", "Updated " & Text(varHomeLastRefresh, "hh:mm"))
+                                    SurfaceColor: =varTheme_SurfaceAlt
+                                    TextColor: =varTheme_Text
+                                    Title: ="Progress"
+                                    TooltipText: ="Open project Overview"
+                                    Trend: =If(Sum(colHomeHiveNodesSorted, Total) = 0, "FLAT", If(Sum(colHomeHiveNodesSorted, Done) / Sum(colHomeHiveNodesSorted, Total) >= 0.9, "UP", "FLAT"))
+                                    ValueText: =If(Sum(colHomeHiveNodesSorted, Total) = 0, "—", Text(100 * Sum(colHomeHiveNodesSorted, Done) / Sum(colHomeHiveNodesSorted, Total), "0.0") & "%")
                                     Width: =(Parent.Width - 58) / 4
                                     X: =10
                                     Y: =36
-                                  Children:
-                                    - recExecutiveKpiProgressAccent_1:
-                                        Control: Rectangle@2.3.0
-                                        Properties:
-                                          BorderColor: =RGBA(0,0,0,0)
-                                          BorderStyle: =BorderStyle.None
-                                          Fill: =If(Sum(colHomeHiveNodesSorted, Total) = 0, varTheme_TextSoft, If(Sum(colHomeHiveNodesSorted, Done) / Sum(colHomeHiveNodesSorted, Total) >= 0.9, varTheme_Green, If(Sum(colHomeHiveNodesSorted, Done) / Sum(colHomeHiveNodesSorted, Total) >= 0.7, varTheme_Amber, varTheme_Red)))
-                                          Height: =4
-                                          Width: =Parent.Width
-                                    - lblExecutiveKpiProgressValue_1:
-                                        Control: ModernText@1.0.0
-                                        Properties:
-                                          Color: =varTheme_Text
-                                          FontWeight: =FontWeight.Bold
-                                          Height: =30
-                                          Size: =20
-                                          Text: =If(Sum(colHomeHiveNodesSorted, Total) = 0, "—", Text(100 * Sum(colHomeHiveNodesSorted, Done) / Sum(colHomeHiveNodesSorted, Total), "0.0") & "%")
-                                          Width: =Parent.Width - 24
-                                          X: =12
-                                          Y: =10
-                                    - lblExecutiveKpiProgressLabel_1:
-                                        Control: ModernText@1.0.0
-                                        Properties:
-                                          Color: =varTheme_TextMuted
-                                          Height: =20
-                                          Size: =9
-                                          Text: ="Overall progress"
-                                          Width: =Parent.Width - 24
-                                          X: =12
-                                          Y: =43
-                                    - btnExecutiveKpiProgressOpen_1:
-                                        Control: Classic/Button@2.2.0
-                                        Properties:
-                                          BorderColor: =RGBA(0,0,0,0)
-                                          BorderStyle: =BorderStyle.None
-                                          BorderThickness: =0
-                                          Fill: =RGBA(0,0,0,0)
-                                          Height: =Parent.Height
-                                          HoverFill: =RGBA(22,119,255,0.035)
-                                          OnSelect: =Set(varAppView, "Overview"); Set(varPageKey, "OVERVIEW"); Set(varPageTitle, "Overview"); Set(varPageSubtitle, "Project Handover Report by subsystem, discipline and form family"); Set(varOps_ViewMode, "OVERVIEW"); Navigate(scr_Overview, ScreenTransition.None)
-                                          Text: =""
-                                          Tooltip: ="Open project Overview"
-                                          Width: =Parent.Width
-                              - conExecutiveKpiTasks_1:
-                                  Control: GroupContainer@1.5.0
-                                  Variant: ManualLayout
+                              - cmpHomeKpiTasks:
+                                  Control: cmp_ExecutiveKpiCard
                                   Properties:
+                                    AccentColor: =varTheme_PulseBlueDark
                                     BorderColor: =varTheme_Border
-                                    BorderThickness: =1
-                                    DropShadow: =DropShadow.None
-                                    Fill: =varTheme_SurfaceAlt
-                                    Height: =72
-                                    RadiusBottomLeft: =10
-                                    RadiusBottomRight: =10
-                                    RadiusTopLeft: =10
-                                    RadiusTopRight: =10
+                                    Height: =112
+                                    Icon: ="Clock"
+                                    MutedTextColor: =varTheme_TextMuted
+                                    OnSelect: =Set(varTasks_ReturnView, "Home"); Set(varTasks_ContextSource, "ExecutiveKpi"); Set(varTasks_AutoLoad, true); Navigate(scr_Tasks, ScreenTransition.None)
+                                    Status: =If(Sum(colHomeHiveNodesSorted, Total) = 0, "NEUTRAL", If(Sum(colHomeHiveNodesSorted, Remaining) = 0, "SUCCESS", "WARNING"))
+                                    SupportingText: =If(Sum(colHomeHiveNodesSorted, Remaining) = 0 && Sum(colHomeHiveNodesSorted, Total) > 0, "All tasks complete", "Requires attention")
+                                    SurfaceColor: =varTheme_SurfaceAlt
+                                    TextColor: =varTheme_Text
+                                    Title: ="Open Tasks"
+                                    TooltipText: ="Open Tasks"
+                                    Trend: =If(Sum(colHomeHiveNodesSorted, Remaining) = 0 && Sum(colHomeHiveNodesSorted, Total) > 0, "UP", "FLAT")
+                                    ValueText: =Text(Sum(colHomeHiveNodesSorted, Remaining), "[$-en-US]#,##0")
                                     Width: =(Parent.Width - 58) / 4
-                                    X: =conExecutiveKpiProgress_1.X + conExecutiveKpiProgress_1.Width + 12
+                                    X: =cmpHomeKpiProgress.X + cmpHomeKpiProgress.Width + 12
                                     Y: =36
-                                  Children:
-                                    - recExecutiveKpiTasksAccent_1:
-                                        Control: Rectangle@2.3.0
-                                        Properties:
-                                          BorderColor: =RGBA(0,0,0,0)
-                                          BorderStyle: =BorderStyle.None
-                                          Fill: =If(Sum(colHomeHiveNodesSorted, Remaining) = 0 && Sum(colHomeHiveNodesSorted, Total) > 0, varTheme_Green, varTheme_PulseBlueDark)
-                                          Height: =4
-                                          Width: =Parent.Width
-                                    - lblExecutiveKpiTasksValue_1:
-                                        Control: ModernText@1.0.0
-                                        Properties:
-                                          Color: =varTheme_Text
-                                          FontWeight: =FontWeight.Bold
-                                          Height: =30
-                                          Size: =20
-                                          Text: =Text(Sum(colHomeHiveNodesSorted, Remaining), "[$-en-US]#,##0")
-                                          Width: =Parent.Width - 24
-                                          X: =12
-                                          Y: =10
-                                    - lblExecutiveKpiTasksLabel_1:
-                                        Control: ModernText@1.0.0
-                                        Properties:
-                                          Color: =varTheme_TextMuted
-                                          Height: =20
-                                          Size: =9
-                                          Text: ="Remaining tasks"
-                                          Width: =Parent.Width - 24
-                                          X: =12
-                                          Y: =43
-                                    - btnExecutiveKpiTasksOpen_1:
-                                        Control: Classic/Button@2.2.0
-                                        Properties:
-                                          BorderColor: =RGBA(0,0,0,0)
-                                          BorderStyle: =BorderStyle.None
-                                          BorderThickness: =0
-                                          Fill: =RGBA(0,0,0,0)
-                                          Height: =Parent.Height
-                                          HoverFill: =RGBA(22,119,255,0.035)
-                                          OnSelect: =Set(varTasks_ReturnView, "Home"); Set(varTasks_ContextSource, "ExecutiveKpi"); Set(varTasks_AutoLoad, true); Navigate(scr_Tasks, ScreenTransition.None)
-                                          Text: =""
-                                          Tooltip: ="Open Tasks"
-                                          Width: =Parent.Width
-                              - conExecutiveKpiPunches_1:
-                                  Control: GroupContainer@1.5.0
-                                  Variant: ManualLayout
+                              - cmpHomeKpiPunches:
+                                  Control: cmp_ExecutiveKpiCard
                                   Properties:
+                                    AccentColor: =varTheme_Amber
                                     BorderColor: =varTheme_Border
-                                    BorderThickness: =1
-                                    DropShadow: =DropShadow.None
-                                    Fill: =varTheme_SurfaceAlt
-                                    Height: =72
-                                    RadiusBottomLeft: =10
-                                    RadiusBottomRight: =10
-                                    RadiusTopLeft: =10
-                                    RadiusTopRight: =10
+                                    Height: =112
+                                    Icon: ="Warning"
+                                    MutedTextColor: =varTheme_TextMuted
+                                    OnSelect: =Set(varPunches_ReturnView, "Home"); Set(varPunches_ContextSource, "ExecutiveKpi"); Set(varPunches_FilterSource, "Dashboard"); Set(varPunchCustomFiltersJson, "[]"); Navigate(scr_Punches, ScreenTransition.None)
+                                    Status: =If(CountRows(colPunchDashboardSummary) = 0, "NEUTRAL", If(Sum(Filter(colPunchDashboardSummary, !(Lower(StatusCode) in ["closed", "done"])), PunchCount) = 0, "SUCCESS", "WARNING"))
+                                    SupportingText: =If(IsBlank(varPunchDashboardLastRefresh), "Current snapshot", "Updated " & Text(varPunchDashboardLastRefresh, "hh:mm"))
+                                    SurfaceColor: =varTheme_SurfaceAlt
+                                    TextColor: =varTheme_Text
+                                    Title: ="Open Punches"
+                                    TooltipText: ="Open Punch List"
+                                    Trend: =If(CountRows(colPunchDashboardTimeline) < 2, "FLAT", If(Last(colPunchDashboardTimeline).OpenDelta < 0, "UP", If(Last(colPunchDashboardTimeline).OpenDelta > 0, "DOWN", "FLAT")))
+                                    ValueText: =Text(Sum(Filter(colPunchDashboardSummary, !(Lower(StatusCode) in ["closed", "done"])), PunchCount), "[$-en-US]#,##0")
                                     Width: =(Parent.Width - 58) / 4
-                                    X: =conExecutiveKpiTasks_1.X + conExecutiveKpiTasks_1.Width + 12
+                                    X: =cmpHomeKpiTasks.X + cmpHomeKpiTasks.Width + 12
                                     Y: =36
-                                  Children:
-                                    - recExecutiveKpiPunchesAccent_1:
-                                        Control: Rectangle@2.3.0
-                                        Properties:
-                                          BorderColor: =RGBA(0,0,0,0)
-                                          BorderStyle: =BorderStyle.None
-                                          Fill: =If(Sum(Filter(colPunchDashboardSummary, !(Lower(StatusCode) in ["closed", "done"])), PunchCount) = 0 && CountRows(colPunchDashboardSummary) > 0, varTheme_Green, varTheme_Amber)
-                                          Height: =4
-                                          Width: =Parent.Width
-                                    - lblExecutiveKpiPunchesValue_1:
-                                        Control: ModernText@1.0.0
-                                        Properties:
-                                          Color: =varTheme_Text
-                                          FontWeight: =FontWeight.Bold
-                                          Height: =30
-                                          Size: =20
-                                          Text: =Text(Sum(Filter(colPunchDashboardSummary, !(Lower(StatusCode) in ["closed", "done"])), PunchCount), "[$-en-US]#,##0")
-                                          Width: =Parent.Width - 24
-                                          X: =12
-                                          Y: =10
-                                    - lblExecutiveKpiPunchesLabel_1:
-                                        Control: ModernText@1.0.0
-                                        Properties:
-                                          Color: =varTheme_TextMuted
-                                          Height: =20
-                                          Size: =9
-                                          Text: ="Open punches"
-                                          Width: =Parent.Width - 24
-                                          X: =12
-                                          Y: =43
-                                    - btnExecutiveKpiPunchesOpen_1:
-                                        Control: Classic/Button@2.2.0
-                                        Properties:
-                                          BorderColor: =RGBA(0,0,0,0)
-                                          BorderStyle: =BorderStyle.None
-                                          BorderThickness: =0
-                                          Fill: =RGBA(0,0,0,0)
-                                          Height: =Parent.Height
-                                          HoverFill: =RGBA(22,119,255,0.035)
-                                          OnSelect: =Set(varPunches_ReturnView, "Home"); Set(varPunches_ContextSource, "ExecutiveKpi"); Set(varPunches_FilterSource, "Dashboard"); Set(varPunchCustomFiltersJson, "[]"); Navigate(scr_Punches, ScreenTransition.None)
-                                          Text: =""
-                                          Tooltip: ="Open Punch List"
-                                          Width: =Parent.Width
-                              - conExecutiveKpiRisk_1:
-                                  Control: GroupContainer@1.5.0
-                                  Variant: ManualLayout
+                              - cmpHomeKpiPendingSubsystems:
+                                  Control: cmp_ExecutiveKpiCard
                                   Properties:
+                                    AccentColor: =varTheme_Red
                                     BorderColor: =varTheme_Border
-                                    BorderThickness: =1
-                                    DropShadow: =DropShadow.None
-                                    Fill: =varTheme_SurfaceAlt
-                                    Height: =72
-                                    RadiusBottomLeft: =10
-                                    RadiusBottomRight: =10
-                                    RadiusTopLeft: =10
-                                    RadiusTopRight: =10
+                                    Height: =112
+                                    Icon: ="Warning"
+                                    MutedTextColor: =varTheme_TextMuted
+                                    OnSelect: =Set(varHomeDashboard, "TASKS"); Set(varHomeShowRightPanel, true); Set(varHomeShowCards, true)
+                                    Status: =If(CountRows(colHomePendingSubsystems) = 0, "SUCCESS", If(CountRows(colHomePendingSubsystems) <= 5, "WARNING", "CRITICAL"))
+                                    SupportingText: =If(CountRows(colHomePendingSubsystems) = 0, "No pending scope", "Review pending scope")
+                                    SurfaceColor: =varTheme_SurfaceAlt
+                                    TextColor: =varTheme_Text
+                                    Title: ="Pending Subsystems"
+                                    TooltipText: ="Show pending subsystems"
+                                    Trend: =If(CountRows(colHomePendingSubsystems) = 0, "UP", "DOWN")
+                                    ValueText: =Text(CountRows(colHomePendingSubsystems), "[$-en-US]#,##0")
                                     Width: =(Parent.Width - 58) / 4
-                                    X: =conExecutiveKpiPunches_1.X + conExecutiveKpiPunches_1.Width + 12
+                                    X: =cmpHomeKpiPunches.X + cmpHomeKpiPunches.Width + 12
                                     Y: =36
-                                  Children:
-                                    - recExecutiveKpiRiskAccent_1:
-                                        Control: Rectangle@2.3.0
-                                        Properties:
-                                          BorderColor: =RGBA(0,0,0,0)
-                                          BorderStyle: =BorderStyle.None
-                                          Fill: =If(CountRows(colHomePendingSubsystems) = 0, varTheme_Green, If(CountRows(colHomePendingSubsystems) <= 5, varTheme_Amber, varTheme_Red))
-                                          Height: =4
-                                          Width: =Parent.Width
-                                    - lblExecutiveKpiRiskValue_1:
-                                        Control: ModernText@1.0.0
-                                        Properties:
-                                          Color: =varTheme_Text
-                                          FontWeight: =FontWeight.Bold
-                                          Height: =30
-                                          Size: =20
-                                          Text: =Text(CountRows(colHomePendingSubsystems), "[$-en-US]#,##0")
-                                          Width: =Parent.Width - 24
-                                          X: =12
-                                          Y: =10
-                                    - lblExecutiveKpiRiskLabel_1:
-                                        Control: ModernText@1.0.0
-                                        Properties:
-                                          Color: =varTheme_TextMuted
-                                          Height: =20
-                                          Size: =9
-                                          Text: ="Pending subsystems"
-                                          Width: =Parent.Width - 24
-                                          X: =12
-                                          Y: =43
-                                    - btnExecutiveKpiRiskOpen_1:
-                                        Control: Classic/Button@2.2.0
-                                        Properties:
-                                          BorderColor: =RGBA(0,0,0,0)
-                                          BorderStyle: =BorderStyle.None
-                                          BorderThickness: =0
-                                          Fill: =RGBA(0,0,0,0)
-                                          Height: =Parent.Height
-                                          HoverFill: =RGBA(22,119,255,0.035)
-                                          OnSelect: =Set(varHomeDashboard, "TASKS"); Set(varHomeShowRightPanel, true); Set(varHomeShowCards, true)
-                                          Text: =""
-                                          Tooltip: ="Show pending subsystems"
-                                          Width: =Parent.Width
+                        - cmpHomeDashboardSkeleton:
+                            Control: cmp_SkeletonLoader
+                            Properties:
+                              BackgroundColor: =varTheme_Surface
+                              BorderColor: =varTheme_Border
+                              Height: =280
+                              SkeletonColor: =ColorFade(varTheme_Border, 35%)
+                              Visible: =!IsBlank(varProjectId) && (varExecutiveDashboardStatus = "LOADING" || varGlobalLoading || varHomeLoading || varPunchDashboardLoading)
+                              VisibleState: =!IsBlank(varProjectId) && (varExecutiveDashboardStatus = "LOADING" || varGlobalLoading || varHomeLoading || varPunchDashboardLoading)
+                              Width: =Parent.Width - 18
+                        - cmpHomeDashboardEmptyState:
+                            Control: cmp_EmptyState
+                            Properties:
+                              AccentColor: =varTheme_PulseBlueDark
+                              ActionText: =If(IsBlank(varProjectId), "Select project", "Refresh")
+                              BorderColor: =varTheme_Border
+                              DangerColor: =varTheme_Red
+                              Height: =260
+                              Message: =If(IsBlank(varProjectId), "Select a project to load its executive dashboard.", If(varExecutiveDashboardStatus = "ERROR", Coalesce(varExecutiveDashboardError, "The dashboard could not be loaded."), If(varHomeNoData, "No operational data is available for the selected project.", "You do not have access to this dashboard.")))
+                              MutedTextColor: =varTheme_TextMuted
+                              OnAction: =Select(btnHome_RequestDashboardLoad)
+                              ShowAction: =!IsBlank(varProjectId) && (varExecutiveDashboardStatus = "ERROR" || varHomeNoData)
+                              State: =If(IsBlank(varProjectId), "NO_PROJECT", If(varExecutiveDashboardStatus = "ERROR", "ERROR", If(varHomeNoData, "EMPTY", "NO_PERMISSION")))
+                              SurfaceColor: =varTheme_Surface
+                              TextColor: =varTheme_Text
+                              Title: =If(IsBlank(varProjectId), "Select a project", If(varExecutiveDashboardStatus = "ERROR", "Dashboard unavailable", If(varHomeNoData, "No data available", "Access restricted")))
+                              Visible: =IsBlank(varProjectId) || varExecutiveDashboardStatus = "ERROR" || (!varGlobalLoading && !varHomeLoading && !varPunchDashboardLoading && varHomeNoData)
+                              Width: =Parent.Width - 18
+                        - conHomeDashboardTabs:
                         - conHomeDashboardTabs:
                             Control: GroupContainer@1.5.0
                             Variant: ManualLayout
@@ -3711,154 +3523,79 @@ Screens:
                                           DropShadow: =DropShadow.None
                                           Fill: =varTheme_Surface
                                           FillPortions: =0
-                                          Height: =286
-                                          LayoutMinHeight: =286
+                                          Height: =322
+                                          LayoutMinHeight: =322
                                           RadiusBottomLeft: =16
                                           RadiusBottomRight: =16
                                           RadiusTopLeft: =16
                                           RadiusTopRight: =16
                                           Width: =Parent.Width
                                         Children:
-                                          - lblPunchInsightsTitle:
-                                              Control: ModernText@1.0.0
+                                          - cmpPunchInsightsHeader:
+                                              Control: cmp_DashboardSectionHeader
                                               Properties:
-                                                Color: =varTheme_Text
-                                                FontWeight: =FontWeight.Semibold
-                                                Height: =24
-                                                Size: =14
-                                                Text: ="Executive Insights"
-                                                Width: =260
-                                                X: =18
-                                                Y: =14
-                                          - lblPunchInsightsSubtitle:
-                                              Control: ModernText@1.0.0
-                                              Properties:
-                                                Color: =varTheme_TextMuted
-                                                Height: =18
-                                                Size: =9
-                                                Text: ="Prioritized signals derived from the latest snapshot and recent trend"
-                                                Width: =520
-                                                X: =18
-                                                Y: =39
-                                          - galPunchExecutiveInsights:
-                                              Control: Gallery@2.15.0
-                                              Variant: Vertical
-                                              Properties:
-                                                BorderColor: =RGBA(0,0,0,0)
-                                                Height: =208
-                                                Items: =FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 5)
-                                                ShowScrollbar: =false
-                                                TemplatePadding: =4
-                                                TemplateSize: =62
-                                                Visible: =CountRows(colPunchDashboardInsights) > 0
-                                                Width: =Parent.Width - 24
-                                                X: =12
-                                                Y: =64
-                                              Children:
-                                                - conPunchInsightRow:
-                                                    Control: GroupContainer@1.5.0
-                                                    Variant: ManualLayout
-                                                    Properties:
-                                                      BorderColor: =varTheme_Border
-                                                      BorderThickness: =1
-                                                      DropShadow: =DropShadow.None
-                                                      Fill: =If(Mod(ThisItem.Priority, 2) = 0, varTheme_SurfaceAlt, varTheme_Surface)
-                                                      Height: =54
-                                                      RadiusBottomLeft: =10
-                                                      RadiusBottomRight: =10
-                                                      RadiusTopLeft: =10
-                                                      RadiusTopRight: =10
-                                                      Width: =Parent.TemplateWidth - 8
-                                                      X: =4
-                                                      Y: =2
-                                                    Children:
-                                                      - recPunchInsightSeverity:
-                                                          Control: Rectangle@2.3.0
-                                                          Properties:
-                                                            BorderColor: =RGBA(0,0,0,0)
-                                                            BorderStyle: =BorderStyle.None
-                                                            Fill: =Switch(ThisItem.Severity, "CRITICAL", varTheme_Red, "WARNING", varTheme_Amber, "SUCCESS", varTheme_Green, varTheme_PulseBlueDark)
-                                                            Height: =Parent.Height
-                                                            Width: =4
-                                                      - lblPunchInsightTitle:
-                                                          Control: ModernText@1.0.0
-                                                          Properties:
-                                                            Color: =varTheme_Text
-                                                            FontWeight: =FontWeight.Semibold
-                                                            Height: =20
-                                                            Size: =10
-                                                            Text: =ThisItem.Title
-                                                            Width: =Parent.Width - 190
-                                                            Wrap: =false
-                                                            X: =16
-                                                            Y: =7
-                                                      - lblPunchInsightMessage:
-                                                          Control: ModernText@1.0.0
-                                                          Properties:
-                                                            Color: =varTheme_TextMuted
-                                                            Height: =18
-                                                            Size: =9
-                                                            Text: =ThisItem.Message
-                                                            Width: =Parent.Width - 190
-                                                            Wrap: =false
-                                                            X: =16
-                                                            Y: =29
-                                                      - lblPunchInsightMetric:
-                                                          Control: ModernText@1.0.0
-                                                          Properties:
-                                                            Align: =Align.Right
-                                                            Color: =Switch(ThisItem.Severity, "CRITICAL", varTheme_Red, "WARNING", varTheme_Amber, "SUCCESS", varTheme_Green, varTheme_PulseBlueDark)
-                                                            FontWeight: =FontWeight.Bold
-                                                            Height: =22
-                                                            Size: =11
-                                                            Text: =If(IsBlank(ThisItem.MetricLabel), "", Text(ThisItem.MetricValue, "[$-en-US]#,##0.0") & " " & ThisItem.MetricLabel)
-                                                            Width: =150
-                                                            X: =Parent.Width - 166
-                                                            Y: =7
-                                                      - btnPunchInsightDrill:
-                                                          Control: Classic/Button@2.2.0
-                                                          Properties:
-                                                            BorderColor: =RGBA(0,0,0,0)
-                                                            BorderStyle: =BorderStyle.None
-                                                            BorderThickness: =0
-                                                            DisplayMode: =If(IsBlank(ThisItem.StatusCode) && IsBlank(ThisItem.CategoryCode) && IsBlank(ThisItem.SubsystemCode) && ThisItem.SubcontractorId < 0, DisplayMode.Disabled, DisplayMode.Edit)
-                                                            Fill: =RGBA(0,0,0,0)
-                                                            Height: =Parent.Height
-                                                            HoverFill: =RGBA(22,119,255,0.035)
-                                                            OnSelect: |-
-                                                              =
-                                                              Set(varPunches_ReturnView, "Home");
-                                                              Set(varPunches_ContextSource, "ExecutiveInsights");
-                                                              Set(varPunches_FilterSource, "Dashboard");
-                                                              Set(varPunchCustomFiltersJson, "[]");
-                                                              Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId));
-                                                              Set(varFilter_PunchStatusCode, Text(ThisItem.StatusCode));
-                                                              Set(varFilter_PunchCategoryCode, Text(ThisItem.CategoryCode));
-                                                              Set(varFilter_SubsystemsCsv, Text(ThisItem.SubsystemCode));
-                                                              Set(varFilter_Subsystem, If(IsBlank(ThisItem.SubsystemCode), Blank(), Text(ThisItem.SubsystemCode)));
-                                                              Set(varFilter_Subcontractor, If(ThisItem.SubcontractorId < 0, Blank(), Text(ThisItem.SubcontractorId)));
-                                                              Set(varFilter_PunchDiscipline, Text(ThisItem.DisciplineCode));
-                                                              Set(varPunches_Page, 1);
-                                                              Set(varPunches_HasSearched, true);
-                                                              Set(varPunches_AutoLoad, true);
-                                                              Clear(colPunches);
-                                                              Set(varAppView, "Punches");
-                                                              Navigate(scr_Punches, ScreenTransition.None)
-                                                            PressedFill: =RGBA(22,119,255,0.07)
-                                                            Text: =""
-                                                            Width: =Parent.Width
-                                          - lblPunchInsightsEmpty:
-                                              Control: ModernText@1.0.0
-                                              Properties:
-                                                Align: =Align.Center
-                                                Color: =varTheme_TextMuted
-                                                Height: =72
-                                                Size: =10
-                                                Text: ="No material executive insight was detected for this snapshot."
-                                                Visible: =CountRows(colPunchDashboardInsights) = 0
+                                                AccentColor: =varTheme_PulseBlueDark
+                                                Height: =54
+                                                MutedTextColor: =varTheme_TextMuted
+                                                OnAction: =Set(varAppView, "Punches"); Navigate(scr_Punches, ScreenTransition.None)
+                                                ShowAction: =true
+                                                ActionText: ="View punches"
+                                                Subtitle: ="Prioritized operational signals generated from the current snapshot"
+                                                TextColor: =varTheme_Text
+                                                Title: ="Executive Insights"
                                                 Width: =Parent.Width - 36
                                                 X: =18
-                                                Y: =104
+                                                Y: =8
+                                          - cmpPunchInsightPrimary:
+                                              Control: cmp_ExecutiveInsightCard
+                                              Properties:
+                                                BorderColor: =varTheme_Border
+                                                Category: =If(CountRows(colPunchDashboardInsights) > 0, Coalesce(First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).InsightType, "Top Risk"), "Status")
+                                                DangerColor: =varTheme_Red
+                                                Detail: =If(CountRows(colPunchDashboardInsights) > 0, First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).Message, "No material deviation was detected for this snapshot.")
+                                                Height: =128
+                                                InfoColor: =varTheme_PulseBlueDark
+                                                MetricText: =If(CountRows(colPunchDashboardInsights) > 0 && !IsBlank(First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).MetricLabel), Text(First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).MetricValue, "[$-en-US]#,##0.0") & " " & First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).MetricLabel, "—")
+                                                MutedTextColor: =varTheme_TextMuted
+                                                OnSelect: =Set(varPunches_ReturnView, "Home"); Set(varPunches_ContextSource, "ExecutiveInsights"); Set(varPunches_FilterSource, "Dashboard"); Set(varPunchCustomFiltersJson, "[]"); Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId)); Navigate(scr_Punches, ScreenTransition.None)
+                                                Severity: =If(CountRows(colPunchDashboardInsights) > 0, First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).Severity, "INFO")
+                                                SurfaceColor: =varTheme_SurfaceAlt
+                                                TextColor: =varTheme_Text
+                                                Title: =If(CountRows(colPunchDashboardInsights) > 0, First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).Title, "Dashboard stable")
+                                                WarningColor: =varTheme_Amber
+                                                Width: =(Parent.Width - 48) / 2
+                                                X: =18
+                                                Y: =72
+                                          - cmpPunchInsightSecondary:
+                                              Control: cmp_ExecutiveInsightCard
+                                              Properties:
+                                                BorderColor: =varTheme_Border
+                                                Category: =If(CountRows(colPunchDashboardInsights) > 1, Coalesce(Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).InsightType, "Hotspot"), "Recommendation")
+                                                DangerColor: =varTheme_Red
+                                                Detail: =If(CountRows(colPunchDashboardInsights) > 1, Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).Message, "Continue monitoring the current operational trend.")
+                                                Height: =128
+                                                InfoColor: =varTheme_PulseBlueDark
+                                                MetricText: =If(CountRows(colPunchDashboardInsights) > 1 && !IsBlank(Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).MetricLabel), Text(Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).MetricValue, "[$-en-US]#,##0.0") & " " & Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).MetricLabel, "—")
+                                                MutedTextColor: =varTheme_TextMuted
+                                                OnSelect: =Set(varPunches_ReturnView, "Home"); Set(varPunches_ContextSource, "ExecutiveInsights"); Set(varPunches_FilterSource, "Dashboard"); Set(varPunchCustomFiltersJson, "[]"); Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId)); Navigate(scr_Punches, ScreenTransition.None)
+                                                Severity: =If(CountRows(colPunchDashboardInsights) > 1, Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).Severity, "INFO")
+                                                SurfaceColor: =varTheme_SurfaceAlt
+                                                TextColor: =varTheme_Text
+                                                Title: =If(CountRows(colPunchDashboardInsights) > 1, Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).Title, "No secondary risk")
+                                                WarningColor: =varTheme_Amber
+                                                Width: =(Parent.Width - 48) / 2
+                                                X: =cmpPunchInsightPrimary.X + cmpPunchInsightPrimary.Width + 12
+                                                Y: =72
+                                          - lblPunchInsightsCoverage:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =varTheme_TextMuted
+                                                Height: =40
+                                                Size: =9
+                                                Text: =If(CountRows(colPunchDashboardInsights) <= 2, "Showing all detected insights.", "Showing the two highest-priority insights. Open Punches to review the remaining " & Text(CountRows(colPunchDashboardInsights) - 2) & ".")
+                                                Width: =Parent.Width - 36
+                                                X: =18
+                                                Y: =216
                                     - conPunchMatrixCard:
                                         Control: GroupContainer@1.5.0
                                         Variant: ManualLayout
