@@ -18,8 +18,7 @@ IF OBJECT_ID(N'[warroom].[ExportBatch]', N'U') IS NULL
 BEGIN
     CREATE TABLE [warroom].[ExportBatch]
     (
-        [ExportBatchId]        uniqueidentifier NOT NULL
-            CONSTRAINT [DF_ExportBatch_ExportBatchId] DEFAULT NEWSEQUENTIALID(),
+        [ExportBatchId]        bigint NOT NULL,
         [ProjectId]            bigint NOT NULL,
         [TemplateId]           bigint NOT NULL,
         [ExportType]           nvarchar(30) NOT NULL,
@@ -47,7 +46,7 @@ IF OBJECT_ID(N'[warroom].[ExportBatchRow]', N'U') IS NULL
 BEGIN
     CREATE TABLE [warroom].[ExportBatchRow]
     (
-        [ExportBatchId]        uniqueidentifier NOT NULL,
+        [ExportBatchId]        bigint NOT NULL,
         [WorkItemId]           bigint NOT NULL,
         [RowVersion]           binary(8) NOT NULL,
         [OriginalValuesJson]   nvarchar(max) NOT NULL,
@@ -71,7 +70,7 @@ BEGIN
     (
         [ImportBatchId]        uniqueidentifier NOT NULL
             CONSTRAINT [DF_ImportBatch_ImportBatchId] DEFAULT NEWSEQUENTIALID(),
-        [ExportBatchId]        uniqueidentifier NOT NULL,
+        [ExportBatchId]        bigint NOT NULL,
         [ProjectId]            bigint NOT NULL,
         [TemplateId]           bigint NOT NULL,
         [FileName]             nvarchar(260) NOT NULL,

@@ -1,0 +1,771 @@
+﻿{
+    "name":  "60c0a0df-ec0f-49c5-8f04-cbe7ed132581",
+    "id":  "/providers/Microsoft.Flow/flows/60c0a0df-ec0f-49c5-8f04-cbe7ed132581",
+    "type":  "Microsoft.Flow/flows",
+    "properties":  {
+                       "apiId":  "/providers/Microsoft.PowerApps/apis/shared_logicflows",
+                       "displayName":  "Warroom_ExportPunchesToExcel",
+                       "definition":  {
+                                          "metadata":  {
+                                                           "workflowEntityId":  null,
+                                                           "processAdvisorMetadata":  null,
+                                                           "flowChargedByPaygo":  null,
+                                                           "flowclientsuspensionreason":  "None",
+                                                           "flowclientsuspensiontime":  null,
+                                                           "flowclientsuspensionreasondetails":  null,
+                                                           "creator":  {
+                                                                           "id":  "b96fb1eb-ced6-41a9-9294-233f5f6f2c3b",
+                                                                           "type":  "User",
+                                                                           "tenantId":  "47312dc6-0a91-4272-a8a5-031fca130189"
+                                                                       },
+                                                           "provisioningMethod":  "FromDefinition",
+                                                           "failureAlertSubscription":  true,
+                                                           "clientLastModifiedTime":  "2026-07-28T14:06:12.8224399Z",
+                                                           "lastModifiedBy":  "b96fb1eb-ced6-41a9-9294-233f5f6f2c3b",
+                                                           "connectionKeySavedTimeKey":  "2026-07-28T14:06:12.8224399Z",
+                                                           "creationSource":  null
+                                                       },
+                                          "$schema":  "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                                          "contentVersion":  "1.0.0.0",
+                                          "parameters":  {
+                                                             "$connections":  {
+                                                                                  "defaultValue":  {
+
+                                                                                                   },
+                                                                                  "type":  "Object"
+                                                                              },
+                                                             "$authentication":  {
+                                                                                     "defaultValue":  {
+
+                                                                                                      },
+                                                                                     "type":  "SecureObject"
+                                                                                 }
+                                                         },
+                                          "triggers":  {
+                                                           "manual":  {
+                                                                          "metadata":  {
+                                                                                           "operationMetadataId":  "21d8db9d-9c5b-4d72-9b43-4b0642f1ea2c"
+                                                                                       },
+                                                                          "type":  "Request",
+                                                                          "kind":  "PowerAppV2",
+                                                                          "inputs":  {
+                                                                                         "schema":  {
+                                                                                                        "type":  "object",
+                                                                                                        "properties":  {
+                                                                                                                           "number":  {
+                                                                                                                                          "title":  "ProjectId",
+                                                                                                                                          "type":  "number",
+                                                                                                                                          "x-ms-dynamically-added":  true,
+                                                                                                                                          "description":  "Please enter a number",
+                                                                                                                                          "x-ms-content-hint":  "NUMBER"
+                                                                                                                                      },
+                                                                                                                           "text":  {
+                                                                                                                                        "title":  "SubsystemCode",
+                                                                                                                                        "type":  "string",
+                                                                                                                                        "x-ms-dynamically-added":  true,
+                                                                                                                                        "description":  "Please enter your input",
+                                                                                                                                        "x-ms-content-hint":  "TEXT"
+                                                                                                                                    },
+                                                                                                                           "number_1":  {
+                                                                                                                                            "title":  "TemplateId",
+                                                                                                                                            "type":  "number",
+                                                                                                                                            "x-ms-dynamically-added":  true,
+                                                                                                                                            "description":  "Please enter a number",
+                                                                                                                                            "x-ms-content-hint":  "NUMBER"
+                                                                                                                                        },
+                                                                                                                           "text_1":  {
+                                                                                                                                          "title":  "CategoryCode",
+                                                                                                                                          "type":  "string",
+                                                                                                                                          "x-ms-dynamically-added":  true,
+                                                                                                                                          "description":  "Please enter your input",
+                                                                                                                                          "x-ms-content-hint":  "TEXT"
+                                                                                                                                      },
+                                                                                                                           "text_2":  {
+                                                                                                                                          "title":  "StatusCode",
+                                                                                                                                          "type":  "string",
+                                                                                                                                          "x-ms-dynamically-added":  true,
+                                                                                                                                          "description":  "Please enter your input",
+                                                                                                                                          "x-ms-content-hint":  "TEXT"
+                                                                                                                                      },
+                                                                                                                           "text_3":  {
+                                                                                                                                          "title":  "PunchDiscipline",
+                                                                                                                                          "type":  "string",
+                                                                                                                                          "x-ms-dynamically-added":  true,
+                                                                                                                                          "description":  "Please enter your input",
+                                                                                                                                          "x-ms-content-hint":  "TEXT"
+                                                                                                                                      },
+                                                                                                                           "text_4":  {
+                                                                                                                                          "title":  "Subcontractor",
+                                                                                                                                          "type":  "string",
+                                                                                                                                          "x-ms-dynamically-added":  true,
+                                                                                                                                          "description":  "Please enter your input",
+                                                                                                                                          "x-ms-content-hint":  "TEXT"
+                                                                                                                                      },
+                                                                                                                           "text_5":  {
+                                                                                                                                          "title":  "CustomFiltersJson",
+                                                                                                                                          "type":  "string",
+                                                                                                                                          "x-ms-dynamically-added":  true,
+                                                                                                                                          "description":  "Please enter your input",
+                                                                                                                                          "x-ms-content-hint":  "TEXT"
+                                                                                                                                      },
+                                                                                                                           "text_6":  {
+                                                                                                                                          "title":  "RequestedByEmail",
+                                                                                                                                          "type":  "string",
+                                                                                                                                          "x-ms-dynamically-added":  true,
+                                                                                                                                          "description":  "Please enter your input",
+                                                                                                                                          "x-ms-content-hint":  "TEXT"
+                                                                                                                                      },
+                                                                                                                           "text_7":  {
+                                                                                                                                          "title":  "RequestedByName",
+                                                                                                                                          "type":  "string",
+                                                                                                                                          "x-ms-dynamically-added":  true,
+                                                                                                                                          "description":  "Please enter your input",
+                                                                                                                                          "x-ms-content-hint":  "TEXT"
+                                                                                                                                      },
+                                                                                                                           "text_8":  {
+                                                                                                                                          "title":  "ExportMode",
+                                                                                                                                          "type":  "string",
+                                                                                                                                          "x-ms-dynamically-added":  true,
+                                                                                                                                          "description":  "Please enter your input",
+                                                                                                                                          "x-ms-content-hint":  "TEXT"
+                                                                                                                                      },
+                                                                                                                           "text_9":  {
+                                                                                                                                          "title":  "SelectedColumnsJson",
+                                                                                                                                          "type":  "string",
+                                                                                                                                          "x-ms-dynamically-added":  true,
+                                                                                                                                          "description":  "Please enter your input",
+                                                                                                                                          "x-ms-content-hint":  "TEXT"
+                                                                                                                                      }
+                                                                                                                       },
+                                                                                                        "required":  [
+                                                                                                                         "number",
+                                                                                                                         "text",
+                                                                                                                         "number_1",
+                                                                                                                         "text_1",
+                                                                                                                         "text_2",
+                                                                                                                         "text_3",
+                                                                                                                         "text_4",
+                                                                                                                         "text_5",
+                                                                                                                         "text_6",
+                                                                                                                         "text_7",
+                                                                                                                         "text_8",
+                                                                                                                         "text_9"
+                                                                                                                     ]
+                                                                                                    }
+                                                                                     }
+                                                                      }
+                                                       },
+                                          "actions":  {
+                                                          "Init_varProjectId":  {
+                                                                                    "runAfter":  {
+
+                                                                                                 },
+                                                                                    "metadata":  {
+                                                                                                     "operationMetadataId":  "976d4a48-f16b-4272-97ed-70f5904351ac"
+                                                                                                 },
+                                                                                    "type":  "InitializeVariable",
+                                                                                    "inputs":  {
+                                                                                                   "variables":  [
+                                                                                                                     {
+                                                                                                                         "name":  "varProjectId",
+                                                                                                                         "type":  "integer",
+                                                                                                                         "value":  "@triggerBody()[\u0027number\u0027]"
+                                                                                                                     }
+                                                                                                                 ]
+                                                                                               }
+                                                                                },
+                                                          "SQL_StartExportLog":  {
+                                                                                     "runAfter":  {
+                                                                                                      "Compose_FilterJson":  [
+                                                                                                                                 "Succeeded"
+                                                                                                                             ]
+                                                                                                  },
+                                                                                     "metadata":  {
+                                                                                                      "operationMetadataId":  "bde34338-a9bf-4f1c-a7db-ead82866036f"
+                                                                                                  },
+                                                                                     "type":  "OpenApiConnection",
+                                                                                     "inputs":  {
+                                                                                                    "host":  {
+                                                                                                                 "apiId":  "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                                                                                                                 "connectionName":  "shared_sqldw_2",
+                                                                                                                 "operationId":  "ExecuteProcedureV2"
+                                                                                                             },
+                                                                                                    "parameters":  {
+                                                                                                                       "server":  "default",
+                                                                                                                       "database":  "default",
+                                                                                                                       "procedure":  "[warroom].[usp_PunchExportLog_Start]",
+                                                                                                                       "parameters/CreatedByEmail":  "@triggerBody()[\u0027text_6\u0027]",
+                                                                                                                       "parameters/CreatedByName":  "@triggerBody()[\u0027text_7\u0027]",
+                                                                                                                       "parameters/FilterJson":  "@triggerBody()[\u0027text_5\u0027]",
+                                                                                                                       "parameters/ProjectId":  "@triggerBody()[\u0027number\u0027]",
+                                                                                                                       "parameters/TemplateSelector":  "@triggerBody()[\u0027number_1\u0027]"
+                                                                                                                   },
+                                                                                                    "authentication":  {
+                                                                                                                           "value":  "@json(decodeBase64(triggerOutputs().headers[\u0027X-MS-APIM-Tokens\u0027]))[\u0027$ConnectionKey\u0027]",
+                                                                                                                           "type":  "Raw"
+                                                                                                                       }
+                                                                                                }
+                                                                                 },
+                                                          "SQL_ExportPunchesPivoted":  {
+                                                                                           "runAfter":  {
+                                                                                                            "Compose_PunchExportLogId":  [
+                                                                                                                                             "Succeeded"
+                                                                                                                                         ]
+                                                                                                        },
+                                                                                           "metadata":  {
+                                                                                                            "operationMetadataId":  "0d4df1a5-4eff-4a3c-b692-e200a069b8ad"
+                                                                                                        },
+                                                                                           "type":  "OpenApiConnection",
+                                                                                           "inputs":  {
+                                                                                                          "host":  {
+                                                                                                                       "apiId":  "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                                                                                                                       "connectionName":  "shared_sqldw_3",
+                                                                                                                       "operationId":  "ExecuteProcedureV2"
+                                                                                                                   },
+                                                                                                          "parameters":  {
+                                                                                                                             "server":  "default",
+                                                                                                                             "database":  "default",
+                                                                                                                             "procedure":  "[warroom].[usp_ExportProjectPunchesExtended_Pivoted]",
+                                                                                                                             "parameters/CategoryCode":  "@triggerBody()[\u0027text_1\u0027]",
+                                                                                                                             "parameters/CustomFiltersJson":  "@triggerBody()[\u0027text_5\u0027]",
+                                                                                                                             "parameters/MaxRows":  50000,
+                                                                                                                             "parameters/ProjectId":  "@variables(\u0027varProjectId\u0027)",
+                                                                                                                             "parameters/PunchDiscipline":  "@triggerBody()[\u0027text_3\u0027]",
+                                                                                                                             "parameters/PunchExportLogId":  "@outputs(\u0027Compose_PunchExportLogId\u0027)",
+                                                                                                                             "parameters/StatusCode":  "@triggerBody()[\u0027text_2\u0027]",
+                                                                                                                             "parameters/Subcontractor":  "@triggerBody()[\u0027text_4\u0027]",
+                                                                                                                             "parameters/SubsystemCode":  "@triggerBody()[\u0027text\u0027]",
+                                                                                                                             "parameters/TemplateId":  "@triggerBody()[\u0027number_1\u0027]"
+                                                                                                                         },
+                                                                                                          "authentication":  {
+                                                                                                                                 "value":  "@json(decodeBase64(triggerOutputs().headers[\u0027X-MS-APIM-Tokens\u0027]))[\u0027$ConnectionKey\u0027]",
+                                                                                                                                 "type":  "Raw"
+                                                                                                                             }
+                                                                                                      }
+                                                                                       },
+                                                          "SQL_GetColumnMap":  {
+                                                                                   "runAfter":  {
+                                                                                                    "SQL_ExportPunchesPivoted":  [
+                                                                                                                                     "Succeeded"
+                                                                                                                                 ]
+                                                                                                },
+                                                                                   "metadata":  {
+                                                                                                    "operationMetadataId":  "16fdce58-a330-4e00-89aa-39b50cd14e5d"
+                                                                                                },
+                                                                                   "type":  "OpenApiConnection",
+                                                                                   "inputs":  {
+                                                                                                  "host":  {
+                                                                                                               "apiId":  "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                                                                                                               "connectionName":  "shared_sqldw_2",
+                                                                                                               "operationId":  "ExecuteProcedureV2"
+                                                                                                           },
+                                                                                                  "parameters":  {
+                                                                                                                     "server":  "default",
+                                                                                                                     "database":  "default",
+                                                                                                                     "procedure":  "[warroom].[usp_GetPunchExportColumnMap]",
+                                                                                                                     "parameters/ProjectId":  "@variables(\u0027varProjectId\u0027)"
+                                                                                                                 },
+                                                                                                  "authentication":  {
+                                                                                                                         "value":  "@json(decodeBase64(triggerOutputs().headers[\u0027X-MS-APIM-Tokens\u0027]))[\u0027$ConnectionKey\u0027]",
+                                                                                                                         "type":  "Raw"
+                                                                                                                     }
+                                                                                              }
+                                                                               },
+                                                          "Compose_ExportRows":  {
+                                                                                     "runAfter":  {
+                                                                                                      "SQL_GetColumnMap":  [
+                                                                                                                               "Succeeded"
+                                                                                                                           ]
+                                                                                                  },
+                                                                                     "metadata":  {
+                                                                                                      "operationMetadataId":  "a4a56d67-a195-4825-a09c-1c1ea3568948"
+                                                                                                  },
+                                                                                     "type":  "Compose",
+                                                                                     "inputs":  "@body(\u0027SQL_ExportPunchesPivoted\u0027)?[\u0027ResultSets\u0027]?[\u0027Table1\u0027]"
+                                                                                 },
+                                                          "Compose_ColumnMap":  {
+                                                                                    "runAfter":  {
+                                                                                                     "Compose_ExportRows":  [
+                                                                                                                                "Succeeded"
+                                                                                                                            ]
+                                                                                                 },
+                                                                                    "metadata":  {
+                                                                                                     "operationMetadataId":  "c7c598f1-3e9b-4d37-bb65-44460a6ba3ec"
+                                                                                                 },
+                                                                                    "type":  "Compose",
+                                                                                    "inputs":  "@body(\u0027SQL_GetColumnMap\u0027)?[\u0027ResultSets\u0027]?[\u0027Table1\u0027]"
+                                                                                },
+                                                          "Compose_ExportInfo":  {
+                                                                                     "runAfter":  {
+                                                                                                      "Compose_RowCount":  [
+                                                                                                                               "Succeeded"
+                                                                                                                           ]
+                                                                                                  },
+                                                                                     "metadata":  {
+                                                                                                      "operationMetadataId":  "a43edb77-c98a-419f-8e47-3acb567d7a7c"
+                                                                                                  },
+                                                                                     "type":  "Compose",
+                                                                                     "inputs":  {
+                                                                                                    "ExportType":  "Punches",
+                                                                                                    "ProjectId":  "@{variables(\u0027varProjectId\u0027)}",
+                                                                                                    "PunchExportLogId":  "@{outputs(\u0027Compose_PunchExportLogId\u0027)}",
+                                                                                                    "ExportedOnUtc":  "@{utcNow()}",
+                                                                                                    "ExportedByEmail":  "@{variables(\u0027varRequestedByEmail\u0027)}",
+                                                                                                    "ExportedByName":  "@{variables(\u0027varRequestedByName\u0027)}",
+                                                                                                    "CanBeImported":  true,
+                                                                                                    "RowCount":  "@int(outputs(\u0027Compose_RowCount\u0027))",
+                                                                                                    "ExportMode":  "@{outputs(\u0027Compose_ExportMode_Safe\u0027)}",
+                                                                                                    "SelectedColumnCount":  "@length(body(\u0027Parse_Selected_Columns\u0027))"
+                                                                                                }
+                                                                                 },
+                                                          "Compose_PunchExportLogId":  {
+                                                                                           "runAfter":  {
+                                                                                                            "SQL_StartExportLog":  [
+                                                                                                                                       "Succeeded"
+                                                                                                                                   ]
+                                                                                                        },
+                                                                                           "metadata":  {
+                                                                                                            "operationMetadataId":  "56a9582c-2778-4879-835e-62e46c4dd1fb"
+                                                                                                        },
+                                                                                           "type":  "Compose",
+                                                                                           "inputs":  "@first(\r\n    body(\u0027SQL_StartExportLog\u0027)?[\u0027ResultSets\u0027]?[\u0027Table1\u0027]\r\n)?[\u0027PunchExportLogId\u0027]"
+                                                                                       },
+                                                          "Init_varRequestedByEmail":  {
+                                                                                           "runAfter":  {
+                                                                                                            "Init_varProjectId":  [
+                                                                                                                                      "Succeeded"
+                                                                                                                                  ]
+                                                                                                        },
+                                                                                           "metadata":  {
+                                                                                                            "operationMetadataId":  "3576bf76-4138-42e6-befa-11623c0ec5ae"
+                                                                                                        },
+                                                                                           "type":  "InitializeVariable",
+                                                                                           "inputs":  {
+                                                                                                          "variables":  [
+                                                                                                                            {
+                                                                                                                                "name":  "varRequestedByEmail",
+                                                                                                                                "type":  "string",
+                                                                                                                                "value":  "@triggerBody()[\u0027text_6\u0027]"
+                                                                                                                            }
+                                                                                                                        ]
+                                                                                                      }
+                                                                                       },
+                                                          "Init_varRequestedByName":  {
+                                                                                          "runAfter":  {
+                                                                                                           "Init_varRequestedByEmail":  [
+                                                                                                                                            "Succeeded"
+                                                                                                                                        ]
+                                                                                                       },
+                                                                                          "metadata":  {
+                                                                                                           "operationMetadataId":  "1cd7cbc2-1ee7-4376-a933-d31d6cc1228e"
+                                                                                                       },
+                                                                                          "type":  "InitializeVariable",
+                                                                                          "inputs":  {
+                                                                                                         "variables":  [
+                                                                                                                           {
+                                                                                                                               "name":  "varRequestedByName",
+                                                                                                                               "type":  "string",
+                                                                                                                               "value":  "@triggerBody()[\u0027text_7\u0027]"
+                                                                                                                           }
+                                                                                                                       ]
+                                                                                                     }
+                                                                                      },
+                                                          "Init_FileName":  {
+                                                                                "runAfter":  {
+                                                                                                 "Init_varRequestedByName":  [
+                                                                                                                                 "Succeeded"
+                                                                                                                             ]
+                                                                                             },
+                                                                                "metadata":  {
+                                                                                                 "operationMetadataId":  "9cf6a5d7-f694-440e-868a-8db36fd12d1b"
+                                                                                             },
+                                                                                "type":  "InitializeVariable",
+                                                                                "inputs":  {
+                                                                                               "variables":  [
+                                                                                                                 {
+                                                                                                                     "name":  "varFileName",
+                                                                                                                     "type":  "string",
+                                                                                                                     "value":  "@{concat(\r\n    \u0027PULSE_Punches_Project_\u0027,\r\n    string(variables(\u0027varProjectId\u0027)),\r\n    \u0027_\u0027,\r\n    formatDateTime(\r\n        utcNow(),\r\n        \u0027yyyyMMdd_HHmmss\u0027\r\n    ),\r\n    \u0027.xlsx\u0027\r\n)}"
+                                                                                                                 }
+                                                                                                             ]
+                                                                                           }
+                                                                            },
+                                                          "Compose_FilterJson":  {
+                                                                                     "runAfter":  {
+                                                                                                      "Parse_Selected_Columns":  [
+                                                                                                                                     "Succeeded"
+                                                                                                                                 ]
+                                                                                                  },
+                                                                                     "metadata":  {
+                                                                                                      "operationMetadataId":  "b2640d80-369a-4b5e-a2c6-22a2fc2d3037"
+                                                                                                  },
+                                                                                     "type":  "Compose",
+                                                                                     "inputs":  {
+                                                                                                    "ProjectId":  "@{triggerBody()?[\u0027number\u0027]}",
+                                                                                                    "SubsystemCode":  "@{triggerBody()?[\u0027text\u0027]}",
+                                                                                                    "TemplateId":  "@{triggerBody()?[\u0027number_1\u0027]}",
+                                                                                                    "CategoryCode":  "@{triggerBody()?[\u0027text_1\u0027]}",
+                                                                                                    "StatusCode":  "@{triggerBody()?[\u0027text_2\u0027]}",
+                                                                                                    "PunchDiscipline":  "@{triggerBody()?[\u0027text_3\u0027]}",
+                                                                                                    "Subcontractor":  "@{triggerBody()?[\u0027text_4\u0027]}",
+                                                                                                    "CustomFiltersJson":  "@{triggerBody()?[\u0027text_5\u0027]}"
+                                                                                                }
+                                                                                 },
+                                                          "Compose_RowCount":  {
+                                                                                   "runAfter":  {
+                                                                                                    "Compose_ColumnMap":  [
+                                                                                                                              "Succeeded"
+                                                                                                                          ]
+                                                                                                },
+                                                                                   "metadata":  {
+                                                                                                    "operationMetadataId":  "1b63b831-2d61-4e60-a465-3b7abe5bbcf0"
+                                                                                                },
+                                                                                   "type":  "Compose",
+                                                                                   "inputs":  "@length(outputs(\u0027Compose_ExportRows\u0027))"
+                                                                               },
+                                                          "Run_script":  {
+                                                                             "runAfter":  {
+                                                                                              "Delay":  [
+                                                                                                            "Succeeded"
+                                                                                                        ]
+                                                                                          },
+                                                                             "metadata":  {
+                                                                                              "operationMetadataId":  "5fd71c8b-88a4-40c1-b385-a65466d242f6",
+                                                                                              "tableId":  null
+                                                                                          },
+                                                                             "type":  "OpenApiConnection",
+                                                                             "inputs":  {
+                                                                                            "host":  {
+                                                                                                         "apiId":  "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+                                                                                                         "connectionName":  "shared_excelonlinebusiness",
+                                                                                                         "operationId":  "RunScriptProd"
+                                                                                                     },
+                                                                                            "parameters":  {
+                                                                                                               "source":  "sites/trsa.sharepoint.com,d892b689-83ab-4011-848c-900b6dc9017c,9cc85727-1e6a-4d5c-980c-2c970ea0158b",
+                                                                                                               "drive":  "b!ibaS2KuDEUCEjJALbckBfCdXyJxqHlxNmAwslw6gFYtgSLbDrR19T6MXIO-NLA14",
+                                                                                                               "file":  "@outputs(\u0027SP_CreateExportFile\u0027)?[\u0027body/Id\u0027]",
+                                                                                                               "scriptId":  "ms-officescript%3A%2F%2Fonedrive_business_itemlink%2F01U46ZCL4OIB6TOPXNUFG2FWLM2XYTCEYA",
+                                                                                                               "ScriptParameters/rowsJson":  "@outputs(\u0027Compose_ExportRows\u0027)",
+                                                                                                               "ScriptParameters/columnMapJson":  "@outputs(\u0027Compose_ColumnMap\u0027)",
+                                                                                                               "ScriptParameters/exportInfoJson":  "@outputs(\u0027Compose_ExportInfo\u0027)",
+                                                                                                               "ScriptParameters/exportMode":  "@outputs(\u0027Compose_ExportMode_Safe\u0027)",
+                                                                                                               "ScriptParameters/selectedColumnsJson":  "@outputs(\u0027Compose_SelectedColumns_Safe\u0027)"
+                                                                                                           },
+                                                                                            "authentication":  {
+                                                                                                                   "value":  "@json(decodeBase64(triggerOutputs().headers[\u0027X-MS-APIM-Tokens\u0027]))[\u0027$ConnectionKey\u0027]",
+                                                                                                                   "type":  "Raw"
+                                                                                                               }
+                                                                                        }
+                                                                         },
+                                                          "SP_CreateExportSharingLink":  {
+                                                                                             "runAfter":  {
+                                                                                                              "Run_script":  [
+                                                                                                                                 "Succeeded"
+                                                                                                                             ]
+                                                                                                          },
+                                                                                             "metadata":  {
+                                                                                                              "operationMetadataId":  "3678a8f8-93ae-4716-a5b5-8e086be34a81"
+                                                                                                          },
+                                                                                             "type":  "OpenApiConnection",
+                                                                                             "inputs":  {
+                                                                                                            "host":  {
+                                                                                                                         "apiId":  "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                                                                                                                         "connectionName":  "shared_sharepointonline",
+                                                                                                                         "operationId":  "CreateSharingLink"
+                                                                                                                     },
+                                                                                                            "parameters":  {
+                                                                                                                               "dataset":  "https://trsa.sharepoint.com/sites/rpa_flows/Pulse",
+                                                                                                                               "table":  "c3b64860-1dad-4f7d-a317-20ef8d2c0d78",
+                                                                                                                               "id":  "@outputs(\u0027SP_CreateExportFile\u0027)?[\u0027body/ItemId\u0027]",
+                                                                                                                               "permission/type":  "view",
+                                                                                                                               "permission/scope":  "organization"
+                                                                                                                           },
+                                                                                                            "authentication":  {
+                                                                                                                                   "value":  "@json(decodeBase64(triggerOutputs().headers[\u0027X-MS-APIM-Tokens\u0027]))[\u0027$ConnectionKey\u0027]",
+                                                                                                                                   "type":  "Raw"
+                                                                                                                               }
+                                                                                                        }
+                                                                                         },
+                                                          "Compose_ExportFileUrl":  {
+                                                                                        "runAfter":  {
+                                                                                                         "SP_CreateExportSharingLink":  [
+                                                                                                                                            "Succeeded"
+                                                                                                                                        ]
+                                                                                                     },
+                                                                                        "metadata":  {
+                                                                                                         "operationMetadataId":  "d2e7a201-af8c-45f3-85cb-ec0b26d5d4f7"
+                                                                                                     },
+                                                                                        "type":  "Compose",
+                                                                                        "inputs":  "@body(\u0027SP_CreateExportSharingLink\u0027)?[\u0027link\u0027]?[\u0027webUrl\u0027]"
+                                                                                    },
+                                                          "Execute_stored_procedure_(V2)":  {
+                                                                                                "runAfter":  {
+                                                                                                                 "Compose_ExportFileUrl":  [
+                                                                                                                                               "Succeeded"
+                                                                                                                                           ]
+                                                                                                             },
+                                                                                                "metadata":  {
+                                                                                                                 "operationMetadataId":  "29e225d4-e0bd-442b-b273-6cfa0fd64883"
+                                                                                                             },
+                                                                                                "type":  "OpenApiConnection",
+                                                                                                "inputs":  {
+                                                                                                               "host":  {
+                                                                                                                            "apiId":  "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                                                                                                                            "connectionName":  "shared_sqldw",
+                                                                                                                            "operationId":  "ExecuteProcedureV2"
+                                                                                                                        },
+                                                                                                               "parameters":  {
+                                                                                                                                  "server":  "default",
+                                                                                                                                  "database":  "default",
+                                                                                                                                  "procedure":  "[warroom].[usp_PunchExportLog_Complete]",
+                                                                                                                                  "parameters/FileName":  "@variables(\u0027varFileName\u0027)",
+                                                                                                                                  "parameters/FileUrl":  "@outputs(\u0027Compose_ExportFileUrl\u0027)",
+                                                                                                                                  "parameters/PunchExportLogId":  "@outputs(\u0027Compose_PunchExportLogId\u0027)",
+                                                                                                                                  "parameters/RowCount":  "@outputs(\u0027Compose_RowCount\u0027)"
+                                                                                                                              },
+                                                                                                               "authentication":  {
+                                                                                                                                      "value":  "@json(decodeBase64(triggerOutputs().headers[\u0027X-MS-APIM-Tokens\u0027]))[\u0027$ConnectionKey\u0027]",
+                                                                                                                                      "type":  "Raw"
+                                                                                                                                  }
+                                                                                                           }
+                                                                                            },
+                                                          "Respond_to_a_Power_App_or_flow":  {
+                                                                                                 "runAfter":  {
+                                                                                                                  "Execute_stored_procedure_(V2)":  [
+                                                                                                                                                        "Succeeded"
+                                                                                                                                                    ]
+                                                                                                              },
+                                                                                                 "metadata":  {
+                                                                                                                  "operationMetadataId":  "9a1072da-4048-4df6-bc84-230b42478dd9"
+                                                                                                              },
+                                                                                                 "type":  "Response",
+                                                                                                 "kind":  "PowerApp",
+                                                                                                 "inputs":  {
+                                                                                                                "statusCode":  200,
+                                                                                                                "body":  {
+                                                                                                                             "success":  true,
+                                                                                                                             "fileurl":  "@{outputs(\u0027Compose_ExportFileUrl\u0027)}",
+                                                                                                                             "filename":  "@{variables(\u0027varFileName\u0027)}",
+                                                                                                                             "rowcount":  "@{outputs(\u0027Compose_RowCount\u0027)}",
+                                                                                                                             "message":  "Export generated successfully."
+                                                                                                                         },
+                                                                                                                "schema":  {
+                                                                                                                               "type":  "object",
+                                                                                                                               "properties":  {
+                                                                                                                                                  "success":  {
+                                                                                                                                                                  "title":  "success",
+                                                                                                                                                                  "x-ms-dynamically-added":  true,
+                                                                                                                                                                  "type":  "boolean"
+                                                                                                                                                              },
+                                                                                                                                                  "fileurl":  {
+                                                                                                                                                                  "title":  "fileUrl",
+                                                                                                                                                                  "x-ms-dynamically-added":  true,
+                                                                                                                                                                  "type":  "string"
+                                                                                                                                                              },
+                                                                                                                                                  "filename":  {
+                                                                                                                                                                   "title":  "fileName",
+                                                                                                                                                                   "x-ms-dynamically-added":  true,
+                                                                                                                                                                   "type":  "string"
+                                                                                                                                                               },
+                                                                                                                                                  "rowcount":  {
+                                                                                                                                                                   "title":  "rowCount",
+                                                                                                                                                                   "x-ms-dynamically-added":  true,
+                                                                                                                                                                   "type":  "number"
+                                                                                                                                                               },
+                                                                                                                                                  "message":  {
+                                                                                                                                                                  "title":  "message",
+                                                                                                                                                                  "x-ms-dynamically-added":  true,
+                                                                                                                                                                  "type":  "string"
+                                                                                                                                                              }
+                                                                                                                                              }
+                                                                                                                           }
+                                                                                                            }
+                                                                                             },
+                                                          "SP_GetTemplateFileContent":  {
+                                                                                            "runAfter":  {
+                                                                                                             "Compose_ExportInfo":  [
+                                                                                                                                        "Succeeded"
+                                                                                                                                    ]
+                                                                                                         },
+                                                                                            "metadata":  {
+                                                                                                             "operationMetadataId":  "867d1ec2-e9f8-4c24-9043-739730e91ae5"
+                                                                                                         },
+                                                                                            "type":  "OpenApiConnection",
+                                                                                            "inputs":  {
+                                                                                                           "host":  {
+                                                                                                                        "apiId":  "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                                                                                                                        "connectionName":  "shared_sharepointonline",
+                                                                                                                        "operationId":  "GetFileContentByPath"
+                                                                                                                    },
+                                                                                                           "parameters":  {
+                                                                                                                              "dataset":  "https://trsa.sharepoint.com/sites/rpa_flows",
+                                                                                                                              "path":  "/Documentos compartidos/General/04_Scripts/Template.xlsx",
+                                                                                                                              "inferContentType":  true
+                                                                                                                          },
+                                                                                                           "authentication":  {
+                                                                                                                                  "value":  "@json(decodeBase64(triggerOutputs().headers[\u0027X-MS-APIM-Tokens\u0027]))[\u0027$ConnectionKey\u0027]",
+                                                                                                                                  "type":  "Raw"
+                                                                                                                              }
+                                                                                                       }
+                                                                                        },
+                                                          "SP_CreateExportFile":  {
+                                                                                      "runAfter":  {
+                                                                                                       "SP_GetTemplateFileContent":  [
+                                                                                                                                         "Succeeded"
+                                                                                                                                     ]
+                                                                                                   },
+                                                                                      "metadata":  {
+                                                                                                       "operationMetadataId":  "cff5b4cb-6dc8-44e6-ac81-f7304bc5374b"
+                                                                                                   },
+                                                                                      "type":  "OpenApiConnection",
+                                                                                      "inputs":  {
+                                                                                                     "host":  {
+                                                                                                                  "apiId":  "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                                                                                                                  "connectionName":  "shared_sharepointonline",
+                                                                                                                  "operationId":  "CreateFile"
+                                                                                                              },
+                                                                                                     "parameters":  {
+                                                                                                                        "dataset":  "https://trsa.sharepoint.com/sites/rpa_flows/Pulse",
+                                                                                                                        "folderPath":  "/Documentos compartidos/Exports",
+                                                                                                                        "name":  "@variables(\u0027varFileName\u0027)",
+                                                                                                                        "body":  "@body(\u0027SP_GetTemplateFileContent\u0027)"
+                                                                                                                    },
+                                                                                                     "authentication":  {
+                                                                                                                            "value":  "@json(decodeBase64(triggerOutputs().headers[\u0027X-MS-APIM-Tokens\u0027]))[\u0027$ConnectionKey\u0027]",
+                                                                                                                            "type":  "Raw"
+                                                                                                                        }
+                                                                                                 },
+                                                                                      "runtimeConfiguration":  {
+                                                                                                                   "contentTransfer":  {
+                                                                                                                                           "transferMode":  "Chunked"
+                                                                                                                                       }
+                                                                                                               }
+                                                                                  },
+                                                          "Delay":  {
+                                                                        "runAfter":  {
+                                                                                         "SP_CreateExportFile":  [
+                                                                                                                     "Succeeded"
+                                                                                                                 ]
+                                                                                     },
+                                                                        "metadata":  {
+                                                                                         "operationMetadataId":  "db50d794-f44c-49d0-ab8e-17d7d4c383a3"
+                                                                                     },
+                                                                        "type":  "Wait",
+                                                                        "inputs":  {
+                                                                                       "interval":  {
+                                                                                                        "count":  15,
+                                                                                                        "unit":  "Second"
+                                                                                                    }
+                                                                                   }
+                                                                    },
+                                                          "Compose_ExportMode_Safe":  {
+                                                                                          "runAfter":  {
+                                                                                                           "Init_FileName":  [
+                                                                                                                                 "Succeeded"
+                                                                                                                             ]
+                                                                                                       },
+                                                                                          "metadata":  {
+                                                                                                           "operationMetadataId":  "c54def83-5c81-4802-a6a1-f1b819fa7f19"
+                                                                                                       },
+                                                                                          "type":  "Compose",
+                                                                                          "inputs":  "@if(\r\n  equals(\r\n    toUpper(\r\n      trim(\r\n        string(\r\n          coalesce(\r\n            triggerBody()?[\u0027ExportMode\u0027],\r\n            \u0027CLIENT\u0027\r\n          )\r\n        )\r\n      )\r\n    ),\r\n    \u0027INTERNAL\u0027\r\n  ),\r\n  \u0027INTERNAL\u0027,\r\n  \u0027CLIENT\u0027\r\n)"
+                                                                                      },
+                                                          "Compose_SelectedColumns_Safe":  {
+                                                                                               "runAfter":  {
+                                                                                                                "Compose_ExportMode_Safe":  [
+                                                                                                                                                "Succeeded"
+                                                                                                                                            ]
+                                                                                                            },
+                                                                                               "metadata":  {
+                                                                                                                "operationMetadataId":  "20c758cc-2bb3-41cc-9260-4cc260deca66"
+                                                                                                            },
+                                                                                               "type":  "Compose",
+                                                                                               "inputs":  "@if(\r\n  or(\r\n    empty(triggerBody()?[\u0027text_9\u0027]),\r\n    equals(trim(triggerBody()?[\u0027text_9\u0027]), \u0027\u0027)\r\n  ),\r\n  \u0027[]\u0027,\r\n  triggerBody()?[\u0027text_9\u0027]\r\n)"
+                                                                                           },
+                                                          "Parse_Selected_Columns":  {
+                                                                                         "runAfter":  {
+                                                                                                          "Compose_SelectedColumns_Safe":  [
+                                                                                                                                               "Succeeded"
+                                                                                                                                           ]
+                                                                                                      },
+                                                                                         "metadata":  {
+                                                                                                          "operationMetadataId":  "39db83f5-bb93-4c9a-9fcc-358b258c67c4"
+                                                                                                      },
+                                                                                         "type":  "ParseJson",
+                                                                                         "inputs":  {
+                                                                                                        "content":  "@outputs(\u0027Compose_SelectedColumns_Safe\u0027)",
+                                                                                                        "schema":  {
+                                                                                                                       "type":  "array",
+                                                                                                                       "items":  {
+                                                                                                                                     "type":  "object",
+                                                                                                                                     "properties":  {
+                                                                                                                                                        "ColumnKey":  {
+                                                                                                                                                                          "type":  "string"
+                                                                                                                                                                      },
+                                                                                                                                                        "ColumnLabel":  {
+                                                                                                                                                                            "type":  "string"
+                                                                                                                                                                        },
+                                                                                                                                                        "SortOrder":  {
+                                                                                                                                                                          "type":  "number"
+                                                                                                                                                                      }
+                                                                                                                                                    },
+                                                                                                                                     "required":  [
+                                                                                                                                                      "ColumnKey",
+                                                                                                                                                      "ColumnLabel",
+                                                                                                                                                      "SortOrder"
+                                                                                                                                                  ]
+                                                                                                                                 }
+                                                                                                                   }
+                                                                                                    }
+                                                                                     }
+                                                      },
+                                          "outputs":  {
+
+                                                      }
+                                      },
+                       "connectionReferences":  {
+                                                    "shared_sqldw_2":  {
+                                                                           "connectionName":  "shared-sqldw-39a77660-3c9d-44fb-a5c9-6e70fcf4b1ae",
+                                                                           "source":  "Invoker",
+                                                                           "id":  "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                                                                           "tier":  "NotSpecified",
+                                                                           "apiName":  "sqldw",
+                                                                           "isProcessSimpleApiReferenceConversionAlreadyDone":  false
+                                                                       },
+                                                    "shared_sqldw_3":  {
+                                                                           "connectionName":  "shared-sqldw-e9c75dca-06c6-41de-b20a-0f3acef3bfbd",
+                                                                           "source":  "Invoker",
+                                                                           "id":  "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                                                                           "tier":  "NotSpecified",
+                                                                           "apiName":  "sqldw",
+                                                                           "isProcessSimpleApiReferenceConversionAlreadyDone":  false
+                                                                       },
+                                                    "shared_excelonlinebusiness":  {
+                                                                                       "connectionName":  "shared-excelonlinebu-6f8713f8-afca-4839-aee5-0a8fdc4b58c7",
+                                                                                       "source":  "Invoker",
+                                                                                       "id":  "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+                                                                                       "tier":  "NotSpecified",
+                                                                                       "apiName":  "excelonlinebusiness",
+                                                                                       "isProcessSimpleApiReferenceConversionAlreadyDone":  false
+                                                                                   },
+                                                    "shared_sharepointonline":  {
+                                                                                    "connectionName":  "950299e4d12b429f9369acd179bf87f3",
+                                                                                    "source":  "Invoker",
+                                                                                    "id":  "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                                                                                    "tier":  "NotSpecified",
+                                                                                    "apiName":  "sharepointonline",
+                                                                                    "isProcessSimpleApiReferenceConversionAlreadyDone":  false
+                                                                                },
+                                                    "shared_sqldw":  {
+                                                                         "connectionName":  "8c9a525fcebb4423a04e486c3782c454",
+                                                                         "source":  "Invoker",
+                                                                         "id":  "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                                                                         "tier":  "NotSpecified",
+                                                                         "apiName":  "sqldw",
+                                                                         "isProcessSimpleApiReferenceConversionAlreadyDone":  false
+                                                                     }
+                                                },
+                       "flowFailureAlertSubscribed":  false,
+                       "isManaged":  false
+                   }
+}

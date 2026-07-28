@@ -27,9 +27,18 @@ Uploading a file never updates a production Punch table.
 
 ## Export contract
 
-Every exported row carries `ExportBatchId`, `ProjectId`, `TemplateId`,
-`WorkItemId`, `RowVersion`, `ExportedAtUtc` and `RowChecksum`. Power Apps
-appends these keys to `SelectedColumnsJson`; they are not user-selectable.
+The real workbook carries `PunchExportLogId`, `ProjectId`, `TemplateId`,
+`PunchId`, `RowHash` and `Original Row Hash`. Contract v2 maps
+`PunchExportLogId` to logical `ExportBatchId`, `PunchId` to `WorkItemId`, and
+the hashes to export/original row checksums. `ExportedOnUtc` is stored once in
+the hidden Export Information sheet.
+
+The Office Script owns these columns, locks them and protects the Punches
+worksheet. Power Apps sends only user-selected business columns in
+`SelectedColumnsJson`.
+
+Contract v1 remains as design history. Runtime integration must use
+`main/contracts/excel-import/export-columns.v2.json`.
 
 The Flow must persist the export batch and its rows, populate the metadata,
 protect those columns, and return the file only after persistence succeeds.
@@ -42,7 +51,7 @@ The exact request contract is
 
 | Object | Responsibility |
 |---|---|
-| `warroom.ExportBatch` | Export identity, scope and allowlist snapshot. |
+| `warroom.ExportBatch` | Extension keyed by the existing BIGINT `PunchExportLogId`; stores scope and allowlist snapshot. |
 | `warroom.ExportBatchRow` | Original state, row version and checksum. |
 | `warroom.ImportBatch` | Import lifecycle and aggregate counters. |
 | `warroom.ImportBatchRow` | Staged data, diff and validation/apply state. |
@@ -55,13 +64,13 @@ invariants transactionally.
 
 ## Concurrency and integrity
 
-`RowVersion` travels as 16-character uppercase hexadecimal text and is stored
-as `binary(8)`. A mismatch between export state and current state is a blocking
-`CONFLICT`; I01 defines no forced overwrite.
+The supplied source does not expose a physical SQL `rowversion`. Concurrency
+therefore uses the SHA-256 `RowHash`/`Original Row Hash` mechanism. Validation
+must recompute the current canonical checksum and compare it with the immutable
+stored export checksum. A mismatch is a blocking `CONFLICT`.
 
-`RowChecksum` is SHA-256 over a backend canonical row representation. The same
-backend implementation must generate and verify it; Power Apps and Excel are
-never checksum authorities.
+The supplied SQL checksum currently omits editable standard fields and must be
+expanded before imports can be committed safely.
 
 ## Column governance
 
@@ -73,7 +82,8 @@ backend definition.
 
 ## Performance baseline
 
-- Maximum MVP file size: 5,000 data rows.
+- Current export Flow limit: 50,000 data rows.
+- Import limit remains a future I02 decision after payload/performance tests.
 - One structured Excel table per file.
 - Batch or bulk staging, never one SQL call per row.
 - Set-based validation/diff and paged row-error retrieval.

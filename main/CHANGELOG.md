@@ -1,5 +1,40 @@
 # CHANGELOG
 
+## Sprint I01.1 - Real export integration
+
+### Added
+
+- Supplied Power Automate package and source definition for
+  `Warroom_ExportPunchesToExcel`.
+- Real Office Script, export dataset procedure and representative XLSX fixture.
+- Repeatable structural workbook inspection.
+- Version 2 export and mapping contracts aligned with physical fields.
+- Corrected Flow definition using the real Power Apps trigger keys for selected
+  columns and filter logging.
+
+### Changed
+
+- Power Apps no longer appends logical technical fields to
+  `SelectedColumnsJson`; the real Office Script owns technical columns.
+- I01 architecture now records the real checksum mechanism and 50,000-row Flow
+  limit.
+
+### Fixed
+
+- Corrected assumed IDs to `PunchExportLogId` and `PunchId`.
+- Corrected the assumption that a physical `RowVersion` is available.
+
+### Removed
+
+- None.
+
+### Known Issues
+
+- Current `RowHash` does not cover every editable standard field.
+- Export rows are not persisted as immutable backend snapshots.
+- The Flow lacks a complete error/cleanup scope.
+- The corrected Flow definition is versioned but not deployed.
+
 ## Sprint I01 - Excel import foundations
 
 ### Added

@@ -61,12 +61,13 @@ Local static validation results are reported in the Sprint handoff.
 
 ## Known limitations
 
-- The Flow definition is absent, so XLSX metadata/protection cannot be proven.
+- The Flow, Office Script, SQL export and fixture are now versioned by I01.1.
 - SQL execution requires an unconfigured non-production target.
-- Mapping targets/lengths remain logical until checked against production.
-- Power Apps requests metadata but cannot guarantee Flow output.
+- The current checksum does not cover every editable standard field.
+- Immutable export-row snapshots are not yet persisted by the supplied Flow.
 
 ## Next step
 
-Integrate and verify export contract v1 in the export Flow. Only then begin I02
-set-based batch creation, staging, validation, diff and conflict detection.
+Complete the I01.1 checksum and immutable export-row snapshot integration.
+Only then begin I02 set-based batch creation, staging, validation, diff and
+conflict detection.
