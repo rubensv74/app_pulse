@@ -1,0 +1,28 @@
+{
+  "mapping": "PULSE.PunchExcelImportColumns",
+  "version": 1,
+  "defaultScope": {
+    "template": "*",
+    "projectId": null
+  },
+  "columns": [
+    { "excelColumn": "ExportBatchId", "targetField": "ExportBatchId", "dataType": "string", "editable": false, "required": true, "maxLength": 36, "validationRule": "uuid; must match stored export batch", "displayOrder": -700, "displayName": "Export batch" },
+    { "excelColumn": "ProjectId", "targetField": "ProjectId", "dataType": "integer", "editable": false, "required": true, "maxLength": null, "validationRule": "positive integer; one value per file; must match export batch", "displayOrder": -600, "displayName": "Project" },
+    { "excelColumn": "TemplateId", "targetField": "TemplateId", "dataType": "integer", "editable": false, "required": true, "maxLength": null, "validationRule": "positive integer; one value per file; must match export batch", "displayOrder": -500, "displayName": "Template" },
+    { "excelColumn": "WorkItemId", "targetField": "WorkItemId", "dataType": "integer", "editable": false, "required": true, "maxLength": null, "validationRule": "positive integer; unique within file; must exist in stored export batch", "displayOrder": -400, "displayName": "Work item" },
+    { "excelColumn": "RowVersion", "targetField": "RowVersion", "dataType": "string", "editable": false, "required": true, "maxLength": 16, "validationRule": "uppercase hexadecimal binary(8); must match stored export row", "displayOrder": -300, "displayName": "Row version" },
+    { "excelColumn": "ExportedAtUtc", "targetField": "ExportedAtUtc", "dataType": "datetime", "editable": false, "required": true, "maxLength": null, "validationRule": "ISO 8601 UTC timestamp; must match export batch", "displayOrder": -200, "displayName": "Exported at UTC" },
+    { "excelColumn": "RowChecksum", "targetField": "RowChecksum", "dataType": "string", "editable": false, "required": true, "maxLength": 64, "validationRule": "SHA-256 hexadecimal; must match stored export row", "displayOrder": -100, "displayName": "Row checksum" },
+    { "excelColumn": "Code", "targetField": "Code", "dataType": "string", "editable": false, "required": true, "maxLength": 100, "validationRule": "must match the current work item identifier", "displayOrder": 100, "displayName": "Punch code" },
+    { "excelColumn": "Description", "targetField": "Description", "dataType": "string", "editable": true, "required": true, "maxLength": 2000, "validationRule": "trimmed non-empty text", "displayOrder": 110, "displayName": "Punch description" },
+    { "excelColumn": "Category", "targetField": "Category", "dataType": "string", "editable": true, "required": false, "maxLength": 50, "validationRule": "must exist in the selected template category catalog", "displayOrder": 120, "displayName": "Category" },
+    { "excelColumn": "Discipline", "targetField": "Discipline", "dataType": "string", "editable": true, "required": false, "maxLength": 100, "validationRule": "must exist in the project discipline catalog", "displayOrder": 130, "displayName": "Discipline" },
+    { "excelColumn": "Status", "targetField": "Status", "dataType": "string", "editable": true, "required": false, "maxLength": 50, "validationRule": "must exist in the punch status catalog", "displayOrder": 140, "displayName": "Status" },
+    { "excelColumn": "SubcontractorName", "targetField": "SubcontractorName", "dataType": "string", "editable": true, "required": false, "maxLength": 255, "validationRule": "must resolve uniquely in the project subcontractor catalog", "displayOrder": 220, "displayName": "Subcontractor" }
+  ],
+  "dynamicColumns": {
+    "prefix": "CF__",
+    "editableByDefault": false,
+    "rule": "A custom field is importable only after an active backend definition is created for the exact template/project scope."
+  }
+}

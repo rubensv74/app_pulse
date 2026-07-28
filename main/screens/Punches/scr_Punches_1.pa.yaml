@@ -3675,21 +3675,34 @@ Screens:
                                         NotificationType.Warning
                                     ),
 
+                                    // Technical import metadata is mandatory and is not
+                                    // exposed as a selectable business column.
+                                    ClearCollect(
+                                        colPunchExportRequestColumns,
+                                        ShowColumns(
+                                            Filter(colPunchExportColumns, IsSelected),
+                                            ColumnKey,
+                                            ColumnLabel,
+                                            SortOrder
+                                        )
+                                    );
+                                    Collect(
+                                        colPunchExportRequestColumns,
+                                        { ColumnKey: "ExportBatchId", ColumnLabel: "ExportBatchId", SortOrder: -700 },
+                                        { ColumnKey: "ProjectId", ColumnLabel: "ProjectId", SortOrder: -600 },
+                                        { ColumnKey: "TemplateId", ColumnLabel: "TemplateId", SortOrder: -500 },
+                                        { ColumnKey: "WorkItemId", ColumnLabel: "WorkItemId", SortOrder: -400 },
+                                        { ColumnKey: "RowVersion", ColumnLabel: "RowVersion", SortOrder: -300 },
+                                        { ColumnKey: "ExportedAtUtc", ColumnLabel: "ExportedAtUtc", SortOrder: -200 },
+                                        { ColumnKey: "RowChecksum", ColumnLabel: "RowChecksum", SortOrder: -100 }
+                                    );
                                     Set(
                                         varPunchExportColumnsJson,
                                         JSON(
-                                            ShowColumns(
-                                                SortByColumns(
-                                                    Filter(
-                                                        colPunchExportColumns,
-                                                        IsSelected
-                                                    ),
-                                                    "SortOrder",
-                                                    SortOrder.Ascending
-                                                ),
-                                                ColumnKey,
-                                                ColumnLabel,
-                                                SortOrder
+                                            SortByColumns(
+                                                colPunchExportRequestColumns,
+                                                "SortOrder",
+                                                SortOrder.Ascending
                                             ),
                                             JSONFormat.Compact
                                         )

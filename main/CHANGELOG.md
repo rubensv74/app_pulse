@@ -1,5 +1,31 @@
 # CHANGELOG
 
+## Sprint I01 - Excel import foundations
+
+### Added
+
+- Azure SQL foundation tables, versioned contracts, backend column mapping and
+  implementation documentation.
+
+### Changed
+
+- The Punch export request includes the seven mandatory import metadata fields.
+
+### Fixed
+
+- Column editability is now governed by a backend mapping contract.
+
+### Removed
+
+- None.
+
+### Known Issues
+
+- The external export Flow must implement and protect the requested metadata.
+- SQL deployment and Power Apps Studio compilation require connected test
+  environments and have not been executed locally.
+- Logical target fields require verification against the production Punch schema.
+
 ## EPIC-01 — Home1 instance stabilization
 
 ### Modified
