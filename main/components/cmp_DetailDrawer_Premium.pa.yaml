@@ -50,7 +50,26 @@ ComponentDefinitions:
         DisplayName: NormalizedRecord
         Description: Normalized task or punch record.
         DataType: Record
-        Default: =varDrawerNormalized
+        Default: |-
+          ={
+              EntityType: "",
+              ProjectId: 0,
+              RecordId: 0,
+              AreaCode: "",
+              UnitCode: "",
+              SystemCode: "",
+              SubsystemCode: "",
+              ElementCode: "",
+              TypeCode: "",
+              TitleValue: "",
+              DescValue: "",
+              StatusValue: "",
+              CategoryValue: "",
+              DisciplineValue: "",
+              SecondaryValue: "",
+              ResponsibleSubcontractorValue: "",
+              ActionByValue: ""
+          }
       OnDeleteComment:
         PropertyKind: Event
         DisplayName: OnDeleteComment
@@ -130,7 +149,7 @@ ComponentDefinitions:
         =
         Set(varDrawerTab, "Summary");
         Set(varDrawerCommentDraft, "");
-        Set(varDrawerSelectedCommentId, Blank())
+        Set(varDrawerSelectedCommentId, 0)
       Width: =Self.HostWidth
     Children:
       - recDrawerScrim:
@@ -247,7 +266,7 @@ ComponentDefinitions:
                         OnSelect: |-
                           =
                           Set(varDrawerCommentDraft, "");
-                          Set(varDrawerSelectedCommentId, Blank());
+                          Set(varDrawerSelectedCommentId, 0);
                           cmp_DetailDrawer_Premium.CloseAction()
                         PaddingBottom: =8
                         PaddingLeft: =8
@@ -554,7 +573,7 @@ ComponentDefinitions:
                                         !IsBlank(Value)
                                     ),
                                     Value,
-                                    "  ›  "
+                                    "  â€º  "
                                 )
                               VerticalAlign: =VerticalAlign.Top
                               Width: =Parent.Width - 40
@@ -682,7 +701,7 @@ ComponentDefinitions:
                               Height: =22
                               OnSelect: =Select(Parent)
                               Size: =8
-                              Text: =Text(ThisItem.CreatedOn,"dd mmm yyyy · HH:mm")
+                              Text: =Text(ThisItem.CreatedOn,"dd mmm yyyy Â· HH:mm")
                               Width: =160
                               X: =Parent.TemplateWidth - 172
                               Y: =8
@@ -737,14 +756,14 @@ ComponentDefinitions:
                       Properties:
                         BorderStyle: =BorderStyle.None
                         Color: =Color.White
-                        DisplayMode: =If(IsBlank(Trim(txtDrawerComment.Text)) || varIsPostingComment,DisplayMode.Disabled,DisplayMode.Edit)
+                        DisplayMode: =If(IsBlank(Trim(txtDrawerComment.Text)) || cmp_DetailDrawer_Premium.IsLoading,DisplayMode.Disabled,DisplayMode.Edit)
                         Fill: =ColorValue("#1677FF")
                         Font: =Font.'Segoe UI'
                         Height: =42
                         HoverFill: =ColorValue("#0F6BFF")
                         OnSelect: =Set(varDrawerCommentDraft,txtDrawerComment.Text); cmp_DetailDrawer_Premium.OnPostComment()
                         Size: =10
-                        Text: =If(varIsPostingComment,"Posting...","Post")
+                        Text: =If(cmp_DetailDrawer_Premium.IsLoading,"Posting...","Post")
                         Width: =106
                         X: =Parent.Width - 130
                         Y: =Parent.Height - 110

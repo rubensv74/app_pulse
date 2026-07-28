@@ -384,7 +384,7 @@ Screens:
                   IsLoading: =varDrawerIsLoading
                   IsOpen: =varShowDetailDrawer
                   NormalizedRecord: =varDrawerNormalized
-                  OnDeleteComment: =Set(varDrawerSelectedCommentId, Blank())
+                  OnDeleteComment: =Set(varDrawerSelectedCommentId, 0)
                   OnManageFieldsRequested: |-
                     =
                     Set(varCT_ShowManageFields, true);
@@ -400,6 +400,7 @@ Screens:
                         IsBlank(Trim(varDrawerCommentDraft)),
                         Notify("Comment is required.", NotificationType.Warning),
                         Set(varIsLoadingComments, true);
+                        Set(varDrawerIsLoading, true);
                         IfError(
                             Warroom_AddTaskComment.Run(
                                 varProjectId,
@@ -411,8 +412,10 @@ Screens:
                                 "Comment"
                             );
                             Set(varDrawerCommentDraft, "");
-                            Select(btnDrawerLoad_Comments_3),
+                            Select(btnDrawerLoad_Comments_3);
+                            Set(varDrawerIsLoading, false),
                             Set(varIsLoadingComments, false);
+                            Set(varDrawerIsLoading, false);
                             Notify("The comment could not be saved.", NotificationType.Error)
                         )
                     )
@@ -1126,7 +1129,7 @@ Screens:
                                     Title: ="Progress"
                                     TooltipText: ="Open project Overview"
                                     Trend: =If(Sum(colHomeHiveNodesSorted, Total) = 0, "FLAT", If(Sum(colHomeHiveNodesSorted, Done) / Sum(colHomeHiveNodesSorted, Total) >= 0.9, "UP", "FLAT"))
-                                    ValueText: =If(Sum(colHomeHiveNodesSorted, Total) = 0, "—", Text(100 * Sum(colHomeHiveNodesSorted, Done) / Sum(colHomeHiveNodesSorted, Total), "0.0") & "%")
+                                    ValueText: =If(Sum(colHomeHiveNodesSorted, Total) = 0, "â€”", Text(100 * Sum(colHomeHiveNodesSorted, Done) / Sum(colHomeHiveNodesSorted, Total), "0.0") & "%")
                                     WarningColor: =varTheme_Amber
                                     Width: =(Parent.Width - 58) / 4
                                     X: =10
@@ -1492,7 +1495,7 @@ Screens:
                                                             Text: |-
                                                               =If(
                                                                   Len(Proper(ThisItem.NodeTitle)) > 15,
-                                                                  Left(Proper(ThisItem.NodeTitle), 14) & "…",
+                                                                  Left(Proper(ThisItem.NodeTitle), 14) & "â€¦",
                                                                   Proper(ThisItem.NodeTitle)
                                                               )
                                                             Width: =Parent.Width - 180
@@ -1535,10 +1538,10 @@ Screens:
                                                             Text: |-
                                                               =Switch(
                                                                   ThisItem.ProgressStatus,
-                                                                  "Delayed", "⚠  Delayed",
-                                                                  "At Risk", "⚠  At Risk",
-                                                                  "In Progress", "●  In Progress",
-                                                                  "Completed", "✓  Completed",
+                                                                  "Delayed", "âš   Delayed",
+                                                                  "At Risk", "âš   At Risk",
+                                                                  "In Progress", "â—  In Progress",
+                                                                  "Completed", "âœ“  Completed",
                                                                   ThisItem.ProgressStatus
                                                               )
                                                             Width: =96
@@ -2840,7 +2843,7 @@ Screens:
                                                             Text: |-
                                                               =
 
-                                                              Text(ThisItem.Remaining, "[$-en-US]#,##0") & " remaining · " &
+                                                              Text(ThisItem.Remaining, "[$-en-US]#,##0") & " remaining Â· " &
                                                               Text(ThisItem.Done, "[$-en-US]#,##0") & " done"
                                                             Width: =Parent.TemplateWidth - 110
                                                             X: =48
@@ -3235,7 +3238,7 @@ Screens:
                                                       "",
                                                       "Snapshot " &
                                                       Text(First(colPunchDashboardSnapshotInfo).GeneratedOn, "dd/mm/yyyy hh:mm") &
-                                                      " · " &
+                                                      " Â· " &
                                                       Text(First(colPunchDashboardSnapshotInfo).SourcePunchCount, "[$-en-US]#,##0") &
                                                       " records"
                                                   )
@@ -3320,8 +3323,8 @@ Screens:
                                                             Text: |-
                                                               =If(
                                                                   ThisItem.Trend = "Neutral",
-                                                                  "— 0.0%",
-                                                                  If(ThisItem.Trend = "Up", "↑ ", "↓ ") &
+                                                                  "â€” 0.0%",
+                                                                  If(ThisItem.Trend = "Up", "â†‘ ", "â†“ ") &
                                                                   Text(Abs(ThisItem.DeltaPercent), "0.0") & "%"
                                                               )
                                                             Width: =74
@@ -3421,10 +3424,10 @@ Screens:
                                                       "Not enough snapshots",
                                                       If(
                                                           Last(colPunchDashboardTimeline).OpenDelta < 0,
-                                                          "▼ " & Text(Abs(Last(colPunchDashboardTimeline).OpenDelta), "[$-en-US]#,##0") & " Open",
+                                                          "â–¼ " & Text(Abs(Last(colPunchDashboardTimeline).OpenDelta), "[$-en-US]#,##0") & " Open",
                                                           If(
                                                               Last(colPunchDashboardTimeline).OpenDelta > 0,
-                                                              "▲ " & Text(Last(colPunchDashboardTimeline).OpenDelta, "[$-en-US]#,##0") & " Open",
+                                                              "â–² " & Text(Last(colPunchDashboardTimeline).OpenDelta, "[$-en-US]#,##0") & " Open",
                                                               "= No change"
                                                           )
                                                       )
@@ -3630,7 +3633,7 @@ Screens:
                                                 Detail: =If(CountRows(colPunchDashboardInsights) > 0, First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).Message, "No material deviation was detected for this snapshot.")
                                                 Height: =128
                                                 InfoColor: =varTheme_PulseBlueDark
-                                                MetricText: =If(CountRows(colPunchDashboardInsights) > 0 && !IsBlank(First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).MetricLabel), Text(First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).MetricValue, "[$-en-US]#,##0.0") & " " & First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).MetricLabel, "—")
+                                                MetricText: =If(CountRows(colPunchDashboardInsights) > 0 && !IsBlank(First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).MetricLabel), Text(First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).MetricValue, "[$-en-US]#,##0.0") & " " & First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).MetricLabel, "â€”")
                                                 MutedTextColor: =varTheme_TextMuted
                                                 OnSelect: =Set(varPunches_ReturnView, "Home"); Set(varPunches_ContextSource, "ExecutiveInsights"); Set(varPunches_FilterSource, "Dashboard"); Set(varPunchCustomFiltersJson, "[]"); Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId)); Navigate(scr_Punches, ScreenTransition.None)
                                                 Severity: =If(CountRows(colPunchDashboardInsights) > 0, First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).Severity, "INFO")
@@ -3651,7 +3654,7 @@ Screens:
                                                 Detail: =If(CountRows(colPunchDashboardInsights) > 1, Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).Message, "Continue monitoring the current operational trend.")
                                                 Height: =128
                                                 InfoColor: =varTheme_PulseBlueDark
-                                                MetricText: =If(CountRows(colPunchDashboardInsights) > 1 && !IsBlank(Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).MetricLabel), Text(Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).MetricValue, "[$-en-US]#,##0.0") & " " & Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).MetricLabel, "—")
+                                                MetricText: =If(CountRows(colPunchDashboardInsights) > 1 && !IsBlank(Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).MetricLabel), Text(Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).MetricValue, "[$-en-US]#,##0.0") & " " & Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).MetricLabel, "â€”")
                                                 MutedTextColor: =varTheme_TextMuted
                                                 OnSelect: =Set(varPunches_ReturnView, "Home"); Set(varPunches_ContextSource, "ExecutiveInsights"); Set(varPunches_FilterSource, "Dashboard"); Set(varPunchCustomFiltersJson, "[]"); Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId)); Navigate(scr_Punches, ScreenTransition.None)
                                                 Severity: =If(CountRows(colPunchDashboardInsights) > 1, Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).Severity, "INFO")
@@ -4025,7 +4028,7 @@ Screens:
                                                             Color: =varTheme_TextMuted
                                                             Height: =18
                                                             Size: =9
-                                                            Text: =Coalesce(ThisItem.CategoryName, ThisItem.CategoryCode) & " · " & Coalesce(ThisItem.StatusName, ThisItem.StatusCode)
+                                                            Text: =Coalesce(ThisItem.CategoryName, ThisItem.CategoryCode) & " Â· " & Coalesce(ThisItem.StatusName, ThisItem.StatusCode)
                                                             Width: =Parent.TemplateWidth - 250
                                                             X: =8
                                                             Y: =27
@@ -4138,7 +4141,7 @@ Screens:
                                                             Color: =varTheme_TextMuted
                                                             Height: =18
                                                             Size: =9
-                                                            Text: =Coalesce(ThisItem.DisciplineName, ThisItem.DisciplineCode) & " · " & Coalesce(ThisItem.CategoryName, ThisItem.CategoryCode)
+                                                            Text: =Coalesce(ThisItem.DisciplineName, ThisItem.DisciplineCode) & " Â· " & Coalesce(ThisItem.CategoryName, ThisItem.CategoryCode)
                                                             Width: =Parent.TemplateWidth - 130
                                                             X: =8
                                                             Y: =27
