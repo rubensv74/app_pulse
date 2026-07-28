@@ -365,32 +365,26 @@ Screens:
           Control: GroupContainer@1.5.0
           Variant: ManualLayout
           Properties:
-            Fill: =RGBA(0,0,0,0.25)
+            Fill: =RGBA(0,0,0,0)
             Height: =App.Height
             Visible: =Coalesce(varShowDetailDrawer, false)
             Width: =App.Width
           Children:
             - comp_DetailDrawer_3:
                 Control: CanvasComponent
-                ComponentName: cmp_DetailDrawer_old
+                ComponentName: cmp_DetailDrawer_Premium
                 Properties:
                   AppColors: =gblAppColors
                   CloseAction: =Set(varShowDetailDrawer, false)
                   EntityType: =varDrawerEntityType
-                  Fill: =RGBA(0,0,0,0.25)
-                  FormCodeText: |-
-                    =
-
-                    Coalesce(
-                        varDrawerNormalized.TitleValue,
-                        "Record " & Text(varDrawerRecordId)
-                    )
-                  Height: =768
+                  Fill: =RGBA(0,0,0,0)
+                  Height: =App.Height
                   HostHeight: =App.Height
                   HostWidth: =App.Width
                   IsLoading: =varDrawerIsLoading
                   IsOpen: =varShowDetailDrawer
                   NormalizedRecord: =varDrawerNormalized
+                  OnDeleteComment: =Set(varDrawerSelectedCommentId, Blank())
                   OnManageFieldsRequested: |-
                     =
                     Set(varCT_ShowManageFields, true);
@@ -400,17 +394,57 @@ Screens:
                     Set(varCT_DefsError, "");
 
                     Select(btnCT_LoadDefs_3)
-                  OnSaveCustomField: =Select(btnCT_SaveFieldDef_3);
-                  OnSaved: =Set(varDrawerIsLoading, false)
-                  OnToggleFieldActiveRequested: =Select(btnCT_SetActive_3)
+                  OnPostComment: |-
+                    =
+                    If(
+                        IsBlank(Trim(varDrawerCommentDraft)),
+                        Notify("Comment is required.", NotificationType.Warning),
+                        Set(varIsLoadingComments, true);
+                        IfError(
+                            Warroom_AddTaskComment.Run(
+                                varProjectId,
+                                varDrawerRecordId,
+                                varDrawerCommentDraft,
+                                varUserEmail,
+                                varDrawerEntityType,
+                                varUserName,
+                                "Comment"
+                            );
+                            Set(varDrawerCommentDraft, "");
+                            Select(btnDrawerLoad_Comments_3),
+                            Set(varIsLoadingComments, false);
+                            Notify("The comment could not be saved.", NotificationType.Error)
+                        )
+                    )
+                  OnRefreshRequested: =Select(btnDrawerLoad_1)
+                  OnSaveFields: |-
+                    =
+                    If(
+                        CountRows(colCT_Dirty) = 0,
+                        Notify("There are no changes to save.", NotificationType.Information),
+                        Set(varCT_IsSaving, true);
+                        Set(varCT_Error, "");
+                        IfError(
+                            WarRoom_SaveCustomBulk.Run(
+                                varProjectId,
+                                varDrawerEntityType,
+                                varDrawerRecordId,
+                                JSON(colCT_Dirty, JSONFormat.Compact),
+                                varUserEmail
+                            );
+                            Clear(colCT_Dirty);
+                            Select(btnDrawerLoad_Custom_3);
+                            Set(varCT_IsSaving, false);
+                            Notify("Custom fields saved.", NotificationType.Success),
+                            Set(varCT_IsSaving, false);
+                            Set(varCT_Error, "The custom fields could not be saved.");
+                            Notify(varCT_Error, NotificationType.Error)
+                        )
+                    )
+                  OnTabChanged: =Select(btnDrawerLoad_1)
                   ProjectId: =varProjectId
                   RecordId: =varDrawerRecordId
                   SelectedRecord: =varDrawerSelectedRecord
-                  StatusText: |-
-                    =Coalesce(
-                        varDrawerNormalized.StatusValue,
-                        ""
-                    )
                   UserEmail: =varUserEmail
                   UserName: =varUserName
                   UserRole: =varUserRole
@@ -558,8 +592,11 @@ Screens:
                     Switch(
                         varDrawerTab,
                         "Comments", Select(btnDrawerLoad_Comments_3),
+                        "Fields", Select(btnDrawerLoad_Custom_3),
                         "Custom", Select(btnDrawerLoad_Custom_3),
+                        "Summary", Set(varDrawerIsLoading, false),
                         "Overview", Set(varDrawerIsLoading, false),
+                        "Activity", Set(varDrawerIsLoading, false),
                         "History", Set(varDrawerIsLoading, false),
                         Set(varDrawerIsLoading, false)
                     );

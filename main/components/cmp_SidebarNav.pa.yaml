@@ -1,0 +1,436 @@
+ComponentDefinitions:
+  cmp_SidebarNav:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      ActiveKey:
+        PropertyKind: Input
+        DisplayName: ActiveKey
+        Description: A custom property
+        DataType: Text
+        Default: =varAppView
+      AppVersion:
+        PropertyKind: Input
+        DisplayName: AppVersion
+        Description: A custom property
+        DataType: Text
+        Default: ="Text"
+      EnvironmentLabel:
+        PropertyKind: Input
+        DisplayName: EnvironmentLabel
+        Description: A custom property
+        DataType: Text
+        Default: ="Text"
+      IsCollapsed:
+        PropertyKind: Input
+        DisplayName: IsCollapsed
+        Description: A custom property
+        DataType: Boolean
+        Default: =true
+      Items:
+        PropertyKind: Input
+        DisplayName: Items
+        Description: A custom property
+        DataType: Table
+        Default: |-
+          =
+
+          Table(
+              {
+                  Order: 10,
+                  Key: "Home",
+                  Label: "Home",
+                  IconKey: "Home"
+              }
+          )
+      NavItems:
+        PropertyKind: Input
+        DisplayName: NavItems
+        Description: A custom property
+        DataType: Table
+        Default: |-
+          =
+
+          Table(
+              {
+                  Order: 10,
+                  Key: "Home",
+                  Label: "Home",
+                  IconKey: "Home"
+              }
+          )
+      OnSelectItem:
+        PropertyKind: Event
+        DisplayName: OnSelectItem
+        Description: A custom property
+        ReturnType: None
+        Default: |+
+          =
+      OnToggleCollapse:
+        PropertyKind: Event
+        DisplayName: OnToggleCollapse
+        Description: A custom property
+        ReturnType: None
+        Default: =
+      ProjectCode:
+        PropertyKind: Input
+        DisplayName: ProjectCode
+        Description: A custom property
+        DataType: Text
+        Default: ="Text"
+      ProjectName:
+        PropertyKind: Input
+        DisplayName: ProjectName
+        Description: A custom property
+        DataType: Text
+        Default: ="Text"
+      SelectedItemKey:
+        PropertyKind: Output
+        DisplayName: SelectedItemKey
+        Description: A custom property
+        DataType: Text
+      SelectedKey:
+        PropertyKind: Output
+        DisplayName: SelectedKey
+        Description: A custom property
+        DataType: Text
+      UserRole:
+        PropertyKind: Input
+        DisplayName: UserRole
+        Description: A custom property
+        DataType: Text
+        Default: ="Text"
+    Properties:
+      Fill: =RGBA(15, 23, 42, 1)
+      Height: =App.Height
+      SelectedItemKey: =Coalesce(varSidebar_SelectedKey, galNavMain.Selected.Key, "")
+      SelectedKey: |+
+        =Coalesce(varSidebar_SelectedKey, galNavMain.Selected.Key, "")
+      Width: =154
+    Children:
+      - conNavRoot:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            BorderColor: =RGBA(45,48,56,1)
+            Fill: =ColorValue("#07111F")
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Center
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =4
+            PaddingBottom: =10
+            Width: = Parent.Width
+          Children:
+            - conNavTop:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.SetByContainer
+                  DropShadow: =DropShadow.None
+                  FillPortions: =0
+                  Height: =116
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutJustifyContent: =LayoutJustifyContent.Center
+                  LayoutMinHeight: =16
+                  LayoutMinWidth: =16
+                  Width: =Parent.Width
+                Children:
+                  - Image2:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderStyle: =BorderStyle.None
+                        BorderThickness: =2
+                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                        DisabledFill: =RGBA(0, 0, 0, 0)
+                        FocusedBorderThickness: =4
+                        Height: =120
+                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                        HoverFill: =RGBA(0, 0, 0, 0)
+                        Image: ='PULSE_logo_sidebar_final_04-removebg-preview'
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        PaddingLeft: =10
+                        PaddingRight: =10
+                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                        PressedFill: =RGBA(0, 0, 0, 0)
+                        Width: =Parent.Width
+            - conNavMenu:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.SetByContainer
+                  DropShadow: =DropShadow.None
+                  Height: =Parent.Height - conNavTop.Height - conSidebarFooter.Height - 16
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutMinHeight: =16
+                  LayoutMinWidth: =16
+                  PaddingBottom: =8
+                  PaddingLeft: =6
+                  PaddingRight: =6
+                  PaddingTop: =4
+                  Width: |+
+                    =Parent.Width
+                Children:
+                  - galNavMain:
+                      Control: Gallery@2.15.0
+                      Variant: Vertical
+                      Properties:
+                        BorderColor: =RGBA(245, 245, 245, 1)
+                        FillPortions: =0
+                        Height: =CountRows(cmp_SidebarNav.NavItems) * Self.TemplateHeight
+                        Items: |-
+                          =
+
+                          SortByColumns(
+                              cmp_SidebarNav.NavItems,
+                              "Order",
+                              SortOrder.Ascending
+                          )
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        OnSelect: |+
+                          =
+                          Set(varSidebar_SelectedKey, ThisItem.Key);
+                          cmp_SidebarNav.OnSelectItem()
+
+                        ShowScrollbar: =false
+                        TemplateFill: |-
+                          =
+                          If(
+                              Lower(Text(ThisItem.Key)) = Lower(Text(cmp_SidebarNav.ActiveKey)),
+                              ColorValue("#0E3A63"),
+                              RGBA(0,0,0,0)
+                          )
+                        TemplatePadding: =2
+                        TemplateSize: =48
+                        Width: =Parent.Width
+                      Children:
+                        - icoNavItem:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              Color: |-
+                                =
+
+
+                                If(
+                                    Lower(Text(ThisItem.Key)) = Lower(Text(cmp_SidebarNav.ActiveKey)),
+                                    Color.White,
+                                    ColorValue("#D7E3F4")
+                                )
+                              DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                              DisabledColor: =RGBA(225, 223, 221, 1)
+                              DisabledFill: =RGBA(0, 0, 0, 0)
+                              FocusedBorderThickness: =8
+                              Height: =22
+                              HoverBorderColor: =RGBA(0, 0, 0, 0)
+                              HoverColor: =RGBA(255, 255, 255, 1)
+                              HoverFill: =RGBA(0, 0, 0, 0)
+                              Icon: |-
+                                =
+
+                                Switch(
+                                    ThisItem.IconKey,
+
+                                    "Home", Icon.Home,
+                                	
+                                    "Trending", Icon.Trending,
+                                	
+                                    "Document", Icon.Document,
+                                	
+                                    "Flag", Icon.Flag,
+
+                                    "Message", Icon.Message,
+
+                                    "Settings", Icon.Settings,
+
+                                    "Lock", Icon.Lock,
+
+                                    "Chart", Icon.TrendingUpwards,
+                                	
+                                	
+                                    Icon.Home
+                                )
+                              OnSelect: =Select(Parent)
+                              PressedBorderColor: =RGBA(0, 0, 0, 0)
+                              PressedColor: =RGBA(16, 110, 190, 1)
+                              PressedFill: =RGBA(0, 0, 0, 0)
+                              Width: =22
+                              X: =14
+                              Y: =12
+                        - lblNavItem:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderStyle: =BorderStyle.None
+                              BorderThickness: =2
+                              Color: |-
+                                =
+
+
+                                If(
+                                    Lower(Text(ThisItem.Key)) = Lower(Text(cmp_SidebarNav.ActiveKey)),
+                                    Color.White,
+                                    ColorValue("#D7E3F4")
+                                )
+                              DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                              DisabledColor: =RGBA(161, 159, 157, 1)
+                              FocusedBorderThickness: =4
+                              Font: =Font.'Segoe UI'
+                              FontWeight: |-
+                                =
+                                If(
+                                    ThisItem.Key = cmp_SidebarNav.ActiveKey,
+                                    FontWeight.Semibold,
+                                    FontWeight.Normal
+                                )
+                              Height: =Parent.TemplateHeight
+                              OnSelect: =Select(Parent)
+                              Size: =11
+                              Text: =ThisItem.Label
+                              Width: =Parent.TemplateWidth - 52
+                              Wrap: =false
+                              X: =42
+                        - recNavActiveBar:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderStyle: =BorderStyle.None
+                              BorderThickness: =2
+                              DisabledFill: =RGBA(161, 159, 157, 1)
+                              Fill: =ColorValue("#00C8FF")
+                              FocusedBorderThickness: =4
+                              Height: =Parent.TemplateHeight - 8
+                              HoverFill: =RGBA(0, 120, 212, 1)
+                              PressedFill: =RGBA(0, 120, 212, 1)
+                              Visible: =Lower(Text(ThisItem.Key)) = Lower(Text(cmp_SidebarNav.ActiveKey))
+                              Width: =3
+                              X: =1
+                              Y: =4
+                        - btnNavHitArea:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderStyle: =BorderStyle.None
+                              BorderThickness: =0
+                              Color: =RGBA(255, 255, 255, 1)
+                              DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                              DisabledColor: =RGBA(161, 159, 157, 1)
+                              DisabledFill: =RGBA(242, 242, 241, 0)
+                              Fill: =RGBA(0,0,0,0)
+                              Font: =Font.'Segoe UI'
+                              Height: =Parent.TemplateHeight
+                              HoverBorderColor: =RGBA(0, 0, 0, 0)
+                              HoverColor: =RGBA(255, 255, 255, 1)
+                              HoverFill: =RGBA(0,0,0,0)
+                              OnSelect: =Select(Parent)
+                              PressedBorderColor: =RGBA(0, 69, 120, 1)
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0,0,0,0)
+                              RadiusBottomLeft: =0
+                              RadiusBottomRight: =0
+                              RadiusTopLeft: =0
+                              RadiusTopRight: =0
+                              Text: =
+                              Width: =Parent.TemplateWidth
+            - conSidebarFooter:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =ColorValue("#061322")
+                  FillPortions: =0
+                  Height: =122
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =2
+                  LayoutMinHeight: =16
+                  LayoutMinWidth: =16
+                  PaddingBottom: =12
+                  PaddingLeft: =14
+                  PaddingRight: =14
+                  PaddingTop: =12
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Width: =Parent.Width
+                Children:
+                  - lblFooterProjectTitle:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Color: =RGBA(120,150,180,1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        Size: =9
+                        Text: ="CURRENT PROJECT"
+                  - lblFooterProjectCode:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =Color.White
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        Text: |-
+                          =
+                          If(
+                              IsBlank(cmp_SidebarNav.ProjectCode),
+                              "No project",
+                              cmp_SidebarNav.ProjectCode
+                          )
+                        Wrap: =false
+                  - lblFooterProjectName:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =RGBA(190,210,230,1)
+                        Font: =Font.'Segoe UI'
+                        Height: =20
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        Size: =9
+                        Text: |-
+                          =
+
+
+                          If(
+                              IsBlank(cmp_SidebarNav.ProjectName),
+                              "Select project",
+                              cmp_SidebarNav.ProjectName
+                          )
+                        Wrap: =false
+                  - recFooterDivider:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderStyle: =BorderStyle.None
+                        BorderThickness: =2
+                        DisabledFill: =RGBA(161, 159, 157, 1)
+                        Fill: =RGBA(255,255,255,0.08)
+                        FocusedBorderThickness: =4
+                        Height: =1
+                        HoverFill: =RGBA(0, 120, 212, 1)
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        PressedFill: =RGBA(0, 120, 212, 1)
+                        Width: =Parent.Width
+                  - lblFooterVersion:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =RGBA(120,140,160,1)
+                        Font: =Font.'Segoe UI'
+                        Height: =18
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        Size: =8
+                        Text: '="PULSE  · v1.0 " '
+                        Wrap: =false
