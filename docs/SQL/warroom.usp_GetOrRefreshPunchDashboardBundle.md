@@ -1,11 +1,5 @@
-SET ANSI_NULLS ON;
-GO
 
-SET QUOTED_IDENTIFIER ON;
-GO
 
-/*
-===============================================================================
 Procedure:
     warroom.usp_GetOrRefreshPunchDashboardBundle
 
@@ -34,8 +28,7 @@ Notes:
     - @MaxSnapshotAgeMinutes = 0 also forces a new snapshot.
     - The output produced by usp_GeneratePunchDashboardSnapshot is captured
       internally so Power Automate receives only the final dashboard result.
-===============================================================================
-*/
+
 
 CREATE OR ALTER PROCEDURE warroom.usp_GetOrRefreshPunchDashboardBundle
 (
