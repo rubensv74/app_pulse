@@ -471,9 +471,9 @@ Screens:
                     With(
                         {
                             resp: WarRoom_GetCustomBundle.Run(
-                                comp_DetailDrawer_3.ProjectId,
-                                comp_DetailDrawer_3.EntityType,
-                                comp_DetailDrawer_3.RecordId
+                                varProjectId,
+                                varDrawerEntityType,
+                                varDrawerRecordId
                             )
                         },
 
@@ -627,8 +627,8 @@ Screens:
                     Set(
                         varCT_DefsResp,
                         WarRoom_ListCustomFieldDefs.Run(
-                            comp_DetailDrawer_3.ProjectId,
-                            comp_DetailDrawer_3.EntityType,
+                            varProjectId,
+                            varDrawerEntityType,
                             If(varCT_ShowInactiveDefs, 1, 0)
                         )
                     );
@@ -700,11 +700,11 @@ Screens:
                     With(
                         {
                             resp: WarRoom_SetCustomFieldActive.Run(
-                                comp_DetailDrawer_3.ProjectId,
-                                comp_DetailDrawer_3.EntityType,
+                                varProjectId,
+                                varDrawerEntityType,
                                 varCT_Toggle_FieldKey,
                                 varCT_Toggle_IsActive,
-                                comp_DetailDrawer_3.UserEmail
+                                varUserEmail
                             )
                         },
                         Select(btnCT_LoadDefs_3);
@@ -716,7 +716,7 @@ Screens:
             - btnCT_SaveFieldDef_3:
                 Control: Button@0.0.45
                 Properties:
-                  OnSelect: "=\r\nIf(\r\n    IsBlank(Trim(varCT_Edit_Label)),\r\n    Set(varCT_SaveField_Error, \"Label is required.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    IsBlank(Trim(varCT_Edit_FieldKey)),\r\n    Set(varCT_SaveField_Error, \"Field key is required.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    !IsBlank(\r\n        LookUp(\r\n            colCT_Defs_Admin,\r\n            Lower(Trim(FieldKey)) = Lower(Trim(varCT_Edit_FieldKey)) &&\r\n            FieldDefId <> Coalesce(varCT_Edit_FieldDefId, 0)\r\n        )\r\n    ),\r\n\r\n    Set(varCT_SaveField_Error, \"This Field Key already exists.\");\r\n    Set(varCT_SaveField_IsLoading, false);\r\n    Notify(\"This Field Key already exists. Use another key or edit the existing field.\", NotificationType.Error),\r\n\r\n    Value(varCT_Edit_SortOrder) <= 0,\r\n    Set(varCT_SaveField_Error, \"Sort order must be greater than zero.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    (varCT_Edit_FieldType = \"Choice\" || varCT_Edit_FieldType = \"MultiChoice\") && IsBlank(Trim(varCT_Edit_OptionsJson)),\r\n    Set(varCT_SaveField_Error, \"OptionsJson is required for Choice and MultiChoice fields.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    With(\r\n        {\r\n            resp: WarRoom_UpsertCustomFieldDef.Run(\r\n                Coalesce(varCT_Edit_FieldDefId, 0),\r\n                comp_DetailDrawer_3.ProjectId,\r\n                comp_DetailDrawer_3.EntityType,\r\n                Trim(varCT_Edit_Label),\r\n                varCT_Edit_FieldType,\r\n                Trim(varCT_Edit_HelpText),\r\n                Value(varCT_Edit_SortOrder),\r\n                If(IsBlank(Trim(varCT_Edit_OptionsJson)), \" \", Trim(varCT_Edit_OptionsJson)),\r\n                comp_DetailDrawer_3.UserEmail,\r\n                Lower(Trim(varCT_Edit_FieldKey)),\r\n                varCT_Edit_IsRequired,\r\n                varCT_Edit_IsPinned,\r\n                varCT_Edit_IsActive,\r\n                varCT_Edit_IsFilterable,\r\nvarCT_Edit_ShowInQuickFilters,\r\nCoalesce(varCT_Edit_FilterOrder, varCT_Edit_SortOrder, 1000),\r\nCoalesce(varCT_Edit_FilterMode, \"Equals\")\r\n            )\r\n        },\r\n        \r\n        Set(varShowCustomAddFields, false);\r\n        Set(varCT_SaveField_Error, \"\");\r\n        Set(varCT_SaveField_IsLoading, false);\r\n\r\n        Select(btnCT_LoadDefs_3);\r\n\r\n        Set(varCT_LoadKey, \"\");\r\n        Select(btnDrawerLoad_Custom_3);\r\n\r\n        Notify(\"Field definition saved successfully.\", NotificationType.Success)\r\n    )\r\n)"
+                  OnSelect: "=\r\nIf(\r\n    IsBlank(Trim(varCT_Edit_Label)),\r\n    Set(varCT_SaveField_Error, \"Label is required.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    IsBlank(Trim(varCT_Edit_FieldKey)),\r\n    Set(varCT_SaveField_Error, \"Field key is required.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    !IsBlank(\r\n        LookUp(\r\n            colCT_Defs_Admin,\r\n            Lower(Trim(FieldKey)) = Lower(Trim(varCT_Edit_FieldKey)) &&\r\n            FieldDefId <> Coalesce(varCT_Edit_FieldDefId, 0)\r\n        )\r\n    ),\r\n\r\n    Set(varCT_SaveField_Error, \"This Field Key already exists.\");\r\n    Set(varCT_SaveField_IsLoading, false);\r\n    Notify(\"This Field Key already exists. Use another key or edit the existing field.\", NotificationType.Error),\r\n\r\n    Value(varCT_Edit_SortOrder) <= 0,\r\n    Set(varCT_SaveField_Error, \"Sort order must be greater than zero.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    (varCT_Edit_FieldType = \"Choice\" || varCT_Edit_FieldType = \"MultiChoice\") && IsBlank(Trim(varCT_Edit_OptionsJson)),\r\n    Set(varCT_SaveField_Error, \"OptionsJson is required for Choice and MultiChoice fields.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    With(\r\n        {\r\n            resp: WarRoom_UpsertCustomFieldDef.Run(\r\n                Coalesce(varCT_Edit_FieldDefId, 0),\r\n                varProjectId,\r\n                varDrawerEntityType,\r\n                Trim(varCT_Edit_Label),\r\n                varCT_Edit_FieldType,\r\n                Trim(varCT_Edit_HelpText),\r\n                Value(varCT_Edit_SortOrder),\r\n                If(IsBlank(Trim(varCT_Edit_OptionsJson)), \" \", Trim(varCT_Edit_OptionsJson)),\r\n                varUserEmail,\r\n                Lower(Trim(varCT_Edit_FieldKey)),\r\n                varCT_Edit_IsRequired,\r\n                varCT_Edit_IsPinned,\r\n                varCT_Edit_IsActive,\r\n                varCT_Edit_IsFilterable,\r\nvarCT_Edit_ShowInQuickFilters,\r\nCoalesce(varCT_Edit_FilterOrder, varCT_Edit_SortOrder, 1000),\r\nCoalesce(varCT_Edit_FilterMode, \"Equals\")\r\n            )\r\n        },\r\n        \r\n        Set(varShowCustomAddFields, false);\r\n        Set(varCT_SaveField_Error, \"\");\r\n        Set(varCT_SaveField_IsLoading, false);\r\n\r\n        Select(btnCT_LoadDefs_3);\r\n\r\n        Set(varCT_LoadKey, \"\");\r\n        Select(btnDrawerLoad_Custom_3);\r\n\r\n        Notify(\"Field definition saved successfully.\", NotificationType.Success)\r\n    )\r\n)"
                   Visible: =false
                   X: =160
                   Y: =160
