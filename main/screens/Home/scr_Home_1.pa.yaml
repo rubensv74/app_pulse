@@ -367,7 +367,7 @@ Screens:
           Properties:
             Fill: =RGBA(0,0,0,0.25)
             Height: =App.Height
-            Visible: =comp_DetailDrawer_3.IsOpen
+            Visible: =Coalesce(varShowDetailDrawer, false)
             Width: =App.Width
           Children:
             - comp_DetailDrawer_3:
@@ -401,7 +401,7 @@ Screens:
 
                     Select(btnCT_LoadDefs_3)
                   OnSaveCustomField: =Select(btnCT_SaveFieldDef_3);
-                  OnSaved: =
+                  OnSaved: =Set(varDrawerIsLoading, false)
                   OnToggleFieldActiveRequested: =Select(btnCT_SetActive_3)
                   ProjectId: =varProjectId
                   RecordId: =varDrawerRecordId
@@ -702,11 +702,11 @@ Screens:
                   EnvironmentLabel: ="Text"
                   Fill: =varTheme_PulseBlue
                   Height: =Parent.Height
-                  IsCollapsed: =true
+                  IsCollapsed: =Coalesce(varNavCollapsed, true)
                   Items: =colSidebarNavItems
                   NavItems: =colSidebarNavItems
                   OnSelectItem: "=\n\nWith(\n    {\n        _key: Lower(Trim(Self.SelectedItemKey)),\n        _hasProject: !IsBlank(varProjectId),\n        _hasConfig: varProjectHasReportConfig || varHomeHiveLoaded || varProjectHasPHRData\n    },\n\n    If(\n        _key = \"superadmin\",\n\n        Set(varGlobalLoading, false);\n        Set(varGlobalLoadingMsg, \"\");\n        Set(varGlobalLoadingSubMsg, \"\");\n        Set(varGlobalLoadingScope, \"\");\n        Set(varGlobalLoadAction, \"\");\n        Set(varGlobalLoadPending, false);\n\n        Set(varPHR_IsLoading, false);\n        Set(varOps_IsLoading, false);\n        Set(varTasks_IsLoading, false);\n        Set(varPunches_IsLoading, false);\n        Set(varCfg_IsLoading, false);\n\n        Set(varAppView, \"SuperAdmin\");\n        Set(varPageKey, \"SUPERADMIN\");\n        Set(varPageTitle, \"Administration\");\n        Set(varPageSubtitle, \"Platform configuration and governance\");\n\n        Navigate(scr_SuperAdmin, ScreenTransition.None),\n\n        If(\n            _key <> \"home\" && !_hasProject,\n\n            Notify(\"Please select a project first.\", NotificationType.Warning);\n\n            Set(varAppView, \"Home\");\n            Set(varPageKey, \"HOME\");\n            Set(varPageTitle, \"Home\");\n            Set(varPageSubtitle, \"Project command center\");\n\n            Navigate(scr_Home_1, ScreenTransition.None),\n\n            If(\n                _key in [\"overview\", \"tasks\", \"punches\", \"briefing\", \"config\", \"skyline\"] && !_hasConfig,\n\n                Notify(\n                    \"This project has no published report configuration yet.\",\n                    NotificationType.Warning\n                );\n\n                Set(varAppView, \"Home\");\n                Set(varPageKey, \"HOME\");\n                Set(varPageTitle, \"Home\");\n                Set(varPageSubtitle, \"Project command center\");\n\n                Navigate(scr_Home_1, ScreenTransition.None),\n\n                Switch(\n                    _key,\n\n                    \"skyline\",\n                    Set(varAppView, \"Skyline\");\n                    Set(varPageKey, \"SKYLINE\");\n                    Set(varPageTitle, \"Delivery Skyline\");\n                    Set(varPageSubtitle, \"Weekly subsystem delivery risk and workload forecast\");\n                    Set(varSkylineLoaded, false);\n                    Set(varSkylineError, \"\");\n                    Clear(colSkylineRaw);\n                    Clear(colSkylineWeeks);\n                    Clear(colSkylineSelectedWeek);\n\n                    Navigate(scr_Skyline, ScreenTransition.None),\n\n                    \n                    \"home\",\n                        Set(varGlobalLoading, false);\n                        Set(varGlobalLoadingMsg, \"\");\n                        Set(varGlobalLoadingSubMsg, \"\");\n                        Set(varGlobalLoadingScope, \"\");\n                        Set(varGlobalLoadAction, \"\");\n                        Set(varGlobalLoadPending, false);\n\n                        Set(varPHR_IsLoading, false);\n                        Set(varOps_IsLoading, false);\n                        Set(varTasks_IsLoading, false);\n                        Set(varPunches_IsLoading, false);\n                        Set(varCfg_IsLoading, false);\n\n                        Set(varAppView, \"Home\");\n                        Set(varPageKey, \"HOME\");\n                        Set(varPageTitle, \"Home\");\n                        Set(varPageSubtitle, \"Project command center\");\n                        Set(varHomeViewMode, \"DASHBOARD\");\n\n                        Navigate(scr_Home_1, ScreenTransition.None),\n\n                    \"overview\",\n                        Set(varAppView, \"Overview\");\n                        Set(varPageKey, \"OVERVIEW\");\n                        Set(varPageTitle, \"Overview\");\n                        Set(varPageSubtitle, \"Project Handover Report by subsystem, discipline and form family\");\n                        Set(varOps_ViewMode, \"OVERVIEW\");\n\n                        Navigate(scr_Overview, ScreenTransition.None),\n\n\n\n                    \"tasks\",\n                        Set(varAppView, \"Tasks\");\n                        Set(varPageKey, \"TASKS\");\n                        Set(varPageTitle, \"Tasks\");\n                        Set(varPageSubtitle, \"Inspection task management\");\n\n                        Navigate(scr_Tasks, ScreenTransition.None),\n\n                    \"punches\",\n                        Set(varAppView, \"Punches\");\n                        Set(varPageKey, \"PUNCHES\");\n                        Set(varPageTitle, \"Punch List\");\n                        Set(varPageSubtitle, \"Punch item management\");\n\n                        Navigate(scr_Punches, ScreenTransition.None),\n\n                    \"briefing\",\n                        Set(varAppView, \"Briefing\");\n                        Set(varPageKey, \"BRIEFING\");\n                        Set(varPageTitle, \"Briefing\");\n                        Set(varPageSubtitle, \"Project reporting and communication\");\n\n                        Navigate(scr_Briefing, ScreenTransition.None),\n\n                    \"config\",\n                        Set(varAppView, \"Config\");\n                        Set(varPageKey, \"CONFIG\");\n                        Set(varPageTitle, \"Configuration\");\n                        Set(varPageSubtitle, \"Report structure and scope management\");\n\n                        Navigate(scr_Config_NEW, ScreenTransition.None),\n\n                    Notify(\"Key not mapped: [\" & _key & \"]\", NotificationType.Error)\n                )\n            )\n        )\n    )\n)"
-                  OnToggleCollapse: =
+                  OnToggleCollapse: =Set(varNavCollapsed, !Coalesce(varNavCollapsed, true))
                   ProjectCode: =Coalesce(Text(varSelectedProject.ProjectCode), "")
                   ProjectName: =Coalesce(varSelectedProject.ProjectName, "")
                   UserRole: ="Text"
@@ -749,7 +749,6 @@ Screens:
                             Variant: AutoLayout
                             Properties:
                               BorderColor: =varTheme_Border
-                              BorderStyle: =BorderStyle.Solid
                               BorderThickness: =1
                               DropShadow: =DropShadow.None
                               Fill: =varTheme_Surface
@@ -776,7 +775,6 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     Fill: =Color.Transparent
-                                    FillPortions: =1
                                     Height: =64
                                     LayoutDirection: =LayoutDirection.Vertical
                                     LayoutJustifyContent: =LayoutJustifyContent.Center
@@ -880,8 +878,8 @@ Screens:
                                           RadiusTopLeft: =4
                                           RadiusTopRight: =4
                                           SelectMultiple: =false
-                                          Width: = Parent.Width - 64
-                                          X: =47
+                                          Width: =400
+                                          X: =7
                                           Y: =25
                                     - Icon16_1:
                                         Control: Classic/Icon@2.5.0
@@ -902,7 +900,7 @@ Screens:
                                           PressedFill: =RGBA(0, 0, 0, 0)
                                           Width: =24
                                           X: =18
-                                          Y: =25
+                                          Y: =4
                                     - Text38_1:
                                         Control: ModernText@1.0.0
                                         Properties:
@@ -983,7 +981,7 @@ Screens:
                                             )
                                           Visible: =!varGlobalLoading
                                           Width: =If(Parent.Width < 280, 96, 110)
-                                          X: =Parent.Width - Self.Width - 16
+                                          X: =150
                                           Y: =19
                                     - lblExecutiveDashboardStatus_1:
                                         Control: ModernText@1.0.0
@@ -1008,7 +1006,7 @@ Screens:
                                                 "IDLE"
                                             )
                                           Width: =96
-                                          X: =Parent.Width - Self.Width - 16
+                                          X: =164
                                           Y: =4
                                     - lblOverviewRefreshTitle_2:
                                         Control: ModernText@1.0.0
@@ -1062,6 +1060,7 @@ Screens:
                                   ComponentName: cmp_DashboardSectionHeader
                                   Properties:
                                     AccentColor: =varTheme_PulseBlueDark
+                                    ActionText: ="Refresh"
                                     Height: =36
                                     MutedTextColor: =varTheme_TextMuted
                                     OnAction: =Select(btnHome_RequestDashboardLoad)
@@ -1071,18 +1070,19 @@ Screens:
                                     Title: ="Project pulse"
                                     Width: =Parent.Width - 28
                                     X: =14
-                                    Y: =0
                               - cmpHomeKpiProgress:
                                   Control: CanvasComponent
                                   ComponentName: cmp_ExecutiveKpiCard
                                   Properties:
                                     AccentColor: =varTheme_PulseBlueDark
                                     BorderColor: =varTheme_Border
+                                    DangerColor: =varTheme_Red
                                     Height: =112
                                     Icon: ="Chart"
                                     MutedTextColor: =varTheme_TextMuted
                                     OnSelect: =Set(varAppView, "Overview"); Set(varPageKey, "OVERVIEW"); Set(varPageTitle, "Overview"); Set(varPageSubtitle, "Project Handover Report by subsystem, discipline and form family"); Set(varOps_ViewMode, "OVERVIEW"); Navigate(scr_Overview, ScreenTransition.None)
                                     Status: =If(Sum(colHomeHiveNodesSorted, Total) = 0, "NEUTRAL", If(Sum(colHomeHiveNodesSorted, Done) / Sum(colHomeHiveNodesSorted, Total) >= 0.9, "SUCCESS", If(Sum(colHomeHiveNodesSorted, Done) / Sum(colHomeHiveNodesSorted, Total) >= 0.7, "WARNING", "CRITICAL")))
+                                    SuccessColor: =varTheme_Green
                                     SupportingText: =If(IsBlank(varHomeLastRefresh), "Current snapshot", "Updated " & Text(varHomeLastRefresh, "hh:mm"))
                                     SurfaceColor: =varTheme_SurfaceAlt
                                     TextColor: =varTheme_Text
@@ -1090,6 +1090,7 @@ Screens:
                                     TooltipText: ="Open project Overview"
                                     Trend: =If(Sum(colHomeHiveNodesSorted, Total) = 0, "FLAT", If(Sum(colHomeHiveNodesSorted, Done) / Sum(colHomeHiveNodesSorted, Total) >= 0.9, "UP", "FLAT"))
                                     ValueText: =If(Sum(colHomeHiveNodesSorted, Total) = 0, "—", Text(100 * Sum(colHomeHiveNodesSorted, Done) / Sum(colHomeHiveNodesSorted, Total), "0.0") & "%")
+                                    WarningColor: =varTheme_Amber
                                     Width: =(Parent.Width - 58) / 4
                                     X: =10
                                     Y: =36
@@ -1099,11 +1100,13 @@ Screens:
                                   Properties:
                                     AccentColor: =varTheme_PulseBlueDark
                                     BorderColor: =varTheme_Border
+                                    DangerColor: =varTheme_Red
                                     Height: =112
                                     Icon: ="Clock"
                                     MutedTextColor: =varTheme_TextMuted
                                     OnSelect: =Set(varTasks_ReturnView, "Home"); Set(varTasks_ContextSource, "ExecutiveKpi"); Set(varTasks_AutoLoad, true); Navigate(scr_Tasks, ScreenTransition.None)
                                     Status: =If(Sum(colHomeHiveNodesSorted, Total) = 0, "NEUTRAL", If(Sum(colHomeHiveNodesSorted, Remaining) = 0, "SUCCESS", "WARNING"))
+                                    SuccessColor: =varTheme_Green
                                     SupportingText: =If(Sum(colHomeHiveNodesSorted, Remaining) = 0 && Sum(colHomeHiveNodesSorted, Total) > 0, "All tasks complete", "Requires attention")
                                     SurfaceColor: =varTheme_SurfaceAlt
                                     TextColor: =varTheme_Text
@@ -1111,6 +1114,7 @@ Screens:
                                     TooltipText: ="Open Tasks"
                                     Trend: =If(Sum(colHomeHiveNodesSorted, Remaining) = 0 && Sum(colHomeHiveNodesSorted, Total) > 0, "UP", "FLAT")
                                     ValueText: =Text(Sum(colHomeHiveNodesSorted, Remaining), "[$-en-US]#,##0")
+                                    WarningColor: =varTheme_Amber
                                     Width: =(Parent.Width - 58) / 4
                                     X: =cmpHomeKpiProgress.X + cmpHomeKpiProgress.Width + 12
                                     Y: =36
@@ -1120,11 +1124,13 @@ Screens:
                                   Properties:
                                     AccentColor: =varTheme_Amber
                                     BorderColor: =varTheme_Border
+                                    DangerColor: =varTheme_Red
                                     Height: =112
                                     Icon: ="Warning"
                                     MutedTextColor: =varTheme_TextMuted
                                     OnSelect: =Set(varPunches_ReturnView, "Home"); Set(varPunches_ContextSource, "ExecutiveKpi"); Set(varPunches_FilterSource, "Dashboard"); Set(varPunchCustomFiltersJson, "[]"); Navigate(scr_Punches, ScreenTransition.None)
                                     Status: =If(CountRows(colPunchDashboardSummary) = 0, "NEUTRAL", If(Sum(Filter(colPunchDashboardSummary, !(Lower(StatusCode) in ["closed", "done"])), PunchCount) = 0, "SUCCESS", "WARNING"))
+                                    SuccessColor: =varTheme_Green
                                     SupportingText: =If(IsBlank(varPunchDashboardLastRefresh), "Current snapshot", "Updated " & Text(varPunchDashboardLastRefresh, "hh:mm"))
                                     SurfaceColor: =varTheme_SurfaceAlt
                                     TextColor: =varTheme_Text
@@ -1132,6 +1138,7 @@ Screens:
                                     TooltipText: ="Open Punch List"
                                     Trend: =If(CountRows(colPunchDashboardTimeline) < 2, "FLAT", If(Last(colPunchDashboardTimeline).OpenDelta < 0, "UP", If(Last(colPunchDashboardTimeline).OpenDelta > 0, "DOWN", "FLAT")))
                                     ValueText: =Text(Sum(Filter(colPunchDashboardSummary, !(Lower(StatusCode) in ["closed", "done"])), PunchCount), "[$-en-US]#,##0")
+                                    WarningColor: =varTheme_Amber
                                     Width: =(Parent.Width - 58) / 4
                                     X: =cmpHomeKpiTasks.X + cmpHomeKpiTasks.Width + 12
                                     Y: =36
@@ -1141,11 +1148,13 @@ Screens:
                                   Properties:
                                     AccentColor: =varTheme_Red
                                     BorderColor: =varTheme_Border
+                                    DangerColor: =varTheme_Red
                                     Height: =112
                                     Icon: ="Warning"
                                     MutedTextColor: =varTheme_TextMuted
                                     OnSelect: =Set(varHomeDashboard, "TASKS"); Set(varHomeShowRightPanel, true); Set(varHomeShowCards, true)
                                     Status: =If(CountRows(colHomePendingSubsystems) = 0, "SUCCESS", If(CountRows(colHomePendingSubsystems) <= 5, "WARNING", "CRITICAL"))
+                                    SuccessColor: =varTheme_Green
                                     SupportingText: =If(CountRows(colHomePendingSubsystems) = 0, "No pending scope", "Review pending scope")
                                     SurfaceColor: =varTheme_SurfaceAlt
                                     TextColor: =varTheme_Text
@@ -1153,6 +1162,7 @@ Screens:
                                     TooltipText: ="Show pending subsystems"
                                     Trend: =If(CountRows(colHomePendingSubsystems) = 0, "UP", "DOWN")
                                     ValueText: =Text(CountRows(colHomePendingSubsystems), "[$-en-US]#,##0")
+                                    WarningColor: =varTheme_Amber
                                     Width: =(Parent.Width - 58) / 4
                                     X: =cmpHomeKpiPunches.X + cmpHomeKpiPunches.Width + 12
                                     Y: =36
@@ -1505,7 +1515,6 @@ Screens:
                                                             Fill: =RGBA(0,0,0,0)
                                                             FontWeight: =FontWeight.Semibold
                                                             Height: =20
-                                                            OnSelect: =
                                                             RadiusBottomLeft: =12
                                                             RadiusBottomRight: =12
                                                             RadiusTopLeft: =12
@@ -1523,7 +1532,6 @@ Screens:
                                                             Fill: =RGBA(0,0,0,0)
                                                             FontWeight: =FontWeight.Semibold
                                                             Height: =20
-                                                            OnSelect: =
                                                             RadiusBottomLeft: =12
                                                             RadiusBottomRight: =12
                                                             RadiusTopLeft: =12
@@ -1540,7 +1548,6 @@ Screens:
                                                             AutoHeight: =true
                                                             Color: =ColorValue("#94A3B8")
                                                             Height: =14
-                                                            OnSelect: =
                                                             Size: =8
                                                             Text: ="TOTAL"
                                                             Width: =Parent.Width / 3
@@ -1553,7 +1560,6 @@ Screens:
                                                             Color: =varTheme_Text
                                                             FontWeight: =FontWeight.Bold
                                                             Height: =18
-                                                            OnSelect: =
                                                             Size: =13
                                                             Text: =Text(ThisItem.Total, "[$-en-US]#,##0")
                                                             Width: =Parent.Width / 3
@@ -1565,7 +1571,6 @@ Screens:
                                                             AutoHeight: =true
                                                             Color: =ColorValue("#94A3B8")
                                                             Height: =14
-                                                            OnSelect: =
                                                             Size: =8
                                                             Text: ="DONE"
                                                             Width: =Parent.Width / 3
@@ -1578,7 +1583,6 @@ Screens:
                                                             Color: =varTheme_Green
                                                             FontWeight: =FontWeight.Bold
                                                             Height: =18
-                                                            OnSelect: =
                                                             Size: =13
                                                             Text: =ThisItem.Done
                                                             Width: =Parent.Width / 3
@@ -1591,7 +1595,6 @@ Screens:
                                                             AutoHeight: =true
                                                             Color: =ColorValue("#94A3B8")
                                                             Height: =14
-                                                            OnSelect: =
                                                             Size: =10
                                                             Text: ="REMAINING"
                                                             Width: =Parent.Width / 3
@@ -1610,7 +1613,6 @@ Screens:
                                                               )
                                                             FontWeight: =FontWeight.Bold
                                                             Height: =18
-                                                            OnSelect: =
                                                             Size: =13
                                                             Text: =ThisItem.Remaining
                                                             Width: =Parent.Width / 3
@@ -1646,7 +1648,6 @@ Screens:
                                                                   },
                                                                   "data:image/svg+xml;utf8," & EncodeUrl(svg)
                                                               )
-                                                            OnSelect: =
                                                             PressedBorderColor: =RGBA(0, 0, 0, 0)
                                                             PressedFill: =RGBA(0, 0, 0, 0)
                                                             Width: =82
@@ -1670,7 +1671,7 @@ Screens:
                                                       - btnSelectNode_1:
                                                           Control: Classic/Button@2.2.0
                                                           Properties:
-                                                            BorderColor: =
+                                                            BorderColor: =RGBA(0,0,0,0)
                                                             BorderStyle: =BorderStyle.None
                                                             BorderThickness: =0
                                                             Color: =RGBA(255, 255, 255, 1)
@@ -1719,7 +1720,7 @@ Screens:
                                                             RadiusBottomRight: =18
                                                             RadiusTopLeft: =18
                                                             RadiusTopRight: =18
-                                                            Text: =
+                                                            Text: =""
                                                             Width: =Parent.Width
                                                       - recNodeAccent_1:
                                                           Control: Rectangle@2.3.0
@@ -2770,7 +2771,6 @@ Screens:
                                                 RadiusTopLeft: =16
                                                 RadiusTopRight: =16
                                                 Width: =Parent.Width
-                                                Y: =
                                               Children:
                                                 - galHomePendingSubsystems_1:
                                                     Control: Gallery@2.15.0
@@ -2877,7 +2877,7 @@ Screens:
                                                             RadiusBottomRight: =0
                                                             RadiusTopLeft: =0
                                                             RadiusTopRight: =0
-                                                            Text: =
+                                                            Text: =""
                                                             Width: =Parent.TemplateWidth
                                                       - btnPendingRowTasks_1:
                                                           Control: ModernButton@1.0.0
@@ -3572,11 +3572,11 @@ Screens:
                                               ComponentName: cmp_DashboardSectionHeader
                                               Properties:
                                                 AccentColor: =varTheme_PulseBlueDark
+                                                ActionText: ="View punches"
                                                 Height: =54
                                                 MutedTextColor: =varTheme_TextMuted
                                                 OnAction: =Set(varAppView, "Punches"); Navigate(scr_Punches, ScreenTransition.None)
                                                 ShowAction: =true
-                                                ActionText: ="View punches"
                                                 Subtitle: ="Prioritized operational signals generated from the current snapshot"
                                                 TextColor: =varTheme_Text
                                                 Title: ="Executive Insights"
@@ -4178,7 +4178,7 @@ Screens:
                                           HoverBorderColor: =RGBA(0,0,0,0)
                                           HoverColor: =varTheme_PulseBlueDark
                                           HoverFill: =RGBA(0,0,0,0)
-                                          Icon: =If(!IsBlank(varPunchDashboardError), Icon.Warning, Icon.BarChart)
+                                          Icon: =If(!IsBlank(varPunchDashboardError), Icon.Warning, Icon.Folder)
                                           PressedBorderColor: =RGBA(0,0,0,0)
                                           PressedColor: =varTheme_PulseBlueDark
                                           PressedFill: =RGBA(0,0,0,0)
@@ -4189,9 +4189,9 @@ Screens:
                                         Control: ModernText@1.0.0
                                         Properties:
                                           Align: =Align.Center
+                                          AutoHeight: =true
                                           Color: =varTheme_Text
                                           FontWeight: =FontWeight.Semibold
-                                          AutoHeight: =true
                                           Size: =16
                                           Text: |-
                                             =
@@ -4213,8 +4213,8 @@ Screens:
                                         Control: ModernText@1.0.0
                                         Properties:
                                           Align: =Align.Center
-                                          Color: =varTheme_TextMuted
                                           AutoHeight: =true
+                                          Color: =varTheme_TextMuted
                                           Size: =10
                                           Text: |-
                                             =
@@ -4369,7 +4369,7 @@ Screens:
                       With(
                           {
                               _resp:
-                                  Warroom_GetPunchDashboardBundle.Run(
+                                  warroom_GetPunchDashboardBundle.Run(
                                       Value(varProjectId),
                                       Value(varPunchDashboardTemplateId)
                                   )
@@ -4542,7 +4542,6 @@ Screens:
               );
               Set(varPunchDashboardLoaded, IsBlank(varPunchDashboardError));
               Set(varPunchDashboardLoading, false);
-              Set(varProjectSwitching, false);
               Set(varExecutiveDashboardCompletedAt, Now());
               Set(
                   varExecutiveDashboardStatus,
@@ -4560,7 +4559,10 @@ Screens:
               Set(varGlobalLoadingSubMsg, "");
               Set(varGlobalLoadingScope, "");
               Set(varGlobalLoadAction, "");
-              Set(varGlobalLoadPending, false)
+              Set(varGlobalLoadPending, false);
+
+              Set(varPunchDashboardLoading, false);
+              Set(varProjectSwitching, false);
             Visible: =false
             X: =180
             Y: =180
@@ -5257,7 +5259,7 @@ Screens:
                         HoverFill: =RGBA(0, 120, 212, 1)
                         PressedFill: =RGBA(0, 120, 212, 1)
                         Width: =Parent.Width - 88
-                        X: =94
+                        X: =88
                         Y: =98
                   - Rectangle6_5:
                       Control: Rectangle@2.3.0
