@@ -1,0 +1,349 @@
+cmp_PunchCard As CanvasComponent:
+    OnOpenDetails():
+        ThisProperty:
+            Default: =
+    OnSelectCard():
+        ThisProperty:
+            Default: =
+    AccentColor: |-
+        =ColorValue("#1677FF")
+    AttachmentCount: =0
+    BackgroundColor: |-
+        =ColorValue("#FFFFFF")
+    BorderColor: |-
+        =ColorValue("#E2E8F0")
+    Category: ="A"
+    CategoryColor: |-
+        =ColorValue("#EA580C")
+    ChildTabPriority: =true
+    CommentCount: =0
+    ContentLanguage: =""
+    Discipline: =""
+    DueDateText: =""
+    EnableChildFocus: =true
+    Fill: =RGBA(0, 0, 0, 0)
+    Height: =164
+    IsSelected: =false
+    Location: =""
+    MutedTextColor: |-
+        =ColorValue("#64748B")
+    Owner: =""
+    PunchCode: ="PUNCH-000"
+    PunchId: =""
+    SelectedPunchId: =cmp_PunchCard.PunchId
+    ShowFooter: =true
+    Status: ="Open"
+    StatusColor: |-
+        =ColorValue("#16A34A")
+    Subcontractor: =""
+    Subsystem: =""
+    SummaryText: =cmp_PunchCard.PunchCode & " · " & cmp_PunchCard.Category & " · " & cmp_PunchCard.Status
+    SurfaceAltColor: |-
+        =ColorValue("#F8FAFC")
+    TextColor: |-
+        =ColorValue("#0F172A")
+    Title: ="Punch description"
+    Visible: =true
+    Width: =420
+    X: =0
+    Y: =0
+
+    conPC_Root As groupContainer.manualLayoutContainer:
+        BorderColor: =If(cmp_PunchCard.IsSelected, cmp_PunchCard.AccentColor, cmp_PunchCard.BorderColor)
+        BorderThickness: =If(cmp_PunchCard.IsSelected, 2, 1)
+        DropShadow: =DropShadow.Semibold
+        Fill: =cmp_PunchCard.BackgroundColor
+        Height: =Parent.Height
+        LayoutGridColumnMinWidth: =0
+        LayoutGridColumns: =6
+        LayoutGridRowMinHeight: =0
+        LayoutGridRows: =6
+        RadiusBottomLeft: =14
+        RadiusBottomRight: =14
+        RadiusTopLeft: =14
+        RadiusTopRight: =14
+        Width: =Parent.Width
+        ZIndex: =1
+
+        btnPC_Click As button:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =0
+            Color: =Color.White
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(161, 159, 157, 1)
+            DisabledFill: =RGBA(242, 242, 241, 0)
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =Parent.Height
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverColor: =Color.White
+            HoverFill: =RGBA(0,0,0,0.02)
+            OnSelect: =cmp_PunchCard.OnSelectCard()
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedColor: =Color.White
+            PressedFill: =RGBA(0,0,0,0.04)
+            RadiusBottomLeft: =14
+            RadiusBottomRight: =14
+            RadiusTopLeft: =14
+            RadiusTopRight: =14
+            Size: =15
+            Text: =""
+            Width: =Parent.Width
+            ZIndex: =1
+
+        conPC_Category As groupContainer.manualLayoutContainer:
+            BorderColor: =cmp_PunchCard.CategoryColor
+            Fill: =cmp_PunchCard.CategoryColor
+            Height: =28
+            LayoutGridColumnMinWidth: =0
+            LayoutGridColumns: =6
+            LayoutGridRowMinHeight: =0
+            LayoutGridRows: =6
+            RadiusBottomLeft: =14
+            RadiusBottomRight: =14
+            RadiusTopLeft: =14
+            RadiusTopRight: =14
+            Width: =42
+            X: =16
+            Y: =14
+            ZIndex: =2
+
+            lblPC_Category As label:
+                Align: =Align.Center
+                BorderColor: =RGBA(0, 0, 0, 0)
+                Color: =Color.White
+                DisabledColor: =RGBA(161, 159, 157, 1)
+                Fill: =Color.Transparent
+                Font: =Font.'Segoe UI'
+                FontWeight: =FontWeight.Semibold
+                Height: =28
+                OnSelect: =cmp_PunchCard.OnSelectCard()
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =11
+                Text: =cmp_PunchCard.Category
+                VerticalAlign: =VerticalAlign.Top
+                Width: =Parent.Width
+                Y: =5
+                ZIndex: =1
+
+        lblPC_Code As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =cmp_PunchCard.MutedTextColor
+            Font: =""
+            FontWeight: =FontWeight.Semibold
+            Height: =18
+            Size: =10
+            Text: =cmp_PunchCard.PunchCode
+            Width: =Parent.Width - 170
+            X: =70
+            Y: =14
+            ZIndex: =3
+
+        conPC_Status As groupContainer.manualLayoutContainer:
+            BorderColor: =cmp_PunchCard.StatusColor
+            BorderThickness: =1
+            Fill: =cmp_PunchCard.SurfaceAltColor
+            Height: =26
+            LayoutGridColumnMinWidth: =0
+            LayoutGridColumns: =6
+            LayoutGridRowMinHeight: =0
+            LayoutGridRows: =6
+            RadiusBottomLeft: =13
+            RadiusBottomRight: =13
+            RadiusTopLeft: =13
+            RadiusTopRight: =13
+            Width: =98
+            X: =Parent.Width - 116
+            Y: =14
+            ZIndex: =4
+
+            lblPC_Status As label:
+                Align: =Align.Center
+                BorderColor: =RGBA(0, 0, 0, 0)
+                Color: =cmp_PunchCard.StatusColor
+                DisabledColor: =RGBA(161, 159, 157, 1)
+                Fill: =Color.Transparent
+                Font: =Font.'Segoe UI'
+                FontWeight: =FontWeight.Semibold
+                Height: =26
+                OnSelect: =cmp_PunchCard.OnSelectCard()
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =9
+                Text: =cmp_PunchCard.Status
+                VerticalAlign: =VerticalAlign.Top
+                Width: =Parent.Width
+                Y: =5
+                ZIndex: =1
+
+        lblPC_Title As label:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =cmp_PunchCard.TextColor
+            DisabledColor: =RGBA(161, 159, 157, 1)
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =38
+            OnSelect: =cmp_PunchCard.OnSelectCard()
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =11
+            Text: =cmp_PunchCard.Title
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Parent.Width - 32
+            X: =16
+            Y: =52
+            ZIndex: =5
+
+        lblPC_Meta1 As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =cmp_PunchCard.MutedTextColor
+            Font: =""
+            Height: =18
+            Size: =9
+            Text: =cmp_PunchCard.Subsystem & If(!IsBlank(cmp_PunchCard.Discipline), " · " & cmp_PunchCard.Discipline, "") & If(!IsBlank(cmp_PunchCard.Subcontractor), " · " & cmp_PunchCard.Subcontractor, "")
+            Width: =Parent.Width - 32
+            X: =16
+            Y: =94
+            ZIndex: =6
+
+        lblPC_Meta2 As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =cmp_PunchCard.MutedTextColor
+            Font: =""
+            Height: =18
+            Size: =9
+            Text: =If(!IsBlank(cmp_PunchCard.Location), cmp_PunchCard.Location, cmp_PunchCard.Owner)
+            Width: =Parent.Width - 156
+            X: =16
+            Y: =116
+            ZIndex: =7
+
+        icoPC_Comments As icon:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =cmp_PunchCard.MutedTextColor
+            DisabledBorderColor: =RGBA(245, 245, 245, 1)
+            DisabledColor: =RGBA(225, 223, 221, 1)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            FocusedBorderThickness: =4
+            Height: =16
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverColor: =cmp_PunchCard.AccentColor
+            HoverFill: =RGBA(0, 0, 0, 0)
+            Icon: =Icon.Message
+            OnSelect: =cmp_PunchCard.OnOpenDetails()
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedColor: =cmp_PunchCard.AccentColor
+            PressedFill: =RGBA(0, 0, 0, 0)
+            Visible: =cmp_PunchCard.ShowFooter
+            Width: =16
+            X: =Parent.Width - 124
+            Y: =118
+            ZIndex: =8
+
+        lblPC_Comments As label:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =cmp_PunchCard.MutedTextColor
+            DisabledColor: =RGBA(161, 159, 157, 1)
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =18
+            OnSelect: =cmp_PunchCard.OnOpenDetails()
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =9
+            Text: =Text(cmp_PunchCard.CommentCount)
+            VerticalAlign: =VerticalAlign.Top
+            Visible: =cmp_PunchCard.ShowFooter
+            Width: =22
+            X: =Parent.Width - 104
+            Y: =118
+            ZIndex: =9
+
+        icoPC_Attachments As icon:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =cmp_PunchCard.MutedTextColor
+            DisabledBorderColor: =RGBA(245, 245, 245, 1)
+            DisabledColor: =RGBA(225, 223, 221, 1)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            FocusedBorderThickness: =4
+            Height: =16
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverColor: =cmp_PunchCard.AccentColor
+            HoverFill: =RGBA(0, 0, 0, 0)
+            Icon: =Icon.PaperClip
+            OnSelect: =cmp_PunchCard.OnOpenDetails()
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedColor: =cmp_PunchCard.AccentColor
+            PressedFill: =RGBA(0, 0, 0, 0)
+            Visible: =cmp_PunchCard.ShowFooter
+            Width: =16
+            X: =Parent.Width - 76
+            Y: =118
+            ZIndex: =10
+
+        lblPC_Attachments As label:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =cmp_PunchCard.MutedTextColor
+            DisabledColor: =RGBA(161, 159, 157, 1)
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =18
+            OnSelect: =cmp_PunchCard.OnOpenDetails()
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =9
+            Text: =Text(cmp_PunchCard.AttachmentCount)
+            VerticalAlign: =VerticalAlign.Top
+            Visible: =cmp_PunchCard.ShowFooter
+            Width: =22
+            X: =Parent.Width - 56
+            Y: =118
+            ZIndex: =11
+
+        btnPC_Details As button:
+            BorderColor: =cmp_PunchCard.AccentColor
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =0
+            Color: =Color.White
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(161, 159, 157, 1)
+            DisabledFill: =RGBA(242, 242, 241, 0)
+            Fill: =cmp_PunchCard.AccentColor
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =28
+            HoverBorderColor: =cmp_PunchCard.AccentColor
+            HoverColor: =Color.White
+            HoverFill: =cmp_PunchCard.AccentColor
+            OnSelect: =cmp_PunchCard.OnOpenDetails()
+            PressedBorderColor: =cmp_PunchCard.AccentColor
+            PressedColor: =Color.White
+            PressedFill: =cmp_PunchCard.AccentColor
+            RadiusBottomLeft: =7
+            RadiusBottomRight: =7
+            RadiusTopLeft: =7
+            RadiusTopRight: =7
+            Size: =9
+            Text: ="Details"
+            Width: =76
+            X: =Parent.Width - 92
+            Y: =Parent.Height - 42
+            ZIndex: =12
+

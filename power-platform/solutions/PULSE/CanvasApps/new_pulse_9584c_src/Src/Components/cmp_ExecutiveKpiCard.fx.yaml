@@ -1,0 +1,139 @@
+cmp_ExecutiveKpiCard As CanvasComponent:
+    OnSelect():
+        ThisProperty:
+            Default: =
+    AccentColor: |-
+        =ColorValue("#1677FF")
+    BorderColor: |-
+        =ColorValue("#E2E8F0")
+    ChildTabPriority: =true
+    ContentLanguage: =""
+    DangerColor: |-
+        =ColorValue("#DC2626")
+    EnableChildFocus: =true
+    Fill: =RGBA(0, 0, 0, 0)
+    Height: =112
+    Icon: ="ClipboardBulletList"
+    MutedTextColor: |-
+        =ColorValue("#64748B")
+    Status: ="NEUTRAL"
+    SuccessColor: |-
+        =ColorValue("#16A34A")
+    SupportingText: ="No change"
+    SurfaceColor: |-
+        =ColorValue("#FFFFFF")
+    TextColor: |-
+        =ColorValue("#0F172A")
+    Title: ="Open punches"
+    TooltipText: ="Open the related dashboard"
+    Trend: ="FLAT"
+    ValueText: ="0"
+    Visible: =true
+    WarningColor: |-
+        =ColorValue("#D97706")
+    Width: =260
+    X: =0
+    Y: =0
+
+    conEKC_Root As groupContainer.manualLayoutContainer:
+        BorderColor: =cmp_ExecutiveKpiCard.BorderColor
+        BorderThickness: =1
+        Fill: =cmp_ExecutiveKpiCard.SurfaceColor
+        Height: =Parent.Height
+        LayoutGridColumnMinWidth: =0
+        LayoutGridColumns: =6
+        LayoutGridRowMinHeight: =0
+        LayoutGridRows: =6
+        RadiusBottomLeft: =14
+        RadiusBottomRight: =14
+        RadiusTopLeft: =14
+        RadiusTopRight: =14
+        Width: =Parent.Width
+        ZIndex: =1
+
+        recEKC_Accent As rectangle:
+            BorderColor: =RGBA(0,0,0,0)
+            BorderStyle: =BorderStyle.None
+            Fill: =Switch(Upper(cmp_ExecutiveKpiCard.Status),"SUCCESS",cmp_ExecutiveKpiCard.SuccessColor,"WARNING",cmp_ExecutiveKpiCard.WarningColor,"CRITICAL",cmp_ExecutiveKpiCard.DangerColor,cmp_ExecutiveKpiCard.AccentColor)
+            Height: =4
+            Width: =Parent.Width
+            ZIndex: =1
+
+        icoEKC_Icon As icon:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =Switch(Upper(cmp_ExecutiveKpiCard.Status),"SUCCESS",cmp_ExecutiveKpiCard.SuccessColor,"WARNING",cmp_ExecutiveKpiCard.WarningColor,"CRITICAL",cmp_ExecutiveKpiCard.DangerColor,cmp_ExecutiveKpiCard.AccentColor)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            DisabledColor: =RGBA(244, 244, 244, 1)
+            Height: =22
+            Icon: =Switch(cmp_ExecutiveKpiCard.Icon,"Check",Icon.Check,"Warning",Icon.Warning,"Clock",Icon.Clock,Icon.Information)
+            Width: =22
+            X: =16
+            Y: =18
+            ZIndex: =2
+
+        lblEKC_Value As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =cmp_ExecutiveKpiCard.TextColor
+            Font: =""
+            FontWeight: =FontWeight.Bold
+            Size: =22
+            Text: =cmp_ExecutiveKpiCard.ValueText
+            Width: =Parent.Width - 70
+            X: =50
+            Y: =12
+            ZIndex: =3
+
+        lblEKC_Title As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =cmp_ExecutiveKpiCard.TextColor
+            Font: =""
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: =cmp_ExecutiveKpiCard.Title
+            Width: =Parent.Width - 32
+            X: =16
+            Y: =50
+            ZIndex: =4
+
+        lblEKC_Trend As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =Switch(Upper(cmp_ExecutiveKpiCard.Trend),"UP",cmp_ExecutiveKpiCard.SuccessColor,"DOWN",cmp_ExecutiveKpiCard.DangerColor,cmp_ExecutiveKpiCard.MutedTextColor)
+            Font: =""
+            FontWeight: =FontWeight.Semibold
+            Height: =20
+            Size: =9
+            Text: =Switch(Upper(cmp_ExecutiveKpiCard.Trend),"UP","↑ ","DOWN","↓ ","→ ") & cmp_ExecutiveKpiCard.SupportingText
+            Width: =Parent.Width - 32
+            X: =16
+            Y: =78
+            ZIndex: =5
+
+        btnEKC_Open As button:
+            BorderColor: =RGBA(0,0,0,0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =0
+            Color: =App.Theme.Colors.PrimaryForeground
+            DisabledBorderColor: =RGBA(244, 244, 244, 1)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            DisabledFill: =RGBA(244, 244, 244, 1)
+            Fill: =RGBA(0,0,0,0)
+            Font: =App.Theme.Font
+            FontWeight: =FontWeight.Semibold
+            Height: =Parent.Height
+            HoverBorderColor: =App.Theme.Colors.Darker10
+            HoverColor: =App.Theme.Colors.PrimaryForeground
+            HoverFill: =RGBA(22,119,255,0.04)
+            OnSelect: =cmp_ExecutiveKpiCard.OnSelect()
+            PressedBorderColor: =App.Theme.Colors.Darker40
+            PressedColor: =Self.Color
+            PressedFill: =RGBA(22,119,255,0.08)
+            Size: =15
+            Text: =""
+            Tooltip: =cmp_ExecutiveKpiCard.TooltipText
+            Width: =Parent.Width
+            ZIndex: =6
+

@@ -1,0 +1,256 @@
+{
+  "ComponentAllowCustomization": true,
+  "ComponentChangedSinceFileImport": true,
+  "ComponentManifest": {
+    "AllowAccessToGlobals": false,
+    "AllowCustomization": true,
+    "Description": "",
+    "Name": "cmp_TableHeader_v2",
+    "TemplateGuid": "7c5317e087094a3ca6bd918bd9ba08f3"
+  },
+  "ComponentType": "CanvasComponent",
+  "CustomGroupControlTemplateName": "",
+  "CustomProperties": [
+    {
+      "Category": 0,
+      "DisplayName": "AccentColor",
+      "Hidden": false,
+      "Name": "AccentColor",
+      "PropertyDataTypeKey": "Color",
+      "Tooltip": "Main accent color",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Color\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "BackgroundColor",
+      "Hidden": false,
+      "Name": "BackgroundColor",
+      "PropertyDataTypeKey": "Color",
+      "Tooltip": "Header background color",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Color\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "BorderColor",
+      "Hidden": false,
+      "Name": "BorderColor",
+      "PropertyDataTypeKey": "Color",
+      "Tooltip": "Border color",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Color\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "ColumnKey",
+      "Hidden": false,
+      "Name": "ColumnKey",
+      "PropertyDataTypeKey": "String",
+      "Tooltip": "Logical column key",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "DataType",
+      "Hidden": false,
+      "Name": "DataType",
+      "PropertyDataTypeKey": "String",
+      "Tooltip": "text, number, date, status, user, boolean",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "FilterCount",
+      "Hidden": false,
+      "Name": "FilterCount",
+      "PropertyDataTypeKey": "Number",
+      "Tooltip": "Number of active filters for this column",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Number\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "HasActiveState",
+      "Hidden": true,
+      "Name": "HasActiveState",
+      "PropertyDataTypeKey": "Boolean",
+      "Tooltip": "True when sorted or filtered",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Boolean\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "IsFiltered",
+      "Hidden": false,
+      "Name": "IsFiltered",
+      "PropertyDataTypeKey": "Boolean",
+      "Tooltip": "True when this column has an active filter",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Boolean\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "IsRequired",
+      "Hidden": false,
+      "Name": "IsRequired",
+      "PropertyDataTypeKey": "Boolean",
+      "Tooltip": "Shows required marker",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Boolean\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "IsResizable",
+      "Hidden": false,
+      "Name": "IsResizable",
+      "PropertyDataTypeKey": "Boolean",
+      "Tooltip": "Shows resize handle",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Boolean\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "IsSorted",
+      "Hidden": false,
+      "Name": "IsSorted",
+      "PropertyDataTypeKey": "Boolean",
+      "Tooltip": "True when this column is the active sort column",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Boolean\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "MutedTextColor",
+      "Hidden": false,
+      "Name": "MutedTextColor",
+      "PropertyDataTypeKey": "Color",
+      "Tooltip": "Muted text color",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Color\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "NextSortDirection",
+      "Hidden": true,
+      "Name": "NextSortDirection",
+      "PropertyDataTypeKey": "String",
+      "Tooltip": "Suggested next sort direction",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 2,
+      "DisplayName": "OnMenu",
+      "Hidden": false,
+      "Name": "OnMenu",
+      "PropertyDataTypeKey": "Void",
+      "PropertyScopeKey": {
+        "PropertyScopeRuleNamespaceKey": "298",
+        "PropertyScopeRulesKey": []
+      },
+      "Tooltip": "Executes when menu icon is selected",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Void\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 2,
+      "DisplayName": "OnResize",
+      "Hidden": false,
+      "Name": "OnResize",
+      "PropertyDataTypeKey": "Void",
+      "PropertyScopeKey": {
+        "PropertyScopeRuleNamespaceKey": "298",
+        "PropertyScopeRulesKey": []
+      },
+      "Tooltip": "Executes when resize handle is selected",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Void\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 2,
+      "DisplayName": "OnSort",
+      "Hidden": false,
+      "Name": "OnSort",
+      "PropertyDataTypeKey": "Void",
+      "PropertyScopeKey": {
+        "PropertyScopeRuleNamespaceKey": "298",
+        "PropertyScopeRulesKey": []
+      },
+      "Tooltip": "Executes when header is selected",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Void\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "ShowDataTypeIcon",
+      "Hidden": false,
+      "Name": "ShowDataTypeIcon",
+      "PropertyDataTypeKey": "Boolean",
+      "Tooltip": "Shows data type icon",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Boolean\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "ShowMenu",
+      "Hidden": false,
+      "Name": "ShowMenu",
+      "PropertyDataTypeKey": "Boolean",
+      "Tooltip": "Shows menu icon",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Boolean\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "SortDirection",
+      "Hidden": false,
+      "Name": "SortDirection",
+      "PropertyDataTypeKey": "String",
+      "Tooltip": "none, asc or desc",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "Subtitle",
+      "Hidden": false,
+      "Name": "Subtitle",
+      "PropertyDataTypeKey": "String",
+      "Tooltip": "Optional small subtitle",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "SurfaceAltColor",
+      "Hidden": false,
+      "Name": "SurfaceAltColor",
+      "PropertyDataTypeKey": "Color",
+      "Tooltip": "Soft hover/active background color",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Color\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "TextColor",
+      "Hidden": false,
+      "Name": "TextColor",
+      "PropertyDataTypeKey": "Color",
+      "Tooltip": "Main text color",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Color\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "Title",
+      "Hidden": false,
+      "Name": "Title",
+      "PropertyDataTypeKey": "String",
+      "Tooltip": "Column title",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "Tooltip",
+      "Hidden": false,
+      "Name": "Tooltip",
+      "PropertyDataTypeKey": "String",
+      "Tooltip": "Tooltip text",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]}}"
+    }
+  ],
+  "FirstParty": true,
+  "Id": "http://microsoft.com/appmagic/Component",
+  "IsComponentLocked": false,
+  "IsComponentTemplate": true,
+  "IsCustomGroupControlTemplate": false,
+  "IsPcfControl": false,
+  "IsPremiumPcfControl": false,
+  "IsWidgetTemplate": false,
+  "LastModifiedTimestamp": "639208323944308515",
+  "Name": "7c5317e087094a3ca6bd918bd9ba08f3",
+  "OverridableProperties": {},
+  "TemplateOriginalName": "fccd3bae6b6e440ab5d2a3c3cf62caee",
+  "Version": "1.0"
+}

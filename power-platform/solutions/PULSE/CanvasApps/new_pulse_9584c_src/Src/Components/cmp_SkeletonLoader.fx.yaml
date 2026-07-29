@@ -1,0 +1,98 @@
+cmp_SkeletonLoader As CanvasComponent:
+    BackgroundColor: |-
+        =ColorValue("#FFFFFF")
+    BorderColor: |-
+        =ColorValue("#E2E8F0")
+    ChildTabPriority: =true
+    ContentLanguage: =""
+    EnableChildFocus: =true
+    Fill: =RGBA(0, 0, 0, 0)
+    Height: =280
+    SkeletonColor: |-
+        =ColorValue("#E8EEF6")
+    Visible: =true
+    VisibleState: =true
+    Width: =900
+    X: =0
+    Y: =0
+
+    conSKL_Root As groupContainer.manualLayoutContainer:
+        BorderColor: =cmp_SkeletonLoader.BorderColor
+        BorderThickness: =1
+        Fill: =cmp_SkeletonLoader.BackgroundColor
+        Height: =Parent.Height
+        LayoutGridColumnMinWidth: =0
+        LayoutGridColumns: =6
+        LayoutGridRowMinHeight: =0
+        LayoutGridRows: =6
+        RadiusBottomLeft: =14
+        RadiusBottomRight: =14
+        RadiusTopLeft: =14
+        RadiusTopRight: =14
+        Visible: =cmp_SkeletonLoader.VisibleState
+        Width: =Parent.Width
+        ZIndex: =1
+
+        recSKL_Title As rectangle:
+            BorderColor: =RGBA(0,0,0,0)
+            Fill: =cmp_SkeletonLoader.SkeletonColor
+            Height: =22
+            Width: =Min(240,Parent.Width-48)
+            X: =24
+            Y: =24
+            ZIndex: =1
+
+        recSKL_Subtitle As rectangle:
+            BorderColor: =RGBA(0,0,0,0)
+            Fill: =cmp_SkeletonLoader.SkeletonColor
+            Height: =12
+            Width: =Min(420,Parent.Width-48)
+            X: =24
+            Y: =58
+            ZIndex: =2
+
+        recSKL_Card1 As rectangle:
+            BorderColor: =RGBA(0,0,0,0)
+            Fill: =cmp_SkeletonLoader.SkeletonColor
+            Height: =78
+            Width: =(Parent.Width-84)/3
+            X: =24
+            Y: =94
+            ZIndex: =3
+
+        recSKL_Card2 As rectangle:
+            BorderColor: =RGBA(0,0,0,0)
+            Fill: =cmp_SkeletonLoader.SkeletonColor
+            Height: =78
+            Width: =(Parent.Width-84)/3
+            X: =recSKL_Card1.X+recSKL_Card1.Width+18
+            Y: =94
+            ZIndex: =4
+
+        recSKL_Card3 As rectangle:
+            BorderColor: =RGBA(0,0,0,0)
+            Fill: =cmp_SkeletonLoader.SkeletonColor
+            Height: =78
+            Width: =(Parent.Width-84)/3
+            X: =recSKL_Card2.X+recSKL_Card2.Width+18
+            Y: =94
+            ZIndex: =5
+
+        recSKL_Row1 As rectangle:
+            BorderColor: =RGBA(0,0,0,0)
+            Fill: =cmp_SkeletonLoader.SkeletonColor
+            Height: =14
+            Width: =Parent.Width-48
+            X: =24
+            Y: =198
+            ZIndex: =6
+
+        recSKL_Row2 As rectangle:
+            BorderColor: =RGBA(0,0,0,0)
+            Fill: =cmp_SkeletonLoader.SkeletonColor
+            Height: =14
+            Width: =Parent.Width-120
+            X: =24
+            Y: =226
+            ZIndex: =7
+

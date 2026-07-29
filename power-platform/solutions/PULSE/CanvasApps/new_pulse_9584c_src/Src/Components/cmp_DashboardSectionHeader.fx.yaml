@@ -1,0 +1,96 @@
+cmp_DashboardSectionHeader As CanvasComponent:
+    OnAction():
+        ThisProperty:
+            Default: =
+    AccentColor: |-
+        =ColorValue("#1677FF")
+    ActionText: ="View details"
+    ChildTabPriority: =true
+    ContentLanguage: =""
+    EnableChildFocus: =true
+    Fill: =RGBA(0, 0, 0, 0)
+    Height: =54
+    MutedTextColor: |-
+        =ColorValue("#64748B")
+    ShowAction: =false
+    Subtitle: ="Supporting context"
+    TextColor: |-
+        =ColorValue("#0F172A")
+    Title: ="Section title"
+    Visible: =true
+    Width: =900
+    X: =0
+    Y: =0
+
+    conDSH_Root As groupContainer.manualLayoutContainer:
+        BorderColor: =RGBA(0,0,0,0)
+        Fill: =Color.Transparent
+        Height: =Parent.Height
+        LayoutGridColumnMinWidth: =0
+        LayoutGridColumns: =6
+        LayoutGridRowMinHeight: =0
+        LayoutGridRows: =6
+        RadiusBottomLeft: =4
+        RadiusBottomRight: =4
+        RadiusTopLeft: =4
+        RadiusTopRight: =4
+        Width: =Parent.Width
+        ZIndex: =1
+
+        lblDSH_Title As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =cmp_DashboardSectionHeader.TextColor
+            Font: =""
+            FontWeight: =FontWeight.Semibold
+            Height: =24
+            Size: =16
+            Text: =cmp_DashboardSectionHeader.Title
+            Width: =Parent.Width-180
+            Y: =4
+            ZIndex: =1
+
+        lblDSH_Subtitle As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =cmp_DashboardSectionHeader.MutedTextColor
+            Font: =""
+            Height: =18
+            Size: =9
+            Text: =cmp_DashboardSectionHeader.Subtitle
+            Width: =Parent.Width-180
+            Y: =31
+            ZIndex: =2
+
+        btnDSH_Action As button:
+            BorderColor: =cmp_DashboardSectionHeader.AccentColor
+            BorderThickness: =1
+            Color: =cmp_DashboardSectionHeader.AccentColor
+            DisabledBorderColor: =RGBA(244, 244, 244, 1)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            DisabledFill: =RGBA(244, 244, 244, 1)
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =32
+            HoverBorderColor: =App.Theme.Colors.Darker10
+            HoverColor: =App.Theme.Colors.PrimaryForeground
+            HoverFill: |-
+                =ColorValue("#EFF6FF")
+            OnSelect: =cmp_DashboardSectionHeader.OnAction()
+            PressedBorderColor: =App.Theme.Colors.Darker40
+            PressedColor: =Self.Color
+            PressedFill: |-
+                =ColorValue("#DBEAFE")
+            RadiusBottomLeft: =9
+            RadiusBottomRight: =9
+            RadiusTopLeft: =9
+            RadiusTopRight: =9
+            Size: =9
+            Text: =cmp_DashboardSectionHeader.ActionText
+            Visible: =cmp_DashboardSectionHeader.ShowAction
+            Width: =132
+            X: =Parent.Width-Self.Width
+            Y: =10
+            ZIndex: =3
+

@@ -1,0 +1,340 @@
+cmp_CustomFieldEditor As CanvasComponent:
+    OnCancel():
+        ThisProperty:
+            Default: =
+    OnFieldSelect():
+        ThisProperty:
+            Default: =
+    OnSave():
+        ThisProperty:
+            Default: =
+    AccentColor: |-
+        =ColorValue("#1677FF")
+    BackgroundColor: |-
+        =ColorValue("#FFFFFF")
+    BorderColor: |-
+        =ColorValue("#E2E8F0")
+    CancelButtonText: ="Cancel"
+    ChildTabPriority: =true
+    ContentLanguage: =""
+    EmptyText: ="No custom fields configured"
+    EnableChildFocus: =true
+    Fill: =RGBA(0, 0, 0, 0)
+    HasFields: =CountRows(cmp_CustomFieldEditor.Items) > 0
+    Height: =560
+    Items: |-
+        =Table(
+            {
+                FieldKey: "",
+                FieldLabel: "",
+                FieldType: "Text",
+                ValueText: "",
+                HelpText: "",
+                IsRequired: false,
+                IsEditable: true
+            }
+        )
+    MutedTextColor: |-
+        =ColorValue("#64748B")
+    OnReset: =Set(varCFE_SelectedFieldKey, "")
+    SaveButtonText: ="Save"
+    SelectedField: =LookUp(cmp_CustomFieldEditor.Items, FieldKey = varCFE_SelectedFieldKey)
+    SelectedFieldKey: =varCFE_SelectedFieldKey
+    SelectedFieldType: =LookUp(cmp_CustomFieldEditor.Items, FieldKey = varCFE_SelectedFieldKey).FieldType
+    ShowFooter: =true
+    ShowHelpText: =true
+    ShowTitle: =true
+    SurfaceAltColor: |-
+        =ColorValue("#F8FAFC")
+    TextColor: |-
+        =ColorValue("#0F172A")
+    Title: ="Custom fields"
+    Visible: =true
+    Width: =520
+    X: =0
+    Y: =0
+
+    conCFE_Root As groupContainer.manualLayoutContainer:
+        BorderColor: =cmp_CustomFieldEditor.BorderColor
+        BorderThickness: =1
+        Fill: =cmp_CustomFieldEditor.BackgroundColor
+        Height: =Parent.Height
+        LayoutGridColumnMinWidth: =0
+        LayoutGridColumns: =6
+        LayoutGridRowMinHeight: =0
+        LayoutGridRows: =6
+        RadiusBottomLeft: =14
+        RadiusBottomRight: =14
+        RadiusTopLeft: =14
+        RadiusTopRight: =14
+        Width: =Parent.Width
+        ZIndex: =1
+
+        lblCFE_Title As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =cmp_CustomFieldEditor.TextColor
+            Font: =""
+            FontWeight: =FontWeight.Semibold
+            Height: =24
+            Size: =14
+            Text: =cmp_CustomFieldEditor.Title
+            Visible: =cmp_CustomFieldEditor.ShowTitle
+            Width: =Parent.Width - 32
+            X: =16
+            Y: =14
+            ZIndex: =1
+
+        rectCFE_TitleLine As rectangle:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            DisabledFill: =RGBA(161, 159, 157, 1)
+            Fill: =cmp_CustomFieldEditor.BorderColor
+            FocusedBorderThickness: =4
+            Height: =1
+            HoverFill: =cmp_CustomFieldEditor.BorderColor
+            PressedFill: =cmp_CustomFieldEditor.BorderColor
+            Visible: =cmp_CustomFieldEditor.ShowTitle
+            Width: =Parent.Width
+            Y: =52
+            ZIndex: =2
+
+        "galCFE_Fields As gallery.'BrowseLayout_Vertical_OneTextVariant_ver5.0'":
+            '#CopilotOverlayLabel': ="Filtered"
+            BorderColor: =RGBA(245, 245, 245, 1)
+            DelayItemLoading: =true
+            Height: =Parent.Height - If(cmp_CustomFieldEditor.ShowTitle, 118, 66) - If(cmp_CustomFieldEditor.ShowFooter, 56, 0)
+            Items: =cmp_CustomFieldEditor.Items
+            Layout: =Layout.Vertical
+            LoadingSpinner: =LoadingSpinner.Data
+            TemplatePadding: =0
+            TemplateSize: =92
+            Visible: =cmp_CustomFieldEditor.HasFields
+            Width: =Parent.Width - 24
+            X: =12
+            Y: =If(cmp_CustomFieldEditor.ShowTitle, 64, 12)
+            ZIndex: =3
+
+            btnCFE_Row As button:
+                BorderColor: =If(ThisItem.FieldKey = varCFE_SelectedFieldKey, cmp_CustomFieldEditor.AccentColor, cmp_CustomFieldEditor.BorderColor)
+                BorderThickness: =If(ThisItem.FieldKey = varCFE_SelectedFieldKey, 2, 1)
+                Color: =Color.White
+                DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                DisabledColor: =RGBA(161, 159, 157, 1)
+                DisabledFill: =RGBA(242, 242, 241, 0)
+                Fill: |-
+                    =If(ThisItem.FieldKey = varCFE_SelectedFieldKey, ColorValue("#EFF6FF"), cmp_CustomFieldEditor.BackgroundColor)
+                Font: =Font.'Segoe UI'
+                FontWeight: =FontWeight.Semibold
+                Height: =Parent.TemplateHeight - 8
+                HoverBorderColor: =cmp_CustomFieldEditor.AccentColor
+                HoverColor: =Color.White
+                HoverFill: |-
+                    =ColorValue("#EFF6FF")
+                OnSelect: |-
+                    =
+                    Set(varCFE_SelectedFieldKey, ThisItem.FieldKey);
+                    cmp_CustomFieldEditor.OnFieldSelect()
+                PressedBorderColor: =cmp_CustomFieldEditor.AccentColor
+                PressedColor: =Color.White
+                PressedFill: |-
+                    =ColorValue("#DBEAFE")
+                Size: =15
+                Text: =""
+                Width: =Parent.TemplateWidth
+                Y: =4
+                ZIndex: =1
+
+            lblCFE_FieldLabel As label:
+                BorderColor: =RGBA(0, 0, 0, 0)
+                Color: =cmp_CustomFieldEditor.TextColor
+                DisabledColor: =RGBA(161, 159, 157, 1)
+                Fill: =Color.Transparent
+                Font: =Font.'Segoe UI'
+                FontWeight: =FontWeight.Semibold
+                Height: =20
+                OnSelect: =Select(btnCFE_Row)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =10
+                Text: =ThisItem.FieldLabel & If(ThisItem.IsRequired, " *", "")
+                VerticalAlign: =VerticalAlign.Top
+                Width: =Parent.TemplateWidth - 150
+                X: =14
+                Y: =12
+                ZIndex: =2
+
+            conCFE_TypePill As groupContainer.manualLayoutContainer:
+                BorderColor: =cmp_CustomFieldEditor.BorderColor
+                BorderThickness: =1
+                Fill: =cmp_CustomFieldEditor.SurfaceAltColor
+                Height: =22
+                LayoutGridColumnMinWidth: =0
+                LayoutGridColumns: =6
+                LayoutGridRowMinHeight: =0
+                LayoutGridRows: =6
+                RadiusBottomLeft: =11
+                RadiusBottomRight: =11
+                RadiusTopLeft: =11
+                RadiusTopRight: =11
+                Width: =90
+                X: =Parent.TemplateWidth - 104
+                Y: =10
+                ZIndex: =3
+
+                lblCFE_Type As label:
+                    Align: =Align.Center
+                    BorderColor: =RGBA(0, 0, 0, 0)
+                    Color: =cmp_CustomFieldEditor.MutedTextColor
+                    DisabledColor: =RGBA(161, 159, 157, 1)
+                    Fill: =Color.Transparent
+                    Font: =Font.'Segoe UI'
+                    FontWeight: =FontWeight.Semibold
+                    Height: =22
+                    PaddingBottom: =0
+                    PaddingLeft: =0
+                    PaddingRight: =0
+                    PaddingTop: =0
+                    Size: =8
+                    Text: =Upper(ThisItem.FieldType)
+                    VerticalAlign: =VerticalAlign.Top
+                    Width: =Parent.Width
+                    Y: =3
+                    ZIndex: =1
+
+            txtCFE_Value As text:
+                BorderColor: =cmp_CustomFieldEditor.BorderColor
+                BorderThickness: =2
+                Color: =cmp_CustomFieldEditor.TextColor
+                Default: =ThisItem.ValueText
+                DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                DisabledColor: =RGBA(161, 159, 157, 1)
+                DisabledFill: =RGBA(242, 242, 241, 0)
+                DisplayMode: =If(ThisItem.IsEditable, DisplayMode.Edit, DisplayMode.Disabled)
+                FocusedBorderThickness: =4
+                Font: =Font.'Segoe UI'
+                Height: =32
+                HintText: ="Enter value"
+                HoverBorderColor: =cmp_CustomFieldEditor.AccentColor
+                HoverColor: =cmp_CustomFieldEditor.TextColor
+                HoverFill: =Color.White
+                PressedBorderColor: =cmp_CustomFieldEditor.AccentColor
+                PressedColor: =cmp_CustomFieldEditor.TextColor
+                PressedFill: =Color.White
+                RadiusBottomLeft: =6
+                RadiusBottomRight: =6
+                RadiusTopLeft: =6
+                RadiusTopRight: =6
+                Size: =10
+                Width: =Parent.TemplateWidth - 28
+                X: =14
+                Y: =38
+                ZIndex: =4
+
+            lblCFE_Help As modernText:
+                AutoHeight: =true
+                BorderStyle: =""
+                Color: =cmp_CustomFieldEditor.MutedTextColor
+                Font: =""
+                Height: =14
+                Size: =8
+                Text: =ThisItem.HelpText
+                Visible: =cmp_CustomFieldEditor.ShowHelpText && !IsBlank(ThisItem.HelpText)
+                Width: =Parent.TemplateWidth - 28
+                X: =14
+                Y: =72
+                ZIndex: =5
+
+        lblCFE_Empty As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =cmp_CustomFieldEditor.MutedTextColor
+            Font: =""
+            FontWeight: =FontWeight.Semibold
+            Height: =24
+            Size: =12
+            Text: =cmp_CustomFieldEditor.EmptyText
+            Visible: =!cmp_CustomFieldEditor.HasFields
+            Width: =Parent.Width - 48
+            X: =24
+            Y: =(Parent.Height - 24) / 2
+            ZIndex: =4
+
+        rectCFE_FooterLine As rectangle:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            DisabledFill: =RGBA(161, 159, 157, 1)
+            Fill: =cmp_CustomFieldEditor.BorderColor
+            FocusedBorderThickness: =4
+            Height: =1
+            HoverFill: =cmp_CustomFieldEditor.BorderColor
+            PressedFill: =cmp_CustomFieldEditor.BorderColor
+            Visible: =cmp_CustomFieldEditor.ShowFooter
+            Width: =Parent.Width
+            Y: =Parent.Height - 56
+            ZIndex: =5
+
+        btnCFE_Cancel As button:
+            BorderColor: =cmp_CustomFieldEditor.BorderColor
+            BorderThickness: =1
+            Color: =cmp_CustomFieldEditor.TextColor
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(161, 159, 157, 1)
+            DisabledFill: =RGBA(242, 242, 241, 0)
+            Fill: =cmp_CustomFieldEditor.BackgroundColor
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =36
+            HoverBorderColor: =cmp_CustomFieldEditor.BorderColor
+            HoverColor: =cmp_CustomFieldEditor.TextColor
+            HoverFill: =cmp_CustomFieldEditor.SurfaceAltColor
+            OnSelect: =cmp_CustomFieldEditor.OnCancel()
+            PressedBorderColor: =cmp_CustomFieldEditor.BorderColor
+            PressedColor: =cmp_CustomFieldEditor.TextColor
+            PressedFill: |-
+                =ColorValue("#F1F5F9")
+            RadiusBottomLeft: =8
+            RadiusBottomRight: =8
+            RadiusTopLeft: =8
+            RadiusTopRight: =8
+            Size: =11
+            Text: =cmp_CustomFieldEditor.CancelButtonText
+            Visible: =cmp_CustomFieldEditor.ShowFooter
+            Width: =104
+            X: =Parent.Width - 232
+            Y: =Parent.Height - 46
+            ZIndex: =6
+
+        btnCFE_Save As button:
+            BorderColor: =cmp_CustomFieldEditor.AccentColor
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =0
+            Color: =Color.White
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(161, 159, 157, 1)
+            DisabledFill: =RGBA(242, 242, 241, 0)
+            Fill: =cmp_CustomFieldEditor.AccentColor
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =36
+            HoverBorderColor: =cmp_CustomFieldEditor.AccentColor
+            HoverColor: =Color.White
+            HoverFill: =cmp_CustomFieldEditor.AccentColor
+            OnSelect: =cmp_CustomFieldEditor.OnSave()
+            PressedBorderColor: =cmp_CustomFieldEditor.AccentColor
+            PressedColor: =Color.White
+            PressedFill: =cmp_CustomFieldEditor.AccentColor
+            RadiusBottomLeft: =8
+            RadiusBottomRight: =8
+            RadiusTopLeft: =8
+            RadiusTopRight: =8
+            Size: =11
+            Text: =cmp_CustomFieldEditor.SaveButtonText
+            Visible: =cmp_CustomFieldEditor.ShowFooter
+            Width: =104
+            X: =Parent.Width - 116
+            Y: =Parent.Height - 46
+            ZIndex: =7
+

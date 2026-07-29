@@ -1,0 +1,229 @@
+{
+  "ComponentAllowCustomization": true,
+  "ComponentChangedSinceFileImport": true,
+  "ComponentManifest": {
+    "AllowAccessToGlobals": false,
+    "AllowCustomization": true,
+    "Description": "",
+    "Name": "cmp_CustomFieldEditor",
+    "TemplateGuid": "c83bfa576ed9453e866f87a3171cedb1"
+  },
+  "ComponentType": "CanvasComponent",
+  "CustomGroupControlTemplateName": "",
+  "CustomProperties": [
+    {
+      "Category": 0,
+      "DisplayName": "AccentColor",
+      "Hidden": false,
+      "Name": "AccentColor",
+      "PropertyDataTypeKey": "Color",
+      "Tooltip": "Main accent color",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Color\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "BackgroundColor",
+      "Hidden": false,
+      "Name": "BackgroundColor",
+      "PropertyDataTypeKey": "Color",
+      "Tooltip": "Editor background color",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Color\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "BorderColor",
+      "Hidden": false,
+      "Name": "BorderColor",
+      "PropertyDataTypeKey": "Color",
+      "Tooltip": "Border color",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Color\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "CancelButtonText",
+      "Hidden": false,
+      "Name": "CancelButtonText",
+      "PropertyDataTypeKey": "String",
+      "Tooltip": "Cancel button text",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "EmptyText",
+      "Hidden": false,
+      "Name": "EmptyText",
+      "PropertyDataTypeKey": "String",
+      "Tooltip": "Empty state text",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "HasFields",
+      "Hidden": true,
+      "Name": "HasFields",
+      "PropertyDataTypeKey": "Boolean",
+      "Tooltip": "True when Items has fields",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Boolean\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "Items",
+      "Hidden": false,
+      "Name": "Items",
+      "PropertyDataTypeKey": "Table",
+      "Tooltip": "Normalized table with FieldKey, FieldLabel, FieldType, ValueText, HelpText, IsRequired, IsEditable",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Table\",\"EnumString\":\"\",\"Type\":[{\"Name\":\"FieldKey\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]},{\"Name\":\"FieldLabel\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]},{\"Name\":\"FieldType\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]},{\"Name\":\"HelpText\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]},{\"Name\":\"IsEditable\",\"Kind\":\"Boolean\",\"EnumString\":\"\",\"Type\":[]},{\"Name\":\"IsRequired\",\"Kind\":\"Boolean\",\"EnumString\":\"\",\"Type\":[]},{\"Name\":\"ValueText\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]}]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "MutedTextColor",
+      "Hidden": false,
+      "Name": "MutedTextColor",
+      "PropertyDataTypeKey": "Color",
+      "Tooltip": "Muted text color",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Color\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 2,
+      "DisplayName": "OnCancel",
+      "Hidden": false,
+      "Name": "OnCancel",
+      "PropertyDataTypeKey": "Void",
+      "PropertyScopeKey": {
+        "PropertyScopeRuleNamespaceKey": "331",
+        "PropertyScopeRulesKey": []
+      },
+      "Tooltip": "Executes when cancel is selected",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Void\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 2,
+      "DisplayName": "OnFieldSelect",
+      "Hidden": false,
+      "Name": "OnFieldSelect",
+      "PropertyDataTypeKey": "Void",
+      "PropertyScopeKey": {
+        "PropertyScopeRuleNamespaceKey": "331",
+        "PropertyScopeRulesKey": []
+      },
+      "Tooltip": "Executes when a field is selected",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Void\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 2,
+      "DisplayName": "OnSave",
+      "Hidden": false,
+      "Name": "OnSave",
+      "PropertyDataTypeKey": "Void",
+      "PropertyScopeKey": {
+        "PropertyScopeRuleNamespaceKey": "331",
+        "PropertyScopeRulesKey": []
+      },
+      "Tooltip": "Executes when save is selected",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Void\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "SaveButtonText",
+      "Hidden": false,
+      "Name": "SaveButtonText",
+      "PropertyDataTypeKey": "String",
+      "Tooltip": "Save button text",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "SelectedField",
+      "Hidden": true,
+      "Name": "SelectedField",
+      "PropertyDataTypeKey": "Record",
+      "Tooltip": "Selected field record",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Record\",\"EnumString\":\"\",\"Type\":[{\"Name\":\"FieldKey\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]},{\"Name\":\"FieldLabel\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]},{\"Name\":\"FieldType\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]},{\"Name\":\"HelpText\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]},{\"Name\":\"IsEditable\",\"Kind\":\"Boolean\",\"EnumString\":\"\",\"Type\":[]},{\"Name\":\"IsRequired\",\"Kind\":\"Boolean\",\"EnumString\":\"\",\"Type\":[]},{\"Name\":\"ValueText\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]}]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "SelectedFieldKey",
+      "Hidden": true,
+      "Name": "SelectedFieldKey",
+      "PropertyDataTypeKey": "String",
+      "Tooltip": "Selected field key",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "SelectedFieldType",
+      "Hidden": true,
+      "Name": "SelectedFieldType",
+      "PropertyDataTypeKey": "String",
+      "Tooltip": "Selected field type",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "ShowFooter",
+      "Hidden": false,
+      "Name": "ShowFooter",
+      "PropertyDataTypeKey": "Boolean",
+      "Tooltip": "Shows footer actions",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Boolean\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "ShowHelpText",
+      "Hidden": false,
+      "Name": "ShowHelpText",
+      "PropertyDataTypeKey": "Boolean",
+      "Tooltip": "Shows help text",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Boolean\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "ShowTitle",
+      "Hidden": false,
+      "Name": "ShowTitle",
+      "PropertyDataTypeKey": "Boolean",
+      "Tooltip": "Shows title",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Boolean\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "SurfaceAltColor",
+      "Hidden": false,
+      "Name": "SurfaceAltColor",
+      "PropertyDataTypeKey": "Color",
+      "Tooltip": "Alternate surface color",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Color\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "TextColor",
+      "Hidden": false,
+      "Name": "TextColor",
+      "PropertyDataTypeKey": "Color",
+      "Tooltip": "Main text color",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"Color\",\"EnumString\":\"\",\"Type\":[]}}"
+    },
+    {
+      "Category": 0,
+      "DisplayName": "Title",
+      "Hidden": false,
+      "Name": "Title",
+      "PropertyDataTypeKey": "String",
+      "Tooltip": "Editor title",
+      "Type": "{\"Version\":\"1.349\",\"Type\":{\"Name\":\"Root\",\"Kind\":\"String\",\"EnumString\":\"\",\"Type\":[]}}"
+    }
+  ],
+  "FirstParty": true,
+  "Id": "http://microsoft.com/appmagic/Component",
+  "IsComponentLocked": false,
+  "IsComponentTemplate": true,
+  "IsCustomGroupControlTemplate": false,
+  "IsPcfControl": false,
+  "IsPremiumPcfControl": false,
+  "IsWidgetTemplate": false,
+  "LastModifiedTimestamp": "639208323944332018",
+  "Name": "c83bfa576ed9453e866f87a3171cedb1",
+  "OverridableProperties": {},
+  "TemplateOriginalName": "560d12cd630643c4a8afa992077ecaff",
+  "Version": "1.0"
+}

@@ -1,0 +1,3858 @@
+scr_Home As screen:
+    Fill: =varTheme_PageBg
+    LoadingSpinnerColor: =RGBA(0, 120, 212, 1)
+    OnVisible: |+
+        =
+        // =====================================================
+        // scr_App.OnVisible
+        // Runtime state only. DO NOT reset selected project here.
+        // =====================================================
+        
+        // Theme / visual tokens
+        Set(varHiveColorExcellent, "#22C55E");
+        Set(varHiveColorGood, "#F59E0B");
+        Set(varHiveColorInProgress, "#00C8FF");
+        Set(varHiveColorDelayed, "#EF4444");
+        Set(varHiveColorNeutral, "#64748B");
+        
+        Set(varHiveColorSelected, "#00C8FF");
+        Set(varHiveColorCardBg, "#FFFFFF");
+        Set(varHiveColorPageBg, "#F6F8FB");
+        Set(varHiveColorBorder, "#E2E8F0");
+        Set(varHiveColorText, "#0F172A");
+        Set(varHiveColorMuted, "#64748B");
+        
+        Set(varTheme_NavBg, ColorValue("#07111F"));
+        Set(varTheme_NavBg2, ColorValue("#0B1220"));
+        Set(varTheme_TopBg, ColorValue("#FFFFFF"));
+        Set(varTheme_PageBg, ColorValue("#F6F8FB"));
+        Set(varTheme_Surface, ColorValue("#FFFFFF"));
+        Set(varTheme_SurfaceAlt, ColorValue("#F8FAFC"));
+        Set(varTheme_Border, ColorValue("#E2E8F0"));
+        Set(varTheme_Text, ColorValue("#0F172A"));
+        Set(varTheme_TextMuted, ColorValue("#64748B"));
+        Set(varTheme_TextSoft, ColorValue("#94A3B8"));
+        Set(varTheme_TextWhite, ColorValue("#FFFFFF"));
+        Set(varTheme_PulseBlue, ColorValue("#00C8FF"));
+        Set(varTheme_PulseBlueDark, ColorValue("#1677FF"));
+        Set(varTheme_PulseSoft, ColorValue("#E0F7FF"));
+        Set(varTheme_Green, ColorValue("#22C55E"));
+        Set(varTheme_Amber, ColorValue("#F59E0B"));
+        Set(varTheme_Red, ColorValue("#EF4444"));
+        Set(varTheme_CardRadius, 16);
+        Set(varTheme_ButtonRadius, 10);
+        
+        // Responsive
+        Set(varIsMobile, App.Width < 900);
+        Set(varIsTablet, App.Width >= 900 && App.Width < 1400);
+        Set(varIsDesktop, App.Width >= 1400);
+        
+        // User
+        Set(varCurrentUserEmail, Lower(User().Email));
+        Set(varCurrentUserName, User().FullName);
+        
+        // Navigation defaults only
+        If(IsBlank(varAppView), Set(varAppView, "Home"));
+        If(IsBlank(varHomeViewMode), Set(varHomeViewMode, "DASHBOARD"));
+        If(IsBlank(varOps_ViewMode), Set(varOps_ViewMode, "OVERVIEW"));
+        If(IsBlank(varOps_QuickFilter), Set(varOps_QuickFilter, "ALL"));
+        
+        // Project context: preserve if already selected
+        If(
+            IsBlank(varProjectId),
+            Set(varProjectLoaded, false),
+            Set(varProjectLoaded, true)
+        );
+        
+        // Loading states
+        
+        
+        If(
+            !varProjectSwitching && !varGlobalLoadPending,
+        
+            Set(varGlobalLoading, false);
+            Set(varGlobalLoadingMsg, "");
+            Set(varGlobalLoadingSubMsg, "");
+            Set(varGlobalLoadingScope, "");
+            Set(varGlobalLoadAction, "");
+            Set(varGlobalLoadPending, false);
+        
+            Set(varLoading, false);
+            Set(varLoadingMsg, "");
+            Set(varProjectSwitching, false);
+            Set(varHomeLoading, false)
+        );
+        
+        
+        
+        Set(varOps_IsLoading, false);
+        Set(varPHR_IsLoading, false);
+        Set(varDash_IsLoading, false);
+        Set(varExecDashboardLoading, false);
+        
+        // Error states
+        Set(varAppError, "");
+        Set(varAppWarning, "");
+        Set(varHomeError, "");
+        Set(varOps_Error, "");
+        Set(varCfg_Error, "");
+        Set(varHomePendingError, "");
+        
+        // UI defaults
+        If(IsBlank(varHiveCardWidth), Set(varHiveCardWidth, 330));
+        If(IsBlank(varHiveCardHeight), Set(varHiveCardHeight, 215));
+        If(IsBlank(varHiveRightPanelWidth), Set(varHiveRightPanelWidth, 326));
+        
+        If(IsBlank(varHomeShowOverview), Set(varHomeShowOverview, false));
+        If(IsBlank(varHomeShowCards), Set(varHomeShowCards, false));
+        If(IsBlank(varHomeShowRightPanel), Set(varHomeShowRightPanel, false));
+        
+        If(IsBlank(varHomeNoData), Set(varHomeNoData, false));
+        If(IsBlank(varOverviewNoConfig), Set(varOverviewNoConfig, false));
+        If(IsBlank(varOverviewNoData), Set(varOverviewNoData, false));
+        
+        // Selected objects typed defaults
+        Set(varOps_SelectedCellId, 0);
+        Set(
+            varOps_SelectedCell,
+            {
+                OperationalCellId: 0,
+                ProjectId: 0,
+                SubsystemCode: "",
+                L1NodeId: "",
+                L2NodeId: "",
+                L3NodeId: "",
+                L1DisplayName: "",
+                L2DisplayName: "",
+                L3DisplayName: "",
+                TotalTasks: 0,
+                DoneTasks: 0,
+                RemainingTasks: 0,
+                ProgressPercent: 0,
+                OwnerEmail: "",
+                DueDate: Blank(),
+                OperationalStatus: "",
+                StatusComment: "",
+                LastReviewedOn: Blank(),
+                LastReviewedBy: "",
+                IsOverdue: false,
+                AgingDays: 0,
+                RefreshedOn: Blank()
+            }
+        );
+        
+        If(
+            IsBlank(varSelectedHiveNode) || IsBlank(varSelectedHiveNode.NodeId),
+            Set(
+                varSelectedHiveNode,
+                {
+                    NodeId: "",
+                    NodeNo: "",
+                    NodeTitle: "",
+                    NodeSubtitle: "",
+                    Discipline: "",
+                    SubsystemCode: "",
+                    Total: 0,
+                    Done: 0,
+                    Remaining: 0,
+                    Progress: 0,
+                    ProgressStatus: "",
+                    ProgressColor: "",
+                    SortOrder: 0
+                }
+            )
+        );
+        
+        If(
+            IsBlank(varSelectedHiveSubsystem) || IsBlank(varSelectedHiveSubsystem.SubsystemCode),
+            Set(
+                varSelectedHiveSubsystem,
+                {
+                    SubsystemCode: "",
+                    Discipline: "",
+                    Total: 0,
+                    Done: 0,
+                    Remaining: 0,
+                    Progress: 0,
+                    ProgressStatus: "",
+                    ProgressColor: ""
+                }
+            )
+        );
+        
+        // PHR defaults
+        If(IsBlank(varPHR_Page), Set(varPHR_Page, 1));
+        If(IsBlank(varPHR_PageSize), Set(varPHR_PageSize, 50));
+        If(IsBlank(varPHR_TotalCount), Set(varPHR_TotalCount, 0));
+        
+        Set(varPHR_ColW, Coalesce(varPHR_ColW, 66));
+        Set(varPHR_StatusW, Coalesce(varPHR_StatusW, 56));
+        Set(varPHR_SubsysW, Coalesce(varPHR_SubsysW, 170));
+        Set(varPHR_ActionsW, Coalesce(varPHR_ActionsW, 92));
+        Set(varPHR_LeftFixedW, varPHR_StatusW + varPHR_SubsysW + varPHR_ActionsW);
+        
+        Set(varPHR_HeaderH1, Coalesce(varPHR_HeaderH1, 28));
+        Set(varPHR_HeaderH2, Coalesce(varPHR_HeaderH2, 28));
+        Set(varPHR_HeaderH3, Coalesce(varPHR_HeaderH3, 28));
+        Set(varPHR_HeaderH4, Coalesce(varPHR_HeaderH4, 32));
+        Set(varPHR_RowH, Coalesce(varPHR_RowH, 52));
+        
+        // No automatic refresh
+        Set(varOps_AutoLoadAllowed, false);
+        Set(varShowFilters, false);
+        Set(varShowMenu, false);
+        Set(varCacheEnabled, true);
+        Set(varUseCompactMode, false);
+        
+        Set(varBriefingEmailVisible, false);
+        
+        // Skyline defaults
+        If(IsBlank(varSkylineLoaded), Set(varSkylineLoaded, false));
+        If(IsBlank(varSkylineLoading), Set(varSkylineLoading, false));
+        If(IsBlank(varSkylineError), Set(varSkylineError, ""));
+        If(IsBlank(varSkylineFromDate), Set(varSkylineFromDate, DateAdd(Today(), -7, TimeUnit.Days)));
+        If(IsBlank(varSkylinePunchWeight), Set(varSkylinePunchWeight, 3));
+        If(IsBlank(varSelectedSkylineMode), Set(varSelectedSkylineMode, "DENSITY"));
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+    tmrGlobalLoader As timer:
+        AutoStart: =varGlobalLoadPending
+        BorderColor: =RGBA(0, 120, 212, 1)
+        BorderStyle: =BorderStyle.None
+        DisabledBorderColor: =RGBA(242, 242, 241, 0)
+        DisabledColor: =RGBA(161, 159, 157, 1)
+        DisabledFill: =RGBA(242, 242, 241, 0)
+        Duration: =150
+        Fill: =RGBA(0, 120, 212, 1)
+        Font: =Font.'Segoe UI'
+        HoverBorderColor: =RGBA(16, 110, 190, 1)
+        HoverColor: =RGBA(255, 255, 255, 1)
+        HoverFill: =RGBA(16, 110, 190, 1)
+        OnTimerEnd: |-
+            =
+            
+            If(
+                IsBlank(varGlobalLoadAction),
+            
+                Set(varGlobalLoadPending, false),
+            
+                Set(varGlobalLoadPending, false);
+            
+                Switch(
+                    varGlobalLoadAction,
+            
+                    "PROJECT_CHANGE",
+                        Select(btnHome_ProjectChange_Commit),
+            
+                    "LOAD_HOME",
+                        Select(btnHome_LoadHive),
+            
+                    "LOAD_TASKS",
+                        Set(varGlobalLoading, false);
+                        Set(varGlobalLoadingMsg, "");
+                        Set(varGlobalLoadingSubMsg, "");
+                        Set(varGlobalLoadingScope, "");
+                        Set(varGlobalLoadAction, "");
+                        Set(varGlobalLoadPending, false),
+            
+                    Notify(
+                        "Home cannot execute action: " & Coalesce(varGlobalLoadAction, "-"),
+                        NotificationType.Warning
+                    );
+            
+                    Set(varGlobalLoading, false);
+                    Set(varGlobalLoadingMsg, "");
+                    Set(varGlobalLoadingSubMsg, "");
+                    Set(varGlobalLoadingScope, "");
+                    Set(varGlobalLoadAction, "");
+                    Set(varGlobalLoadPending, false);
+                    Set(varHomeLoading, false);
+                    Set(varProjectSwitching, false)
+                )
+            )
+        PressedBorderColor: =RGBA(16, 110, 190, 1)
+        PressedColor: =RGBA(255, 255, 255, 1)
+        PressedFill: =RGBA(16, 110, 190, 1)
+        Visible: =false
+        X: =100
+        Y: =100
+        ZIndex: =1
+
+    conLayer_Drawer As groupContainer.manualLayoutContainer:
+        DropShadow: =DropShadow.Light
+        Fill: =RGBA(0,0,0,0.25)
+        Height: =App.Height
+        LayoutGridColumnMinWidth: =0
+        LayoutGridColumns: =6
+        LayoutGridRowMinHeight: =0
+        LayoutGridRows: =6
+        RadiusBottomLeft: =4
+        RadiusBottomRight: =4
+        RadiusTopLeft: =4
+        RadiusTopRight: =4
+        Visible: =comp_DetailDrawer.IsOpen
+        Width: =App.Width
+        ZIndex: =2
+
+        comp_DetailDrawer As cmp_DetailDrawer_old:
+            ChildTabPriority: =true
+            CloseAction: =Set(varShowDetailDrawer, false)
+            ContentLanguage: =""
+            EnableChildFocus: =true
+            FormCodeText: |-
+                =
+                
+                Coalesce(
+                    varDrawerNormalized.TitleValue,
+                    "Record " & Text(varDrawerRecordId)
+                )
+            Height: =768
+            IsLoading: =varDrawerIsLoading
+            OnManageFieldsRequested: |-
+                =
+                Set(varCT_ShowManageFields, true);
+                
+                Set(varCT_DefsSearch, "");
+                
+                Set(varCT_DefsError, "");
+                
+                Select(btnCT_LoadDefs)
+            OnSaveCustomField: =Select(btnCT_SaveFieldDef);
+            OnSaved: =
+            OnToggleFieldActiveRequested: =Select(btnCT_SetActive)
+            StatusText: |-
+                =Coalesce(
+                    varDrawerNormalized.StatusValue,
+                    ""
+                )
+            Visible: =varShowDetailDrawer
+            Width: =App.Width
+
+        btnDrawerLoad_Custom As Button:
+            BasePaletteColor: =
+            BorderColor: =
+            DisplayMode: =DisplayMode.Edit
+            FontColor: =
+            Height: =32
+            OnSelect: |-
+                =
+                
+                Set(varCT_Loading, true);
+                Set(varCT_Error, "");
+                
+                // Limpieza
+                Clear(colCT_Quick);
+                Clear(colCT_Merged_Base);
+                Clear(colCT_Merged_UI);
+                
+                // Llamada al flow
+                With(
+                    {
+                        resp: WarRoom_GetCustomBundle.Run(
+                            comp_DetailDrawer.ProjectId,
+                            comp_DetailDrawer.EntityType,
+                            comp_DetailDrawer.RecordId
+                        )
+                    },
+                
+                    With(
+                        {
+                            parsed: ParseJSON(Coalesce(resp.bundlejson, "{}"))
+                        },
+                
+                        // Base (defs)
+                        ClearCollect(
+                            colCT_Merged_Base,
+                            ForAll(
+                                Table(parsed.defs),
+                                {
+                                    FieldKey: Text(ThisRecord.Value.FieldKey),
+                                    Label: Text(ThisRecord.Value.Label),
+                                    FieldType: Text(ThisRecord.Value.FieldType),
+                                    IsRequired: Boolean(ThisRecord.Value.IsRequired),
+                                    IsPinned: Boolean(ThisRecord.Value.IsPinned),
+                                    SortOrder: Value(ThisRecord.Value.SortOrder),
+                                    OptionsJson: Text(ThisRecord.Value.OptionsJson)
+                                }
+                            )
+                        );
+                
+                        // Valores (values)
+                        ClearCollect(
+                            colCT_Merged_UI,
+                            ForAll(
+                                Table(parsed.values),
+                                {
+                                    FieldKey: Text(ThisRecord.Value.FieldKey),
+                                    ValueText: Text(ThisRecord.Value.ValueText),
+                                    ValueNumber: Value(ThisRecord.Value.ValueNumber),
+                                    ValueDate: If(
+                                        !IsBlank(ThisRecord.Value.ValueDate),
+                                        DateTimeValue(Text(ThisRecord.Value.ValueDate)),
+                                        Blank()
+                                    ),
+                                    ValueBool: Boolean(ThisRecord.Value.ValueBool)
+                                }
+                            )
+                        )
+                    )
+                );
+                
+                // Merge final (lo que pinta la UI)
+                ClearCollect(
+                    colCT_Quick,
+                    AddColumns(
+                        colCT_Merged_Base,
+                        'CurrentValue',
+                        LookUp(colCT_Merged_UI, FieldKey = ThisRecord.FieldKey)
+                    )
+                );
+                
+                Set(varCT_Loading, false);
+            Visible: =false
+            Width: =96
+            X: =60
+            Y: =60
+            ZIndex: =2
+
+        btnDrawerLoad_Comments As Button:
+            BasePaletteColor: =
+            BorderColor: =
+            DisplayMode: =DisplayMode.Edit
+            FontColor: =
+            Height: =32
+            OnSelect: |-
+                =Set(varIsLoadingComments, true);
+                
+                Set(varCommentsPage, 1);
+                Set(varCommentsPageSize, Coalesce(varCommentsPageSize, 20));
+                
+                With(
+                    {
+                        resp: Warroom_GetTaskCommentsPaged.Run(
+                            varProjectId,
+                            varDrawerRecordId,
+                            varCommentsPage,
+                            varCommentsPageSize,
+                            varDrawerEntityType
+                        )
+                    },
+                    With(
+                        {
+                            arr: Table(ParseJSON(Coalesce(resp.result, "[]")))
+                        },
+                        ClearCollect(
+                            colComments,
+                            ForAll(
+                                arr,
+                                {
+                                    CommentId: Value(ThisRecord.Value.CommentId),
+                                    CommentText: Text(ThisRecord.Value.CommentText),
+                                    CommentType: Text(ThisRecord.Value.CommentType),
+                                    CreatedOn: DateTimeValue(Text(ThisRecord.Value.CreatedOn)),
+                                    CreatedByEmail: Text(ThisRecord.Value.CreatedByEmail),
+                                    CreatedByName: Text(ThisRecord.Value.CreatedByName),
+                                    TotalRows: Value(ThisRecord.Value.TotalRows),
+                                    TotalPages: Value(ThisRecord.Value.TotalPages),
+                                    PageNumber: Value(ThisRecord.Value.PageNumber),
+                                    PageSize: Value(ThisRecord.Value.PageSize)
+                                }
+                            )
+                        )
+                    )
+                );
+                
+                Set(varCommentsTotalRows, If(CountRows(colComments) > 0, First(colComments).TotalRows, 0));
+                Set(varCommentsTotalPages, If(CountRows(colComments) > 0, First(colComments).TotalPages, 0));
+                
+                Set(varIsLoadingComments, false);
+                Set(varDrawerIsLoading, false);
+            Visible: =false
+            Width: =96
+            X: =80
+            Y: =80
+            ZIndex: =3
+
+        btnDrawerLoad As Button:
+            AcceptsFocus: =true
+            AccessibleLabel: =""
+            Align: =""
+            Appearance: ="Primary"
+            BasePaletteColor: =
+            BorderColor: =
+            BorderStyle: =""
+            ContentLanguage: =""
+            DisplayMode: =DisplayMode.Edit
+            Font: =""
+            FontColor: =
+            FontItalic: =false
+            FontSize: =0
+            FontStrikethrough: =false
+            FontUnderline: =false
+            FontWeight: =""
+            Height: =32
+            Icon: =""
+            IconRotation: =0
+            IconStyle: ="Outline"
+            Layout: ="Icon before"
+            OnSelect: |-
+                =Set(varDrawerIsLoading, true);
+                
+                Switch(
+                    varDrawerTab,
+                    "Comments", Select(btnDrawerLoad_Comments),
+                    "Custom", Select(btnDrawerLoad_Custom),
+                    "Overview", Set(varDrawerIsLoading, false),
+                    "History", Set(varDrawerIsLoading, false),
+                    Set(varDrawerIsLoading, false)
+                );
+            TabIndex: =0
+            Text: ="Button"
+            Tooltip: =""
+            VerticalAlign: =""
+            Visible: =false
+            Width: =96
+            X: =40
+            Y: =40
+            ZIndex: =4
+
+        btnDrawerRefreshFromTab As Button:
+            BasePaletteColor: =
+            BorderColor: =
+            DisplayMode: =DisplayMode.Edit
+            FontColor: =
+            Height: =32
+            OnSelect: |-
+                =
+                Set(varDrawerTab, "Custom");
+                Select(btnDrawerLoad_Custom)
+            Visible: =false
+            Width: =96
+            X: =0
+            Y: =0
+            ZIndex: =5
+
+        btnCT_LoadDefs As Button:
+            BasePaletteColor: =
+            BorderColor: =
+            DisplayMode: =DisplayMode.Edit
+            FontColor: =
+            Height: =32
+            OnSelect: |-
+                =
+                Set(varCT_DefsIsLoading, true);
+                Set(varCT_DefsError, "");
+                
+                Clear(colCT_Defs_Admin);
+                
+                Set(
+                    varCT_DefsResp,
+                    WarRoom_ListCustomFieldDefs.Run(
+                        comp_DetailDrawer.ProjectId,
+                        comp_DetailDrawer.EntityType,
+                        If(varCT_ShowInactiveDefs, 1, 0)
+                    )
+                );
+                
+                
+                Set(
+                    varCT_DefsOuter,
+                    Table(ParseJSON(Coalesce(varCT_DefsResp.result, "[]")))
+                );
+                
+                If(
+                    CountRows(varCT_DefsOuter) = 0,
+                
+                    Set(varCT_DefsError, "The flow returned no data."),
+                
+                    Set(
+                        varCT_DefsBundle,
+                        ParseJSON(
+                            Text(First(varCT_DefsOuter).Value.result)
+                        )
+                    );
+                
+                    ClearCollect(
+                        colCT_Defs_Admin,
+                        ForAll(
+                            Table(varCT_DefsBundle.defs),
+                            {
+                                FieldDefId: Value(ThisRecord.Value.FieldDefId),
+                                ProjectId: Value(ThisRecord.Value.ProjectId),
+                                EntityType: Text(ThisRecord.Value.EntityType),
+                                FieldKey: Text(ThisRecord.Value.FieldKey),
+                                Label: Text(ThisRecord.Value.Label),
+                                FieldType: Text(ThisRecord.Value.FieldType),
+                                HelpText: Coalesce(Text(ThisRecord.Value.HelpText), ""),
+                                IsRequired: Boolean(ThisRecord.Value.IsRequired),
+                                IsPinned: Boolean(ThisRecord.Value.IsPinned),
+                                IsActive: Boolean(ThisRecord.Value.IsActive),
+                                SortOrder: Value(ThisRecord.Value.SortOrder),
+                                OptionsJson: Coalesce(Text(ThisRecord.Value.OptionsJson), ""),
+                                ModifiedOn: If(
+                                    IsBlank(Text(ThisRecord.Value.ModifiedOn)),
+                                    Blank(),
+                                    DateTimeValue(Text(ThisRecord.Value.ModifiedOn))
+                                ),
+                                ModifiedByEmail: Coalesce(Text(ThisRecord.Value.ModifiedByEmail), ""),
+                                IsFilterable: Boolean(ThisRecord.Value.IsFilterable),
+                                ShowInQuickFilters: Boolean(ThisRecord.Value.ShowInQuickFilters),
+                                FilterOrder: If(
+                                    IsBlank(Text(ThisRecord.Value.FilterOrder)),
+                                    Coalesce(Value(ThisRecord.Value.SortOrder), 1000),
+                                    Value(ThisRecord.Value.FilterOrder)
+                                ),
+                                FilterMode: Coalesce(Text(ThisRecord.Value.FilterMode), "Equals")
+                            }
+                        )
+                    )
+                );
+                
+                Set(varCT_DefsIsLoading, false);
+            Visible: =false
+            Width: =96
+            X: =100
+            Y: =100
+            ZIndex: =6
+
+        btnCT_SetActive As Button:
+            BasePaletteColor: =
+            BorderColor: =
+            DisplayMode: =DisplayMode.Edit
+            FontColor: =
+            Height: =32
+            OnSelect: |-
+                =
+                
+                With(
+                    {
+                        resp: WarRoom_SetCustomFieldActive.Run(
+                            comp_DetailDrawer.ProjectId,
+                            comp_DetailDrawer.EntityType,
+                            varCT_Toggle_FieldKey,
+                            varCT_Toggle_IsActive,
+                            comp_DetailDrawer.UserEmail
+                        )
+                    },
+                    Select(btnCT_LoadDefs);
+                    Select(btnDrawerLoad_Custom)
+                );
+            Visible: =false
+            Width: =96
+            X: =140
+            Y: =140
+            ZIndex: =8
+
+        btnCT_SaveFieldDef As Button:
+            BasePaletteColor: =
+            BorderColor: =
+            DisplayMode: =DisplayMode.Edit
+            FontColor: =
+            Height: =32
+            OnSelect: |-
+                =
+                If(
+                    IsBlank(Trim(varCT_Edit_Label)),
+                    Set(varCT_SaveField_Error, "Label is required.");
+                    Set(varCT_SaveField_IsLoading, false),
+                
+                    IsBlank(Trim(varCT_Edit_FieldKey)),
+                    Set(varCT_SaveField_Error, "Field key is required.");
+                    Set(varCT_SaveField_IsLoading, false),
+                
+                    !IsBlank(
+                        LookUp(
+                            colCT_Defs_Admin,
+                            Lower(Trim(FieldKey)) = Lower(Trim(varCT_Edit_FieldKey)) &&
+                            FieldDefId <> Coalesce(varCT_Edit_FieldDefId, 0)
+                        )
+                    ),
+                
+                    Set(varCT_SaveField_Error, "This Field Key already exists.");
+                    Set(varCT_SaveField_IsLoading, false);
+                    Notify("This Field Key already exists. Use another key or edit the existing field.", NotificationType.Error),
+                
+                    Value(varCT_Edit_SortOrder) <= 0,
+                    Set(varCT_SaveField_Error, "Sort order must be greater than zero.");
+                    Set(varCT_SaveField_IsLoading, false),
+                
+                    (varCT_Edit_FieldType = "Choice" || varCT_Edit_FieldType = "MultiChoice") && IsBlank(Trim(varCT_Edit_OptionsJson)),
+                    Set(varCT_SaveField_Error, "OptionsJson is required for Choice and MultiChoice fields.");
+                    Set(varCT_SaveField_IsLoading, false),
+                
+                    With(
+                        {
+                            resp: WarRoom_UpsertCustomFieldDef.Run(
+                                Coalesce(varCT_Edit_FieldDefId, 0),
+                                comp_DetailDrawer.ProjectId,
+                                comp_DetailDrawer.EntityType,
+                                Trim(varCT_Edit_Label),
+                                varCT_Edit_FieldType,
+                                Trim(varCT_Edit_HelpText),
+                                Value(varCT_Edit_SortOrder),
+                                If(IsBlank(Trim(varCT_Edit_OptionsJson)), " ", Trim(varCT_Edit_OptionsJson)),
+                                comp_DetailDrawer.UserEmail,
+                                Lower(Trim(varCT_Edit_FieldKey)),
+                                varCT_Edit_IsRequired,
+                                varCT_Edit_IsPinned,
+                                varCT_Edit_IsActive,
+                                varCT_Edit_IsFilterable,
+                varCT_Edit_ShowInQuickFilters,
+                Coalesce(varCT_Edit_FilterOrder, varCT_Edit_SortOrder, 1000),
+                Coalesce(varCT_Edit_FilterMode, "Equals")
+                            )
+                        },
+                        
+                        Set(varShowCustomAddFields, false);
+                        Set(varCT_SaveField_Error, "");
+                        Set(varCT_SaveField_IsLoading, false);
+                
+                        Select(btnCT_LoadDefs);
+                
+                        Set(varCT_LoadKey, "");
+                        Select(btnDrawerLoad_Custom);
+                
+                        Notify("Field definition saved successfully.", NotificationType.Success)
+                    )
+                )
+            Visible: =false
+            Width: =96
+            X: =160
+            Y: =160
+            ZIndex: =9
+
+    conHomeScreenRoot As groupContainer.horizontalAutoLayoutContainer:
+        DropShadow: =DropShadow.Light
+        Height: =App.Height
+        LayoutAlignItems: =LayoutAlignItems.Center
+        LayoutGridColumnMinWidth: =0
+        LayoutGridColumns: =6
+        LayoutGridRowMinHeight: =0
+        LayoutGridRows: =6
+        LayoutMode: =LayoutMode.Auto
+        Width: =App.Width
+        ZIndex: =3
+
+        cmp_NavApp As cmp_SidebarNav:
+            AppVersion: ="v1.0.0"
+            ChildTabPriority: =true
+            ContentLanguage: =""
+            EnableChildFocus: =true
+            Fill: =varTheme_PulseBlue
+            Height: =Parent.Height
+            Items: =colSidebarNavItems
+            LayoutMaxHeight: =0
+            LayoutMaxWidth: =0
+            LayoutMinHeight: =640
+            LayoutMinWidth: =640
+            NavItems: =colSidebarNavItems
+            OnSelectItem: |-
+                =
+                
+                With(
+                    {
+                        _key: Lower(Trim(Self.SelectedItemKey)),
+                        _hasProject: !IsBlank(varProjectId),
+                        _hasConfig: varProjectHasReportConfig || varHomeHiveLoaded || varProjectHasPHRData
+                    },
+                
+                    If(
+                        _key = "superadmin",
+                
+                        Set(varGlobalLoading, false);
+                        Set(varGlobalLoadingMsg, "");
+                        Set(varGlobalLoadingSubMsg, "");
+                        Set(varGlobalLoadingScope, "");
+                        Set(varGlobalLoadAction, "");
+                        Set(varGlobalLoadPending, false);
+                
+                        Set(varPHR_IsLoading, false);
+                        Set(varOps_IsLoading, false);
+                        Set(varTasks_IsLoading, false);
+                        Set(varPunches_IsLoading, false);
+                        Set(varCfg_IsLoading, false);
+                
+                        Set(varAppView, "SuperAdmin");
+                        Set(varPageKey, "SUPERADMIN");
+                        Set(varPageTitle, "Administration");
+                        Set(varPageSubtitle, "Platform configuration and governance");
+                
+                        Navigate(scr_SuperAdmin, ScreenTransition.None),
+                
+                        If(
+                            _key <> "home" && !_hasProject,
+                
+                            Notify("Please select a project first.", NotificationType.Warning);
+                
+                            Set(varAppView, "Home");
+                            Set(varPageKey, "HOME");
+                            Set(varPageTitle, "Home");
+                            Set(varPageSubtitle, "Project command center");
+                
+                            Navigate(scr_Home, ScreenTransition.None),
+                
+                            If(
+                                _key in ["overview", "tasks", "punches", "briefing", "config", "skyline"] && !_hasConfig,
+                
+                                Notify(
+                                    "This project has no published report configuration yet.",
+                                    NotificationType.Warning
+                                );
+                
+                                Set(varAppView, "Home");
+                                Set(varPageKey, "HOME");
+                                Set(varPageTitle, "Home");
+                                Set(varPageSubtitle, "Project command center");
+                
+                                Navigate(scr_Home, ScreenTransition.None),
+                
+                                Switch(
+                                    _key,
+                
+                                    "skyline",
+                                    Set(varAppView, "Skyline");
+                                    Set(varPageKey, "SKYLINE");
+                                    Set(varPageTitle, "Delivery Skyline");
+                                    Set(varPageSubtitle, "Weekly subsystem delivery risk and workload forecast");
+                                    Set(varSkylineLoaded, false);
+                                    Set(varSkylineError, "");
+                                    Clear(colSkylineRaw);
+                                    Clear(colSkylineWeeks);
+                                    Clear(colSkylineSelectedWeek);
+                
+                                    Navigate(scr_Skyline, ScreenTransition.None),
+                
+                                    
+                                    "home",
+                                        Set(varGlobalLoading, false);
+                                        Set(varGlobalLoadingMsg, "");
+                                        Set(varGlobalLoadingSubMsg, "");
+                                        Set(varGlobalLoadingScope, "");
+                                        Set(varGlobalLoadAction, "");
+                                        Set(varGlobalLoadPending, false);
+                
+                                        Set(varPHR_IsLoading, false);
+                                        Set(varOps_IsLoading, false);
+                                        Set(varTasks_IsLoading, false);
+                                        Set(varPunches_IsLoading, false);
+                                        Set(varCfg_IsLoading, false);
+                
+                                        Set(varAppView, "Home");
+                                        Set(varPageKey, "HOME");
+                                        Set(varPageTitle, "Home");
+                                        Set(varPageSubtitle, "Project command center");
+                                        Set(varHomeViewMode, "DASHBOARD");
+                
+                                        Navigate(scr_Home, ScreenTransition.None),
+                
+                                    "overview",
+                                        Set(varAppView, "Overview");
+                                        Set(varPageKey, "OVERVIEW");
+                                        Set(varPageTitle, "Overview");
+                                        Set(varPageSubtitle, "Project Handover Report by subsystem, discipline and form family");
+                                        Set(varOps_ViewMode, "OVERVIEW");
+                
+                                        Navigate(scr_Overview, ScreenTransition.None),
+                
+                
+                
+                                    "tasks",
+                                        Set(varAppView, "Tasks");
+                                        Set(varPageKey, "TASKS");
+                                        Set(varPageTitle, "Tasks");
+                                        Set(varPageSubtitle, "Inspection task management");
+                
+                                        Navigate(scr_Tasks, ScreenTransition.None),
+                
+                                    "punches",
+                                        Set(varAppView, "Punches");
+                                        Set(varPageKey, "PUNCHES");
+                                        Set(varPageTitle, "Punch List");
+                                        Set(varPageSubtitle, "Punch item management");
+                
+                                        Navigate(scr_Punches, ScreenTransition.None),
+                
+                                    "briefing",
+                                        Set(varAppView, "Briefing");
+                                        Set(varPageKey, "BRIEFING");
+                                        Set(varPageTitle, "Briefing");
+                                        Set(varPageSubtitle, "Project reporting and communication");
+                
+                                        Navigate(scr_Briefing, ScreenTransition.None),
+                
+                                    "config",
+                                        Set(varAppView, "Config");
+                                        Set(varPageKey, "CONFIG");
+                                        Set(varPageTitle, "Configuration");
+                                        Set(varPageSubtitle, "Report structure and scope management");
+                
+                                        Navigate(scr_Config_NEW, ScreenTransition.None),
+                
+                                    Notify("Key not mapped: [" & _key & "]", NotificationType.Error)
+                                )
+                            )
+                        )
+                    )
+                )
+            OnToggleCollapse: =
+            ProjectCode: =Coalesce(Text(varSelectedProject.ProjectCode), "")
+            ProjectName: =Coalesce(varSelectedProject.ProjectName, "")
+            Visible: =true
+
+        conHomeContent As groupContainer.horizontalAutoLayoutContainer:
+            Fill: =varTheme_PageBg
+            Height: =App.Height
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGridColumnMinWidth: =0
+            LayoutGridColumns: =6
+            LayoutGridRowMinHeight: =0
+            LayoutGridRows: =6
+            LayoutMaxHeight: =0
+            LayoutMaxWidth: =0
+            LayoutMinHeight: =16
+            LayoutMinWidth: =16
+            LayoutMode: =LayoutMode.Auto
+            Width: =App.Width - cmp_NavApp.Width
+            ZIndex: =2
+
+            con_Home As groupContainer.verticalAutoLayoutContainer:
+                Fill: =varTheme_PageBg
+                LayoutAlignItems: =LayoutAlignItems.Center
+                LayoutDirection: =LayoutDirection.Vertical
+                LayoutGridColumnMinWidth: =0
+                LayoutGridColumns: =6
+                LayoutGridRowMinHeight: =0
+                LayoutGridRows: =6
+                LayoutMaxHeight: =0
+                LayoutMaxWidth: =0
+                LayoutMinHeight: =16
+                LayoutMinWidth: =16
+                LayoutMode: =LayoutMode.Auto
+                Visible: =varView_Home
+                ZIndex: =2
+
+                conView_Home_Header As groupContainer.horizontalAutoLayoutContainer:
+                    BorderColor: =RGBA(0, 0, 0, 0)
+                    BorderStyle: =BorderStyle.None
+                    Fill: =varTheme_PageBg
+                    FillPortions: =0
+                    Height: =56
+                    LayoutAlignItems: =LayoutAlignItems.Center
+                    LayoutGridColumnMinWidth: =0
+                    LayoutGridColumns: =6
+                    LayoutGridRowMinHeight: =0
+                    LayoutGridRows: =6
+                    LayoutMaxHeight: =0
+                    LayoutMaxWidth: =0
+                    LayoutMinHeight: =16
+                    LayoutMinWidth: =16
+                    LayoutMode: =LayoutMode.Auto
+                    PaddingBottom: =8
+                    PaddingLeft: =20
+                    PaddingRight: =24
+                    PaddingTop: =8
+                    X: =40
+                    Y: =40
+                    ZIndex: =1
+
+                    lblHomeTitle As modernText:
+                        BorderStyle: =""
+                        Color: =varTheme_Text
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =Parent.Height
+                        LayoutMaxHeight: =0
+                        LayoutMaxWidth: =0
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        PaddingBottom: =0
+                        PaddingLeft: =10
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        RadiusBottomLeft: =0
+                        RadiusBottomRight: =0
+                        RadiusTopLeft: =0
+                        RadiusTopRight: =0
+                        Size: =22
+                        Text: ="Home"
+                        Width: =90
+                        X: =40
+                        Y: =40
+                        ZIndex: =1
+
+                conExecutiveHeader As groupContainer.horizontalAutoLayoutContainer:
+                    BorderColor: =
+                    BorderStyle: =BorderStyle.None
+                    Fill: =varTheme_PageBg
+                    FillPortions: =0
+                    Height: =90
+                    LayoutAlignItems: =LayoutAlignItems.Center
+                    LayoutGap: =16
+                    LayoutGridColumnMinWidth: =0
+                    LayoutGridColumns: =6
+                    LayoutGridRowMinHeight: =0
+                    LayoutGridRows: =6
+                    LayoutMaxHeight: =0
+                    LayoutMaxWidth: =0
+                    LayoutMinHeight: =16
+                    LayoutMinWidth: =16
+                    LayoutMode: =LayoutMode.Auto
+                    PaddingBottom: =8
+                    PaddingLeft: =8
+                    PaddingRight: =24
+                    PaddingTop: =8
+                    Width: =Parent.Width
+                    ZIndex: =2
+
+                    conProjectSelectorCard As groupContainer.manualLayoutContainer:
+                        BorderColor: =varTheme_Border
+                        BorderThickness: =1
+                        Fill: =varTheme_Surface
+                        FillPortions: =0
+                        Height: =68
+                        LayoutGridColumnMinWidth: =0
+                        LayoutGridColumns: =6
+                        LayoutGridRowMinHeight: =0
+                        LayoutGridRows: =6
+                        LayoutMaxHeight: =0
+                        LayoutMaxWidth: =0
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        PaddingLeft: =12
+                        PaddingRight: =12
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                        Width: =440
+                        ZIndex: =1
+
+                        cmbHome_ProjectSelector As modernCombobox:
+                            Appearance: =Appearance.FilledDarker
+                            BorderStyle: =""
+                            BorderThickness: =0
+                            Color: =varTheme_Text
+                            DefaultSelectedItems: |-
+                                =
+                                
+                                If(
+                                    IsBlank(varProjectId),
+                                    [],
+                                    Filter(
+                                        colEnabledProjectsUI,
+                                        Value(ProjectId) = Value(varProjectId)
+                                    )
+                                )
+                            Fill: =Color.Transparent
+                            Font: =""
+                            FontWeight: =FontWeight.Bold
+                            InputTextPlaceholder: ="Select Project"
+                            IsSearchable: =false
+                            ItemDisplayText: =ThisItem.ProjectDisplayName
+                            Items: =colEnabledProjectsUI
+                            OnChange: |-
+                                =
+                                
+                                
+                                If(
+                                    !IsBlank(Self.Selected.ProjectId),
+                                
+                                    Set(varPendingProjectId, Value(Self.Selected.ProjectId));
+                                
+                                    Set(varGlobalLoading, true);
+                                    Set(varGlobalLoadingMsg, "Changing project...");
+                                    Set(varGlobalLoadingSubMsg, "Preparing project dashboard");
+                                    Set(varGlobalLoadingScope, "HOME");
+                                
+                                    Set(varProjectSwitching, true);
+                                    Set(varHomeLoading, false);
+                                
+                                    Set(varGlobalLoadAction, "PROJECT_CHANGE");
+                                    Set(varGlobalLoadPending, true)
+                                )
+                            RadiusBottomLeft: =4
+                            RadiusBottomRight: =4
+                            RadiusTopLeft: =4
+                            RadiusTopRight: =4
+                            Required: =false
+                            SelectMultiple: =false
+                            ValidationState: =ValidationState.None
+                            Width: = Parent.Width - 64
+                            X: =47
+                            Y: =25
+                            ZIndex: =153
+
+                        Icon16 As icon.Folder:
+                            BorderColor: =RGBA(0, 0, 0, 0)
+                            Color: |-
+                                =ColorValue("#0B5ED7")
+                            DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                            DisabledColor: =RGBA(225, 223, 221, 1)
+                            DisabledFill: =RGBA(0, 0, 0, 0)
+                            FocusedBorderThickness: =4
+                            Height: =24
+                            HoverBorderColor: =RGBA(0, 0, 0, 0)
+                            HoverColor: =RGBA(16, 110, 190, 1)
+                            HoverFill: =RGBA(0, 0, 0, 0)
+                            Icon: =Icon.Folder
+                            PressedBorderColor: =RGBA(0, 0, 0, 0)
+                            PressedColor: =RGBA(16, 110, 190, 1)
+                            PressedFill: =RGBA(0, 0, 0, 0)
+                            Width: =24
+                            X: =18
+                            Y: =25
+                            ZIndex: =154
+
+                        Text38 As modernText:
+                            Color: =varTheme_TextMuted
+                            Height: =24
+                            Size: =10
+                            Text: ="Project"
+                            Width: =220
+                            X: =56
+                            Y: =8
+                            ZIndex: =155
+
+                    conHome_RefreshCard As groupContainer.manualLayoutContainer:
+                        BorderColor: =varTheme_Border
+                        BorderThickness: =1
+                        Fill: =varTheme_Surface
+                        FillPortions: =0
+                        Height: =72
+                        LayoutGridColumnMinWidth: =0
+                        LayoutGridColumns: =6
+                        LayoutGridRowMinHeight: =0
+                        LayoutGridRows: =6
+                        LayoutMaxHeight: =0
+                        LayoutMaxWidth: =0
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        RadiusBottomLeft: =12
+                        RadiusBottomRight: =12
+                        RadiusTopLeft: =12
+                        RadiusTopRight: =12
+                        Width: =280
+                        ZIndex: =172
+
+                        lblExecLastRefresh As modernText:
+                            BorderStyle: =""
+                            Color: =varTheme_Text
+                            Font: =""
+                            FontWeight: =FontWeight.Semibold
+                            Size: =12
+                            Text: |-
+                                =
+                                If(
+                                    IsBlank(varHomeLastRefresh),
+                                    "--",
+                                    Text(varHomeLastRefresh, "dd/mm/yyyy hh:mm")
+                                )
+                            Width: =130
+                            X: =16
+                            Y: =28
+                            ZIndex: =173
+
+                        btnHomeRefreshData As modernButton:
+                            Appearance: ='ButtonCanvas.Appearance'.Secondary
+                            BasePaletteColor: |-
+                                =ColorValue("#0B5ED7")
+                            BorderStyle: =""
+                            DisplayMode: |-
+                                =
+                                
+                                If(
+                                    IsBlank(varProjectId) || varGlobalLoading || varHomeLoading || varProjectSwitching,
+                                    DisplayMode.Disabled,
+                                    DisplayMode.Edit
+                                )
+                            Font: =""
+                            Height: =36
+                            Icon: ="ArrowClockwise"
+                            OnSelect: |-
+                                =
+                                
+                                If(
+                                    IsBlank(varProjectId),
+                                
+                                    Notify("Please select a project first.", NotificationType.Warning),
+                                
+                                    Set(varGlobalLoading, true);
+                                    Set(varGlobalLoadingMsg, "Refreshing dashboard...");
+                                    Set(varGlobalLoadingSubMsg, "Updating operational data");
+                                    
+                                    Set(varGlobalLoadingScope, "HOME");
+                                
+                                    Set(varHomeLoading, false);
+                                    Set(varProjectSwitching, false);
+                                
+                                    Set(varGlobalLoadAction, "LOAD_HOME");
+                                    Set(varGlobalLoadPending, true)
+                                )
+                            RadiusBottomLeft: =10
+                            RadiusBottomRight: =10
+                            RadiusTopLeft: =10
+                            RadiusTopRight: =10
+                            Size: =0
+                            Text: |-
+                                =If(
+                                    varHomeLoading || varProjectSwitching,
+                                    "Loading...",
+                                    "Refresh"
+                                )
+                            Visible: =!varGlobalLoading
+                            Width: =110
+                            X: =Parent.Width - Self.Width - 16
+                            Y: =19
+                            ZIndex: =174
+
+                        lblOverviewRefreshTitle_1 As modernText:
+                            BorderStyle: =""
+                            Color: =varTheme_TextMuted
+                            Font: =""
+                            Size: =10
+                            Text: ="Last Refresh"
+                            X: =16
+                            Y: =10
+                            ZIndex: =175
+
+                conHomeShell As groupContainer.horizontalAutoLayoutContainer:
+                    Fill: =varTheme_PageBg
+                    Height: =Parent.Height
+                    LayoutAlignItems: =LayoutAlignItems.Center
+                    LayoutGap: =10
+                    LayoutGridColumnMinWidth: =0
+                    LayoutGridColumns: =6
+                    LayoutGridRowMinHeight: =0
+                    LayoutGridRows: =6
+                    LayoutMaxHeight: =0
+                    LayoutMaxWidth: =0
+                    LayoutMinHeight: =16
+                    LayoutMinWidth: =16
+                    LayoutMode: =LayoutMode.Auto
+                    PaddingBottom: =8
+                    PaddingLeft: =10
+                    PaddingRight: =8
+                    PaddingTop: =8
+                    ZIndex: =3
+
+                    conHomeMain As groupContainer.manualLayoutContainer:
+                        Fill: =varTheme_PageBg
+                        FillPortions: =0
+                        Height: =Parent.Height - Parent.PaddingTop - Parent.PaddingBottom
+                        LayoutGridColumnMinWidth: =0
+                        LayoutGridColumns: =6
+                        LayoutGridRowMinHeight: =0
+                        LayoutGridRows: =6
+                        LayoutMaxHeight: =0
+                        LayoutMaxWidth: =0
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        RadiusBottomLeft: =4
+                        RadiusBottomRight: =4
+                        RadiusTopLeft: =4
+                        RadiusTopRight: =4
+                        Width: =Parent.Width - 380
+                        ZIndex: =1
+
+                        cntHome_HiveGridArea As groupContainer.manualLayoutContainer:
+                            BorderStyle: =BorderStyle.None
+                            Height: =Parent.Height
+                            LayoutGridColumnMinWidth: =0
+                            LayoutGridColumns: =6
+                            LayoutGridRowMinHeight: =0
+                            LayoutGridRows: =6
+                            RadiusBottomLeft: =4
+                            RadiusBottomRight: =4
+                            RadiusTopLeft: =4
+                            RadiusTopRight: =4
+                            Width: =Parent.Width
+                            ZIndex: =1
+
+                            galHomeHiveNodes As gallery.galleryVertical:
+                                '#CopilotOverlayLabel': ="Filtered"
+                                BorderColor: =RGBA(245, 245, 245, 1)
+                                DelayItemLoading: =true
+                                Height: =Parent.Height - Self.Y - 16
+                                Items: |+
+                                    =
+                                    
+                                        colHomeHiveNodesSorted
+                                    
+                                Layout: =Layout.Vertical
+                                LoadingSpinner: =LoadingSpinner.Data
+                                NavigationStep: =2
+                                ShowNavigation: =true
+                                ShowScrollbar: =false
+                                TemplatePadding: =8
+                                TemplateSize: =220
+                                Transition: =Transition.Pop
+                                Visible: |-
+                                    =varHomeShowCards &&
+                                    !varHomeLoading &&
+                                    CountRows(colHomeHiveNodesSorted) > 0
+                                Width: =Parent.Width
+                                WrapCount: |-
+                                    =
+                                    If(
+                                        Parent.Width >= 1180,
+                                        4,
+                                        Parent.Width >= 900,
+                                        3,
+                                        Parent.Width >= 620,
+                                        2,
+                                        1
+                                    )
+                                Y: =conHome_DisciplinesOverview.Y + conHome_DisciplinesOverview.Height + 18
+                                ZIndex: =1
+
+                                conNodeCard As groupContainer.manualLayoutContainer:
+                                    BorderColor: |-
+                                        =
+                                        
+                                        
+                                        If(
+                                            varSelectedHiveNode.NodeId = ThisItem.NodeId,
+                                            varTheme_PulseBlue,
+                                            ColorValue("#E7EDF5")
+                                        )
+                                    BorderThickness: |-
+                                        =
+                                        If(
+                                            varSelectedHiveNode.NodeId = ThisItem.NodeId,
+                                            2,
+                                            1
+                                        )
+                                    DropShadow: |-
+                                        =
+                                        If(
+                                            varSelectedHiveNode.NodeId = ThisItem.NodeId,
+                                            DropShadow.Regular,
+                                            DropShadow.Semilight
+                                        )
+                                    Fill: =varTheme_Surface
+                                    Height: =204
+                                    LayoutGridColumnMinWidth: =0
+                                    LayoutGridColumns: =6
+                                    LayoutGridRowMinHeight: =0
+                                    LayoutGridRows: =6
+                                    RadiusBottomLeft: =18
+                                    RadiusBottomRight: =18
+                                    RadiusTopLeft: =18
+                                    RadiusTopRight: =18
+                                    Width: =Min(315, Parent.TemplateWidth - 14)
+                                    X: =(Parent.TemplateWidth - Self.Width) / 2
+                                    Y: =8
+                                    ZIndex: =1
+
+                                    recNodeHeaderBg As rectangle:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =2
+                                        DisabledFill: =RGBA(161, 159, 157, 1)
+                                        Fill: |-
+                                            =ColorValue("#FBFCFE")
+                                        FocusedBorderThickness: =4
+                                        Height: =52
+                                        HoverFill: =RGBA(0, 120, 212, 1)
+                                        PressedFill: =RGBA(0, 120, 212, 1)
+                                        Width: =Parent.Width
+                                        ZIndex: =1
+
+                                    Text10 As modernText:
+                                        Align: =Align.Center
+                                        BorderStyle: =""
+                                        Color: |-
+                                            =ColorValue("#EF4444")
+                                        Fill: |-
+                                            =ColorValue("#FEECEC")
+                                        Font: =""
+                                        FontWeight: =FontWeight.Bold
+                                        Height: =28
+                                        RadiusBottomLeft: =10
+                                        RadiusBottomRight: =10
+                                        RadiusTopLeft: =10
+                                        RadiusTopRight: =10
+                                        Size: =10
+                                        Text: =ThisItem.NodeNo
+                                        Width: =44
+                                        X: =16
+                                        Y: =15
+                                        ZIndex: =2
+
+                                    Text21 As modernText:
+                                        AutoHeight: =true
+                                        BorderStyle: =""
+                                        Color: =varTheme_Text
+                                        Font: =""
+                                        FontWeight: =FontWeight.Semibold
+                                        Height: =26
+                                        Size: =18
+                                        Text: |-
+                                            =If(
+                                                Len(Proper(ThisItem.NodeTitle)) > 15,
+                                                Left(Proper(ThisItem.NodeTitle), 14) & "…",
+                                                Proper(ThisItem.NodeTitle)
+                                            )
+                                        Width: =Parent.Width - 180
+                                        Wrap: =false
+                                        X: =68
+                                        Y: =9
+                                        ZIndex: =3
+
+                                    Text19 As modernText:
+                                        Align: =Align.Center
+                                        BorderStyle: =""
+                                        Color: |-
+                                            =
+                                            
+                                            Switch(
+                                                ThisItem.ProgressStatus,
+                                                "Delayed", varTheme_Red,
+                                                "At Risk", varTheme_Amber,
+                                                "In Progress", varTheme_PulseBlueDark,
+                                                "Completed", varTheme_Green,
+                                                varTheme_TextMuted
+                                            )
+                                        Fill: |-
+                                            =
+                                            
+                                            Switch(
+                                                ThisItem.ProgressStatus,
+                                                "Delayed", ColorFade(varTheme_Red, 85%),
+                                                "At Risk", ColorFade(varTheme_Amber, 85%),
+                                                "In Progress", ColorFade(varTheme_PulseBlue, 85%),
+                                                "Completed", ColorFade(varTheme_Green, 85%),
+                                                varTheme_SurfaceAlt
+                                            )
+                                        Font: =""
+                                        FontWeight: =FontWeight.Semibold
+                                        Height: =24
+                                        RadiusBottomLeft: =999
+                                        RadiusBottomRight: =999
+                                        RadiusTopLeft: =999
+                                        RadiusTopRight: =999
+                                        Size: =9
+                                        Text: |-
+                                            =Switch(
+                                                ThisItem.ProgressStatus,
+                                                "Delayed", "⚠  Delayed",
+                                                "At Risk", "⚠  At Risk",
+                                                "In Progress", "●  In Progress",
+                                                "Completed", "✓  Completed",
+                                                ThisItem.ProgressStatus
+                                            )
+                                        Width: =96
+                                        X: =Parent.Width - 112
+                                        Y: =16
+                                        ZIndex: =4
+
+                                    Text20 As modernText:
+                                        AutoHeight: =true
+                                        BorderStyle: =""
+                                        Color: =varTheme_Text
+                                        Fill: =RGBA(0,0,0,0)
+                                        Font: =""
+                                        FontWeight: =FontWeight.Semibold
+                                        Height: =20
+                                        OnSelect: =
+                                        RadiusBottomLeft: =12
+                                        RadiusBottomRight: =12
+                                        RadiusTopLeft: =12
+                                        RadiusTopRight: =12
+                                        Size: =10
+                                        Text: |-
+                                            =Text(ThisItem.Remaining, "[$-en-US]#,##0") & " remaining"
+                                        Width: =Parent.Width - 146
+                                        X: =132
+                                        Y: =82
+                                        ZIndex: =5
+
+                                    Text32 As modernText:
+                                        AutoHeight: =true
+                                        BorderStyle: =""
+                                        Color: =varTheme_Green
+                                        Fill: =RGBA(0,0,0,0)
+                                        Font: =""
+                                        FontWeight: =FontWeight.Semibold
+                                        Height: =20
+                                        OnSelect: =
+                                        RadiusBottomLeft: =12
+                                        RadiusBottomRight: =12
+                                        RadiusTopLeft: =12
+                                        RadiusTopRight: =12
+                                        Size: =10
+                                        Text: |-
+                                            =Text(ThisItem.Done, "[$-en-US]#,##0") & " done"
+                                        Width: =Parent.Width - 146
+                                        X: =132
+                                        Y: =108
+                                        ZIndex: =6
+
+                                    Text37 As modernText:
+                                        Align: =Align.Center
+                                        AutoHeight: =true
+                                        BorderStyle: =""
+                                        Color: |-
+                                            =ColorValue("#94A3B8")
+                                        Font: =""
+                                        Height: =14
+                                        OnSelect: =
+                                        Size: =8
+                                        Text: ="TOTAL"
+                                        Width: =Parent.Width / 3
+                                        Y: =175
+                                        ZIndex: =7
+
+                                    Text33 As modernText:
+                                        Align: =Align.Center
+                                        AutoHeight: =true
+                                        BorderStyle: =""
+                                        Color: =varTheme_Text
+                                        Font: =""
+                                        FontWeight: =FontWeight.Bold
+                                        Height: =18
+                                        OnSelect: =
+                                        Size: =13
+                                        Text: |-
+                                            =Text(ThisItem.Total, "[$-en-US]#,##0")
+                                        Width: =Parent.Width / 3
+                                        Y: =158
+                                        ZIndex: =8
+
+                                    Text37_1 As modernText:
+                                        Align: =Align.Center
+                                        AutoHeight: =true
+                                        BorderStyle: =""
+                                        Color: |-
+                                            =ColorValue("#94A3B8")
+                                        Font: =""
+                                        Height: =14
+                                        OnSelect: =
+                                        Size: =8
+                                        Text: ="DONE"
+                                        Width: =Parent.Width / 3
+                                        X: =Parent.Width / 3
+                                        Y: =175
+                                        ZIndex: =9
+
+                                    Text34 As modernText:
+                                        Align: =Align.Center
+                                        BorderStyle: =""
+                                        Color: =varTheme_Green
+                                        Font: =""
+                                        FontWeight: =FontWeight.Bold
+                                        Height: =18
+                                        OnSelect: =
+                                        Size: =13
+                                        Text: =ThisItem.Done
+                                        Width: =Parent.Width / 3
+                                        X: =Parent.Width / 3
+                                        Y: =158
+                                        ZIndex: =10
+
+                                    Text37_2 As modernText:
+                                        Align: =Align.Center
+                                        AutoHeight: =true
+                                        BorderStyle: =""
+                                        Color: |-
+                                            =ColorValue("#94A3B8")
+                                        Font: =""
+                                        Height: =14
+                                        OnSelect: =
+                                        Size: =10
+                                        Text: ="REMAINING"
+                                        Width: =Parent.Width / 3
+                                        X: = Parent.Width * 2 / 3
+                                        Y: =175
+                                        ZIndex: =11
+
+                                    Text35 As modernText:
+                                        Align: =Align.Center
+                                        AutoHeight: =true
+                                        BorderStyle: =""
+                                        Color: |-
+                                            =If(
+                                                ThisItem.ProgressStatus = "Delayed",
+                                                varTheme_Red,
+                                                varTheme_Amber
+                                            )
+                                        Font: =""
+                                        FontWeight: =FontWeight.Bold
+                                        Height: =18
+                                        OnSelect: =
+                                        Size: =13
+                                        Text: =ThisItem.Remaining
+                                        Width: =Parent.Width / 3
+                                        X: = Parent.Width * 2 / 3
+                                        Y: =158
+                                        ZIndex: =12
+
+                                    imgNodeDonut As image:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =2
+                                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                                        DisabledFill: =RGBA(0, 0, 0, 0)
+                                        FocusedBorderThickness: =4
+                                        Height: =82
+                                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                        HoverFill: =RGBA(0, 0, 0, 0)
+                                        Image: |-
+                                            =
+                                            
+                                            With(
+                                                {
+                                                    svg:
+                                                    "<svg width='82' height='82' viewBox='0 0 82 82' xmlns='http://www.w3.org/2000/svg'>
+                                                        <circle cx='41' cy='41' r='30' fill='none' stroke='#E2E8F0' stroke-width='8'/>
+                                                        <circle cx='41' cy='41' r='30' fill='none' stroke='" & ThisItem.ProgressColor & "' stroke-width='8'
+                                                            stroke-dasharray='" & Text(ThisItem.Progress * 1.633) & " 163.3'
+                                                            stroke-linecap='round'
+                                                            transform='rotate(-90 41 41)'/>
+                                                        <text x='41' y='40' text-anchor='middle' font-size='14' font-weight='700' fill='#0F172A'>" & ThisItem.Progress & "%</text>
+                                                        <text x='41' y='56' text-anchor='middle' font-size='8' fill='#64748B'>Done</text>
+                                                    </svg>"
+                                                },
+                                                "data:image/svg+xml;utf8," & EncodeUrl(svg)
+                                            )
+                                        OnSelect: =
+                                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                                        PressedFill: =RGBA(0, 0, 0, 0)
+                                        Width: =82
+                                        X: =20
+                                        Y: =72
+                                        ZIndex: =13
+
+                                    Rectangle7 As rectangle:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =2
+                                        DisabledFill: =RGBA(161, 159, 157, 1)
+                                        Fill: |-
+                                            =ColorValue("#EDF2F7")
+                                        FocusedBorderThickness: =4
+                                        Height: =1
+                                        HoverFill: =RGBA(0, 120, 212, 1)
+                                        PressedFill: =RGBA(0, 120, 212, 1)
+                                        Width: =Parent.Width - 32
+                                        X: =16
+                                        Y: =158
+                                        ZIndex: =14
+
+                                    btnSelectNode As button:
+                                        BorderColor: =
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =0
+                                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                                        DisabledColor: =RGBA(161, 159, 157, 1)
+                                        DisabledFill: =RGBA(242, 242, 241, 0)
+                                        Fill: =RGBA(0,0,0,0)
+                                        Font: =Font.'Segoe UI'
+                                        FontWeight: =FontWeight.Semibold
+                                        Height: =Parent.Height
+                                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                        HoverColor: =RGBA(255, 255, 255, 1)
+                                        HoverFill: =RGBA(0,200,255,0.025)
+                                        OnSelect: |-
+                                            =
+                                            
+                                            Set(
+                                                varSelectedHiveNode,
+                                                {
+                                                    NodeId: Text(ThisItem.NodeId),
+                                                    NodeNo: Text(ThisItem.NodeNo),
+                                                    NodeTitle: Text(ThisItem.NodeTitle),
+                                                    NodeSubtitle: Text(ThisItem.NodeSubtitle),
+                                                    Discipline: Text(ThisItem.Discipline),
+                                                    SubsystemCode: Text(ThisItem.SubsystemCode),
+                                                    Total: Value(ThisItem.Total),
+                                                    Done: Value(ThisItem.Done),
+                                                    Remaining: Value(ThisItem.Remaining),
+                                                    Progress: Value(ThisItem.Progress),
+                                                    ProgressStatus: Text(ThisItem.ProgressStatus),
+                                                    ProgressColor: Text(ThisItem.ProgressColor),
+                                                    SortOrder: Value(ThisItem.SortOrder)
+                                                }
+                                            );
+                                            
+                                            Clear(colHomePendingSubsystems);
+                                            Clear(colHomePendingSubsystems_Staging);
+                                            
+                                            Set(varHomePendingError, "");
+                                            Set(varPendingSubsystemsLoading, false);
+                                            
+                                            Select(btnHome_LoadPendingSubsystems)
+                                        PressedBorderColor: =RGBA(0, 69, 120, 1)
+                                        PressedColor: =RGBA(255, 255, 255, 1)
+                                        PressedFill: =RGBA(0,200,255,0.06)
+                                        RadiusBottomLeft: =18
+                                        RadiusBottomRight: =18
+                                        RadiusTopLeft: =18
+                                        RadiusTopRight: =18
+                                        Size: =15
+                                        Text: =
+                                        Width: =Parent.Width
+                                        ZIndex: =15
+
+                                    recNodeAccent As rectangle:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =2
+                                        DisabledFill: =RGBA(161, 159, 157, 1)
+                                        Fill: |-
+                                            =Switch(
+                                                ThisItem.ProgressStatus,
+                                                "Delayed", varTheme_Red,
+                                                "At Risk", varTheme_Amber,
+                                                "In Progress", varTheme_PulseBlue,
+                                                "Completed", varTheme_Green,
+                                                varTheme_Border
+                                            )
+                                        FocusedBorderThickness: =4
+                                        Height: =3
+                                        HoverFill: =RGBA(0, 120, 212, 1)
+                                        PressedFill: =RGBA(0, 120, 212, 1)
+                                        Width: =48
+                                        X: =18
+                                        ZIndex: =16
+
+                                    recNodeHeaderDivider As rectangle:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =2
+                                        DisabledFill: =RGBA(161, 159, 157, 1)
+                                        Fill: |-
+                                            =ColorValue("#EDF2F7")
+                                        FocusedBorderThickness: =4
+                                        Height: =1
+                                        HoverFill: =RGBA(0, 120, 212, 1)
+                                        PressedFill: =RGBA(0, 120, 212, 1)
+                                        Width: =Parent.Width - 32
+                                        X: =16
+                                        Y: =56
+                                        ZIndex: =17
+
+                                    recNodeBodyDivider As rectangle:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =2
+                                        DisabledFill: =RGBA(161, 159, 157, 1)
+                                        Fill: |-
+                                            =ColorValue("#EDF2F7")
+                                        FocusedBorderThickness: =4
+                                        Height: =72
+                                        HoverFill: =RGBA(0, 120, 212, 1)
+                                        PressedFill: =RGBA(0, 120, 212, 1)
+                                        Width: =1
+                                        X: =116
+                                        Y: =74
+                                        ZIndex: =18
+
+                                    recNodeProgressTrack As rectangle:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =2
+                                        DisabledFill: =RGBA(161, 159, 157, 1)
+                                        Fill: |-
+                                            =ColorValue("#EEF3F8")
+                                        FocusedBorderThickness: =4
+                                        Height: =4
+                                        HoverFill: =RGBA(0, 120, 212, 1)
+                                        PressedFill: =RGBA(0, 120, 212, 1)
+                                        Width: =Parent.Width - 36
+                                        X: =18
+                                        Y: =198
+                                        ZIndex: =19
+
+                                    recNodeProgressValue As rectangle:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =2
+                                        DisabledFill: =RGBA(161, 159, 157, 1)
+                                        Fill: |-
+                                            =If(
+                                                IsBlank(ThisItem.ProgressColor),
+                                                varTheme_PulseBlue,
+                                                ColorValue(ThisItem.ProgressColor)
+                                            )
+                                        FocusedBorderThickness: =4
+                                        Height: =4
+                                        HoverFill: =RGBA(0, 120, 212, 1)
+                                        PressedFill: =RGBA(0, 120, 212, 1)
+                                        Width: = Max(4, (Parent.Width - 36) * Value(ThisItem.Progress) / 100)
+                                        X: =18
+                                        Y: =198
+                                        ZIndex: =20
+
+                                    "Icon2 As icon.'3DPrinting'":
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        Color: |-
+                                            =Switch(
+                                                ThisItem.NodeTitle,
+                                                "Building", ColorValue("#EF4444"),
+                                                "Civil Work", ColorValue("#0284C7"),
+                                                "Electrical", ColorValue("#F59E0B"),
+                                                "Hvac", ColorValue("#06B6D4"),
+                                                "Instrumentation", ColorValue("#22C55E"),
+                                                "Mechanical", ColorValue("#F97316"),
+                                                "Piping", ColorValue("#0EA5E9"),
+                                                "Safety", ColorValue("#8B5CF6"),
+                                                "Steel Structure", ColorValue("#6366F1"),
+                                                "Telecom", ColorValue("#2563EB"),
+                                                varTheme_PulseBlue
+                                            )
+                                        DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                                        DisabledColor: =RGBA(225, 223, 221, 1)
+                                        DisabledFill: =RGBA(0, 0, 0, 0)
+                                        FocusedBorderThickness: =4
+                                        Height: =22
+                                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                        HoverColor: =RGBA(16, 110, 190, 1)
+                                        HoverFill: =RGBA(0, 0, 0, 0)
+                                        Icon: =Icon.Tools
+                                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                                        PressedColor: =RGBA(16, 110, 190, 1)
+                                        PressedFill: =RGBA(0, 0, 0, 0)
+                                        Visible: =false
+                                        Width: =22
+                                        X: =18
+                                        Y: =168
+                                        ZIndex: =21
+
+                                    txtNodeProgressInline As modernText:
+                                        Color: =ColorValue(ThisItem.ProgressColor)
+                                        FontWeight: =FontWeight.Semibold
+                                        Height: =18
+                                        Size: =9
+                                        Text: =Text(ThisItem.Progress, "0") & "% progress"
+                                        Width: =Parent.Width - 150
+                                        X: =132
+                                        Y: =134
+                                        ZIndex: =22
+
+                            conHomeSkeleton As groupContainer.manualLayoutContainer:
+                                DropShadow: =DropShadow.Light
+                                Fill: =Color.White
+                                Height: =Parent.Height - Self.Y - 16
+                                LayoutGridColumnMinWidth: =0
+                                LayoutGridColumns: =6
+                                LayoutGridRowMinHeight: =0
+                                LayoutGridRows: =6
+                                RadiusBottomLeft: =4
+                                RadiusBottomRight: =4
+                                RadiusTopLeft: =4
+                                RadiusTopRight: =4
+                                Visible: =varHomeLoading || varProjectSwitching
+                                Width: =Parent.Width
+                                ZIndex: =2
+
+                                Container13 As groupContainer.manualLayoutContainer:
+                                    DropShadow: =DropShadow.Light
+                                    Fill: |-
+                                        =ColorValue("#E8EEF6")
+                                    Height: =128
+                                    LayoutGridColumnMinWidth: =0
+                                    LayoutGridColumns: =6
+                                    LayoutGridRowMinHeight: =0
+                                    LayoutGridRows: =6
+                                    RadiusBottomLeft: =16
+                                    RadiusBottomRight: =16
+                                    RadiusTopLeft: =16
+                                    RadiusTopRight: =16
+                                    Width: =163
+                                    X: =40
+                                    Y: =176
+                                    ZIndex: =1
+
+                                    Rectangle8 As rectangle:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =2
+                                        DisabledFill: =RGBA(161, 159, 157, 1)
+                                        Fill: |-
+                                            =ColorValue("#DBEAFE")
+                                        FocusedBorderThickness: =4
+                                        Height: =4
+                                        HoverFill: =RGBA(0, 120, 212, 1)
+                                        PressedFill: =RGBA(0, 120, 212, 1)
+                                        Width: =Parent.Width
+                                        ZIndex: =1
+
+                                Container13_1 As groupContainer.manualLayoutContainer:
+                                    DropShadow: =DropShadow.Light
+                                    Fill: |-
+                                        =ColorValue("#E8EEF6")
+                                    Height: =128
+                                    LayoutGridColumnMinWidth: =0
+                                    LayoutGridColumns: =6
+                                    LayoutGridRowMinHeight: =0
+                                    LayoutGridRows: =6
+                                    RadiusBottomLeft: =16
+                                    RadiusBottomRight: =16
+                                    RadiusTopLeft: =16
+                                    RadiusTopRight: =16
+                                    Width: =163
+                                    X: =230
+                                    Y: =176
+                                    ZIndex: =2
+
+                                    Rectangle8_1 As rectangle:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =2
+                                        DisabledFill: =RGBA(161, 159, 157, 1)
+                                        Fill: |-
+                                            =ColorValue("#DBEAFE")
+                                        FocusedBorderThickness: =4
+                                        Height: =4
+                                        HoverFill: =RGBA(0, 120, 212, 1)
+                                        PressedFill: =RGBA(0, 120, 212, 1)
+                                        Width: =Parent.Width
+                                        ZIndex: =165
+
+                                Container13_2 As groupContainer.manualLayoutContainer:
+                                    DropShadow: =DropShadow.Light
+                                    Fill: |-
+                                        =ColorValue("#E8EEF6")
+                                    Height: =128
+                                    LayoutGridColumnMinWidth: =0
+                                    LayoutGridColumns: =6
+                                    LayoutGridRowMinHeight: =0
+                                    LayoutGridRows: =6
+                                    RadiusBottomLeft: =16
+                                    RadiusBottomRight: =16
+                                    RadiusTopLeft: =16
+                                    RadiusTopRight: =16
+                                    Width: =163
+                                    X: =420
+                                    Y: =176
+                                    ZIndex: =159
+
+                                    Rectangle8_2 As rectangle:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =2
+                                        DisabledFill: =RGBA(161, 159, 157, 1)
+                                        Fill: |-
+                                            =ColorValue("#DBEAFE")
+                                        FocusedBorderThickness: =4
+                                        Height: =4
+                                        HoverFill: =RGBA(0, 120, 212, 1)
+                                        PressedFill: =RGBA(0, 120, 212, 1)
+                                        Width: =Parent.Width
+                                        ZIndex: =166
+
+                                Container13_3 As groupContainer.manualLayoutContainer:
+                                    DropShadow: =DropShadow.Light
+                                    Fill: |-
+                                        =ColorValue("#E8EEF6")
+                                    Height: =128
+                                    LayoutGridColumnMinWidth: =0
+                                    LayoutGridColumns: =6
+                                    LayoutGridRowMinHeight: =0
+                                    LayoutGridRows: =6
+                                    RadiusBottomLeft: =16
+                                    RadiusBottomRight: =16
+                                    RadiusTopLeft: =16
+                                    RadiusTopRight: =16
+                                    Width: =163
+                                    X: =610
+                                    Y: =176
+                                    ZIndex: =160
+
+                                    Rectangle8_3 As rectangle:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =2
+                                        DisabledFill: =RGBA(161, 159, 157, 1)
+                                        Fill: |-
+                                            =ColorValue("#DBEAFE")
+                                        FocusedBorderThickness: =4
+                                        Height: =4
+                                        HoverFill: =RGBA(0, 120, 212, 1)
+                                        PressedFill: =RGBA(0, 120, 212, 1)
+                                        Width: =Parent.Width
+                                        ZIndex: =167
+
+                                Container13_4 As groupContainer.manualLayoutContainer:
+                                    DropShadow: =DropShadow.Light
+                                    Fill: |-
+                                        =ColorValue("#E8EEF6")
+                                    Height: =128
+                                    LayoutGridColumnMinWidth: =0
+                                    LayoutGridColumns: =6
+                                    LayoutGridRowMinHeight: =0
+                                    LayoutGridRows: =6
+                                    RadiusBottomLeft: =16
+                                    RadiusBottomRight: =16
+                                    RadiusTopLeft: =16
+                                    RadiusTopRight: =16
+                                    Width: =163
+                                    X: =610
+                                    Y: =350
+                                    ZIndex: =161
+
+                                    Rectangle8_4 As rectangle:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =2
+                                        DisabledFill: =RGBA(161, 159, 157, 1)
+                                        Fill: |-
+                                            =ColorValue("#DBEAFE")
+                                        FocusedBorderThickness: =4
+                                        Height: =4
+                                        HoverFill: =RGBA(0, 120, 212, 1)
+                                        PressedFill: =RGBA(0, 120, 212, 1)
+                                        Width: =Parent.Width
+                                        ZIndex: =168
+
+                                Container13_5 As groupContainer.manualLayoutContainer:
+                                    DropShadow: =DropShadow.Light
+                                    Fill: |-
+                                        =ColorValue("#E8EEF6")
+                                    Height: =128
+                                    LayoutGridColumnMinWidth: =0
+                                    LayoutGridColumns: =6
+                                    LayoutGridRowMinHeight: =0
+                                    LayoutGridRows: =6
+                                    RadiusBottomLeft: =16
+                                    RadiusBottomRight: =16
+                                    RadiusTopLeft: =16
+                                    RadiusTopRight: =16
+                                    Width: =163
+                                    X: =420
+                                    Y: =350
+                                    ZIndex: =162
+
+                                    Rectangle8_5 As rectangle:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =2
+                                        DisabledFill: =RGBA(161, 159, 157, 1)
+                                        Fill: |-
+                                            =ColorValue("#DBEAFE")
+                                        FocusedBorderThickness: =4
+                                        Height: =4
+                                        HoverFill: =RGBA(0, 120, 212, 1)
+                                        PressedFill: =RGBA(0, 120, 212, 1)
+                                        Width: =Parent.Width
+                                        ZIndex: =169
+
+                                Container13_6 As groupContainer.manualLayoutContainer:
+                                    DropShadow: =DropShadow.Light
+                                    Fill: |-
+                                        =ColorValue("#E8EEF6")
+                                    Height: =128
+                                    LayoutGridColumnMinWidth: =0
+                                    LayoutGridColumns: =6
+                                    LayoutGridRowMinHeight: =0
+                                    LayoutGridRows: =6
+                                    RadiusBottomLeft: =16
+                                    RadiusBottomRight: =16
+                                    RadiusTopLeft: =16
+                                    RadiusTopRight: =16
+                                    Width: =163
+                                    X: =230
+                                    Y: =350
+                                    ZIndex: =163
+
+                                    Rectangle8_6 As rectangle:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =2
+                                        DisabledFill: =RGBA(161, 159, 157, 1)
+                                        Fill: |-
+                                            =ColorValue("#DBEAFE")
+                                        FocusedBorderThickness: =4
+                                        Height: =4
+                                        HoverFill: =RGBA(0, 120, 212, 1)
+                                        PressedFill: =RGBA(0, 120, 212, 1)
+                                        Width: =Parent.Width
+                                        ZIndex: =170
+
+                                Container13_7 As groupContainer.manualLayoutContainer:
+                                    DropShadow: =DropShadow.Light
+                                    Fill: |-
+                                        =ColorValue("#E8EEF6")
+                                    Height: =128
+                                    LayoutGridColumnMinWidth: =0
+                                    LayoutGridColumns: =6
+                                    LayoutGridRowMinHeight: =0
+                                    LayoutGridRows: =6
+                                    RadiusBottomLeft: =16
+                                    RadiusBottomRight: =16
+                                    RadiusTopLeft: =16
+                                    RadiusTopRight: =16
+                                    Width: =163
+                                    X: =40
+                                    Y: =350
+                                    ZIndex: =164
+
+                                    Rectangle8_7 As rectangle:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =2
+                                        DisabledFill: =RGBA(161, 159, 157, 1)
+                                        Fill: |-
+                                            =ColorValue("#DBEAFE")
+                                        FocusedBorderThickness: =4
+                                        Height: =4
+                                        HoverFill: =RGBA(0, 120, 212, 1)
+                                        PressedFill: =RGBA(0, 120, 212, 1)
+                                        Width: =Parent.Width
+                                        ZIndex: =171
+
+                            conHome_DisciplinesOverview As groupContainer.manualLayoutContainer:
+                                BorderColor: =varTheme_Border
+                                BorderThickness: =1
+                                Fill: =varTheme_Surface
+                                Height: =104
+                                LayoutGridColumnMinWidth: =0
+                                LayoutGridColumns: =6
+                                LayoutGridRowMinHeight: =0
+                                LayoutGridRows: =6
+                                PaddingLeft: =4
+                                RadiusBottomLeft: =8
+                                RadiusBottomRight: =8
+                                RadiusTopLeft: =8
+                                RadiusTopRight: =8
+                                Visible: |-
+                                    =varHomeShowOverview &&
+                                    !varHomeLoading &&
+                                    CountRows(colHomeHiveNodesSorted) > 0
+                                Width: =Parent.Width
+                                ZIndex: =3
+
+                                lblDiscOverviewTitle As modernText:
+                                    AutoHeight: =true
+                                    Color: =varTheme_Text
+                                    FontWeight: =FontWeight.Semibold
+                                    Size: =16
+                                    Text: ="Disciplines Overview"
+                                    Width: =175
+                                    X: =17
+                                    Y: =17
+                                    ZIndex: =1
+
+                                recOverviewDivider As rectangle:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderStyle: =BorderStyle.None
+                                    BorderThickness: =2
+                                    DisabledFill: =RGBA(161, 159, 157, 1)
+                                    Fill: =varTheme_Border
+                                    FocusedBorderThickness: =4
+                                    Height: =56
+                                    HoverFill: =RGBA(0, 120, 212, 1)
+                                    PressedFill: =RGBA(0, 120, 212, 1)
+                                    Width: =1
+                                    X: =196
+                                    Y: =24
+                                    ZIndex: =2
+
+                                lblDiscOverviewSubtitle As modernText:
+                                    Color: =varTheme_TextMuted
+                                    Size: =11
+                                    Text: ="Progress summary by discipline"
+                                    VerticalAlign: =VerticalAlign.Top
+                                    Width: =175
+                                    X: =17
+                                    Y: =46
+                                    ZIndex: =3
+
+                                conKpiRemaining As groupContainer.manualLayoutContainer:
+                                    BorderColor: =varTheme_Border
+                                    Fill: =varTheme_Surface
+                                    Height: =60
+                                    LayoutGridColumnMinWidth: =0
+                                    LayoutGridColumns: =6
+                                    LayoutGridRowMinHeight: =0
+                                    LayoutGridRows: =6
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Width: =150
+                                    X: =conKpiCompleted.X + conKpiCompleted.Width + 12
+                                    Y: =22
+                                    ZIndex: =4
+
+                                    Text66 As modernText:
+                                        AutoHeight: =true
+                                        Color: =varTheme_Text
+                                        FontWeight: =FontWeight.Bold
+                                        Size: =18
+                                        Text: |-
+                                            =
+                                            
+                                            // Remaining
+                                            Text(
+                                                Sum(colHomeHiveNodesSorted, Remaining),
+                                                "[$-en-US]#,##0"
+                                            )
+                                        Width: =84
+                                        X: =58
+                                        Y: =10
+                                        ZIndex: =1
+
+                                    Icon14 As icon.Clock:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        Color: =RGBA(0, 120, 212, 1)
+                                        DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                                        DisabledColor: =RGBA(225, 223, 221, 1)
+                                        DisabledFill: =RGBA(0, 0, 0, 0)
+                                        Fill: =Color.Transparent
+                                        FocusedBorderThickness: =4
+                                        Height: =36
+                                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                        HoverColor: =RGBA(16, 110, 190, 1)
+                                        HoverFill: =RGBA(0, 0, 0, 0)
+                                        Icon: =Icon.Clock
+                                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                                        PressedColor: =RGBA(16, 110, 190, 1)
+                                        PressedFill: =RGBA(0, 0, 0, 0)
+                                        Width: =36
+                                        X: =12
+                                        Y: =12
+                                        ZIndex: =2
+
+                                    Text70 As modernText:
+                                        AutoHeight: =true
+                                        Color: =varTheme_TextMuted
+                                        Size: =10
+                                        Text: ="Remaining"
+                                        Width: =84
+                                        X: =58
+                                        Y: =34
+                                        ZIndex: =3
+
+                                conKpiCompleted As groupContainer.manualLayoutContainer:
+                                    BorderColor: =varTheme_Border
+                                    Fill: =varTheme_Surface
+                                    Height: =60
+                                    LayoutGridColumnMinWidth: =0
+                                    LayoutGridColumns: =6
+                                    LayoutGridRowMinHeight: =0
+                                    LayoutGridRows: =6
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Width: =150
+                                    X: =conKpiTotalTasks.X + conKpiTotalTasks.Width + 12
+                                    Y: =22
+                                    ZIndex: =156
+
+                                    Text65 As modernText:
+                                        AutoHeight: =true
+                                        Color: =varTheme_Text
+                                        FontWeight: =FontWeight.Bold
+                                        Size: =18
+                                        Text: |-
+                                            =
+                                            
+                                            
+                                            // Completed
+                                            Text(
+                                                Sum(colHomeHiveNodesSorted, Done),
+                                                "[$-en-US]#,##0"
+                                            )
+                                        Width: =84
+                                        X: =58
+                                        Y: =10
+                                        ZIndex: =1
+
+                                    Icon12 As icon.CheckBadge:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        Color: =RGBA(0, 120, 212, 1)
+                                        DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                                        DisabledColor: =RGBA(225, 223, 221, 1)
+                                        DisabledFill: =RGBA(0, 0, 0, 0)
+                                        Fill: =Color.Transparent
+                                        FocusedBorderThickness: =4
+                                        Height: =36
+                                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                        HoverColor: =RGBA(16, 110, 190, 1)
+                                        HoverFill: =RGBA(0, 0, 0, 0)
+                                        Icon: =Icon.CheckBadge
+                                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                                        PressedColor: =RGBA(16, 110, 190, 1)
+                                        PressedFill: =RGBA(0, 0, 0, 0)
+                                        Width: =36
+                                        X: =12
+                                        Y: =12
+                                        ZIndex: =2
+
+                                    Text69 As modernText:
+                                        AutoHeight: =true
+                                        Color: =varTheme_TextMuted
+                                        Size: =10
+                                        Text: ="Completed"
+                                        Width: =84
+                                        X: =58
+                                        Y: =34
+                                        ZIndex: =3
+
+                                conKpiTotalTasks As groupContainer.manualLayoutContainer:
+                                    BorderColor: =varTheme_Border
+                                    Fill: =varTheme_Surface
+                                    Height: =60
+                                    LayoutGridColumnMinWidth: =0
+                                    LayoutGridColumns: =6
+                                    LayoutGridRowMinHeight: =0
+                                    LayoutGridRows: =6
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Width: =150
+                                    X: =conKpiDisciplines.X + conKpiDisciplines.Width + 12
+                                    Y: =22
+                                    ZIndex: =157
+
+                                    Text64 As modernText:
+                                        AutoHeight: =true
+                                        Color: =varTheme_Text
+                                        FontWeight: =FontWeight.Bold
+                                        Height: =24
+                                        Size: =18
+                                        Text: |-
+                                            =
+                                            
+                                            // Total Tasks
+                                            Text(
+                                                Sum(colHomeHiveNodesSorted, Total),
+                                                "[$-en-US]#,##0"
+                                            )
+                                        Width: =84
+                                        X: =58
+                                        Y: =10
+                                        ZIndex: =1
+
+                                    Icon13 As icon.DocumentwithContent:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        Color: =RGBA(0, 120, 212, 1)
+                                        DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                                        DisabledColor: =RGBA(225, 223, 221, 1)
+                                        DisabledFill: =RGBA(0, 0, 0, 0)
+                                        Fill: =Color.Transparent
+                                        FocusedBorderThickness: =4
+                                        Height: =36
+                                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                        HoverColor: =RGBA(16, 110, 190, 1)
+                                        HoverFill: =RGBA(0, 0, 0, 0)
+                                        Icon: =Icon.DocumentWithContent
+                                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                                        PressedColor: =RGBA(16, 110, 190, 1)
+                                        PressedFill: =RGBA(0, 0, 0, 0)
+                                        Width: =36
+                                        X: =12
+                                        Y: =12
+                                        ZIndex: =2
+
+                                    Text68 As modernText:
+                                        AutoHeight: =true
+                                        Color: =varTheme_TextMuted
+                                        Height: =18
+                                        Size: =10
+                                        Text: ="Total Tasks"
+                                        Width: =84
+                                        X: =58
+                                        Y: =34
+                                        ZIndex: =3
+
+                                conKpiDisciplines As groupContainer.manualLayoutContainer:
+                                    BorderColor: =varTheme_Border
+                                    Fill: =varTheme_Surface
+                                    Height: =60
+                                    LayoutGridColumnMinWidth: =0
+                                    LayoutGridColumns: =6
+                                    LayoutGridRowMinHeight: =0
+                                    LayoutGridRows: =6
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Width: =150
+                                    X: =220
+                                    Y: =22
+                                    ZIndex: =158
+
+                                    Text61 As modernText:
+                                        AutoHeight: =true
+                                        Color: =varTheme_Text
+                                        FontWeight: =FontWeight.Bold
+                                        Height: =24
+                                        Size: =18
+                                        Text: |-
+                                            =// Disciplines
+                                            Text(
+                                                CountRows(colHomeHiveNodesSorted),
+                                                "[$-en-US]#,##0"
+                                            )
+                                        Width: =84
+                                        X: =58
+                                        Y: =10
+                                        ZIndex: =1
+
+                                    Icon11 As icon.Items:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        Color: =RGBA(0, 120, 212, 1)
+                                        DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                                        DisabledColor: =RGBA(225, 223, 221, 1)
+                                        DisabledFill: =RGBA(0, 0, 0, 0)
+                                        Fill: =Color.Transparent
+                                        FocusedBorderThickness: =4
+                                        Height: =36
+                                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                        HoverColor: =RGBA(16, 110, 190, 1)
+                                        HoverFill: =RGBA(0, 0, 0, 0)
+                                        Icon: =Icon.Items
+                                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                                        PressedColor: =RGBA(16, 110, 190, 1)
+                                        PressedFill: =RGBA(0, 0, 0, 0)
+                                        Width: =36
+                                        X: =12
+                                        Y: =12
+                                        ZIndex: =2
+
+                                    Text67 As modernText:
+                                        AutoHeight: =true
+                                        Color: =varTheme_TextMuted
+                                        Size: =10
+                                        Text: ="Disciplines"
+                                        Width: =84
+                                        X: =58
+                                        Y: =34
+                                        ZIndex: =3
+
+                    conHomeSidebar As groupContainer.manualLayoutContainer:
+                        Fill: =varTheme_PageBg
+                        FillPortions: =0
+                        Height: =Parent.Height
+                        LayoutGridColumnMinWidth: =0
+                        LayoutGridColumns: =6
+                        LayoutGridRowMinHeight: =0
+                        LayoutGridRows: =6
+                        LayoutMaxHeight: =0
+                        LayoutMaxWidth: =0
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        RadiusBottomLeft: =4
+                        RadiusBottomRight: =4
+                        RadiusTopLeft: =4
+                        RadiusTopRight: =4
+                        Visible: =varHomeShowRightPanel
+                        Width: =340
+                        ZIndex: =3
+
+                        cntHome_RightPanelArea As groupContainer.verticalAutoLayoutContainer:
+                            Fill: =varTheme_PageBg
+                            Height: =Parent.Height
+                            LayoutAlignItems: =LayoutAlignItems.Center
+                            LayoutDirection: =LayoutDirection.Vertical
+                            LayoutGap: =14
+                            LayoutGridColumnMinWidth: =0
+                            LayoutGridColumns: =6
+                            LayoutGridRowMinHeight: =0
+                            LayoutGridRows: =6
+                            LayoutMode: =LayoutMode.Auto
+                            LayoutOverflowY: =LayoutOverflow.Scroll
+                            PaddingBottom: =16
+                            PaddingLeft: =8
+                            PaddingRight: =8
+                            PaddingTop: =8
+                            RadiusBottomLeft: =4
+                            RadiusBottomRight: =4
+                            RadiusTopLeft: =4
+                            RadiusTopRight: =4
+                            Width: =Parent.Width
+                            ZIndex: =156
+
+                            cntHome_SelectedNode As groupContainer.manualLayoutContainer:
+                                BorderColor: =varTheme_Border
+                                BorderThickness: =1
+                                Fill: =varTheme_Surface
+                                FillPortions: =0
+                                Height: =300
+                                LayoutGridColumnMinWidth: =0
+                                LayoutGridColumns: =6
+                                LayoutGridRowMinHeight: =0
+                                LayoutGridRows: =6
+                                LayoutMaxHeight: =0
+                                LayoutMaxWidth: =0
+                                LayoutMinHeight: =100
+                                LayoutMinWidth: =250
+                                RadiusBottomLeft: =16
+                                RadiusBottomRight: =16
+                                RadiusTopLeft: =16
+                                RadiusTopRight: =16
+                                Width: =Parent.Width
+                                ZIndex: =1
+
+                                lblSelectedPanelTitle As modernText:
+                                    AutoHeight: =true
+                                    BorderStyle: =""
+                                    Color: =varTheme_Text
+                                    Font: =""
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =24
+                                    Size: =16
+                                    Text: ="Selected Discipline"
+                                    Width: =Parent.Width - 48
+                                    X: =18
+                                    Y: =14
+                                    ZIndex: =1
+
+                                Icon15 As icon:
+                                    BorderThickness: =1
+                                    Color: =varTheme_Text
+                                    DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                                    DisabledColor: =RGBA(225, 223, 221, 1)
+                                    DisabledFill: =RGBA(0, 0, 0, 0)
+                                    DisplayMode: =DisplayMode.View
+                                    FocusedBorderThickness: =4
+                                    Height: =20
+                                    HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                    HoverColor: =RGBA(16, 110, 190, 1)
+                                    HoverFill: =RGBA(0, 0, 0, 0)
+                                    Icon: =Icon.ChevronDown
+                                    PressedBorderColor: =RGBA(0, 0, 0, 0)
+                                    PressedColor: =RGBA(16, 110, 190, 1)
+                                    PressedFill: =RGBA(0, 0, 0, 0)
+                                    Width: =20
+                                    X: =Parent.Width - 36
+                                    Y: =23
+                                    ZIndex: =2
+
+                                lblSelectedNodeNo As modernText:
+                                    Align: =Align.Center
+                                    BorderStyle: =""
+                                    Color: =varTheme_Red
+                                    Fill: =ColorFade(varTheme_Red, 88%)
+                                    Font: =""
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =36
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    Size: =14
+                                    Text: |-
+                                        =If(
+                                            IsBlank(varSelectedHiveNode.NodeId),
+                                            "--",
+                                            varSelectedHiveNode.NodeNo
+                                        )
+                                    Width: =42
+                                    X: =18
+                                    Y: =58
+                                    ZIndex: =3
+
+                                lblSelectedNodeTitle As modernText:
+                                    AutoHeight: =true
+                                    BorderStyle: =""
+                                    Color: |-
+                                        =ColorValue("#0F172A")
+                                    Font: =""
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =26
+                                    Size: =16
+                                    Text: |-
+                                        =If(
+                                            IsBlank(varSelectedHiveNode.NodeId),
+                                            "No discipline selected",
+                                            Proper(varSelectedHiveNode.NodeTitle)
+                                        )
+                                    Width: =Parent.Width - 100
+                                    X: =72
+                                    Y: =56
+                                    ZIndex: =4
+
+                                lblSelectedNodeSubtitle As modernText:
+                                    AutoHeight: =true
+                                    BorderStyle: =""
+                                    Color: |-
+                                        =ColorValue("#64748B")
+                                    Font: =""
+                                    Size: =12
+                                    Text: |-
+                                        =If(
+                                            IsBlank(varSelectedHiveNode.NodeId),
+                                            "Select a discipline card to inspect operational details.",
+                                            varSelectedHiveNode.NodeSubtitle
+                                        )
+                                    Width: =Parent.Width - 100
+                                    X: =72
+                                    Y: =82
+                                    ZIndex: =5
+
+                                imgSelectedProgressRing As image:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderStyle: =BorderStyle.None
+                                    BorderThickness: =2
+                                    DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                                    DisabledFill: =RGBA(0, 0, 0, 0)
+                                    FocusedBorderThickness: =4
+                                    Height: =110
+                                    HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                    HoverFill: =RGBA(0, 0, 0, 0)
+                                    Image: |-
+                                        =With(
+                                            {
+                                                _progress: Value(varSelectedHiveNode.Progress),
+                                                _color: Coalesce(varSelectedHiveNode.ProgressColor, "#EF4444")
+                                            },
+                                            "data:image/svg+xml;utf8," &
+                                            EncodeUrl(
+                                                "<svg width='110' height='110' viewBox='0 0 110 110' xmlns='http://www.w3.org/2000/svg'>
+                                                    <circle cx='52' cy='52' r='38' fill='none' stroke='#E2E8F0' stroke-width='12'/>
+                                                    <circle cx='52' cy='52' r='38' fill='none' stroke='" & _color & "' stroke-width='12'
+                                                        stroke-dasharray='" & Text(_progress * 2.387) & " 238.7'
+                                                        stroke-linecap='round'
+                                                        transform='rotate(-90 52 52)'/>
+                                                    <text x='52' y='52' text-anchor='middle' dominant-baseline='middle' font-size='24' font-weight='700' fill='#0F172A'>" & Text(_progress) & "%</text>
+                                                    <text x='52' y='73' text-anchor='middle' font-size='12' fill='#64748B'>Progress</text>
+                                                </svg>"
+                                            )
+                                        )
+                                    PressedBorderColor: =RGBA(0, 0, 0, 0)
+                                    PressedFill: =RGBA(0, 0, 0, 0)
+                                    Visible: =!IsBlank(varSelectedHiveNode.NodeId)
+                                    Width: =110
+                                    X: =24
+                                    Y: =116
+                                    ZIndex: =6
+
+                                lblSelectedStatusCaption As modernText:
+                                    AutoHeight: =true
+                                    BorderStyle: =""
+                                    Color: |-
+                                        =ColorValue("#64748B")
+                                    Font: =""
+                                    Height: =18
+                                    Size: =10
+                                    Text: ="Status"
+                                    Width: =100
+                                    X: =160
+                                    Y: =130
+                                    ZIndex: =7
+
+                                lblSelectedStatusPill As modernText:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    BorderStyle: =""
+                                    Color: |-
+                                        =Switch(
+                                            varSelectedHiveNode.ProgressStatus,
+                                            "Delayed", varTheme_Red,
+                                            "At Risk", varTheme_Amber,
+                                            "In Progress", varTheme_PulseBlueDark,
+                                            "Completed", varTheme_Green,
+                                            varTheme_TextMuted
+                                        )
+                                    Fill: |-
+                                        =Switch(
+                                            varSelectedHiveNode.ProgressStatus,
+                                            "Delayed", ColorFade(varTheme_Red, 85%),
+                                            "At Risk", ColorFade(varTheme_Amber, 85%),
+                                            "In Progress", ColorFade(varTheme_PulseBlue, 85%),
+                                            "Completed", ColorFade(varTheme_Green, 85%),
+                                            varTheme_SurfaceAlt
+                                        )
+                                    Font: =""
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =28
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    Size: =10
+                                    Text: |-
+                                        =If(
+                                            IsBlank(varSelectedHiveNode.NodeId),
+                                            "-",
+                                            varSelectedHiveNode.ProgressStatus
+                                        )
+                                    Visible: =!IsBlank(varSelectedHiveNode.NodeId)
+                                    Width: =92
+                                    X: =160
+                                    Y: =152
+                                    ZIndex: =8
+
+                                recSelectedMetricsDivider As rectangle:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderStyle: =BorderStyle.None
+                                    BorderThickness: =2
+                                    DisabledFill: =RGBA(161, 159, 157, 1)
+                                    Fill: |-
+                                        =ColorValue("#E2E8F0")
+                                    FocusedBorderThickness: =4
+                                    Height: =1
+                                    HoverFill: =RGBA(0, 120, 212, 1)
+                                    PressedFill: =RGBA(0, 120, 212, 1)
+                                    Width: =Parent.Width - 36
+                                    X: =18
+                                    Y: =236
+                                    ZIndex: =9
+
+                                lblSelectedTotalValue As modernText:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    BorderStyle: =""
+                                    Color: =varTheme_Text
+                                    Font: =""
+                                    FontWeight: =FontWeight.Bold
+                                    Size: =20
+                                    Text: |-
+                                        =If(
+                                            IsBlank(varSelectedHiveNode.NodeId),
+                                            "-",
+                                            Text(varSelectedHiveNode.Total, "[$-en-US]#,##0")
+                                        )
+                                    Width: =(Parent.Width - 36) / 4
+                                    X: =18
+                                    Y: =244
+                                    ZIndex: =10
+
+                                lblSelectedTotalLabel As modernText:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    BorderStyle: =""
+                                    Color: =varTheme_TextMuted
+                                    Font: =""
+                                    Height: =16
+                                    Size: =10
+                                    Text: ="Total"
+                                    Width: =lblSelectedTotalValue.Width
+                                    X: =lblSelectedTotalValue.X
+                                    Y: =268
+                                    ZIndex: =11
+
+                                lblSelectedDoneValue As modernText:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    BorderStyle: =""
+                                    Color: =varTheme_Green
+                                    Font: =""
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =20
+                                    Size: =20
+                                    Text: |-
+                                        =If(
+                                            IsBlank(varSelectedHiveNode.NodeId),
+                                            "-",
+                                            Text(varSelectedHiveNode.Done, "[$-en-US]#,##0")
+                                        )
+                                    Width: =(Parent.Width - 36) / 4
+                                    X: =18 + ((Parent.Width - 36) / 4)
+                                    Y: =244
+                                    ZIndex: =12
+
+                                lblSelectedDoneLabel As modernText:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    BorderStyle: =""
+                                    Color: =varTheme_TextMuted
+                                    Font: =""
+                                    Height: =16
+                                    Size: =10
+                                    Text: ="Done"
+                                    Width: = lblSelectedDoneValue.Width
+                                    X: =lblSelectedDoneValue.X
+                                    Y: =268
+                                    ZIndex: =13
+
+                                lblSelectedRemainingValue As modernText:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    BorderStyle: =""
+                                    Color: |-
+                                        =If(
+                                            varSelectedHiveNode.ProgressStatus = "Delayed",
+                                            varTheme_Red,
+                                            varTheme_Amber
+                                        )
+                                    Font: =""
+                                    FontWeight: =FontWeight.Bold
+                                    Size: =20
+                                    Text: |-
+                                        =If(
+                                            IsBlank(varSelectedHiveNode.NodeId),
+                                            "-",
+                                            Text(varSelectedHiveNode.Remaining, "[$-en-US]#,##0")
+                                        )
+                                    Width: =(Parent.Width - 36) / 4
+                                    X: =18 + (((Parent.Width - 36) / 4) * 2)
+                                    Y: =244
+                                    ZIndex: =14
+
+                                lblSelectedRemainingLabel As modernText:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    BorderStyle: =""
+                                    Color: =varTheme_TextMuted
+                                    Font: =""
+                                    Height: =16
+                                    Size: =10
+                                    Text: ="Remaining"
+                                    Width: =lblSelectedRemainingValue.Width
+                                    X: = lblSelectedRemainingValue.X
+                                    Y: =268
+                                    ZIndex: =15
+
+                                lblSelectedProgressValue As modernText:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    BorderStyle: =""
+                                    Color: =varTheme_Amber
+                                    Font: =""
+                                    FontWeight: =FontWeight.Bold
+                                    Size: =20
+                                    Text: |-
+                                        =If(
+                                            IsBlank(varSelectedHiveNode.NodeId),
+                                            "-",
+                                            Text(varSelectedHiveNode.Progress) & "%"
+                                        )
+                                    Width: =(Parent.Width - 36) / 4
+                                    X: =18 + (((Parent.Width - 36) / 4) * 3)
+                                    Y: =244
+                                    ZIndex: =16
+
+                                lblSelectedProgressLabel As modernText:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    BorderStyle: =""
+                                    Color: =varTheme_TextMuted
+                                    Font: =""
+                                    Size: =10
+                                    Text: ="Progress"
+                                    Width: = lblSelectedProgressValue.Width
+                                    X: =lblSelectedProgressValue.X
+                                    Y: =268
+                                    ZIndex: =17
+
+                            cntHome_PendingSubsystems As groupContainer.manualLayoutContainer:
+                                BorderColor: =varTheme_Border
+                                BorderThickness: =1
+                                Fill: =varTheme_Surface
+                                FillPortions: =0
+                                Height: =320
+                                LayoutGridColumnMinWidth: =0
+                                LayoutGridColumns: =6
+                                LayoutGridRowMinHeight: =0
+                                LayoutGridRows: =6
+                                LayoutMaxHeight: =0
+                                LayoutMaxWidth: =0
+                                LayoutMinHeight: =100
+                                LayoutMinWidth: =250
+                                RadiusBottomLeft: =16
+                                RadiusBottomRight: =16
+                                RadiusTopLeft: =16
+                                RadiusTopRight: =16
+                                Width: =Parent.Width
+                                Y: =
+                                ZIndex: =2
+
+                                galHomePendingSubsystems As gallery.galleryVertical:
+                                    '#CopilotOverlayLabel': ="Filtered"
+                                    BorderColor: =RGBA(245, 245, 245, 1)
+                                    DelayItemLoading: =true
+                                    Height: =198
+                                    Items: |
+                                        =
+                                            colHomePendingSubsystems
+                                    Layout: =Layout.Vertical
+                                    LoadingSpinner: =LoadingSpinner.Data
+                                    ShowScrollbar: =false
+                                    TemplatePadding: =4
+                                    TemplateSize: =64
+                                    Visible: |-
+                                        =!varPendingSubsystemsLoading &&
+                                        !IsBlank(varSelectedHiveNode.NodeId) &&
+                                        CountRows(colHomePendingSubsystems) > 0
+                                    Width: =Parent.Width - 36
+                                    X: =18
+                                    Y: =76
+                                    ZIndex: =1
+
+                                    lbl_Dt As modernText:
+                                        AutoHeight: =true
+                                        BorderStyle: =""
+                                        Color: |-
+                                            =ColorValue("#64748B")
+                                        Font: =""
+                                        Height: =18
+                                        OnSelect: =Select(Parent)
+                                        Size: =11
+                                        Text: |-
+                                            =
+                                            
+                                            Text(ThisItem.Remaining, "[$-en-US]#,##0") & " remaining · " &
+                                            Text(ThisItem.Done, "[$-en-US]#,##0") & " done"
+                                        Width: =Parent.TemplateWidth - 110
+                                        X: =48
+                                        Y: =28
+                                        ZIndex: =2
+
+                                    lbl_Ss As modernText:
+                                        AutoHeight: =true
+                                        BorderStyle: =""
+                                        Color: =varTheme_Text
+                                        Font: =""
+                                        FontWeight: =FontWeight.Bold
+                                        Height: =20
+                                        OnSelect: =Select(Parent)
+                                        Size: =13
+                                        Text: =ThisItem.SubsystemCode
+                                        Width: =Parent.TemplateWidth - 110
+                                        X: =48
+                                        Y: =6
+                                        ZIndex: =3
+
+                                    lbl_Ranking As modernText:
+                                        Align: =Align.Center
+                                        AutoHeight: =true
+                                        BorderStyle: =""
+                                        Color: |-
+                                            =ColorValue("#EF4444")
+                                        Fill: |-
+                                            =ColorValue("#FEECEC")
+                                        Font: =""
+                                        FontWeight: =FontWeight.Bold
+                                        Height: =28
+                                        OnSelect: =Select(Parent)
+                                        RadiusBottomLeft: =6
+                                        RadiusBottomRight: =6
+                                        RadiusTopLeft: =6
+                                        RadiusTopRight: =6
+                                        Size: =12
+                                        Text: =ThisItem.RowNo
+                                        Width: =28
+                                        Y: =10
+                                        ZIndex: =4
+
+                                    Button2 As button:
+                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                        BorderStyle: =BorderStyle.None
+                                        BorderThickness: =0
+                                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                                        DisabledColor: =RGBA(161, 159, 157, 1)
+                                        DisabledFill: =RGBA(242, 242, 241, 0)
+                                        Fill: =RGBA(0,0,0,0)
+                                        Font: =Font.'Segoe UI'
+                                        FontWeight: =FontWeight.Semibold
+                                        Height: =Parent.TemplateHeight
+                                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                        HoverColor: =RGBA(255, 255, 255, 1)
+                                        HoverFill: =RGBA(0,200,255,0.04)
+                                        OnSelect: |-
+                                            =
+                                            Set(
+                                                varSelectedHiveSubsystem,
+                                                {
+                                                    SubsystemCode: Text(ThisItem.SubsystemCode),
+                                                    Discipline: Text(ThisItem.Discipline),
+                                                    Total: Value(ThisItem.Total),
+                                                    Done: Value(ThisItem.Done),
+                                                    Remaining: Value(ThisItem.Remaining),
+                                                    Progress: Value(ThisItem.Progress),
+                                                    ProgressStatus: Text(ThisItem.ProgressStatus),
+                                                    ProgressColor: Text(ThisItem.ProgressColor)
+                                                }
+                                            )
+                                        PressedBorderColor: =RGBA(0, 69, 120, 1)
+                                        PressedColor: =RGBA(255, 255, 255, 1)
+                                        PressedFill: =RGBA(0,200,255,0.08)
+                                        RadiusBottomLeft: =0
+                                        RadiusBottomRight: =0
+                                        RadiusTopLeft: =0
+                                        RadiusTopRight: =0
+                                        Size: =15
+                                        Text: =
+                                        Width: =Parent.TemplateWidth
+                                        ZIndex: =5
+
+                                    btnPendingRowTasks As modernButton:
+                                        BasePaletteColor: |-
+                                            =ColorValue("#0B5ED7")
+                                        Height: =30
+                                        Icon: ="ArrowRight"
+                                        Layout: =ButtonLayout.IconAfter
+                                        OnSelect: |-
+                                            =
+                                            
+                                            
+                                            Set(
+                                                varSelectedHiveSubsystem,
+                                                {
+                                                    SubsystemCode: Text(ThisItem.SubsystemCode),
+                                                    Discipline: Text(ThisItem.Discipline),
+                                                    Total: Value(ThisItem.Total),
+                                                    Done: Value(ThisItem.Done),
+                                                    Remaining: Value(ThisItem.Remaining),
+                                                    Progress: Value(ThisItem.Progress),
+                                                    ProgressStatus: Text(ThisItem.ProgressStatus),
+                                                    ProgressColor: Text(ThisItem.ProgressColor)
+                                                }
+                                            );
+                                            
+                                            Set(varTasks_ReturnView, "Home");
+                                            Set(varTasks_ContextSource, "Hive");
+                                            
+                                            Set(varTasks_Filter_Subsystem, Text(ThisItem.SubsystemCode));
+                                            Set(varFilter_ElementDiscipline, Text(ThisItem.Discipline));
+                                            Set(varFilter_Subcontractor, "");
+                                            
+                                            Set(varTasks_Page, 1);
+                                            Set(varTasks_PageSize, 50);
+                                            Set(varTasks_HasSearched, true);
+                                            
+                                            Set(varApplySubsystemDefault, true);
+                                            Set(varTasks_AutoLoad, true);
+                                            
+                                            Clear(colTasks);
+                                            
+                                            Set(varAppView, "Tasks");
+                                            Navigate(scr_Tasks, ScreenTransition.None)
+                                        Text: ="Tasks"
+                                        Width: =90
+                                        X: =Parent.TemplateWidth - 92
+                                        Y: =15
+                                        ZIndex: =6
+
+                                Text57 As modernText:
+                                    AutoHeight: =true
+                                    BorderStyle: =""
+                                    Color: =varTheme_TextMuted
+                                    Font: =""
+                                    Size: =10
+                                    Text: |-
+                                        =
+                                        If(
+                                            IsBlank(varSelectedHiveNode.Discipline),
+                                            "Select a discipline to see pending subsystems",
+                                            "Subsystems with pending " & Proper(varSelectedHiveNode.Discipline) & " tasks"
+                                        )
+                                    Width: =Parent.Width - 36
+                                    X: =18
+                                    Y: =42
+                                    ZIndex: =2
+
+                                Text56 As modernText:
+                                    AutoHeight: =true
+                                    BorderStyle: =""
+                                    Color: =varTheme_Text
+                                    Font: =""
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =24
+                                    Size: =14
+                                    Text: ="Pending Subsystems"
+                                    Width: =Parent.Width - 36
+                                    X: =18
+                                    Y: =16
+                                    ZIndex: =3
+
+                                Text60 As modernText:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    BorderStyle: =""
+                                    Color: =varTheme_TextMuted
+                                    Font: =""
+                                    Height: =48
+                                    Size: =11
+                                    Text: |-
+                                        =If(
+                                            IsBlank(varSelectedHiveNode.NodeId),
+                                            "Select a discipline to see pending subsystems",
+                                            "No pending subsystems found for this discipline"
+                                        )
+                                    Visible: |-
+                                        =!varPendingSubsystemsLoading &&
+                                        (
+                                            IsBlank(varSelectedHiveNode.NodeId) ||
+                                            CountRows(colHomePendingSubsystems) = 0
+                                        )
+                                    Width: =Parent.Width - 48
+                                    X: =24
+                                    Y: =110
+                                    ZIndex: =4
+
+                                conPendingSubsystemsLoading As groupContainer.manualLayoutContainer:
+                                    DropShadow: =DropShadow.Light
+                                    Fill: =RGBA(255,255,255,0.72)
+                                    Height: =Parent.Height - 70
+                                    LayoutGridColumnMinWidth: =0
+                                    LayoutGridColumns: =6
+                                    LayoutGridRowMinHeight: =0
+                                    LayoutGridRows: =6
+                                    RadiusBottomLeft: =4
+                                    RadiusBottomRight: =4
+                                    RadiusTopLeft: =4
+                                    RadiusTopRight: =4
+                                    Visible: =varPendingSubsystemsLoading
+                                    Width: =Parent.Width
+                                    Y: =70
+                                    ZIndex: =5
+
+                                    Spinner5 As Spinner:
+                                        BasePaletteColor: =varTheme_PulseBlueDark
+                                        DisplayMode: =DisplayMode.Edit
+                                        FontColor: =
+                                        Height: =32
+                                        SpinnerColor: =
+                                        TrackColor: =
+                                        Width: =32
+                                        X: =(Parent.Width - Self.Width) / 2
+                                        Y: =54
+                                        ZIndex: =1
+
+                                    Text11 As modernText:
+                                        Align: =Align.Center
+                                        AutoHeight: =true
+                                        Color: =varTheme_TextMuted
+                                        Size: =11
+                                        Text: ="Loading pending subsystems..."
+                                        Width: =Parent.Width - 48
+                                        X: =24
+                                        Y: =96
+                                        ZIndex: =2
+
+                conHome_NoDataState As groupContainer.manualLayoutContainer:
+                    DropShadow: =DropShadow.Light
+                    Fill: =varTheme_Surface
+                    LayoutGridColumnMinWidth: =0
+                    LayoutGridColumns: =6
+                    LayoutGridRowMinHeight: =0
+                    LayoutGridRows: =6
+                    LayoutMaxHeight: =0
+                    LayoutMaxWidth: =0
+                    LayoutMinHeight: =16
+                    LayoutMinWidth: =16
+                    RadiusBottomLeft: =4
+                    RadiusBottomRight: =4
+                    RadiusTopLeft: =4
+                    RadiusTopRight: =4
+                    Visible: |-
+                        =
+                        !varHomeLoading &&
+                        varHomeNoData &&
+                        !IsBlank(varProjectId)
+                    ZIndex: =4
+
+                    Text13 As modernText:
+                        Text: ="No dashboard data configured"
+                        Width: =400
+                        X: =40
+                        Y: =40
+                        ZIndex: =1
+
+                    Text14 As modernText:
+                        Text: ="This project is available, but no discipline dashboard data has been configured yet."
+                        Width: =600
+                        X: =40
+                        Y: =102
+                        ZIndex: =2
+
+    btnHome_OpenNodeOperations As modernButton:
+        OnSelect: |-
+            =
+            
+            If(
+                IsBlank(varSelectedHiveSubsystem.SubsystemCode),
+            
+                Notify("Select a pending subsystem first.", NotificationType.Warning),
+            
+                Set(varAppView, "Tasks");
+            
+                Set(varTasks_ContextSource, "Hive");
+                Set(varTasks_Filter_Subsystem, varSelectedHiveSubsystem.SubsystemCode);
+                Set(varFilter_ElementDiscipline, varSelectedHiveSubsystem.Discipline);
+                Set(varFilter_Subcontractor, "");
+            
+                Set(varTasks_Page, 1);
+                Set(varTasks_PageSize, 50);
+                Set(varTasks_HasSearched, true);
+            
+            
+            
+                Set(varGlobalLoading, true);
+                Set(varGlobalLoadingMsg, "Loading Tasks...");
+                Set(varGlobalLoadingSubMsg, "Opening subsystem task list");
+                Set(varGlobalLoadingScope, "TASKS");
+            
+                Set(varGlobalLoadAction, "LOAD_TASKS");
+                Set(varGlobalLoadPending, true)
+            )
+        Text: ="Button"
+        Visible: =false
+        X: =140
+        Y: =140
+        ZIndex: =4
+
+    btnHome_LoadPendingSubsystems As modernButton:
+        OnSelect: |-
+            =
+            
+            If(
+                IsBlank(varProjectId) || IsBlank(varSelectedHiveNode.Discipline),
+            
+                Clear(colHomePendingSubsystems);
+                Clear(colHomePendingSubsystems_Staging);
+            
+                Set(varPendingSubsystemsLoading, false);
+                Set(varHomePendingError, "");
+            
+                Exit()
+            );
+            
+            If(
+                varPendingSubsystemsLoading,
+                Exit()
+            );
+            
+            Set(varPendingSubsystemsLoading, true);
+            Set(varHomePendingError, "");
+            
+            Clear(colHomePendingSubsystems);
+            Clear(colHomePendingSubsystems_Staging);
+            
+            IfError(
+                With(
+                    {
+                        _resp:
+                            Warroom_GetPendingSubsystemsByDiscipline.Run(
+                                varProjectId,
+                                varSelectedHiveNode.Discipline
+                            )
+                    },
+            
+                    ClearCollect(
+                        colHomePendingSubsystems_Staging,
+                        ForAll(
+                            Table(ParseJSON(Coalesce(_resp.result, "[]"))),
+                            With(
+                                { r: ThisRecord.Value },
+                                {
+                                    RowNo:
+                                        If(
+                                            IsBlank(Text(r.RowNo)) || Text(r.RowNo) = "null",
+                                            0,
+                                            Value(Text(r.RowNo))
+                                        ),
+            
+                                    SubsystemCode: Text(r.SubsystemCode),
+                                    Discipline: Text(r.Discipline),
+            
+                                    Total:
+                                        If(
+                                            IsBlank(Text(r.Total)) || Text(r.Total) = "null",
+                                            0,
+                                            Value(Text(r.Total))
+                                        ),
+            
+                                    Done:
+                                        If(
+                                            IsBlank(Text(r.Done)) || Text(r.Done) = "null",
+                                            0,
+                                            Value(Text(r.Done))
+                                        ),
+            
+                                    Remaining:
+                                        If(
+                                            IsBlank(Text(r.Remaining)) || Text(r.Remaining) = "null",
+                                            0,
+                                            Value(Text(r.Remaining))
+                                        ),
+            
+                                    Progress:
+                                        If(
+                                            IsBlank(Text(r.Progress)) || Text(r.Progress) = "null",
+                                            0,
+                                            Value(Text(r.Progress))
+                                        ),
+            
+                                    ProgressStatus: Text(r.ProgressStatus),
+            
+                                    ProgressColor:
+                                        Switch(
+                                            Text(r.ProgressStatus),
+                                            "Excellent", "#22C55E",
+                                            "Good", "#F59E0B",
+                                            "In Progress", "#00C8FF",
+                                            "Delayed", "#EF4444",
+                                            "#64748B"
+                                        )
+                                }
+                            )
+                        )
+                    )
+                ),
+            
+                Set(varHomePendingError, FirstError.Message)
+            );
+            
+            If(
+                IsBlank(varHomePendingError),
+            
+                ClearCollect(
+                    colHomePendingSubsystems,
+                    SortByColumns(
+                        colHomePendingSubsystems_Staging,
+                        "RowNo",
+                        SortOrder.Ascending
+                    )
+                ),
+            
+                Notify(
+                    "Pending subsystems could not be loaded.",
+                    NotificationType.Warning
+                )
+            );
+            
+            Set(varPendingSubsystemsLoading, false)
+        Text: ="Button"
+        Visible: =false
+        X: =80
+        Y: =80
+        ZIndex: =5
+
+    btnHome_LoadHive As modernButton:
+        OnSelect: |-
+            =
+            
+            Set(varGlobalLoading, true);
+            Set(varGlobalLoadingMsg, "Loading Home...");
+            Set(varGlobalLoadingSubMsg, "Loading selected project dashboard");
+            Set(varGlobalLoadingScope, "HOME");
+            
+            If(
+                IsBlank(varProjectId),
+            
+                Notify("Please select a project first.", NotificationType.Warning);
+            
+                Set(varHomeLoading, false);
+                Set(varProjectSwitching, false);
+                Set(varGlobalLoading, false);
+                Set(varGlobalLoadingMsg, "");
+                Set(varGlobalLoadingSubMsg, "");
+                Set(varGlobalLoadingScope, "");
+                Set(varGlobalLoadAction, "");
+                Set(varGlobalLoadPending, false);
+            
+                Exit()
+            );
+            
+            If(
+                varHomeLoading,
+            
+                Exit()
+            );
+            
+            Set(varHomeLoading, true);
+            Set(varProjectSwitching, true);
+            Set(varHomeError, "");
+            Set(varHomeNoData, false);
+            Set(varProjectHasHomeData, false);
+            Set(varProjectHasReportConfig, false);
+            
+            Set(varHomeShowOverview, false);
+            Set(varHomeShowCards, false);
+            Set(varHomeShowRightPanel, false);
+            
+            Clear(colHomeHiveNodes);
+            Clear(colHomeHiveNodesSorted);
+            Clear(colHomeLowestProgress);
+            
+            Clear(colHomeHiveNodes_Staging);
+            Clear(colHomeHiveNodesSorted_Staging);
+            Clear(colHomeLowestProgress_Staging);
+            
+            IfError(
+                With(
+                    {
+                        _resp: Warroom_GetHiveNodesByDiscipline.Run(varProjectId)
+                    },
+                    With(
+                        {
+                            _obj: ParseJSON(Coalesce(_resp.result, "{}"))
+                        },
+            
+                        If(
+                            Text(_obj.success) = "false",
+            
+                            Set(varHomeNoData, true);
+                            Set(varProjectHasHomeData, false);
+                            Set(varHomeHiveLoaded, false);
+                            Set(varProjectHasReportConfig, false);
+            
+                            Set(varHomeShowOverview, false);
+                            Set(varHomeShowCards, false);
+                            Set(varHomeShowRightPanel, true);
+            
+                            Set(
+                                varAppWarning,
+                                Coalesce(
+                                    Text(_obj.message),
+                                    "This project has no published report configuration yet."
+                                )
+                            ),
+            
+                            ClearCollect(
+                                colHomeHiveNodes_Staging,
+                                ForAll(
+                                    Table(_obj.result),
+                                    With(
+                                        { r: ThisRecord.Value },
+                                        {
+                                            NodeId: Text(r.NodeId),
+                                            NodeNo: Text(r.NodeNo),
+                                            NodeTitle: Text(r.NodeTitle),
+                                            NodeSubtitle: Text(r.NodeSubtitle),
+                                            Discipline: Text(r.Discipline),
+                                            SubsystemCode: Coalesce(Text(r.SubsystemCode), Text(r.Discipline)),
+            
+                                            Total:
+                                                If(
+                                                    IsBlank(Text(r.Total)) || Text(r.Total) = "null",
+                                                    0,
+                                                    Value(Text(r.Total))
+                                                ),
+            
+                                            Done:
+                                                If(
+                                                    IsBlank(Text(r.Done)) || Text(r.Done) = "null",
+                                                    0,
+                                                    Value(Text(r.Done))
+                                                ),
+            
+                                            Remaining:
+                                                If(
+                                                    IsBlank(Text(r.Remaining)) || Text(r.Remaining) = "null",
+                                                    0,
+                                                    Value(Text(r.Remaining))
+                                                ),
+            
+                                            Progress:
+                                                If(
+                                                    IsBlank(Text(r.Progress)) || Text(r.Progress) = "null",
+                                                    0,
+                                                    Value(Text(r.Progress))
+                                                ),
+            
+                                            ProgressStatus: Text(r.ProgressStatus),
+            
+                                            SortOrder:
+                                                If(
+                                                    IsBlank(Text(r.SortOrder)) || Text(r.SortOrder) = "null",
+                                                    0,
+                                                    Value(Text(r.SortOrder))
+                                                ),
+            
+                                            ProgressColor:
+                                                Switch(
+                                                    Text(r.ProgressStatus),
+                                                    "Excellent", "#22C55E",
+                                                    "Good", "#F59E0B",
+                                                    "In Progress", "#00C8FF",
+                                                    "Delayed", "#EF4444",
+                                                    "#64748B"
+                                                )
+                                        }
+                                    )
+                                )
+                            );
+            
+                            ClearCollect(
+                                colHomeHiveNodesSorted_Staging,
+                                SortByColumns(
+                                    colHomeHiveNodes_Staging,
+                                    "SortOrder",
+                                    SortOrder.Ascending
+                                )
+                            );
+            
+                            ClearCollect(
+                                colHomeLowestProgress_Staging,
+                                FirstN(
+                                    SortByColumns(
+                                        colHomeHiveNodes_Staging,
+                                        "Progress",
+                                        SortOrder.Ascending,
+                                        "Remaining",
+                                        SortOrder.Descending
+                                    ),
+                                    3
+                                )
+                            )
+                        )
+                    )
+                ),
+            
+                Set(varHomeError, FirstError.Message)
+            );
+            
+            If(
+                !IsBlank(varHomeError),
+            
+                Set(varHomeNoData, true);
+                Set(varProjectHasHomeData, false);
+                Set(varProjectHasReportConfig, false);
+                Set(varHomeHiveLoaded, false);
+            
+                Set(varHomeShowOverview, false);
+                Set(varHomeShowCards, false);
+                Set(varHomeShowRightPanel, true);
+            
+                Notify(
+                    "Home dashboard could not be loaded for this project.",
+                    NotificationType.Warning
+                ),
+            
+                If(
+                    CountRows(colHomeHiveNodes_Staging) = 0,
+            
+                    Set(varHomeNoData, true);
+                    Set(varProjectHasHomeData, false);
+                    Set(varProjectHasReportConfig, false);
+                    Set(varHomeHiveLoaded, false);
+            
+                    Set(varHomeShowOverview, false);
+                    Set(varHomeShowCards, false);
+                    Set(varHomeShowRightPanel, true);
+            
+                    If(
+                        IsBlank(varAppWarning),
+                        Set(
+                            varAppWarning,
+                            "This project has no published report configuration yet."
+                        )
+                    ),
+            
+                    ClearCollect(colHomeHiveNodes, colHomeHiveNodes_Staging);
+                    ClearCollect(colHomeHiveNodesSorted, colHomeHiveNodesSorted_Staging);
+                    ClearCollect(colHomeLowestProgress, colHomeLowestProgress_Staging);
+            
+                    Set(varHomeNoData, false);
+                    Set(varProjectHasHomeData, true);
+                    Set(varProjectHasReportConfig, true);
+                    Set(varHomeHiveLoaded, true);
+            
+                    Set(varHomeShowOverview, true);
+                    Set(varHomeShowCards, true);
+                    Set(varHomeShowRightPanel, true);
+            
+                    Set(varHomeLastRefresh, Now())
+                )
+            );
+            
+            Set(varHomeLoading, false);
+            Set(varProjectSwitching, false);
+            Set(varGlobalLoading, false);
+            Set(varGlobalLoadingMsg, "");
+            Set(varGlobalLoadingSubMsg, "");
+            Set(varGlobalLoadingScope, "");
+            Set(varGlobalLoadAction, "");
+            Set(varGlobalLoadPending, false)
+        Text: ="Button"
+        Visible: =false
+        X: =60
+        Y: =60
+        ZIndex: =6
+
+    btnHome_ProjectChange_Commit As modernButton:
+        OnSelect: |-
+            =
+            If(
+                IsBlank(varPendingProjectId),
+            
+                Notify("No pending project selected.", NotificationType.Warning);
+            
+                Set(varProjectSwitching, false);
+                Set(varHomeLoading, false);
+                Set(varGlobalLoading, false);
+                Set(varGlobalLoadingMsg, "");
+                Set(varGlobalLoadingSubMsg, "");
+                Set(varGlobalLoadingScope, "");
+                Set(varGlobalLoadAction, "");
+                Set(varGlobalLoadPending, false);
+            
+                Exit()
+            );
+            
+            Set(
+                varSelectedProject,
+                LookUp(
+                    colEnabledProjectsUI,
+                    Value(ProjectId) = Value(varPendingProjectId)
+                )
+            );
+            
+            If(
+                IsBlank(varSelectedProject) || IsBlank(varSelectedProject.ProjectId),
+            
+                Notify("Selected project was not found in the enabled projects list.", NotificationType.Error);
+            
+                Set(varProjectLoaded, false);
+                Set(varProjectId, Blank());
+                Set(varPendingProjectId, Blank());
+            
+                Set(varProjectSwitching, false);
+                Set(varHomeLoading, false);
+                Set(varGlobalLoading, false);
+                Set(varGlobalLoadingMsg, "");
+                Set(varGlobalLoadingSubMsg, "");
+                Set(varGlobalLoadingScope, "");
+                Set(varGlobalLoadAction, "");
+                Set(varGlobalLoadPending, false);
+            
+                Exit()
+            );
+            
+            // Project context
+            Set(varProjectId, Value(varSelectedProject.ProjectId));
+            Set(varProjectCode, Text(varSelectedProject.ProjectCode));
+            Set(varProjectName, Text(varSelectedProject.ProjectName));
+            Set(varProjectDescription, Text(varSelectedProject.ProjectDescription));
+            Set(varProjectLoaded, true);
+            Set(varPendingProjectId, Blank());
+            
+            // Navigation
+            Set(varAppView, "Home");
+            Set(varPageKey, "HOME");
+            Set(varPageTitle, "Home");
+            Set(varPageSubtitle, "Project command center");
+            Set(varHomeViewMode, "DASHBOARD");
+            
+            // Reset errors
+            Set(varAppError, "");
+            Set(varAppWarning, "");
+            Set(varHomeError, "");
+            Set(varOps_Error, "");
+            Set(varCfg_Error, "");
+            Set(varHomePendingError, "");
+            
+            // Reset flags
+            Set(varProjectHasHomeData, false);
+            Set(varProjectHasReportConfig, false);
+            Set(varHomeHiveLoaded, false);
+            Set(varHomeNoData, false);
+            
+            // Reset visibility
+            Set(varHomeShowOverview, false);
+            Set(varHomeShowCards, false);
+            Set(varHomeShowRightPanel, false);
+            
+            // Reset selected Home entities
+            Set(
+                varSelectedHiveNode,
+                {
+                    NodeId: "",
+                    NodeNo: "",
+                    NodeTitle: "",
+                    NodeSubtitle: "",
+                    Discipline: "",
+                    SubsystemCode: "",
+                    Total: 0,
+                    Done: 0,
+                    Remaining: 0,
+                    Progress: 0,
+                    ProgressStatus: "",
+                    ProgressColor: "",
+                    SortOrder: 0
+                }
+            );
+            
+            Set(
+                varSelectedHiveSubsystem,
+                {
+                    SubsystemCode: "",
+                    Discipline: "",
+                    Total: 0,
+                    Done: 0,
+                    Remaining: 0,
+                    Progress: 0,
+                    ProgressStatus: "",
+                    ProgressColor: ""
+                }
+            );
+            
+            // Clear Home collections
+            Clear(colHomeHiveNodes);
+            Clear(colHomeHiveNodesSorted);
+            Clear(colHomeLowestProgress);
+            Clear(colHomePendingSubsystems);
+            Clear(colHomePendingSubsystems_Staging);
+            
+            // Reset dependent areas
+            Clear(colTasks);
+            Clear(colTasks_Staging);
+            Clear(colPunches);
+            Clear(colPunches_Staging);
+            
+            // Punch filters reset
+            Set(varPunchCatalogs_ProjectId, Blank());
+            Clear(colPunchSubsystems_Filter);
+            Clear(colPunchTemplates_Filter);
+            Clear(colPunchCategories_Filter);
+            Clear(colPunchStatuses_Filter);
+            Clear(colPunchDisciplines_Filter);
+            Clear(colPunchSubcontractors_Filter);
+            
+            Set(varPunchesLoaded, false);
+            Set(varPunches_HasSearched, false);
+            Set(varPunches_Page, 1);
+            Set(varPunches_TotalPages, 0);
+            Set(varPunches_TotalRows, 0);
+            
+            // Loading state
+            Set(varProjectSwitching, true);
+            Set(varHomeLoading, false);
+            
+            Set(varGlobalLoading, true);
+            Set(varGlobalLoadingMsg, "Loading Home...");
+            Set(varGlobalLoadingSubMsg, "Loading selected project dashboard");
+            Set(varGlobalLoadingScope, "HOME");
+            
+            // Schedule Home load
+            Set(varGlobalLoadAction, "LOAD_HOME");
+            Set(varGlobalLoadPending, false);
+            Set(varGlobalLoadPending, true)
+        Text: ="Button"
+        Visible: =false
+        X: =120
+        Y: =120
+        ZIndex: =7
+
+    conGlobalOverlay_Home As groupContainer.manualLayoutContainer:
+        DropShadow: =DropShadow.Light
+        Fill: =RGBA(15, 23, 42, 0.38)
+        Height: =App.Height
+        LayoutGridColumnMinWidth: =0
+        LayoutGridColumns: =6
+        LayoutGridRowMinHeight: =0
+        LayoutGridRows: =6
+        RadiusBottomLeft: =4
+        RadiusBottomRight: =4
+        RadiusTopLeft: =4
+        RadiusTopRight: =4
+        Visible: |-
+            =varGlobalLoading ||
+            varProjectSwitching ||
+            varHomeLoading ||
+            varGlobalLoadPending
+        Width: =App.Width
+        ZIndex: =8
+
+        conGlobalLoadingCard As groupContainer.manualLayoutContainer:
+            BorderColor: |-
+                =ColorValue("#E2E8F0")
+            BorderThickness: =1
+            DropShadow: =DropShadow.Semilight
+            Fill: |-
+                =ColorValue("#FFFFFF")
+            Height: =136
+            LayoutGridColumnMinWidth: =0
+            LayoutGridColumns: =6
+            LayoutGridRowMinHeight: =0
+            LayoutGridRows: =6
+            RadiusBottomLeft: =16
+            RadiusBottomRight: =16
+            RadiusTopLeft: =16
+            RadiusTopRight: =16
+            Width: =340
+            X: =(Parent.Width - Self.Width) / 2
+            Y: =(Parent.Height - Self.Height) / 2
+            ZIndex: =1
+
+            Spinner3 As Spinner:
+                BasePaletteColor: =
+                DisplayMode: =DisplayMode.Edit
+                FontColor: =
+                Height: =32
+                SpinnerColor: =varTheme_PulseBlue
+                TrackColor: =
+                Width: =32
+                X: =24
+                Y: =86
+                ZIndex: =1
+
+            Text31 As modernText:
+                AutoHeight: =true
+                Color: =varTheme_TextMuted
+                Size: =11
+                Text: |-
+                    =
+                    Coalesce(varGlobalLoadingSubMsg, "")
+                Width: =Parent.Width - 48
+                X: =24
+                Y: =52
+                ZIndex: =2
+
+            Text36 As modernText:
+                AutoHeight: =true
+                Color: =varTheme_Text
+                FontWeight: =FontWeight.Semibold
+                Height: =24
+                Size: =14
+                Text: |-
+                    =
+                    Coalesce(varGlobalLoadingMsg, "Loading...")
+                Width: =Parent.Width - 48
+                X: =24
+                Y: =24
+                ZIndex: =3
+
+            Rectangle2 As rectangle:
+                BorderColor: =RGBA(0, 0, 0, 0)
+                BorderStyle: =BorderStyle.None
+                BorderThickness: =2
+                DisabledFill: =RGBA(161, 159, 157, 1)
+                Fill: |-
+                    =ColorValue("#E2E8F0")
+                FocusedBorderThickness: =4
+                Height: =4
+                HoverFill: =RGBA(0, 120, 212, 1)
+                PressedFill: =RGBA(0, 120, 212, 1)
+                Width: =Parent.Width - 88
+                X: =94
+                Y: =98
+                ZIndex: =4
+
+            Rectangle6 As rectangle:
+                BorderColor: =RGBA(0, 0, 0, 0)
+                BorderStyle: =BorderStyle.None
+                BorderThickness: =2
+                DisabledFill: =RGBA(161, 159, 157, 1)
+                Fill: =varTheme_PulseBlue
+                FocusedBorderThickness: =4
+                Height: =4
+                HoverFill: =RGBA(0, 120, 212, 1)
+                PressedFill: =RGBA(0, 120, 212, 1)
+                Width: =90
+                X: =64
+                Y: =98
+                ZIndex: =5
+

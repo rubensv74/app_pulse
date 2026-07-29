@@ -1,0 +1,571 @@
+cmp_OverviewTile As CanvasComponent:
+    OnExpand():
+        ThisProperty:
+            Default: =
+    OnInfo():
+        ThisProperty:
+            Default: =
+    OnRefresh():
+        ThisProperty:
+            Default: =
+    OnSelectTile():
+        ThisProperty:
+            Default: =
+    AccentColor: |-
+        =ColorValue("#1677FF")
+    BackgroundColor: |-
+        =ColorValue("#FFFFFF")
+    BadgeText: =""
+    BodyHeight: =cmp_OverviewTile.Height - If(cmp_OverviewTile.ShowHeader, 116, 60)
+    BodyWidth: =cmp_OverviewTile.Width - 32
+    BodyX: =16
+    BodyY: =If(cmp_OverviewTile.ShowHeader, 72, 16)
+    BorderColor: |-
+        =ColorValue("#E2E8F0")
+    ChildTabPriority: =true
+    ContentLanguage: =""
+    DangerColor: |-
+        =ColorValue("#DC2626")
+    DeltaDirection: ="flat"
+    DeltaText: =""
+    EmptyText: ="No data available"
+    EnableChildFocus: =true
+    ErrorText: ="Unable to load tile"
+    Fill: =RGBA(0, 0, 0, 0)
+    FooterText: =""
+    Height: =220
+    InsightText: =""
+    IsEmpty: =Lower(cmp_OverviewTile.State) = "empty"
+    IsError: =Lower(cmp_OverviewTile.State) = "error"
+    IsInsight: =Lower(cmp_OverviewTile.TileType) = "insight" || Lower(cmp_OverviewTile.TileType) = "warning"
+    IsLoading: =Lower(cmp_OverviewTile.State) = "loading"
+    IsMetric: =Lower(cmp_OverviewTile.TileType) = "metric"
+    IsProgress: =Lower(cmp_OverviewTile.TileType) = "progress"
+    IsSelected: =false
+    IsSuccess: =Lower(cmp_OverviewTile.State) = "success"
+    LoadingText: ="Loading..."
+    MutedTextColor: |-
+        =ColorValue("#64748B")
+    ProgressLabel: =""
+    ProgressValue: =0
+    SecondaryValueText: =""
+    ShowExpand: =true
+    ShowFooter: =true
+    ShowHeader: =true
+    ShowInfo: =false
+    ShowRefresh: =true
+    ShowToolbar: =true
+    SourceText: =""
+    State: ="Success"
+    StatusColor: |-
+        =ColorValue("#16A34A")
+    Subtitle: =""
+    SurfaceAltColor: |-
+        =ColorValue("#F8FAFC")
+    TextColor: |-
+        =ColorValue("#0F172A")
+    TileSize: ="M"
+    TileType: ="Metric"
+    Title: ="Overview"
+    ValueText: ="0"
+    Visible: =true
+    WarningColor: |-
+        =ColorValue("#EA580C")
+    Width: =320
+    X: =0
+    Y: =0
+
+    conOT_Root As groupContainer.manualLayoutContainer:
+        BorderColor: =If(cmp_OverviewTile.IsSelected, cmp_OverviewTile.AccentColor, cmp_OverviewTile.BorderColor)
+        BorderThickness: =If(cmp_OverviewTile.IsSelected, 2, 1)
+        DropShadow: =DropShadow.Semibold
+        Fill: =cmp_OverviewTile.BackgroundColor
+        Height: =Parent.Height
+        LayoutGridColumnMinWidth: =0
+        LayoutGridColumns: =6
+        LayoutGridRowMinHeight: =0
+        LayoutGridRows: =6
+        RadiusBottomLeft: =16
+        RadiusBottomRight: =16
+        RadiusTopLeft: =16
+        RadiusTopRight: =16
+        Width: =Parent.Width
+        ZIndex: =1
+
+        btnOT_Click As button:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =0
+            Color: =Color.White
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(161, 159, 157, 1)
+            DisabledFill: =RGBA(242, 242, 241, 0)
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =Parent.Height
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverColor: =Color.White
+            HoverFill: =RGBA(0,0,0,0.02)
+            OnSelect: =cmp_OverviewTile.OnSelectTile()
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedColor: =Color.White
+            PressedFill: =RGBA(0,0,0,0.04)
+            RadiusBottomLeft: =16
+            RadiusBottomRight: =16
+            RadiusTopLeft: =16
+            RadiusTopRight: =16
+            Size: =15
+            Text: =""
+            Width: =Parent.Width
+            ZIndex: =1
+
+        lblOT_Title As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =cmp_OverviewTile.TextColor
+            Font: =""
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =13
+            Text: =cmp_OverviewTile.Title
+            Visible: =cmp_OverviewTile.ShowHeader
+            Width: =Parent.Width - If(cmp_OverviewTile.ShowToolbar, 150, 32)
+            X: =16
+            Y: =14
+            ZIndex: =2
+
+        lblOT_Subtitle As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =cmp_OverviewTile.MutedTextColor
+            Font: =""
+            Height: =18
+            Size: =9
+            Text: =cmp_OverviewTile.Subtitle
+            Visible: =cmp_OverviewTile.ShowHeader && !IsBlank(cmp_OverviewTile.Subtitle)
+            Width: =Parent.Width - If(cmp_OverviewTile.ShowToolbar, 150, 32)
+            X: =16
+            Y: =38
+            ZIndex: =3
+
+        conOT_Badge As groupContainer.manualLayoutContainer:
+            BorderColor: =cmp_OverviewTile.AccentColor
+            BorderThickness: =1
+            Fill: =cmp_OverviewTile.SurfaceAltColor
+            Height: =24
+            LayoutGridColumnMinWidth: =0
+            LayoutGridColumns: =6
+            LayoutGridRowMinHeight: =0
+            LayoutGridRows: =6
+            RadiusBottomLeft: =12
+            RadiusBottomRight: =12
+            RadiusTopLeft: =12
+            RadiusTopRight: =12
+            Visible: =cmp_OverviewTile.ShowHeader && !IsBlank(cmp_OverviewTile.BadgeText)
+            Width: =86
+            X: =Parent.Width - If(cmp_OverviewTile.ShowToolbar, 238, 104)
+            Y: =18
+            ZIndex: =4
+
+            lblOT_Badge As label:
+                Align: =Align.Center
+                BorderColor: =RGBA(0, 0, 0, 0)
+                Color: =cmp_OverviewTile.AccentColor
+                DisabledColor: =RGBA(161, 159, 157, 1)
+                Fill: =Color.Transparent
+                Font: =Font.'Segoe UI'
+                FontWeight: =FontWeight.Semibold
+                Height: =24
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =8
+                Text: =cmp_OverviewTile.BadgeText
+                VerticalAlign: =VerticalAlign.Top
+                Width: =Parent.Width
+                Y: =3
+                ZIndex: =1
+
+        icoOT_Refresh As icon:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =cmp_OverviewTile.MutedTextColor
+            DisabledBorderColor: =RGBA(245, 245, 245, 1)
+            DisabledColor: =RGBA(225, 223, 221, 1)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            FocusedBorderThickness: =4
+            Height: =18
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverColor: =cmp_OverviewTile.AccentColor
+            HoverFill: =RGBA(0, 0, 0, 0)
+            Icon: =Icon.Reload
+            OnSelect: =cmp_OverviewTile.OnRefresh()
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedColor: =cmp_OverviewTile.AccentColor
+            PressedFill: =RGBA(0, 0, 0, 0)
+            Visible: =cmp_OverviewTile.ShowHeader && cmp_OverviewTile.ShowToolbar && cmp_OverviewTile.ShowRefresh
+            Width: =18
+            X: =Parent.Width - 104
+            Y: =20
+            ZIndex: =5
+
+        icoOT_Expand As icon:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =cmp_OverviewTile.MutedTextColor
+            DisabledBorderColor: =RGBA(245, 245, 245, 1)
+            DisabledColor: =RGBA(225, 223, 221, 1)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            FocusedBorderThickness: =4
+            Height: =18
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverColor: =cmp_OverviewTile.AccentColor
+            HoverFill: =RGBA(0, 0, 0, 0)
+            Icon: =Icon.ExpandView
+            OnSelect: =cmp_OverviewTile.OnExpand()
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedColor: =cmp_OverviewTile.AccentColor
+            PressedFill: =RGBA(0, 0, 0, 0)
+            Visible: =cmp_OverviewTile.ShowHeader && cmp_OverviewTile.ShowToolbar && cmp_OverviewTile.ShowExpand
+            Width: =18
+            X: =Parent.Width - 68
+            Y: =20
+            ZIndex: =6
+
+        icoOT_Info As icon:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =cmp_OverviewTile.MutedTextColor
+            DisabledBorderColor: =RGBA(245, 245, 245, 1)
+            DisabledColor: =RGBA(225, 223, 221, 1)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            FocusedBorderThickness: =4
+            Height: =18
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverColor: =cmp_OverviewTile.AccentColor
+            HoverFill: =RGBA(0, 0, 0, 0)
+            Icon: =Icon.Information
+            OnSelect: =cmp_OverviewTile.OnInfo()
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedColor: =cmp_OverviewTile.AccentColor
+            PressedFill: =RGBA(0, 0, 0, 0)
+            Visible: =cmp_OverviewTile.ShowHeader && cmp_OverviewTile.ShowToolbar && cmp_OverviewTile.ShowInfo
+            Width: =18
+            X: =Parent.Width - 32
+            Y: =20
+            ZIndex: =7
+
+        rectOT_HeaderLine As rectangle:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            DisabledFill: =RGBA(161, 159, 157, 1)
+            Fill: =cmp_OverviewTile.BorderColor
+            FocusedBorderThickness: =4
+            Height: =1
+            HoverFill: =cmp_OverviewTile.BorderColor
+            PressedFill: =cmp_OverviewTile.BorderColor
+            Visible: =cmp_OverviewTile.ShowHeader
+            Width: =Parent.Width
+            Y: =64
+            ZIndex: =8
+
+        lblOT_State As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =If(cmp_OverviewTile.IsError, cmp_OverviewTile.DangerColor, cmp_OverviewTile.MutedTextColor)
+            Font: =""
+            FontWeight: =FontWeight.Semibold
+            Height: =24
+            Size: =12
+            Text: |-
+                =If(
+                    cmp_OverviewTile.IsLoading,
+                    cmp_OverviewTile.LoadingText,
+                    If(
+                        cmp_OverviewTile.IsError,
+                        cmp_OverviewTile.ErrorText,
+                        cmp_OverviewTile.EmptyText
+                    )
+                )
+            Visible: =cmp_OverviewTile.IsLoading || cmp_OverviewTile.IsEmpty || cmp_OverviewTile.IsError
+            Width: =Parent.Width - 48
+            X: =24
+            Y: =(Parent.Height - 24) / 2
+            ZIndex: =9
+
+        lblOT_Value As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =cmp_OverviewTile.TextColor
+            Font: =""
+            FontWeight: =FontWeight.Semibold
+            Height: =44
+            Size: =30
+            Text: =cmp_OverviewTile.ValueText
+            Visible: =cmp_OverviewTile.IsSuccess && cmp_OverviewTile.IsMetric
+            Width: =Parent.Width - 32
+            X: =16
+            Y: =If(cmp_OverviewTile.ShowHeader, 84, 28)
+            ZIndex: =10
+
+        lblOT_SecondaryValue As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =cmp_OverviewTile.MutedTextColor
+            Font: =""
+            Height: =18
+            Size: =10
+            Text: =cmp_OverviewTile.SecondaryValueText
+            Visible: =cmp_OverviewTile.IsSuccess && cmp_OverviewTile.IsMetric && !IsBlank(cmp_OverviewTile.SecondaryValueText)
+            Width: =Parent.Width - 32
+            X: =16
+            Y: =If(cmp_OverviewTile.ShowHeader, 130, 74)
+            ZIndex: =11
+
+        conOT_Delta As groupContainer.manualLayoutContainer:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Fill: =cmp_OverviewTile.SurfaceAltColor
+            Height: =26
+            LayoutGridColumnMinWidth: =0
+            LayoutGridColumns: =6
+            LayoutGridRowMinHeight: =0
+            LayoutGridRows: =6
+            RadiusBottomLeft: =13
+            RadiusBottomRight: =13
+            RadiusTopLeft: =13
+            RadiusTopRight: =13
+            Visible: =cmp_OverviewTile.IsSuccess && cmp_OverviewTile.IsMetric && !IsBlank(cmp_OverviewTile.DeltaText)
+            Width: =92
+            X: =16
+            Y: =If(cmp_OverviewTile.ShowHeader, 154, 98)
+            ZIndex: =12
+
+            icoOT_Delta As icon:
+                BorderColor: =RGBA(0, 0, 0, 0)
+                Color: |-
+                    =Switch(
+                        Lower(cmp_OverviewTile.DeltaDirection),
+                        "up", cmp_OverviewTile.StatusColor,
+                        "down", cmp_OverviewTile.DangerColor,
+                        cmp_OverviewTile.MutedTextColor
+                    )
+                DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                DisabledColor: =RGBA(225, 223, 221, 1)
+                DisabledFill: =RGBA(0, 0, 0, 0)
+                FocusedBorderThickness: =4
+                Height: =14
+                HoverBorderColor: =RGBA(0, 0, 0, 0)
+                HoverColor: =Self.Color
+                HoverFill: =RGBA(0, 0, 0, 0)
+                Icon: |-
+                    =Switch(
+                        Lower(cmp_OverviewTile.DeltaDirection),
+                        "up", Icon.ChevronUp,
+                        "down", Icon.ChevronDown,
+                        Icon.HorizontalLine
+                    )
+                OnSelect: =cmp_OverviewTile.OnSelectTile()
+                PressedBorderColor: =RGBA(0, 0, 0, 0)
+                PressedColor: =Self.Color
+                PressedFill: =RGBA(0, 0, 0, 0)
+                Width: =14
+                X: =8
+                Y: =6
+                ZIndex: =1
+
+            lblOT_Delta As label:
+                BorderColor: =RGBA(0, 0, 0, 0)
+                Color: =icoOT_Delta.Color
+                DisabledColor: =RGBA(161, 159, 157, 1)
+                Fill: =Color.Transparent
+                Font: =Font.'Segoe UI'
+                FontWeight: =FontWeight.Semibold
+                Height: =26
+                OnSelect: =cmp_OverviewTile.OnSelectTile()
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =9
+                Text: =cmp_OverviewTile.DeltaText
+                VerticalAlign: =VerticalAlign.Top
+                Width: =Parent.Width - 30
+                X: =28
+                Y: =6
+                ZIndex: =2
+
+        lblOT_ProgressValue As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =cmp_OverviewTile.TextColor
+            Font: =""
+            FontWeight: =FontWeight.Semibold
+            Height: =36
+            Size: =24
+            Text: =Text(cmp_OverviewTile.ProgressValue) & "%"
+            Visible: =cmp_OverviewTile.IsSuccess && cmp_OverviewTile.IsProgress
+            Width: =Parent.Width - 32
+            X: =16
+            Y: =If(cmp_OverviewTile.ShowHeader, 84, 28)
+            ZIndex: =13
+
+        lblOT_ProgressLabel As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =cmp_OverviewTile.MutedTextColor
+            Font: =""
+            Height: =18
+            Size: =10
+            Text: =cmp_OverviewTile.ProgressLabel
+            Visible: =cmp_OverviewTile.IsSuccess && cmp_OverviewTile.IsProgress && !IsBlank(cmp_OverviewTile.ProgressLabel)
+            Width: =Parent.Width - 32
+            X: =16
+            Y: =If(cmp_OverviewTile.ShowHeader, 124, 68)
+            ZIndex: =14
+
+        rectOT_ProgressBg As rectangle:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            DisabledFill: =RGBA(161, 159, 157, 1)
+            Fill: =cmp_OverviewTile.SurfaceAltColor
+            FocusedBorderThickness: =4
+            Height: =10
+            HoverFill: =cmp_OverviewTile.SurfaceAltColor
+            PressedFill: =cmp_OverviewTile.SurfaceAltColor
+            Visible: =cmp_OverviewTile.IsSuccess && cmp_OverviewTile.IsProgress
+            Width: =Parent.Width - 32
+            X: =16
+            Y: =If(cmp_OverviewTile.ShowHeader, 154, 98)
+            ZIndex: =15
+
+        rectOT_ProgressFill As rectangle:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            DisabledFill: =RGBA(161, 159, 157, 1)
+            Fill: =cmp_OverviewTile.AccentColor
+            FocusedBorderThickness: =4
+            Height: =10
+            HoverFill: =cmp_OverviewTile.AccentColor
+            PressedFill: =cmp_OverviewTile.AccentColor
+            Visible: =cmp_OverviewTile.IsSuccess && cmp_OverviewTile.IsProgress
+            Width: =(Parent.Width - 32) * Min(Max(cmp_OverviewTile.ProgressValue, 0), 100) / 100
+            X: =16
+            Y: =rectOT_ProgressBg.Y
+            ZIndex: =16
+
+        conOT_InsightIcon As groupContainer.manualLayoutContainer:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Fill: |-
+                =If(Lower(cmp_OverviewTile.TileType) = "warning", ColorValue("#FFF7ED"), cmp_OverviewTile.SurfaceAltColor)
+            Height: =38
+            LayoutGridColumnMinWidth: =0
+            LayoutGridColumns: =6
+            LayoutGridRowMinHeight: =0
+            LayoutGridRows: =6
+            RadiusBottomLeft: =12
+            RadiusBottomRight: =12
+            RadiusTopLeft: =12
+            RadiusTopRight: =12
+            Visible: =cmp_OverviewTile.IsSuccess && cmp_OverviewTile.IsInsight
+            Width: =38
+            X: =16
+            Y: =If(cmp_OverviewTile.ShowHeader, 84, 28)
+            ZIndex: =17
+
+            icoOT_Insight As icon:
+                BorderColor: =RGBA(0, 0, 0, 0)
+                Color: =If(Lower(cmp_OverviewTile.TileType) = "warning", cmp_OverviewTile.WarningColor, cmp_OverviewTile.AccentColor)
+                DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                DisabledColor: =RGBA(225, 223, 221, 1)
+                DisabledFill: =RGBA(0, 0, 0, 0)
+                FocusedBorderThickness: =4
+                Height: =20
+                HoverBorderColor: =RGBA(0, 0, 0, 0)
+                HoverColor: =Self.Color
+                HoverFill: =RGBA(0, 0, 0, 0)
+                Icon: =If(Lower(cmp_OverviewTile.TileType) = "warning", Icon.Warning, Icon.Lightbulb)
+                OnSelect: =cmp_OverviewTile.OnSelectTile()
+                PressedBorderColor: =RGBA(0, 0, 0, 0)
+                PressedColor: =Self.Color
+                PressedFill: =RGBA(0, 0, 0, 0)
+                Width: =20
+                X: =9
+                Y: =9
+                ZIndex: =1
+
+        lblOT_Insight As label:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =cmp_OverviewTile.TextColor
+            DisabledColor: =RGBA(161, 159, 157, 1)
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =76
+            OnSelect: =cmp_OverviewTile.OnSelectTile()
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =10
+            Text: =cmp_OverviewTile.InsightText
+            VerticalAlign: =VerticalAlign.Top
+            Visible: =cmp_OverviewTile.IsSuccess && cmp_OverviewTile.IsInsight
+            Width: =Parent.Width - 76
+            X: =64
+            Y: =If(cmp_OverviewTile.ShowHeader, 86, 30)
+            ZIndex: =18
+
+        conOT_BodyHost As groupContainer.manualLayoutContainer:
+            BorderColor: =cmp_OverviewTile.BorderColor
+            Fill: =Color.Transparent
+            Height: =Parent.Height - If(cmp_OverviewTile.ShowHeader, 116, 60)
+            LayoutGridColumnMinWidth: =0
+            LayoutGridColumns: =6
+            LayoutGridRowMinHeight: =0
+            LayoutGridRows: =6
+            Visible: =cmp_OverviewTile.IsSuccess && !(cmp_OverviewTile.IsMetric || cmp_OverviewTile.IsProgress || cmp_OverviewTile.IsInsight)
+            Width: =Parent.Width - 32
+            X: =16
+            Y: =If(cmp_OverviewTile.ShowHeader, 76, 16)
+            ZIndex: =19
+
+        rectOT_FooterLine As rectangle:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            DisabledFill: =RGBA(161, 159, 157, 1)
+            Fill: =cmp_OverviewTile.BorderColor
+            FocusedBorderThickness: =4
+            Height: =1
+            HoverFill: =cmp_OverviewTile.BorderColor
+            PressedFill: =cmp_OverviewTile.BorderColor
+            Visible: =cmp_OverviewTile.ShowFooter
+            Width: =Parent.Width
+            Y: =Parent.Height - 42
+            ZIndex: =20
+
+        lblOT_Footer As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =cmp_OverviewTile.MutedTextColor
+            Font: =""
+            Height: =16
+            Size: =8
+            Text: =cmp_OverviewTile.FooterText
+            Visible: =cmp_OverviewTile.ShowFooter && !IsBlank(cmp_OverviewTile.FooterText)
+            Width: =Parent.Width - 130
+            X: =16
+            Y: =Parent.Height - 28
+            ZIndex: =21
+
+        lblOT_Source As modernText:
+            AutoHeight: =true
+            BorderStyle: =""
+            Color: =cmp_OverviewTile.MutedTextColor
+            Font: =""
+            Height: =16
+            Size: =8
+            Text: =cmp_OverviewTile.SourceText
+            Visible: =cmp_OverviewTile.ShowFooter && !IsBlank(cmp_OverviewTile.SourceText)
+            Width: =110
+            X: =Parent.Width - 126
+            Y: =Parent.Height - 28
+            ZIndex: =22
+

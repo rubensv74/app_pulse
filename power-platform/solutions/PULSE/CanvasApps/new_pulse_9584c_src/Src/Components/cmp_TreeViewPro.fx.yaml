@@ -1,0 +1,223 @@
+cmp_TreeViewPro As CanvasComponent:
+    OnSelectNode():
+        ThisProperty:
+            Default: =false
+    AccentColor: |-
+        =ColorValue("#1677FF")
+    AllowSearch: =true
+    BorderColor: |-
+        =ColorValue("#E2E8F0")
+    ChildTabPriority: =true
+    CompactMode: =true
+    ContentLanguage: =""
+    EnableChildFocus: =true
+    Fill: =cmp_TreeViewPro.SurfaceColor
+    Height: =520
+    Items: |-
+        =Table(
+            {
+                RowNodeId: "",
+                RowParentNodeId: "",
+                RowLevel: 1,
+                RowLabel: "",
+                RowDescription: "",
+                RowSortPath: "",
+                RowIcon: ""
+            }
+        )
+    MutedTextColor: |-
+        =ColorValue("#64748B")
+    OnReset: |-
+        =
+        Set(varTree_SearchText, "");
+        Set(varTree_SelectedNodeId, cmp_TreeViewPro.SelectedNodeId);
+        Set(varTree_SelectedParentId, "");
+        Set(varTree_SelectedLevel, 0);
+        Set(varTree_SelectedLabel, "");
+        Set(varTree_SelectedRecord, Blank())
+    SearchText: =""
+    SelectedLabelOut: =varTree_SelectedLabel
+    SelectedLevelOut: =varTree_SelectedLevel
+    SelectedNodeId: =""
+    SelectedNodeIdOut: =varTree_SelectedNodeId
+    SelectedParentIdOut: =varTree_SelectedParentId
+    SelectedRecordOut: =varTree_SelectedRecord
+    SelectionFill: |-
+        =ColorValue("#E0F7FF")
+    ShowIcons: =true
+    ShowLines: =true
+    SurfaceColor: |-
+        =ColorValue("#FFFFFF")
+    TextColor: |-
+        =ColorValue("#0F172A")
+    Visible: =true
+    Width: =420
+    X: =0
+    Y: =0
+
+    conTreeRoot As groupContainer.manualLayoutContainer:
+        BorderColor: =cmp_TreeViewPro.BorderColor
+        BorderThickness: =1
+        Fill: =cmp_TreeViewPro.SurfaceColor
+        Height: =Parent.Height
+        LayoutGridColumnMinWidth: =0
+        LayoutGridColumns: =6
+        LayoutGridRowMinHeight: =0
+        LayoutGridRows: =6
+        RadiusBottomLeft: =12
+        RadiusBottomRight: =12
+        RadiusTopLeft: =12
+        RadiusTopRight: =12
+        Width: =Parent.Width
+        ZIndex: =1
+
+        txtTreeSearch As modernTextInput:
+            Appearance: =Appearance.Outline
+            BorderStyle: =""
+            Default: =Coalesce(cmp_TreeViewPro.SearchText, varTree_SearchText)
+            Font: =""
+            Height: =36
+            OnChange: =Set(varTree_SearchText, Self.Text)
+            Placeholder: ="Search..."
+            Required: =false
+            TriggerOutput: =TriggerOutput.Keypress
+            ValidationState: =ValidationState.None
+            Visible: =cmp_TreeViewPro.AllowSearch
+            Width: =Parent.Width - 28
+            X: =14
+            Y: =14
+            ZIndex: =1
+
+        galTreeRows As gallery.galleryVertical:
+            '#CopilotOverlayLabel': ="Filtered"
+            BorderColor: =Color.Transparent
+            DelayItemLoading: =true
+            Height: =Parent.Height - Self.Y - 12
+            Items: |-
+                =
+                SortByColumns(
+                    Filter(
+                        cmp_TreeViewPro.Items,
+                        IsBlank(Coalesce(cmp_TreeViewPro.SearchText, varTree_SearchText)) ||
+                        StartsWith(
+                            Lower(Text(RowLabel)),
+                            Lower(Text(Coalesce(cmp_TreeViewPro.SearchText, varTree_SearchText)))
+                        ) ||
+                        StartsWith(
+                            Lower(Text(RowDescription)),
+                            Lower(Text(Coalesce(cmp_TreeViewPro.SearchText, varTree_SearchText)))
+                        )
+                    ),
+                    "RowSortPath",
+                    SortOrder.Ascending
+                )
+            Layout: =Layout.Vertical
+            LoadingSpinner: =LoadingSpinner.Data
+            OnSelect: |-
+                =
+                Set(varTree_SelectedNodeId, Text(ThisItem.RowNodeId));
+                Set(varTree_SelectedParentId, Text(ThisItem.RowParentNodeId));
+                Set(varTree_SelectedLevel, Value(ThisItem.RowLevel));
+                Set(varTree_SelectedLabel, Text(ThisItem.RowLabel));
+                Set(varTree_SelectedRecord, ThisItem);
+                cmp_TreeViewPro.OnSelectNode()
+            TemplateFill: |-
+                =
+                If(
+                    Text(ThisItem.RowNodeId) = Text(varTree_SelectedNodeId) ||
+                    Text(ThisItem.RowNodeId) = Text(cmp_TreeViewPro.SelectedNodeId),
+                    cmp_TreeViewPro.SelectionFill,
+                    Color.Transparent
+                )
+            TemplatePadding: =0
+            TemplateSize: =If(cmp_TreeViewPro.CompactMode, 32, 40)
+            Width: =Parent.Width - 28
+            X: =14
+            Y: =If(cmp_TreeViewPro.AllowSearch, 62, 14)
+            ZIndex: =2
+
+            recTreeGuide_1 As rectangle:
+                BorderColor: =App.Theme.Colors.Darker40
+                Fill: =RGBA(148,163,184,0.28)
+                Height: =Parent.TemplateHeight
+                OnSelect: =Select(Parent)
+                Visible: =cmp_TreeViewPro.ShowLines && Value(ThisItem.RowLevel) > 1
+                Width: =1
+                X: =15 + ((Value(ThisItem.RowLevel) - 2) * 18)
+                ZIndex: =1
+
+            recTreeBranch_1 As rectangle:
+                BorderColor: =App.Theme.Colors.Darker40
+                Fill: =RGBA(148,163,184,0.28)
+                Height: =1
+                OnSelect: =Select(Parent)
+                Visible: =cmp_TreeViewPro.ShowLines && Value(ThisItem.RowLevel) > 1
+                Width: =12
+                X: =15 + ((Value(ThisItem.RowLevel) - 2) * 18)
+                Y: =If(cmp_TreeViewPro.CompactMode, 15, 19)
+                ZIndex: =2
+
+            icoTreeRow As icon:
+                BorderColor: =App.Theme.Colors.Darker40
+                Color: |-
+                    =
+                    Switch(
+                        Value(ThisItem.RowLevel),
+                        1, cmp_TreeViewPro.AccentColor,
+                        2, ColorValue("#0EA5E9"),
+                        3, cmp_TreeViewPro.MutedTextColor,
+                        cmp_TreeViewPro.MutedTextColor
+                    )
+                DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                DisabledColor: =RGBA(244, 244, 244, 1)
+                Height: =If(cmp_TreeViewPro.CompactMode, 16, 18)
+                Icon: |-
+                    =
+                    Switch(
+                        Value(ThisItem.RowLevel),
+                        1, Icon.Database,
+                        2, Icon.Folder,
+                        3, Icon.Document,
+                        Icon.Document
+                    )
+                OnSelect: =Select(Parent)
+                Visible: =cmp_TreeViewPro.ShowIcons
+                Width: =If(cmp_TreeViewPro.CompactMode, 16, 18)
+                X: =8 + ((Value(ThisItem.RowLevel) - 1) * 18)
+                Y: =If(cmp_TreeViewPro.CompactMode, 8, 11)
+                ZIndex: =3
+
+            lblTreeRow As label:
+                BorderColor: =App.Theme.Colors.Darker40
+                Color: |-
+                    =
+                    If(
+                        Text(ThisItem.RowNodeId) = Text(varTree_SelectedNodeId) ||
+                        Text(ThisItem.RowNodeId) = Text(cmp_TreeViewPro.SelectedNodeId),
+                        cmp_TreeViewPro.AccentColor,
+                        cmp_TreeViewPro.TextColor
+                    )
+                DisabledColor: =RGBA(166, 166, 166, 1)
+                Fill: =Color.Transparent
+                Font: =Font.'Segoe UI'
+                FontWeight: |-
+                    =
+                    If(
+                        Text(ThisItem.RowNodeId) = Text(varTree_SelectedNodeId) ||
+                        Text(ThisItem.RowNodeId) = Text(cmp_TreeViewPro.SelectedNodeId),
+                        FontWeight.Semibold,
+                        If(Value(ThisItem.RowLevel) = 1, FontWeight.Semibold, FontWeight.Normal)
+                    )
+                Height: =Parent.TemplateHeight
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =If(cmp_TreeViewPro.CompactMode, 9, 10)
+                Text: =Text(ThisItem.RowLabel)
+                Width: =Parent.TemplateWidth - Self.X - 10
+                Wrap: =false
+                X: =If(cmp_TreeViewPro.ShowIcons, icoTreeRow.X + 24, 8 + ((Value(ThisItem.RowLevel) - 1) * 18))
+                ZIndex: =4
+

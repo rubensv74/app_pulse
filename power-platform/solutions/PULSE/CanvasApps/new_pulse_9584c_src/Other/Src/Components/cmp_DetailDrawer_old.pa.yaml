@@ -1,0 +1,3105 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+ComponentDefinitions:
+  cmp_DetailDrawer_old:
+    DefinitionType: CanvasComponent
+    AccessAppScope: true
+    CustomProperties:
+      AppColors:
+        PropertyKind: Input
+        DisplayName: AppColors
+        Description: A custom property
+        DataType: Record
+        Default: =gblAppColors
+      CloseAction:
+        PropertyKind: Event
+        DisplayName: CloseAction
+        Description: A custom property
+        ReturnType: None
+        Default: =Set(varShowDetailDrawer, false)
+      EntityType:
+        PropertyKind: Input
+        DisplayName: EntityType
+        Description: A custom property
+        DataType: Text
+        Default: =varDrawerEntityType
+      FormCodeText:
+        PropertyKind: Input
+        DisplayName: FormCodeText
+        Description: A custom property
+        DataType: Text
+        Default: ="Text"
+      HostHeight:
+        PropertyKind: Input
+        DisplayName: HostHeight
+        Description: A custom property
+        DataType: Number
+        Default: =App.Height
+      HostWidth:
+        PropertyKind: Input
+        DisplayName: HostWidth
+        Description: A custom property
+        DataType: Number
+        Default: =App.Width
+      IsLoading:
+        PropertyKind: Input
+        DisplayName: IsLoading
+        Description: A custom property
+        DataType: Boolean
+        Default: =false
+      IsOpen:
+        PropertyKind: Input
+        DisplayName: IsOpen
+        Description: A custom property
+        DataType: Boolean
+        Default: =varShowDetailDrawer
+      NormalizedRecord:
+        PropertyKind: Input
+        DisplayName: NormalizedRecord
+        Description: A custom property
+        DataType: Record
+        Default: =varDrawerNormalized
+      OnManageFieldsRequested:
+        PropertyKind: Event
+        DisplayName: OnManageFieldsRequested
+        Description: A custom property
+        ReturnType: None
+        Default: =
+      OnSaveCustomField:
+        PropertyKind: Event
+        DisplayName: OnSaveCustomField
+        Description: A custom property
+        ReturnType: None
+        Default: =
+      OnSaved:
+        PropertyKind: Event
+        DisplayName: OnSaved
+        Description: A custom property
+        ReturnType: None
+        Default: =
+      OnToggleFieldActiveRequested:
+        PropertyKind: Event
+        DisplayName: OnToggleFieldActiveRequested
+        Description: A custom property
+        ReturnType: None
+        Default: =
+      ProjectId:
+        PropertyKind: Input
+        DisplayName: ProjectId
+        Description: A custom property
+        DataType: Number
+        Default: =varProjectId
+      RecordId:
+        PropertyKind: Input
+        DisplayName: RecordId
+        Description: A custom property
+        DataType: Number
+        Default: =varDrawerRecordId
+      SelectedRecord:
+        PropertyKind: Input
+        DisplayName: SelectedRecord
+        Description: A custom property
+        DataType: Record
+        Default: =varDrawerSelectedRecord
+      StatusText:
+        PropertyKind: Input
+        DisplayName: StatusText
+        Description: A custom property
+        DataType: Text
+        Default: ="Text"
+      UserEmail:
+        PropertyKind: Input
+        DisplayName: UserEmail
+        Description: A custom property
+        DataType: Text
+        Default: =varUserEmail
+      UserName:
+        PropertyKind: Input
+        DisplayName: UserName
+        Description: A custom property
+        DataType: Text
+        Default: =varUserName
+      UserRole:
+        PropertyKind: Input
+        DisplayName: UserRole
+        Description: A custom property
+        DataType: Text
+        Default: =varUserRole
+    Properties:
+      Fill: =RGBA(0,0,0,0.25)
+      Height: |+
+        =
+        With({pad: 12}, Min(820, App.Height - 2*pad))
+      OnReset: |+
+        =
+
+        Set(varDrawerProjectId, Self.ProjectId);
+        Set(varDrawerEntityType, Self.EntityType);
+        Set(varDrawerRecordId, Self.RecordId);
+
+        // Variables tipadas
+        Set(varCT_Error, "");
+        Set(varCT_IsLoading, false);
+        Set(varCT_IsSaving, false);
+        Set(varCT_IsDirty, false);
+        Set(varCT_LoadKey, "");
+
+        // Crear colección vacía de forma segura
+        Clear(colCT_Merged);
+        Clear(colCT_Dirty);
+        Clear(colCT_Quick);
+
+
+        ClearCollect(
+            colCT_Dirty,
+            {
+                FieldKey: "",
+                FieldType: "",
+                ValueText: "",
+                ValueNumber: Blank(),
+                ValueDate: Blank(),
+                ValueBool: false,
+                ValueJson: ""
+            }
+        );
+        RemoveIf(colCT_Dirty, FieldKey = "");
+      Width: |+
+        =
+
+        With({pad: 12}, Min(720, App.Width - 2*pad))
+    Children:
+      - conDrawer:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Height: |-
+              =With(
+                  { pad: 12 },
+                  cmp_DetailDrawer_old.HostHeight - 2*pad
+              )
+            Width: |-
+              =With(
+                  { pad: 12, mode: If(cmp_DetailDrawer_old.HostWidth < 1100 || cmp_DetailDrawer_old.HostHeight < 750, "Overlay", "Side") },
+                  Min(720, cmp_DetailDrawer_old.HostWidth - 2*pad)
+              )
+            X: =(Parent.Width - Self.Width) / 2
+            Y: |-
+              =With(
+                  { pad: 12 },
+                  RoundDown((cmp_DetailDrawer_old.HostHeight - Self.Height)/2, 0)
+              )
+          Children:
+            - conDrawerSurface:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  Fill: =RGBA(245, 247, 250, 1)
+                  Height: =744
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  PaddingBottom: =If(App.Width < 1100 || App.Height < 750, 16, 12)
+                  PaddingLeft: =If(App.Width < 1100 || App.Height < 750, 16, 12)
+                  PaddingRight: =If(App.Width < 1100 || App.Height < 750, 16, 12)
+                  PaddingTop: =If(App.Width < 1100 || App.Height < 750, 16, 12)
+                  Width: =Parent.Width
+                Children:
+                  - conSpinner:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255,255,255,0.7)
+                        Height: =Parent.Height
+                        Visible: =false //cmp_DetailDrawer.IsOpen && cmp_DetailDrawer.IsOpen && cmp_DetailDrawer.IsLoading
+                        Width: =Parent.Width
+                        X: =40
+                        Y: =40
+                      Children:
+                        - Spinner1:
+                            Control: Spinner@1.4.6
+                            Properties:
+                              Height: =127
+                              SpinnerSize: ='Spinner.SpinnerSize'.Large
+                              Width: =168
+                              X: =240
+                              Y: =35
+                        - lblCommentsTitle_1:
+                            Control: Text@0.0.51
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              FontColor: =cmp_DetailDrawer_old.AppColors.TextPrimary
+                              Height: =31
+                              Text: ="Loading details..."
+                              VerticalAlign: =VerticalAlign.Middle
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =168
+                              X: =240
+                              Y: =146
+                  - conHeader:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =varTheme_Border
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =varTheme_Surface
+                        FillPortions: =0
+                        Height: =60
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =2
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        PaddingBottom: =16
+                        PaddingLeft: =20
+                        PaddingRight: =20
+                        PaddingTop: =16
+                        RadiusBottomLeft: =16
+                        RadiusBottomRight: =16
+                        RadiusTopLeft: =16
+                        RadiusTopRight: =16
+                        Visible: =!cmp_DetailDrawer_old.IsLoading
+                        Width: '=Parent.Width '
+                      Children:
+                        - lblTitle:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Color: =varTheme_Text
+                              FontWeight: =FontWeight.Semibold
+                              LayoutMinHeight: =40
+                              LayoutMinWidth: =16
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              RadiusBottomLeft: =4
+                              RadiusBottomRight: =4
+                              RadiusTopLeft: =4
+                              RadiusTopRight: =4
+                              Size: =22
+                              Text: |
+                                =
+
+                                Text(cmp_DetailDrawer_old.SelectedRecord.ElementCode) & "  •  " &
+
+                                cmp_DetailDrawer_old.EntityType & " #" & 
+
+                                Text(cmp_DetailDrawer_old.SelectedRecord.PunchId) 
+                              VerticalAlign: =VerticalAlign.Top
+                              Width: |+
+                                =Parent.Width - 50
+
+                        - icoClose:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              Color: =RGBA(106, 122, 127, 1)
+                              DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                              DisabledColor: =RGBA(225, 223, 221, 1)
+                              DisabledFill: =RGBA(0, 0, 0, 0)
+                              FocusedBorderThickness: =4
+                              Height: =20
+                              HoverBorderColor: =RGBA(0, 0, 0, 0)
+                              HoverColor: =cmp_DetailDrawer_old.AppColors.TextPrimary
+                              HoverFill: =RGBA(0, 0, 0, 0)
+                              Icon: =Icon.Cancel
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              OnSelect: |-
+                                =
+
+                                cmp_DetailDrawer_old.CloseAction();
+
+                                Set(varCT_LoadKey, "");
+                                Clear(colCT_Merged);
+                                Clear(colCT_Quick);
+                                Clear(colCT_Dirty);
+                              PressedBorderColor: =RGBA(0, 0, 0, 0)
+                              PressedColor: =cmp_DetailDrawer_old.AppColors.TextPrimary
+                              PressedFill: =RGBA(0, 0, 0, 0)
+                              Width: =20
+                  - tabDetail:
+                      Control: TabList@2.2.31
+                      Properties:
+                        Alignment: ='TabList.Alignment'.Horizontal
+                        BasePaletteColor: =RGBA(95, 121, 151, 1)
+                        DefaultSelectedItems: =[varDrawerTab]
+                        Font: =Font.'Segoe UI'
+                        FontColor: =cmp_DetailDrawer_old.AppColors.TextPrimary
+                        FontSize: =16
+                        Height: =40
+                        Items: =["Overview","Comments","Custom","History"]
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        OnChange: "=\r\n\r\nSet(varDrawerTab, Coalesce(tabDetail.Selected.Value, \"Overview\"));\r\n\r\nIf(\r\n    IsBlank(cmp_DetailDrawer_old.RecordId) || Value(cmp_DetailDrawer_old.RecordId) = 0,\r\n    Notify(\"No record selected.\", NotificationType.Warning\r\n),\r\n\r\n    Switch(\r\n        \r\n        varDrawerTab,\r\n\r\n        // =========================\r\n        // COMMENTS TAB\r\n        // =========================\r\n        \"Comments\",\r\n\r\n            Set(varIsLoadingComments, true);\r\n            Set(varCommentsPageSize, Coalesce(varCommentsPageSize, 20));\r\n            Set(varCommentsPage, 1);\r\n\r\n            // Asegura schema tipado de colComments (1 vez)\r\n            If(\r\n                IsEmpty(colComments),\r\n                ClearCollect(\r\n                    colComments,\r\n                    Table(\r\n                        {\r\n                            CommentId: 0,\r\n                            TaskId: 0,\r\n                            CommentText: \"\",\r\n                            CommentType: \"\",\r\n                            CreatedOn: Now(),\r\n                            CreatedByEmail: \"\",\r\n                            CreatedByName: \"\",\r\n                            ModifiedOn: Now(),\r\n                            ModifiedByEmail: \"\",\r\n                            TotalRows: 0,\r\n                            TotalPages: 0,\r\n                            PageNumber: 1,\r\n                            PageSize: 20\r\n                        }\r\n                    )\r\n                );\r\n                Clear(colComments)\r\n            );\r\n\r\n            Set(\r\n                varCommResp,\r\n                Warroom_GetTaskCommentsPaged.Run(\r\n                    cmp_DetailDrawer_old.ProjectId,\r\n                    cmp_DetailDrawer_old.RecordId,\r\n                    varCommentsPage,\r\n                    varCommentsPageSize,\r\n                    cmp_DetailDrawer_old.EntityType\r\n                )\r\n            );\r\n\r\n            Set(varCommResultText, Coalesce(Text(varCommResp.result), \"\"));\r\n\r\n            If(\r\n                varCommResultText = \"\",\r\n                Clear(colComments);\r\n                Set(varCommentsTotalRows, 0);\r\n                Set(varCommentsTotalPages, 0),\r\n                \r\n                ClearCollect(\r\n                    colComments,\r\n                    ForAll(\r\n                        Table(ParseJSON(varCommResultText)),\r\n                        {\r\n                            CommentId: Value(ThisRecord.Value.CommentId),\r\n                            TaskId: Value(ThisRecord.Value.TaskId),\r\n                            CommentType: Text(ThisRecord.Value.CommentType),\r\n                            CreatedOn: DateTimeValue(Text(ThisRecord.Value.CreatedOn)),\r\n                            CreatedByEmail: Text(ThisRecord.Value.CreatedByEmail),\r\n                            CreatedByName: Text(ThisRecord.Value.CreatedByName),\r\n                            ModifiedOn: DateTimeValue(Text(ThisRecord.Value.ModifiedOn)),\r\n                            ModifiedByEmail: Text(ThisRecord.Value.ModifiedByEmail),\r\n                            CommentText: Text(ThisRecord.Value.CommentText),\r\n                            TotalRows: Value(ThisRecord.Value.TotalRows),\r\n                            TotalPages: Value(ThisRecord.Value.TotalPages),\r\n                            PageNumber: Value(ThisRecord.Value.PageNumber),\r\n                            PageSize: Value(ThisRecord.Value.PageSize)\r\n                        }\r\n                    )\r\n                );\r\n\r\n                Set(varCommentsTotalRows,  Coalesce(First(colComments).TotalRows, 0));\r\n                Set(varCommentsTotalPages, Coalesce(First(colComments).TotalPages, 0))\r\n            );\r\n\r\n            Set(varIsLoadingComments, false),\r\n\r\n        // =========================\r\n        // CUSTOM TAB\r\n        // =========================\r\n            \"Custom\",\r\n            If(\r\n                IsBlank(cmp_DetailDrawer_old.RecordId) || cmp_DetailDrawer_old.RecordId = 0,\r\n                Notify(\"No record selected.\", NotificationType.Warning),\r\n                Select(btnCT_Load)\r\n            ),\r\n\r\n        // =========================\r\n        // DEFAULT: no action\r\n        // =========================\r\n        true\r\n    )\r\n);"
+                        OnSelect: |-
+                          =
+
+                          /*
+                          Switch(
+                              tabDetail.Selected.Value,
+                              "Overview",  Set(varDrawerTab, Coalesce(tabDetail.Selected.Value, "Overview")) ,
+                              "Comments", Set(varDrawerTab, Coalesce(tabDetail.Selected.Value, "Comments")),
+                              "Custom", Set(varDrawerTab, Coalesce(tabDetail.Selected.Value, "Custom")),
+                              "History", Set(varDrawerTab, Coalesce(tabDetail.Selected.Value, "History"))
+                          );
+                          */
+                        Size: ='TabList.Size'.Small
+                        Width: |
+                          =Parent.Width
+                        X: =40
+                        Y: =40
+                  - conBody:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        AlignInContainer: =AlignInContainer.SetByContainer
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(245, 247, 250, 1)
+                        Height: =conDrawer.Height - conHeader.Height - tabDetail.Height - 20
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =10
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        PaddingBottom: =2
+                        PaddingLeft: =2
+                        PaddingRight: =4
+                        PaddingTop: =4
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Visible: =!cmp_DetailDrawer_old.IsLoading
+                        Width: =Parent.Width
+                      Children:
+                        - conOverview:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =cmp_DetailDrawer_old.AppColors.Background
+                              Height: =Parent.Height
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =10
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              PaddingBottom: =2
+                              PaddingLeft: =2
+                              PaddingRight: =2
+                              PaddingTop: =2
+                              Visible: |+
+                                =varDrawerTab = "Overview"
+
+                              Width: =Parent.Width
+                            Children:
+                              - conOverview_Wbs:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: =RGBA(214, 221, 224, 1)
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =2
+                                    PaddingLeft: =10
+                                    PaddingRight: =2
+                                    PaddingTop: =2
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                  Children:
+                                    - lblWbs_Area:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          BorderStyle: =BorderStyle.Solid
+                                          BorderThickness: =0
+                                          FontColor: =RGBA(0, 0, 0, 1)
+                                          Height: =28
+                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.AreaCode
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =280
+                                          X: =182
+                                          Y: =46
+                                    - lblWbs_Unit:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          BorderStyle: =BorderStyle.Solid
+                                          BorderThickness: =0
+                                          FontColor: =RGBA(0, 0, 0, 1)
+                                          Height: =28
+                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.UnitCode
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =280
+                                          X: =182
+                                          Y: =79
+                                    - lblWbs_System:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          BorderStyle: =BorderStyle.Solid
+                                          BorderThickness: =0
+                                          FontColor: =RGBA(0, 0, 0, 1)
+                                          Height: =28
+                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.SystemCode
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =280
+                                          X: =182
+                                          Y: =112
+                                    - lblWbs_Subsystem:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          BorderStyle: =BorderStyle.Solid
+                                          BorderThickness: =0
+                                          FontColor: =RGBA(0, 0, 0, 1)
+                                          Height: =28
+                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.SubsystemCode
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =280
+                                          X: =182
+                                          Y: =149
+                                    - lblWbs_TypeCode:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          BorderStyle: =BorderStyle.Solid
+                                          BorderThickness: =0
+                                          FontColor: =RGBA(0, 0, 0, 1)
+                                          Height: =28
+                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.TypeCode
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =280
+                                          X: =182
+                                          Y: =287
+                                    - lblWbs_ElementCode:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          BorderStyle: =BorderStyle.Solid
+                                          BorderThickness: =0
+                                          FontColor: =RGBA(0, 0, 0, 1)
+                                          Height: =28
+                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.ElementCode
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =280
+                                          X: =182
+                                          Y: =219
+                                    - lblWbs_ElementDiscipline:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          BorderStyle: =BorderStyle.Solid
+                                          BorderThickness: =0
+                                          FontColor: =RGBA(0, 0, 0, 1)
+                                          Height: =28
+                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.DisciplineValue
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =280
+                                          X: =182
+                                          Y: =254
+                                    - txtArea:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          Text: |-
+                                            ="Area: "
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Weight: ='TextCanvas.Weight'.Semibold
+                                          Width: =50
+                                          X: =40
+                                          Y: =45
+                                    - txtUnit:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          Text: |-
+                                            ="Unit: "
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Weight: ='TextCanvas.Weight'.Semibold
+                                          Width: =50
+                                          X: =40
+                                          Y: =79
+                                    - txtSystem:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          Text: |-
+                                            ="System: "
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Weight: ='TextCanvas.Weight'.Semibold
+                                          Width: =60
+                                          X: =40
+                                          Y: =111
+                                    - txtSubsystem:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          Text: |-
+                                            ="Subsystem: "
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Weight: ='TextCanvas.Weight'.Semibold
+                                          Width: =80
+                                          X: =40
+                                          Y: =147
+                                    - txtElementDiscipline:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.DisciplineLabel
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Weight: ='TextCanvas.Weight'.Semibold
+                                          Width: =130
+                                          X: =40
+                                          Y: =252
+                                    - txtTypeCode:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          Text: |-
+                                            ="Type Code: "
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Weight: ='TextCanvas.Weight'.Semibold
+                                          X: =40
+                                          Y: =284
+                                    - txtElementCode:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          FontWeight: =FontWeight.Semibold
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          RadiusBottomLeft: =0
+                                          RadiusBottomRight: =0
+                                          RadiusTopLeft: =0
+                                          RadiusTopRight: =0
+                                          Size: =14
+                                          Text: |-
+                                            ="Element Code: "
+                                          Width: =96
+                                          X: =40
+                                          Y: =218
+                                    - txtTypeCode_1:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          Height: =28
+                                          Text: |-
+                                            =cmp_DetailDrawer_old.NormalizedRecord.TitleLabel  //"Form Code: "
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Weight: ='TextCanvas.Weight'.Semibold
+                                          Width: =130
+                                          X: =40
+                                          Y: =316
+                                    - lblWbs_TypeCode_1:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          BorderStyle: =BorderStyle.Solid
+                                          BorderThickness: =0
+                                          FontColor: =RGBA(0, 0, 0, 1)
+                                          Height: =28
+                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.TitleValue
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =280
+                                          X: =182
+                                          Y: =318
+                                    - txtTypeCode_2:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          Text: |-
+                                            = cmp_DetailDrawer_old.NormalizedRecord.DescLabel   //"Form Description: "
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Weight: ='TextCanvas.Weight'.Semibold
+                                          Width: =130
+                                          X: =40
+                                          Y: =346
+                                    - lblWbs_TypeCode_2:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          BorderStyle: =BorderStyle.Solid
+                                          BorderThickness: =0
+                                          FontColor: =RGBA(0, 0, 0, 1)
+                                          Height: =160
+                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.DescValue
+                                          VerticalAlign: =VerticalAlign.Top
+                                          Width: =477
+                                          X: =182
+                                          Y: =354
+                                    - lblWbs_System_1:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          BorderStyle: =BorderStyle.Solid
+                                          BorderThickness: =0
+                                          FontColor: =RGBA(0, 0, 0, 1)
+                                          Height: =28
+                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.StatusValue
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =130
+                                          X: =182
+                                          Y: =180
+                                    - txtSystem_1:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          Text: |-
+                                            ="Status: "
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Weight: ='TextCanvas.Weight'.Semibold
+                                          Width: =60
+                                          X: =40
+                                          Y: =179
+                        - conComments:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =Color.Transparent
+                              Height: =Parent.Height
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =10
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              PaddingBottom: =2
+                              PaddingLeft: =2
+                              PaddingRight: =2
+                              PaddingTop: =2
+                              Visible: |
+                                =varDrawerTab = "Comments"
+                              Width: =Parent.Width
+                            Children:
+                              - conCommentsHeader:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: =RGBA(214, 221, 224, 1)
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =cmp_DetailDrawer_old.AppColors.Surface
+                                    FillPortions: =0
+                                    Height: =56
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingLeft: =2
+                                    PaddingRight: =2
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Width: =Parent.Width
+                                  Children:
+                                    - lblCommentsMeta:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          FontColor: =cmp_DetailDrawer_old.AppColors.TextPrimary
+                                          Height: =28
+                                          Size: =16
+                                          Text: |-
+                                            =
+                                            Coalesce(
+                                                cmp_DetailDrawer_old.FormCodeText,
+                                                "Record " & Text(cmp_DetailDrawer_old.RecordId)
+                                            )
+                                            &
+                                            If(
+                                                !IsBlank(cmp_DetailDrawer_old.StatusText),
+                                                "  •  " & cmp_DetailDrawer_old.StatusText,
+                                                ""
+                                            )
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =400
+                                          X: =164
+                                          Y: =12
+                                    - lblCommentsTitle:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          FontColor: =cmp_DetailDrawer_old.AppColors.TextPrimary
+                                          Height: =28
+                                          Text: ="Comments"
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Weight: ='TextCanvas.Weight'.Semibold
+                                          Width: =80
+                                          X: =61
+                                          Y: =12
+                                    - lblCommentsBadge:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          Align: ='TextCanvas.Align'.Center
+                                          BorderRadius: =14
+                                          Fill: =cmp_DetailDrawer_old.AppColors.Primary
+                                          FontColor: =RGBA(255, 255, 255, 1)
+                                          Height: =28
+                                          PaddingBottom: =4
+                                          PaddingLeft: =10
+                                          PaddingRight: =10
+                                          PaddingTop: =4
+                                          Size: =12
+                                          Text: =Text(varCommentsTotalRows)
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =36
+                                          X: =18
+                                          Y: =12
+                              - conCommentsComposer:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    BorderColor: =RGBA(214, 221, 224, 1)
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =cmp_DetailDrawer_old.AppColors.Surface
+                                    FillPortions: =0
+                                    Height: =300
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =8
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =8
+                                    PaddingLeft: =6
+                                    PaddingRight: =6
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Width: =Parent.Width
+                                  Children:
+                                    - conComposerLeft:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =1.2
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =8
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          PaddingBottom: =2
+                                          PaddingLeft: =6
+                                          PaddingRight: =6
+                                          PaddingTop: =2
+                                          Width: =530
+                                        Children:
+                                          - txtNewComment:
+                                              Control: RichTextEditor@2.7.0
+                                              Properties:
+                                                BorderColor: =RGBA(79, 90, 94, 1)
+                                                Default: =
+                                                Height: =270
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                Width: =520
+                                    - conComposerRight:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =0.3
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =20
+                                          LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          PaddingBottom: =10
+                                          PaddingTop: =10
+                                          RadiusBottomLeft: =0
+                                          RadiusBottomRight: =0
+                                          RadiusTopLeft: =0
+                                          RadiusTopRight: =0
+                                          Width: =100
+                                        Children:
+                                          - ddCommentType:
+                                              Control: ComboBox@0.0.51
+                                              Properties:
+                                                Appearance: ='ComboboxCanvas.Appearance'.Outline
+                                                InputTextPlaceholder: ="Type"
+                                                IsSearchable: =false
+                                                Items: =["General","Internal","Action"]
+                                                OnChange: =
+                                                Width: =120
+                                                X: =531
+                                                Y: =2
+                                          - btnSendComment:
+                                              Control: Button@0.0.45
+                                              Properties:
+                                                BasePaletteColor: =varTheme_PulseBlueDark
+                                                DisplayMode: |
+                                                  =
+                                                  If(
+                                                      varIsLoadingComments || IsBlank(Trim(txtNewComment.HtmlText)) || IsBlank(ddCommentType.Selected.Value) || cmp_DetailDrawer_old.IsOpen && cmp_DetailDrawer_old.IsLoading, 
+                                                      DisplayMode.Disabled, 
+                                                      DisplayMode.Edit
+                                                      )
+                                                OnSelect: |
+                                                  =
+
+                                                  Set(varIsLoadingComments, true);
+
+                                                  Set(
+                                                      varAddResp,
+                                                      Warroom_AddTaskComment.Run(
+                                                          cmp_DetailDrawer_old.ProjectId,
+                                                          cmp_DetailDrawer_old.RecordId,
+                                                          txtNewComment.HtmlText,
+                                                          User().Email,
+                                                          cmp_DetailDrawer_old.EntityType,
+                                                          User().FullName,
+                                                          ddCommentType.Selected.Value
+
+                                                      )
+                                                  );
+
+                                                  Reset(txtNewComment);
+                                                  Reset(ddCommentType);
+
+                                                  // Recarga page 1
+                                                  Set(varCommentsPage, 1);
+
+                                                  Set(
+                                                      varCommResp,
+                                                      Warroom_GetTaskCommentsPaged.Run(
+                                                          cmp_DetailDrawer_old.ProjectId,
+                                                          cmp_DetailDrawer_old.RecordId,
+                                                          varCommentsPage,
+                                                          varCommentsPageSize,
+                                                          cmp_DetailDrawer_old.EntityType
+                                                      )
+                                                  );
+
+                                                  ClearCollect(
+                                                      colComments,
+                                                      ForAll(
+                                                          Table(ParseJSON(varCommResp.result)),
+                                                          {
+                                                              CommentId: Value(ThisRecord.Value.CommentId),
+                                                              TaskId: Value(ThisRecord.Value.TaskId),
+                                                              CommentType: Text(ThisRecord.Value.CommentType),
+                                                              CreatedOn: DateTimeValue(Text(ThisRecord.Value.CreatedOn)),
+                                                              CreatedByEmail: Text(ThisRecord.Value.CreatedByEmail),
+                                                              CreatedByName: Text(ThisRecord.Value.CreatedByName),
+                                                              ModifiedOn: DateTimeValue(Text(ThisRecord.Value.ModifiedOn)),
+                                                              ModifiedByEmail: Text(ThisRecord.Value.ModifiedByEmail),
+                                                              CommentText: Text(ThisRecord.Value.CommentText),
+                                                              TotalRows: Value(ThisRecord.Value.TotalRows),
+                                                              TotalPages: Value(ThisRecord.Value.TotalPages),
+                                                              PageNumber: Value(ThisRecord.Value.PageNumber),
+                                                              PageSize: Value(ThisRecord.Value.PageSize)
+                                                          }
+                                                      )
+                                                  );
+
+                                                  Set(varCommentsTotalRows,  Coalesce(First(colComments).TotalRows, 0));
+                                                  Set(varCommentsTotalPages, Coalesce(First(colComments).TotalPages, 0));
+
+                                                  Set(varIsLoadingComments, false);
+                                                Text: ="Post"
+                                                X: =47
+                                                Y: =41
+                              - conCommentsList:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    AlignInContainer: =AlignInContainer.SetByContainer
+                                    BorderColor: =RGBA(214, 221, 224, 1)
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =cmp_DetailDrawer_old.AppColors.Surface
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutMinHeight: =200
+                                    LayoutMinWidth: =16
+                                    LayoutOverflowY: =LayoutOverflow.Scroll
+                                    PaddingBottom: =12
+                                    PaddingLeft: =12
+                                    PaddingRight: =12
+                                    PaddingTop: =12
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Width: =Parent.Width - 1
+                                  Children:
+                                    - lblEmptyState:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Align: =Align.Center
+                                          Color: =cmp_DetailDrawer_old.AppColors.TextPrimary
+                                          Height: =Parent.Height
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          RadiusBottomLeft: =0
+                                          RadiusBottomRight: =0
+                                          RadiusTopLeft: =0
+                                          RadiusTopRight: =0
+                                          Size: =14
+                                          Text: ="No comments yet. Be the first to add one."
+                                          Visible: =false//varCommentsTotalRows = 0
+                                          Width: =Parent.Width
+                                          X: |
+                                            =0
+                                    - galComments:
+                                        Control: Gallery@2.15.0
+                                        Variant: Vertical
+                                        Properties:
+                                          BorderColor: =Color.Transparent
+                                          BorderStyle: =BorderStyle.None
+                                          DisplayMode: |
+                                            =If(varIsLoadingComments, DisplayMode.Disabled, DisplayMode.Edit)
+                                          Fill: =Color.Transparent
+                                          FillPortions: =2
+                                          Height: =300
+                                          Items: |
+                                            =
+
+
+                                            SortByColumns(colComments, "CreatedOn", SortOrder.Descending)
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          ShowNavigation: =true
+                                          ShowScrollbar: =false
+                                          TemplateFill: =Color.Transparent
+                                          TemplateSize: =commentCard.Height
+                                          Visible: |+
+                                            =
+                                            varCommentsTotalRows > 0
+
+
+
+                                        Children:
+                                          - commentCard:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =RGBA(214, 221, 224, 1)
+                                                BorderThickness: =1
+                                                DropShadow: =DropShadow.None
+                                                Fill: =cmp_DetailDrawer_old.AppColors.Surface
+                                                Height: =htmlComment.Y + htmlComment.Height + 24
+                                                PaddingBottom: =12
+                                                PaddingLeft: =12
+                                                PaddingRight: =12
+                                                PaddingTop: =12
+                                                RadiusBottomLeft: =10
+                                                RadiusBottomRight: =10
+                                                RadiusTopLeft: =10
+                                                RadiusTopRight: =10
+                                                Width: =Parent.TemplateWidth
+                                              Children:
+                                                - htmlComment:
+                                                    Control: HtmlViewer@2.1.0
+                                                    Properties:
+                                                      AutoHeight: =true
+                                                      DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                                                      DisabledFill: =RGBA(0, 0, 0, 0)
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =200
+                                                      HoverBorderColor: =
+                                                      HtmlText: =ThisItem.CommentText
+                                                      OnSelect: =
+                                                      PaddingBottom: =0
+                                                      PaddingRight: =0
+                                                      PaddingTop: =0
+                                                      Width: =Parent.Width - 32
+                                                      X: =10
+                                                      Y: =65
+                                                - lblWhen:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Align: =Align.Right
+                                                      Height: =30
+                                                      PaddingBottom: =0
+                                                      PaddingLeft: =0
+                                                      PaddingRight: =0
+                                                      PaddingTop: =0
+                                                      RadiusBottomLeft: =0
+                                                      RadiusBottomRight: =0
+                                                      RadiusTopLeft: =0
+                                                      RadiusTopRight: =0
+                                                      Size: =14
+                                                      Text: =Text(DateTimeValue(ThisItem.CreatedOn), "dd mmm yyyy · HH:mm")
+                                                      Width: =164
+                                                      X: =470
+                                                      Y: =34
+                                                - lblCommentType:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      Color: =RGBA(255, 255, 255, 1)
+                                                      Fill: |
+                                                        =
+
+                                                        Switch(
+                                                          ThisItem.CommentType,
+                                                          "Internal", Color.Orange,
+                                                          "Action", RGBA(254, 226, 226, 1),
+                                                          Color.Green
+                                                        )
+                                                      Height: =28
+                                                      PaddingBottom: =0
+                                                      PaddingLeft: =0
+                                                      PaddingRight: =0
+                                                      PaddingTop: =0
+                                                      RadiusBottomLeft: =0
+                                                      RadiusBottomRight: =0
+                                                      RadiusTopLeft: =0
+                                                      RadiusTopRight: =0
+                                                      Size: =14
+                                                      Text: =ThisItem.CommentType
+                                                      Width: =96
+                                                      X: =299
+                                                      Y: =12
+                                                - lblUserEmail:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Color: =cmp_DetailDrawer_old.AppColors.TextPrimary
+                                                      Height: =28
+                                                      PaddingBottom: =0
+                                                      PaddingLeft: =0
+                                                      PaddingRight: =0
+                                                      PaddingTop: =0
+                                                      RadiusBottomLeft: =0
+                                                      RadiusBottomRight: =0
+                                                      RadiusTopLeft: =0
+                                                      RadiusTopRight: =0
+                                                      Size: =12
+                                                      Text: =ThisItem.CreatedByEmail
+                                                      Width: =230
+                                                      X: =66
+                                                      Y: =26
+                                                - lblUserName:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =28
+                                                      PaddingBottom: =0
+                                                      PaddingLeft: =0
+                                                      PaddingRight: =0
+                                                      PaddingTop: =0
+                                                      RadiusBottomLeft: =0
+                                                      RadiusBottomRight: =0
+                                                      RadiusTopLeft: =0
+                                                      RadiusTopRight: =0
+                                                      Size: =14
+                                                      Text: =ThisItem.CreatedByName
+                                                      VerticalAlign: =VerticalAlign.Bottom
+                                                      Width: =230
+                                                      X: =66
+                                                      Y: =4
+                                                - lblAuthor:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      Color: =Color.White
+                                                      Fill: =cmp_DetailDrawer_old.AppColors.Primary
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =44
+                                                      PaddingBottom: =0
+                                                      PaddingLeft: =0
+                                                      PaddingRight: =0
+                                                      PaddingTop: =0
+                                                      RadiusBottomLeft: =22
+                                                      RadiusBottomRight: =22
+                                                      RadiusTopLeft: =22
+                                                      RadiusTopRight: =22
+                                                      Size: =16
+                                                      Text: =Upper(Left(Coalesce(ThisItem.CreatedByName, ThisItem.CreatedByEmail), 1))
+                                                      Width: =44
+                                                      X: =14
+                                                      Y: =14
+                                                - icoDelete:
+                                                    Control: Classic/Icon@2.5.0
+                                                    Properties:
+                                                      BorderColor: =RGBA(0, 0, 0, 0)
+                                                      Color: =RGBA(239, 68, 68, 1)
+                                                      DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                                                      DisabledColor: =RGBA(225, 223, 221, 1)
+                                                      DisabledFill: =RGBA(0, 0, 0, 0)
+                                                      FocusedBorderThickness: =4
+                                                      Height: =20
+                                                      HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                                      HoverColor: =RGBA(220, 38, 38, 1)
+                                                      HoverFill: =RGBA(0, 0, 0, 0)
+                                                      Icon: =Icon.Trash
+                                                      OnSelect: |
+                                                        =
+                                                        Set(varIsLoadingComments, true);
+
+                                                        Set(
+                                                            varDelResp,
+                                                            'PowerAppV2->Executestoredprocedure(V2),RespondtoaPowerApp...'.Run(
+                                                                cmp_DetailDrawer_old.ProjectId,
+                                                                cmp_DetailDrawer_old.EntityType,
+                                                                ThisItem.CommentId,
+                                                                User().Email
+                                                            )
+                                                        );
+
+                                                        // Recarga página actual
+                                                        Set(
+                                                            varCommResp,
+                                                            Warroom_GetTaskCommentsPaged.Run(
+                                                                cmp_DetailDrawer_old.ProjectId,
+                                                                cmp_DetailDrawer_old.RecordId,
+                                                                varCommentsPage,
+                                                                varCommentsPageSize,
+                                                                cmp_DetailDrawer_old.EntityType
+                                                            )
+                                                        );
+
+                                                        ClearCollect(colComments, varCommResp.result);
+
+                                                        Set(varCommentsTotalRows,  Coalesce(First(colComments).TotalRows, 0));
+                                                        Set(varCommentsTotalPages, Coalesce(First(colComments).TotalPages, 0));
+
+                                                        Set(varIsLoadingComments, false);
+                                                      PressedBorderColor: =RGBA(0, 0, 0, 0)
+                                                      PressedColor: =RGBA(16, 110, 190, 1)
+                                                      PressedFill: =RGBA(0, 0, 0, 0)
+                                                      Visible: =true //varUserRole = "manager"
+                                                      Width: =20
+                                                      X: =608
+                                                      Y: =8
+                              - conCommentsFooter:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    Fill: =cmp_DetailDrawer_old.AppColors.Surface
+                                    Height: =0
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Visible: =false
+                                    X: =40
+                                    Y: =40
+                                  Children:
+                                    - lblCommentsRange:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Height: =24
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          RadiusBottomLeft: =0
+                                          RadiusBottomRight: =0
+                                          RadiusTopLeft: =0
+                                          RadiusTopRight: =0
+                                          Size: =14
+                                          Text: |
+                                            =
+
+
+
+                                            If(
+                                                varIsLoadingComments,
+                                                "Loading...",
+                                                If(
+                                                    varCommentsTotalRows = 0,
+                                                    "No comments",
+                                                    "Showing " &
+                                                    Text( (varCommentsPage - 1) * varCommentsPageSize + 1 ) &
+                                                    " to " &
+                                                    Text( Min(varCommentsPage * varCommentsPageSize, varCommentsTotalRows) ) &
+                                                    " of " &
+                                                    Text(varCommentsTotalRows)
+                                                )
+                                            )
+                                          VerticalAlign: =VerticalAlign.Top
+                                          Visible: =false
+                                          Width: =181
+                                          X: =11
+                                          Y: =13
+                                    - btnNextComments:
+                                        Control: Button@0.0.45
+                                        Properties:
+                                          Appearance: ='ButtonCanvas.Appearance'.Secondary
+                                          BasePaletteColor: =RGBA(95, 121, 151, 1)
+                                          DisplayMode: =If(varCommentsPage >= varCommentsTotalPages, DisplayMode.Disabled, DisplayMode.Edit)
+                                          OnSelect: |
+                                            =
+
+                                            Set(varCommentsPage, varCommentsPage + 1);
+                                            Set(varIsLoadingComments, true);
+
+                                            Set(
+                                                varCommResp,
+                                                Warroom_GetTaskCommentsPaged.Run(
+                                                    cmp_DetailDrawer_old.ProjectId,
+                                                    cmp_DetailDrawer_old.EntityType,
+                                                    cmp_DetailDrawer_old.RecordId,
+                                                    varCommentsPage,
+                                                    varCommentsPageSize
+                                                )
+                                            );
+
+                                            ClearCollect(colComments, varCommResp.result);
+
+                                            Set(varCommentsTotalRows,  If(CountRows(colComments) > 0, First(colComments).TotalRows, 0));
+                                            Set(varCommentsTotalPages, If(CountRows(colComments) > 0, First(colComments).TotalPages, 0));
+
+                                            Set(varIsLoadingComments, false);
+                                          Text: ="Next"
+                                          X: =456
+                                          Y: =5
+                                    - lblCommentsPage:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          Text: |+
+                                            =
+                                            If(
+                                                varCommentsTotalRows=0, "No comments",
+                                                "Page " & Text(varCommentsPage) & " of " & Text(varCommentsTotalPages)
+                                            )
+
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          X: =333
+                                          Y: =5
+                                    - btnPrevComments:
+                                        Control: Button@0.0.45
+                                        Properties:
+                                          Appearance: ='ButtonCanvas.Appearance'.Secondary
+                                          BasePaletteColor: =RGBA(95, 121, 151, 1)
+                                          DisplayMode: =If(varCommentsPage <= 1, DisplayMode.Disabled, DisplayMode.Edit)
+                                          OnSelect: |
+                                            =
+
+                                            Set(varCommentsPage, varCommentsPage - 1);
+                                            Set(varIsLoadingComments, true);
+
+                                            Set(
+                                                varCommResp,
+                                                Warroom_GetTaskCommentsPaged.Run(
+                                                    cmp_DetailDrawer_old.ProjectId,
+                                                    cmp_DetailDrawer_old.EntityType,
+                                                    cmp_DetailDrawer_old.RecordId,
+                                                    varCommentsPage,
+                                                    varCommentsPageSize
+                                                )
+                                            );
+
+                                            ClearCollect(colComments, varCommResp.result);
+
+                                            Set(varCommentsTotalRows,  Coalesce(First(colComments).TotalRows, 0));
+                                            Set(varCommentsTotalPages, Coalesce(First(colComments).TotalPages, 0));
+
+                                            Set(varIsLoadingComments, false);
+                                          Text: ="Previous"
+                                          X: =212
+                                          Y: =5
+                        - conCustom:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Height: =Parent.Height
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =10
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              PaddingBottom: =2
+                              PaddingLeft: =2
+                              PaddingRight: =2
+                              PaddingTop: =2
+                              Visible: |+
+                                =varDrawerTab = "Custom"
+
+                              Width: =Parent.Width
+                            Children:
+                              - conCustom_Header:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    BorderColor: =RGBA(214, 221, 224, 1)
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =0
+                                    Height: =56
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =10
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =8
+                                    PaddingLeft: =8
+                                    PaddingRight: =8
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Width: =Parent.Width
+                                  Children:
+                                    - lblCustomTitle:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          Align: ='TextCanvas.Align'.Center
+                                          Height: =28
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Size: =16
+                                          Text: ="Custom fields"
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Weight: ='TextCanvas.Weight'.Semibold
+                                          Width: =120
+                                    - lblCustomStatus:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Align: =Align.Center
+                                          Color: |-
+                                            =
+
+                                            Switch(
+                                                lblCustomStatus.Text,
+                                                "Saved", RGBA(22,101,52,1),
+                                                "Unsaved", RGBA(146,64,14,1),
+                                                "Empty", RGBA(146,64,14,1),
+                                                "Saving...", RGBA(30,64,175,1),
+                                                "Loading...", RGBA(30,64,175,1),
+                                                RGBA(55,65,81,1)
+                                            )
+                                          Fill: |-
+                                            =
+
+                                            Switch(
+                                                lblCustomStatus.Text,
+                                                "Saved", RGBA(220,252,231,1),
+                                                "Unsaved", RGBA(254,243,199,1),
+                                                "Empty", RGBA(254,243,199,1),
+                                                "Saving...", RGBA(219,234,254,1),
+                                                "Loading...", RGBA(219,234,254,1),
+                                                RGBA(229,231,235,1)
+                                            )
+                                          Height: =24
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          RadiusBottomLeft: =10
+                                          RadiusBottomRight: =10
+                                          RadiusTopLeft: =10
+                                          RadiusTopRight: =10
+                                          Size: =14
+                                          Text: |-
+                                            =
+
+
+                                            If(
+                                                varCT_IsSaving,
+                                                "Saving...",
+                                                If(
+                                                    varCT_IsLoading,
+                                                    "Loading...",
+                                                    If(
+                                                        varCT_IsDirty,
+                                                        "Unsaved",
+                                                        If(varCT_HasValues, "Saved", "Empty")
+                                                    )
+                                                )
+                                            )
+                                          Width: =80
+                                    - btnCustomSave:
+                                        Control: ModernButton@1.0.0
+                                        Properties:
+                                          Align: =Align.Center
+                                          BasePaletteColor: =varTheme_PulseBlueDark
+                                          DisplayMode: |-
+                                            =
+                                            If(
+                                                varCT_IsLoading || varCT_IsSaving || !varCT_IsDirty,
+                                                DisplayMode.Disabled,
+                                                DisplayMode.Edit
+                                            )
+                                          FontWeight: =""
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          OnSelect: |-
+                                            =
+                                            If(
+                                                CountRows(colCT_Dirty) = 0,
+                                                Notify("There are no changes to save.", NotificationType.Information),
+
+                                                Set(varCT_IsSaving, true);
+                                                Set(varCT_Error, "");
+
+                                                Set(
+                                                    varCT_SaveJson, 
+                                                    JSON(colCT_Dirty, JSONFormat.Compact)
+                                                );
+
+                                                IfError(
+                                                    Set(
+                                                        varCT_SaveResp,
+                                                        WarRoom_SaveCustomBulk.Run(
+                                                            cmp_DetailDrawer_old.ProjectId,
+                                                            cmp_DetailDrawer_old.EntityType,
+                                                            cmp_DetailDrawer_old.RecordId,
+                                                            varCT_SaveJson,
+                                                            cmp_DetailDrawer_old.UserEmail
+                                                        )
+                                                    );
+
+                                                    Set(
+                                                        varCT_SaveOuter,
+                                                        Table(ParseJSON(Coalesce(varCT_SaveResp.result, "[]")))
+                                                    );
+
+                                                    If(
+                                                        CountRows(varCT_SaveOuter) = 0,
+                                                        Set(varCT_IsSaving, false);
+                                                        Set(varCT_Error, "Save returned no data.");
+                                                        Notify("Save returned no data.", NotificationType.Error),
+
+                                                        Set(
+                                                            varCT_Bundle,
+                                                            ParseJSON(Text(First(varCT_SaveOuter).Value.result))
+                                                        );
+
+                                                        ClearCollect(
+                                                            colCT_Merged_UI,
+                                                            ForAll(
+                                                                Table(varCT_Bundle.merged),
+                                                                {
+                                                                    FieldKey: Text(ThisRecord.Value.FieldKey),
+                                                                    Label: Text(ThisRecord.Value.Label),
+                                                                    FieldType: Text(ThisRecord.Value.FieldType),
+                                                                    HelpText: Coalesce(Text(ThisRecord.Value.HelpText), ""),
+                                                                    IsRequired: Boolean(ThisRecord.Value.IsRequired),
+                                                                    IsPinned: Boolean(ThisRecord.Value.IsPinned),
+                                                                    SortOrder: Value(ThisRecord.Value.SortOrder),
+                                                                    OptionsJson: Coalesce(Text(ThisRecord.Value.OptionsJson), ""),
+
+                                                                    ValueText: Coalesce(Text(ThisRecord.Value.ValueText), ""),
+                                                                    ValueNumber: If(
+                                                                        IsBlank(Text(ThisRecord.Value.ValueNumber)),
+                                                                        Blank(),
+                                                                        Value(Text(ThisRecord.Value.ValueNumber))
+                                                                    ),
+                                                                    ValueDate: If(
+                                                                        IsBlank(Text(ThisRecord.Value.ValueDate)),
+                                                                        Blank(),
+                                                                        DateValue(Text(ThisRecord.Value.ValueDate))
+                                                                    ),
+                                                                    ValueBool: Boolean(ThisRecord.Value.ValueBool),
+                                                                    ValueJson: Coalesce(Text(ThisRecord.Value.ValueJson), ""),
+
+                                                                    LastUpdatedOn: If(
+                                                                        IsBlank(Text(ThisRecord.Value.LastUpdatedOn)),
+                                                                        Blank(),
+                                                                        DateTimeValue(Text(ThisRecord.Value.LastUpdatedOn))
+                                                                    ),
+                                                                    LastUpdatedByEmail: Coalesce(Text(ThisRecord.Value.LastUpdatedByEmail), "")
+                                                                }
+                                                            )
+                                                        );
+
+                                                        ClearCollect(colCT_Merged_Base, colCT_Merged_UI);
+
+                                                        ClearCollect(
+                                                            colCT_Quick,
+                                                            SortByColumns(
+                                                                Filter(colCT_Merged_UI, IsPinned = true),
+                                                                "SortOrder",
+                                                                SortOrder.Ascending
+                                                            )
+                                                        );
+
+                                                        Clear(colCT_Dirty);
+                                                        Set(varCT_IsDirty, false);
+                                                        Set(varCT_IsSaving, false);
+
+                                                        If(
+                                                            CountRows(colCT_Merged_UI) > 0,
+                                                            Set(varCT_LastUpdatedBy, First(colCT_Merged_UI).LastUpdatedByEmail);
+                                                            Set(varCT_LastUpdatedOn, First(colCT_Merged_UI).LastUpdatedOn);
+                                                            Set(varCT_LastUpdatedOnTxt, Text(First(colCT_Merged_UI).LastUpdatedOn, "dd/mm/yyyy hh:mm"))
+                                                        );
+
+                                                        Notify("Custom fields saved successfully.", NotificationType.Success)
+                                                    ),
+
+                                                    Set(varCT_IsSaving, false);
+                                                    Set(varCT_Error, FirstError.Message);
+                                                    Notify("Save error: " & FirstError.Message, NotificationType.Error)
+                                                )
+                                            )
+                                          PaddingBottom: =5
+                                          PaddingLeft: =12
+                                          PaddingRight: =12
+                                          PaddingTop: =5
+                                          RadiusBottomLeft: =4
+                                          RadiusBottomRight: =4
+                                          RadiusTopLeft: =4
+                                          RadiusTopRight: =4
+                                          Text: ="Save"
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Visible: =Lower(Coalesce(cmp_DetailDrawer_old.UserRole, "reader")) = "manager"
+                                          Width: =80
+                                    - btnCustomReset:
+                                        Control: Button@0.0.45
+                                        Properties:
+                                          Appearance: ='ButtonCanvas.Appearance'.Outline
+                                          BasePaletteColor: =ColorValue("#FFFFFF")
+                                          DisplayMode: |-
+                                            =
+                                            If(
+                                                varCT_IsLoading || varCT_IsSaving || !varCT_IsDirty,
+                                                DisplayMode.Disabled,
+                                                DisplayMode.Edit
+                                            )
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          OnSelect: |-
+                                            =Clear(colCT_Dirty);
+
+                                            ClearCollect(colCT_Merged_UI, colCT_Merged_Base);
+
+                                            ClearCollect(
+                                                colCT_Quick,
+                                                SortByColumns(
+                                                    Filter(colCT_Merged_UI, IsPinned = true),
+                                                    "SortOrder",
+                                                    SortOrder.Ascending
+                                                )
+                                            );
+
+                                            If(
+                                                CountRows(colCT_Merged_UI) > 0 && !IsBlank(First(colCT_Merged_UI).LastUpdatedOn),
+                                                Set(varCT_LastUpdatedBy, First(colCT_Merged_UI).LastUpdatedByEmail);
+                                                Set(varCT_LastUpdatedOn, First(colCT_Merged_UI).LastUpdatedOn);
+                                                Set(varCT_LastUpdatedOnTxt, Text(First(colCT_Merged_UI).LastUpdatedOn, "dd/mm/yyyy hh:mm")),
+                                                Set(varCT_LastUpdatedBy, "");
+                                                Set(varCT_LastUpdatedOn, Blank());
+                                                Set(varCT_LastUpdatedOnTxt, "")
+                                            );
+
+                                            Set(varCT_Error, "");
+                                            Set(varCT_IsDirty, false);
+                                          Text: ="Reset"
+                                          Visible: =Lower(Coalesce(cmp_DetailDrawer_old.UserRole, "reader")) = "manager"
+                                          Width: =80
+                                    - btnManageFields:
+                                        Control: Button@0.0.45
+                                        Properties:
+                                          Appearance: ='ButtonCanvas.Appearance'.Primary
+                                          BasePaletteColor: =varTheme_PulseBlueDark
+                                          Icon: ="Add"
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          OnSelect: |-
+                                            =
+
+
+
+                                            Set(varCT_ShowManageFields, true);
+
+                                            Set(varShowCustomAddFields, false);
+
+                                            Set(varCT_DefsSearch, "");
+                                            Set(varCT_DefsError, "");
+
+                                            cmp_DetailDrawer_old.OnManageFieldsRequested()
+                                          Text: ="Manage fields"
+                                          Visible: =cmp_DetailDrawer_old.UserRole = "manager"
+                                          Width: =150
+                                    - lblCustomError:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          RadiusBottomLeft: =0
+                                          RadiusBottomRight: =0
+                                          RadiusTopLeft: =0
+                                          RadiusTopRight: =0
+                                          Size: =14
+                                          VerticalAlign: =VerticalAlign.Top
+                                          Visible: =false
+                                          Width: =96
+                                    - icoCustomDirty:
+                                        Control: Classic/Icon@2.5.0
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(0, 120, 212, 1)
+                                          DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                                          DisabledColor: =RGBA(225, 223, 221, 1)
+                                          DisabledFill: =RGBA(0, 0, 0, 0)
+                                          FocusedBorderThickness: =4
+                                          Height: =30
+                                          HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                          HoverColor: =RGBA(16, 110, 190, 1)
+                                          HoverFill: =RGBA(0, 0, 0, 0)
+                                          Icon: =Icon.Error
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          PressedBorderColor: =RGBA(0, 0, 0, 0)
+                                          PressedColor: =RGBA(16, 110, 190, 1)
+                                          PressedFill: =RGBA(0, 0, 0, 0)
+                                          Visible: =varCT_IsDirty
+                                          Width: =30
+                                    - Spinner2:
+                                        Control: Spinner@1.4.6
+                                        Properties:
+                                          Height: =30
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Visible: =varCT_IsLoading || varCT_IsSaving
+                                          Width: =30
+                              - conCustom_Body:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    BorderColor: =RGBA(214, 221, 224, 1)
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =8
+                                    PaddingLeft: =8
+                                    PaddingRight: =8
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                  Children:
+                                    - conCustom_Quick:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          PaddingBottom: =8
+                                          PaddingLeft: =8
+                                          PaddingRight: =8
+                                          PaddingTop: =8
+                                        Children:
+                                          - btnCT_Load:
+                                              Control: Button@0.0.45
+                                              Properties:
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                OnSelect: |-
+                                                  =
+                                                  Set(varCT_IsLoading, true);
+                                                  Set(varCT_Error, "");
+                                                  Set(varCT_IsDirty, false);
+
+                                                  Clear(colCT_Dirty);
+                                                  Clear(colCT_Merged_UI);
+                                                  Clear(colCT_Merged_Base);
+                                                  Clear(colCT_Quick);
+
+                                                  IfError(
+
+                                                      Set(
+                                                          varCT_Resp,
+                                                          WarRoom_GetCustomBundle.Run(
+                                                              cmp_DetailDrawer_old.ProjectId,
+                                                              cmp_DetailDrawer_old.EntityType,
+                                                              cmp_DetailDrawer_old.RecordId
+                                                          )
+                                                      );
+
+                                                      Set(
+                                                          varCT_Bundle,
+                                                          ParseJSON(Coalesce(varCT_Resp.bundlejson, "{}"))
+                                                      );
+
+                                                      ClearCollect(
+                                                          colCT_Merged_UI,
+                                                          ForAll(
+                                                              Table(varCT_Bundle.merged),
+                                                              {
+                                                                  FieldKey: Text(ThisRecord.Value.FieldKey),
+                                                                  Label: Text(ThisRecord.Value.Label),
+                                                                  FieldType: Text(ThisRecord.Value.FieldType),
+                                                                  HelpText: Text(ThisRecord.Value.HelpText),
+                                                                  IsRequired: Boolean(ThisRecord.Value.IsRequired),
+                                                                  IsPinned: Boolean(ThisRecord.Value.IsPinned),
+                                                                  SortOrder: Value(ThisRecord.Value.SortOrder),
+                                                                  OptionsJson: Text(ThisRecord.Value.OptionsJson),
+
+                                                                  ValueText: Text(ThisRecord.Value.ValueText),
+                                                                  ValueNumber: If(
+                                                                      IsBlank(Text(ThisRecord.Value.ValueNumber)),
+                                                                      Blank(),
+                                                                      Value(Text(ThisRecord.Value.ValueNumber))
+                                                                  ),
+                                                                  ValueDate: If(
+                                                                      IsBlank(Text(ThisRecord.Value.ValueDate)),
+                                                                      Blank(),
+                                                                      DateValue(Text(ThisRecord.Value.ValueDate))
+                                                                  ),
+                                                                  ValueBool: Boolean(ThisRecord.Value.ValueBool),
+                                                                  ValueJson: Text(ThisRecord.Value.ValueJson),
+
+                                                                  LastUpdatedOn: If(
+                                                                      IsBlank(Text(ThisRecord.Value.LastUpdatedOn)),
+                                                                      Blank(),
+                                                                      DateTimeValue(Text(ThisRecord.Value.LastUpdatedOn))
+                                                                  ),
+                                                                  LastUpdatedByEmail: Text(ThisRecord.Value.LastUpdatedByEmail)
+                                                              }
+                                                          )
+                                                      );
+
+                                                      ClearCollect(colCT_Merged_Base, colCT_Merged_UI);
+
+                                                      ClearCollect(
+                                                          colCT_Quick,
+                                                          SortByColumns(
+                                                              Filter(colCT_Merged_UI, IsPinned = true),
+                                                              "SortOrder",
+                                                              SortOrder.Ascending
+                                                          )
+                                                      );
+
+                                                      Set(varCT_IsLoading, false),
+
+                                                      Set(varCT_IsLoading, false);
+                                                      Set(varCT_Error, "Error loading custom fields.");
+                                                      Notify("Error loading custom fields.", NotificationType.Error)
+                                                  );
+
+                                                  Set(
+                                                      varCT_HasValues,
+                                                      CountRows(
+                                                          Filter(
+                                                              colCT_Merged_UI,
+                                                              !IsBlank(Trim(Coalesce(ValueText, ""))) ||
+                                                              !IsBlank(ValueNumber) ||
+                                                              !IsBlank(ValueDate) ||
+                                                              ValueBool = true ||
+                                                              !IsBlank(Trim(Coalesce(ValueJson, "")))
+                                                          )
+                                                      ) > 0
+                                                  );
+                                                Visible: =false
+                                          - btnCT_InitCollections:
+                                              Control: Button@0.0.45
+                                              Properties:
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                OnSelect: |-
+                                                  =
+
+                                                  ClearCollect(colCT_ManageDefs, { FieldKey: "" });
+                                                  Clear(colCT_ManageDefs);
+                                                Visible: =false
+                                          - galCustomQuick:
+                                              Control: Gallery@2.15.0
+                                              Variant: Vertical
+                                              Properties:
+                                                BorderColor: =RGBA(245, 245, 245, 1)
+                                                Height: =Parent.Height
+                                                Items: =SortByColumns(colCT_Quick, "SortOrder", SortOrder.Ascending)
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                ShowNavigation: =true
+                                                ShowScrollbar: =false
+                                                TemplatePadding: =0
+                                                TemplateSize: =130
+                                                Visible: '=varDrawerTab = "Custom" '
+                                                Width: =Parent.Width
+                                              Children:
+                                                - txtFieldNumber:
+                                                    Control: ModernNumberInput@1.1.1
+                                                    Properties:
+                                                      Default: =If(IsBlank(ThisItem.ValueNumber), Blank(), Text(ThisItem.ValueNumber))
+                                                      Height: =36
+                                                      OnChange: |+
+                                                        =
+
+                                                        RemoveIf(colCT_Dirty, FieldKey = ThisItem.FieldKey);
+
+                                                        Collect(
+                                                            colCT_Dirty,
+                                                            {
+                                                                FieldKey: ThisItem.FieldKey,
+                                                                FieldType: ThisItem.FieldType,
+                                                                ValueText: "",
+                                                                ValueNumber: If(IsBlank(Self.Value), Blank(), Value(Self.Value)),
+                                                                ValueDate: Blank(),
+                                                                ValueBool: false,
+                                                                ValueJson: ""
+                                                            }
+                                                        );
+
+                                                        Patch(
+                                                            colCT_Quick,
+                                                            LookUp(colCT_Quick, FieldKey = ThisItem.FieldKey),
+                                                            { ValueNumber: If(IsBlank(Self.Value), Blank(), Value(Self.Value)) }
+                                                        );
+
+                                                        Set(varCT_IsDirty, true)
+
+                                                      Visible: =ThisItem.FieldType = "Number"
+                                                      Width: =Parent.TemplateWidth - 280
+                                                      X: =260
+                                                      Y: =22
+                                                - tglFieldYesNo:
+                                                    Control: Toggle@1.1.5
+                                                    Properties:
+                                                      DisplayMode: |-
+                                                        =If(
+                                                            Lower(Coalesce(cmp_DetailDrawer_old.UserRole, "reader")) = "manager",
+                                                            DisplayMode.Edit,
+                                                            DisplayMode.View
+                                                        )
+                                                      Height: =36
+                                                      Label: ="Yes / No"
+                                                      OnCheck: |-
+                                                        =
+
+                                                        RemoveIf(colCT_Dirty, FieldKey = ThisItem.FieldKey);
+
+                                                        Collect(
+                                                            colCT_Dirty,
+                                                            {
+                                                                FieldKey: ThisItem.FieldKey,
+                                                                FieldType: ThisItem.FieldType,
+                                                                ValueText: "",
+                                                                ValueNumber: Blank(),
+                                                                ValueDate: Blank(),
+                                                                ValueBool: true,
+                                                                ValueJson: ""
+                                                            }
+                                                        );
+
+                                                        Patch(
+                                                            colCT_Quick,
+                                                            LookUp(colCT_Quick, FieldKey = ThisItem.FieldKey),
+                                                            { ValueBool: true }
+                                                        );
+
+                                                        Set(varCT_IsDirty, true)
+                                                      OnSelect: =Select(Parent)
+                                                      OnUncheck: |-
+                                                        =
+
+                                                        RemoveIf(colCT_Dirty, FieldKey = ThisItem.FieldKey);
+
+                                                        Collect(
+                                                            colCT_Dirty,
+                                                            {
+                                                                FieldKey: ThisItem.FieldKey,
+                                                                FieldType: ThisItem.FieldType,
+                                                                ValueText: "",
+                                                                ValueNumber: Blank(),
+                                                                ValueDate: Blank(),
+                                                                ValueBool: false,
+                                                                ValueJson: ""
+                                                            }
+                                                        );
+
+                                                        Patch(
+                                                            colCT_Quick,
+                                                            LookUp(colCT_Quick, FieldKey = ThisItem.FieldKey),
+                                                            { ValueBool: false }
+                                                        );
+
+                                                        Set(varCT_IsDirty, true)
+                                                      Visible: =ThisItem.FieldType = "YesNo"
+                                                      Width: =Parent.TemplateWidth - 280
+                                                      X: =260
+                                                      Y: =22
+                                                - txtFieldText:
+                                                    Control: ModernTextInput@1.1.1
+                                                    Properties:
+                                                      Appearance: =Appearance.Outline
+                                                      BorderColor: =RGBA(209,213,219,1)
+                                                      Default: =ThisItem.ValueText
+                                                      DisplayMode: |-
+                                                        =If(
+                                                            Lower(Coalesce(cmp_DetailDrawer_old.UserRole, "reader")) = "manager",
+                                                            DisplayMode.Edit,
+                                                            DisplayMode.View
+                                                        )
+                                                      Fill: =RGBA(255,255,255,1)
+                                                      Height: =98
+                                                      OnChange: |-
+                                                        =
+                                                        RemoveIf(colCT_Dirty, FieldKey = ThisItem.FieldKey);
+
+                                                        Collect(
+                                                            colCT_Dirty,
+                                                            {
+                                                                FieldKey: ThisItem.FieldKey,
+                                                                FieldType: ThisItem.FieldType,
+                                                                ValueText: Self.Text,
+                                                                ValueNumber: Blank(),
+                                                                ValueDate: Blank(),
+                                                                ValueBool: false,
+                                                                ValueJson: ""
+                                                            }
+                                                        );
+
+                                                        Patch(
+                                                            colCT_Quick,
+                                                            LookUp(colCT_Quick, FieldKey = ThisItem.FieldKey),
+                                                            { ValueText: Self.Text }
+                                                        );
+
+                                                        Set(varCT_IsDirty, true)
+                                                      Placeholder: ="Enter value..."
+                                                      Type: =TextInputType.Multiline
+                                                      Visible: =ThisItem.FieldType = "Text"
+                                                      Width: =Parent.TemplateWidth - 280
+                                                      X: =260
+                                                      Y: |+
+                                                        =10
+                                                - dpFieldDate:
+                                                    Control: ModernDatePicker@1.0.1
+                                                    Properties:
+                                                      Appearance: =Appearance.Outline
+                                                      DefaultDate: =ThisItem.ValueDate
+                                                      Height: |+
+                                                        =36
+                                                      OnChange: |-
+                                                        =
+
+                                                        RemoveIf(colCT_Dirty, FieldKey = ThisItem.FieldKey);
+
+                                                        Collect(
+                                                            colCT_Dirty,
+                                                            {
+                                                                FieldKey: ThisItem.FieldKey,
+                                                                FieldType: ThisItem.FieldType,
+                                                                ValueText: "",
+                                                                ValueNumber: Blank(),
+                                                                ValueDate: Self.SelectedDate,
+                                                                ValueBool: false,
+                                                                ValueJson: ""
+                                                            }
+                                                        );
+
+                                                        Patch(
+                                                            colCT_Quick,
+                                                            LookUp(colCT_Quick, FieldKey = ThisItem.FieldKey),
+                                                            { ValueDate: Self.SelectedDate }
+                                                        );
+
+                                                        Set(varCT_IsDirty, true)
+                                                      Visible: =ThisItem.FieldType = "Date"
+                                                      Width: =Parent.TemplateWidth - 280
+                                                      X: =260
+                                                      Y: =22
+                                                - ddFieldChoice:
+                                                    Control: Classic/ComboBox@2.4.0
+                                                    Properties:
+                                                      BorderColor: =RGBA(245, 245, 245, 1)
+                                                      ChevronBackground: =RGBA(245, 245, 245, 1)
+                                                      ChevronDisabledBackground: =RGBA(242, 242, 241, 0)
+                                                      ChevronDisabledFill: =RGBA(161, 159, 157, 1)
+                                                      ChevronFill: =RGBA(50, 49, 48, 1)
+                                                      ChevronHoverBackground: =RGBA(245, 245, 245, 1)
+                                                      ChevronHoverFill: =RGBA(50, 49, 48, 1)
+                                                      Color: =RGBA(50, 49, 48, 1)
+                                                      DefaultSelectedItems: |-
+                                                        =
+
+
+                                                        If(
+                                                            ThisItem.FieldType = "Choice",
+                                                            If(
+                                                                IsBlank(ThisItem.ValueText),
+                                                                Blank(),
+                                                                Table({Value: ThisItem.ValueText})
+                                                            ),
+                                                            If(
+                                                                ThisItem.FieldType = "MultiChoice",
+                                                                If(
+                                                                    IsBlank(ThisItem.ValueJson),
+                                                                    Blank(),
+                                                                    ForAll(
+                                                                        Table(ParseJSON(ThisItem.ValueJson)),
+                                                                        {Value: Text(Value)}
+                                                                    )
+                                                                ),
+                                                                Blank()
+                                                            )
+                                                        )
+                                                      DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                                                      DisabledColor: =RGBA(161, 159, 157, 1)
+                                                      DisabledFill: =RGBA(242, 242, 241, 0)
+                                                      DisplayFields: =["Value"]
+                                                      Fill: =RGBA(245, 245, 245, 1)
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =36
+                                                      HoverBorderColor: =RGBA(16, 110, 190, 1)
+                                                      HoverColor: =RGBA(50, 49, 48, 1)
+                                                      HoverFill: =RGBA(245, 245, 245, 1)
+                                                      Items: |-
+                                                        =
+
+
+                                                        ForAll(
+                                                            Table(ParseJSON(Coalesce(ThisItem.OptionsJson, "[]"))),
+                                                            {Value: Text(Value)}
+                                                        )
+                                                      OnChange: |-
+                                                        =
+
+                                                        RemoveIf(colCT_Dirty, FieldKey = ThisItem.FieldKey);
+
+                                                        With(
+                                                            {
+                                                                _valueJson:
+                                                                    "[" &
+                                                                    Concat(
+                                                                        ddFieldChoice.SelectedItems,
+                                                                        """" & Substitute(Value, """", "\""") & """",
+                                                                        ","
+                                                                    ) &
+                                                                    "]"
+                                                            },
+
+                                                            If(
+                                                                Lower(Trim(ThisItem.FieldType)) = "choice",
+
+                                                                Collect(
+                                                                    colCT_Dirty,
+                                                                    {
+                                                                        FieldKey: ThisItem.FieldKey,
+                                                                        FieldType: ThisItem.FieldType,
+                                                                        ValueText: Coalesce(ddFieldChoice.Selected.Value, ""),
+                                                                        ValueNumber: Blank(),
+                                                                        ValueDate: Blank(),
+                                                                        ValueBool: false,
+                                                                        ValueJson: ""
+                                                                    }
+                                                                );
+
+                                                                Patch(
+                                                                    colCT_Quick,
+                                                                    LookUp(colCT_Quick, FieldKey = ThisItem.FieldKey),
+                                                                    { ValueText: Coalesce(ddFieldChoice.Selected.Value, "") }
+                                                                ),
+
+                                                                Collect(
+                                                                    colCT_Dirty,
+                                                                    {
+                                                                        FieldKey: ThisItem.FieldKey,
+                                                                        FieldType: ThisItem.FieldType,
+                                                                        ValueText: "",
+                                                                        ValueNumber: Blank(),
+                                                                        ValueDate: Blank(),
+                                                                        ValueBool: false,
+                                                                        ValueJson: _valueJson
+                                                                    }
+                                                                );
+
+                                                                Patch(
+                                                                    colCT_Quick,
+                                                                    LookUp(colCT_Quick, FieldKey = ThisItem.FieldKey),
+                                                                    { ValueJson: _valueJson }
+                                                                )
+                                                            )
+                                                        );
+
+                                                        Set(varCT_IsDirty, true);
+                                                      OnSelect: =Select(Parent)
+                                                      PressedBorderColor: =RGBA(16, 110, 190, 1)
+                                                      PressedColor: =RGBA(255, 255, 255, 1)
+                                                      PressedFill: =RGBA(0, 120, 212, 1)
+                                                      SearchFields: =["Value"]
+                                                      SelectMultiple: =Lower(Trim(ThisItem.FieldType)) = "multichoice"
+                                                      SelectionColor: =RGBA(255, 255, 255, 1)
+                                                      SelectionFill: =RGBA(0, 120, 212, 1)
+                                                      Visible: =ThisItem.FieldType = "Choice" || ThisItem.FieldType = "MultiChoice"
+                                                      Width: =Parent.TemplateWidth - 280
+                                                      X: =260
+                                                      Y: =22
+                                                - lblFieldHelp:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Color: =RGBA(107,114,128,1)
+                                                      Font: =Font.'Segoe UI'
+                                                      OnSelect: =Select(Parent)
+                                                      Size: =11
+                                                      Text: =ThisItem.FieldKey
+                                                      Width: =210
+                                                      X: =32
+                                                      Y: =44
+                                                - lblFieldLabel:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Color: =RGBA(17,24,39,1)
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Bold
+                                                      OnSelect: =Select(Parent)
+                                                      Text: =ThisItem.Label & If(ThisItem.IsRequired, " *", "")
+                                                      Width: =210
+                                                      Wrap: =false
+                                                      X: =32
+                                                      Y: =22
+                              - conCustom_Footer:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    BorderColor: =RGBA(214, 221, 224, 1)
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =0
+                                    Height: =56
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutJustifyContent: =LayoutJustifyContent.End
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =8
+                                    PaddingLeft: =8
+                                    PaddingRight: =20
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                  Children:
+                                    - lblLastUpdated:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Align: =Align.Right
+                                          Color: =RGBA(95,121,151,1)
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          RadiusBottomLeft: =0
+                                          RadiusBottomRight: =0
+                                          RadiusTopLeft: =0
+                                          RadiusTopRight: =0
+                                          Size: =14
+                                          Text: |-
+                                            =If(
+                                                !IsBlank(varCT_LastUpdatedOn),
+                                                "🕜Last updated on " & 
+                                                Text(varCT_LastUpdatedOn, "dd mmm yyyy hh:mm") & 
+                                                " by " & varCT_LastUpdatedBy,
+                                                "No updates yet"
+                                            )
+                                          Width: =600
+                        - conHistory:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =10
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              PaddingLeft: =2
+                              Visible: |+
+                                =varDrawerTab = "History"
+
+            - conOverlay:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  BorderStyle: =BorderStyle.None
+                  BorderThickness: =2
+                  DisabledFill: =RGBA(161, 159, 157, 1)
+                  Fill: =RGBA(15,23,42,0.22)
+                  FocusedBorderThickness: =4
+                  Height: =744
+                  HoverFill: =RGBA(161, 159, 157, 1)
+                  OnSelect: |
+                    =
+                    If(
+                        varShowCustomAddFields,
+                        Set(varShowCustomAddFields, false),
+                        Set(varCT_ShowManageFields, false)
+                    )
+                  PressedFill: =RGBA(161, 159, 157, 1)
+                  Visible: =cmp_DetailDrawer_old.IsOpen && (varCT_ShowManageFields || varShowCustomAddFields)
+                  Width: =719
+            - conManageFieldsModal:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =RGBA(214, 221, 224, 1)
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.Bold
+                  Fill: =RGBA(255,255,255,1)
+                  Height: =715
+                  RadiusBottomLeft: =16
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =16
+                  RadiusTopRight: =16
+                  Visible: =varCT_ShowManageFields
+                  Width: =696
+                  X: =10
+                  Y: =13
+                Children:
+                  - icoCloseManageFieldsModal:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =RGBA(106, 122, 127, 1)
+                        DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                        DisabledColor: =RGBA(225, 223, 221, 1)
+                        DisabledFill: =RGBA(0, 0, 0, 0)
+                        FocusedBorderThickness: =4
+                        Height: =20
+                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                        HoverColor: =RGBA(79, 90, 94, 1)
+                        HoverFill: =RGBA(0, 0, 0, 0)
+                        Icon: =Icon.Cancel
+                        OnSelect: |-
+                          =
+
+
+
+                          Set(varCT_ShowManageFields, false);
+                          Set(varShowCustomAddFields, false);
+                          Set(varCT_DefsError, "");
+                          Set(varCT_DefsSearch, "");
+                          Set(varCT_SaveField_Error, "");
+                          Select(btnCT_Load);
+                          Set(varCT_SaveField_IsLoading, false)
+                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                        PressedColor: =RGBA(16, 110, 190, 1)
+                        PressedFill: =RGBA(0, 0, 0, 0)
+                        Width: =20
+                        X: =651
+                        Y: =21
+                  - lblManageFieldsTitle:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        FontWeight: =FontWeight.Bold
+                        Height: =40
+                        Size: =20
+                        Text: ="Manage custom fields"
+                        Width: =260
+                        X: =24
+                        Y: =12
+                  - txtManageFieldsSearch:
+                      Control: ModernTextInput@1.1.1
+                      Properties:
+                        Appearance: =Appearance.Outline
+                        Default: =varCT_DefsSearch
+                        Height: =36
+                        OnChange: =Set(varCT_DefsSearch, Self.Text)
+                        Placeholder: ="Search by label or key"
+                        Width: =240
+                        X: =24
+                        Y: =60
+                  - tglManageFieldsInactive:
+                      Control: Classic/Toggle@2.1.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderStyle: =BorderStyle.None
+                        Color: =RGBA(50, 49, 48, 1)
+                        Default: =varCT_ShowInactiveDefs
+                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                        FalseFill: =RGBA(96, 94, 92, 1)
+                        FalseHoverFill: =RGBA(50, 49, 48, 1)
+                        FalseText: ="Active only"
+                        FocusedBorderThickness: =4
+                        Font: =Font.'Segoe UI'
+                        Height: =36
+                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                        OnChange: |-
+                          =
+                          Set(varCT_ShowInactiveDefs, Self.Value);
+                          cmp_DetailDrawer_old.OnManageFieldsRequested()
+                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                        TrueFill: =RGBA(0, 120, 212, 1)
+                        TrueHoverFill: =RGBA(16, 110, 190, 1)
+                        TrueText: ="Show inactive"
+                        Width: =190
+                        X: =280
+                        Y: =60
+                  - btnManageFieldsRefresh:
+                      Control: Button@0.0.45
+                      Properties:
+                        BasePaletteColor: =RGBA(95,121,151,0.4)
+                        Height: =36
+                        OnSelect: =cmp_DetailDrawer_old.OnManageFieldsRequested()
+                        Text: ="Refresh"
+                        Width: =90
+                        X: =Parent.Width - 218
+                        Y: =60
+                  - btnManageFieldsAdd:
+                      Control: ModernButton@1.0.0
+                      Properties:
+                        Align: =Align.Center
+                        BasePaletteColor: =RGBA(95,121,151,0.3)
+                        FontWeight: =""
+                        Height: =36
+                        OnSelect: |+
+                          =
+                          If(
+                              IsEmpty(colCT_Defs_Admin),
+                              cmp_DetailDrawer_old.OnManageFieldsRequested()
+                          );
+
+                          Set(varCT_FieldEditMode, "Add");
+                          Set(varShowCustomAddFields, true);
+
+                          Set(varCT_Edit_FieldDefId, Blank());
+                          Set(varCT_Edit_FieldKey, "");
+                          Set(varCT_Edit_Label, "");
+                          Set(varCT_Edit_FieldType, "Text");
+                          Set(varCT_Edit_HelpText, "");
+                          Set(varCT_Edit_IsRequired, false);
+                          Set(varCT_Edit_IsPinned, true);
+                          Set(varCT_Edit_IsActive, true);
+                          Set(varCT_Edit_SortOrder, 100);
+                          Set(varCT_Edit_OptionsJson, "");
+
+                          Set(varCT_Edit_IsFilterable, false);
+                          Set(varCT_Edit_ShowInQuickFilters, false);
+                          Set(varCT_Edit_FilterOrder, 100);
+                          Set(varCT_Edit_FilterMode, "Equals");
+
+                          Set(varCT_SaveField_Error, "");
+                          Set(varCT_SaveField_IsLoading, false)
+
+
+
+                        PaddingBottom: =5
+                        PaddingLeft: =12
+                        PaddingRight: =12
+                        PaddingTop: =5
+                        RadiusBottomLeft: =4
+                        RadiusBottomRight: =4
+                        RadiusTopLeft: =4
+                        RadiusTopRight: =4
+                        Text: ="+ Add"
+                        VerticalAlign: =VerticalAlign.Middle
+                        Width: =94
+                        X: =Parent.Width - 118
+                        Y: =60
+                  - galManageFieldsDefs:
+                      Control: Gallery@2.15.0
+                      Variant: Vertical
+                      Properties:
+                        BorderColor: =RGBA(245, 245, 245, 1)
+                        Height: |
+                          =Parent.Height - 140
+                        Items: |-
+                          =
+                          With(
+                              {
+                                  src: If(
+                                      varCT_ShowInactiveDefs,
+                                      colCT_Defs_Admin,
+                                      Filter(colCT_Defs_Admin, IsActive = true)
+                                  ),
+                                  searchText: Lower(Trim(txtManageFieldsSearch.Text))
+                              },
+                              SortByColumns(
+                                  If(
+                                      IsBlank(searchText),
+                                      src,
+                                      Filter(
+                                          src,
+                                          searchText in Lower(Label) ||
+                                          searchText in Lower(FieldKey)
+                                      )
+                                  ),
+                                  "SortOrder",
+                                  SortOrder.Ascending
+                              )
+                          )
+                        TemplatePadding: =6
+                        TemplateSize: =92
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =112
+                      Children:
+                        - conRow:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =RGBA(226,232,240,1)
+                              BorderThickness: =1
+                              Height: =Parent.TemplateHeight - 8
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                              Width: =Parent.TemplateWidth
+                            Children:
+                              - btnDefToggle:
+                                  Control: Button@0.0.45
+                                  Properties:
+                                    BasePaletteColor: =RGBA(95,121,151,0.4)
+                                    OnSelect: |-
+                                      =
+
+                                      Set(varCT_Toggle_FieldKey, ThisItem.FieldKey);
+                                      Set(varCT_Toggle_IsActive, !ThisItem.IsActive);
+                                      cmp_DetailDrawer_old.OnToggleFieldActiveRequested()
+                                    Text: =If(ThisItem.IsActive, "Disable", "Enable")
+                                    Width: =70
+                                    X: =530
+                                    Y: =32
+                              - btnDefEdit:
+                                  Control: ModernButton@1.0.0
+                                  Properties:
+                                    Align: =Align.Center
+                                    BasePaletteColor: =RGBA(95,121,151,0.4)
+                                    FontWeight: =""
+                                    OnSelect: |+
+                                      =
+                                      Set(varCT_FieldEditMode, "Edit");
+                                      Set(varShowCustomAddFields, true);
+
+                                      Set(varCT_Edit_FieldDefId, ThisItem.FieldDefId);
+                                      Set(varCT_Edit_FieldKey, ThisItem.FieldKey);
+                                      Set(varCT_Edit_Label, ThisItem.Label);
+                                      Set(varCT_Edit_FieldType, ThisItem.FieldType);
+                                      Set(varCT_Edit_HelpText, ThisItem.HelpText);
+                                      Set(varCT_Edit_IsRequired, ThisItem.IsRequired);
+                                      Set(varCT_Edit_IsPinned, ThisItem.IsPinned);
+                                      Set(varCT_Edit_IsActive, ThisItem.IsActive);
+                                      Set(varCT_Edit_SortOrder, ThisItem.SortOrder);
+                                      Set(varCT_Edit_OptionsJson, ThisItem.OptionsJson);
+
+                                      Set(varCT_Edit_IsFilterable, ThisItem.IsFilterable);
+                                      Set(varCT_Edit_ShowInQuickFilters, ThisItem.ShowInQuickFilters);
+                                      Set(varCT_Edit_FilterOrder, ThisItem.FilterOrder);
+                                      Set(varCT_Edit_FilterMode, ThisItem.FilterMode);
+
+                                      Set(varCT_SaveField_Error, "");
+                                      Set(varCT_SaveField_IsLoading, false)
+
+                                    PaddingBottom: =5
+                                    PaddingLeft: =12
+                                    PaddingRight: =12
+                                    PaddingTop: =5
+                                    RadiusBottomLeft: =4
+                                    RadiusBottomRight: =4
+                                    RadiusTopLeft: =4
+                                    RadiusTopRight: =4
+                                    Text: ="Edit"
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =58
+                                    X: =452
+                                    Y: =32
+                              - lblDefStatus:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Color: =If(ThisItem.IsActive, RGBA(22,101,52,1), RGBA(153,27,27,1))
+                                    OnSelect: =
+                                    RadiusBottomLeft: =10
+                                    RadiusBottomRight: =10
+                                    RadiusTopLeft: =10
+                                    RadiusTopRight: =10
+                                    Size: =12
+                                    Text: |-
+                                      =
+                                      If(ThisItem.IsActive, "Active", "Inactive")
+                                    Width: =70
+                                    X: =352
+                                    Y: =56
+                              - lblDefFlags:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Color: =RGBA(71,85,105,1)
+                                    OnSelect: =
+                                    Size: =12
+                                    Text: |-
+                                      =Concatenate(
+                                          If(ThisItem.IsRequired, "Required", ""),
+                                          If(ThisItem.IsRequired && ThisItem.IsPinned, " • ", ""),
+                                          If(ThisItem.IsPinned, "Pinned", "")
+                                      )
+                                    Width: =180
+                                    X: =136
+                                    Y: |+
+                                      =56
+                              - lblDefType:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Color: =RGBA(71,85,105,1)
+                                    OnSelect: =
+                                    Size: =12
+                                    Text: =ThisItem.FieldType
+                                    Width: =80
+                                    X: |+
+                                      =16
+                                    Y: =56
+                              - lblDefKey:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Color: =RGBA(100,116,139,1)
+                                    OnSelect: =
+                                    Size: =12
+                                    Text: =ThisItem.FieldKey
+                                    Width: =Parent.Width - 220
+                                    X: =16
+                                    Y: =30
+                              - lblDefLabel:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Color: =RGBA(17,24,39,1)
+                                    FontWeight: =FontWeight.Semibold
+                                    OnSelect: =
+                                    Size: =14
+                                    Text: =ThisItem.Label
+                                    Width: =Parent.Width - 220
+                                    X: =16
+                                    Y: =4
+                  - conManagerFieldsModal:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: =RGBA(226,232,240,1)
+                        BorderThickness: =1
+                        Fill: =RGBA(248,250,252,1)
+                        Height: =32
+                        Visible: =false
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =104
+                      Children:
+                        - lblHdrActions:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Color: =RGBA(71,85,105,1)
+                              FontWeight: =FontWeight.Semibold
+                              Height: =Parent.Height
+                              Size: =12
+                              Text: ="Actions"
+                              Width: =70
+                              X: =570
+                        - lblHdrStatus:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Color: =RGBA(71,85,105,1)
+                              FontWeight: =FontWeight.Semibold
+                              Height: =Parent.Height
+                              Size: =12
+                              Text: ="Status"
+                              Width: =60
+                              X: =476
+                        - lblHdrType:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Color: =RGBA(71,85,105,1)
+                              FontWeight: =FontWeight.Semibold
+                              Height: =Parent.Height
+                              Size: =12
+                              Text: ="Type"
+                              Width: =80
+                              X: =320
+                        - lblHdrKey:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Color: =RGBA(71,85,105,1)
+                              FontWeight: =FontWeight.Semibold
+                              Height: =Parent.Height
+                              Size: =12
+                              Text: ="Field Key"
+                              Width: =80
+                              X: =140
+                        - lblHdrLabel:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Color: =RGBA(71,85,105,1)
+                              FontWeight: =FontWeight.Semibold
+                              Height: =Parent.Height
+                              Size: =12
+                              Text: ="Label"
+                              Width: =190
+                              X: =16
+                  - lblManageFieldsEmpty:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Text: ="No custom fields found."
+                        Visible: =CountRows(galManageFieldsDefs.AllItems) = 0
+                        Width: =240
+                        X: =36
+                        Y: =120
+            - conAddEditFields:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =RGBA(214,221,224,1)
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(15,23,42,0.18)
+                  Height: =Parent.Height
+                  RadiusBottomLeft: =16
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =16
+                  RadiusTopRight: =16
+                  Visible: =varShowCustomAddFields
+                  Width: =Parent.Width
+                Children:
+                  - conCT_AddFieldModal:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(226,232,240,1)
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.Regular
+                        Fill: =RGBA(255,255,255,1)
+                        Height: =728
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =14
+                        LayoutOverflowY: =LayoutOverflow.Scroll
+                        PaddingBottom: =18
+                        PaddingLeft: =20
+                        PaddingRight: =20
+                        PaddingTop: =18
+                        RadiusBottomLeft: =16
+                        RadiusBottomRight: =16
+                        RadiusTopLeft: =16
+                        RadiusTopRight: =16
+                        Width: =701
+                        X: =9
+                        Y: =3
+                      Children:
+                        - conCT_AddFieldHeader_1:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255,255,255,1)
+                              FillPortions: =0
+                              Height: =52
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutJustifyContent: =LayoutJustifyContent.Center
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              PaddingBottom: =8
+                              PaddingLeft: =8
+                              PaddingRight: =8
+                              PaddingTop: =8
+                            Children:
+                              - lblCT_AddFieldTitle_1:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Color: =RGBA(17,24,39,1)
+                                    FontWeight: =FontWeight.Bold
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =0
+                                    PaddingTop: =0
+                                    Size: =20
+                                    Text: |-
+                                      =If(
+                                          varCT_FieldEditMode = "Edit",
+                                          "Edit custom field",
+                                          "Add custom field"
+                                      )
+                                    Width: =Parent.Width - 60
+                              - btnCT_AddFieldClose_1:
+                                  Control: Button@0.0.45
+                                  Properties:
+                                    Appearance: ='ButtonCanvas.Appearance'.Secondary
+                                    BorderStyle: =BorderStyle.None
+                                    Height: =40
+                                    Icon: ="Dismiss"
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnSelect: |+
+                                      =
+
+                                      Set(varShowCustomAddFields, false);
+                                      Set(varCT_SaveField_Error, "");
+                                      Set(varCT_SaveField_IsLoading, false)
+
+                                    Text: =
+                                    Width: =40
+                        - conCT_AddFieldBody_1:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              Fill: =RGBA(248,250,252,1)
+                              Height: =400
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =10
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              PaddingBottom: =16
+                              PaddingLeft: =16
+                              PaddingRight: =16
+                              PaddingTop: =16
+                              RadiusBottomLeft: =14
+                              RadiusBottomRight: =14
+                              RadiusTopLeft: =14
+                              RadiusTopRight: =14
+                            Children:
+                              - txtCT_FieldLabel_1:
+                                  Control: ModernTextInput@1.1.1
+                                  Properties:
+                                    Appearance: =Appearance.Outline
+                                    Default: =varCT_Edit_Label
+                                    Height: =44
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnChange: =Set(varCT_Edit_Label, Self.Text)
+                                    Placeholder: ="Label or name of the column"
+                                    Width: =Parent.Width - 20
+                              - txtCT_FieldKey_1:
+                                  Control: ModernTextInput@1.1.1
+                                  Properties:
+                                    Appearance: =Appearance.Outline
+                                    Default: =varCT_Edit_FieldKey
+                                    DisplayMode: |+
+                                      =
+                                          DisplayMode.View
+
+                                    Height: =44
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnChange: |-
+                                      =Set(
+                                          varCT_Edit_FieldKey,
+                                          Lower(
+                                              Substitute(
+                                                  Trim(Self.Text),
+                                                  " ",
+                                                  "_"
+                                              )
+                                          )
+                                      )
+                                    Placeholder: ="Generated automatically"
+                                    Visible: =false
+                                    Width: =Parent.Width - 20
+                              - ddCT_FieldType_1:
+                                  Control: DropDown@0.0.45
+                                  Properties:
+                                    Appearance: ='DropdownCanvas.Appearance'.Outline
+                                    DefaultSelectedItems: =[ varCT_Edit_FieldType ]
+                                    DisplayMode: |-
+                                      =If(
+                                          varCT_FieldEditMode = "Edit",
+                                          DisplayMode.View,
+                                          DisplayMode.Edit
+                                      )
+                                    Items: =["Text","Number","Date","YesNo","Choice","MultiChoice"]
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnChange: =Set(varCT_Edit_FieldType, ddCT_FieldType_1.Selected.Value)
+                              - txtCT_OptionsJson_1:
+                                  Control: ModernTextInput@1.1.1
+                                  Properties:
+                                    Appearance: =Appearance.Outline
+                                    Default: =varCT_Edit_OptionsJson
+                                    Height: =100
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnChange: =Set(varCT_Edit_OptionsJson, Self.Text)
+                                    Placeholder: |-
+                                      =
+
+
+                                      If(
+                                          ddCT_FieldType_1.Selected.Value = "Choice" ||
+                                          ddCT_FieldType_1.Selected.Value = "MultiChoice",
+
+                                          "Enter one option per line" &
+                                          Char(10) &
+                                          Char(10) &
+                                          "High" &
+                                          Char(10) &
+                                          "Medium" &
+                                          Char(10) &
+                                          "Low",
+
+                                          ""
+                                      )
+                                    Type: =TextInputType.Multiline
+                                    Visible: =varCT_Edit_FieldType = "Choice" || varCT_Edit_FieldType = "MultiChoice" || varCT_Edit_FieldType = "Json"
+                              - txtCT_HelpText_1:
+                                  Control: ModernTextInput@1.1.1
+                                  Properties:
+                                    Appearance: =Appearance.Outline
+                                    Default: =varCT_Edit_HelpText
+                                    Height: =40
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnChange: =Set(varCT_Edit_HelpText, Self.Text)
+                                    Placeholder: ="Help text (optional)"
+                              - tglCT_Required_1:
+                                  Control: Classic/Toggle@2.1.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderStyle: =BorderStyle.None
+                                    Color: =RGBA(50, 49, 48, 1)
+                                    Default: =varCT_Edit_IsRequired
+                                    DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                                    FalseFill: =RGBA(96, 94, 92, 1)
+                                    FalseHoverFill: =RGBA(50, 49, 48, 1)
+                                    FalseText: ="Optional"
+                                    FocusedBorderThickness: =4
+                                    Font: =Font.'Segoe UI'
+                                    HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnChange: =Set(varCT_Edit_IsRequired, Self.Value)
+                                    PressedBorderColor: =RGBA(0, 0, 0, 0)
+                                    TrueFill: =RGBA(0, 120, 212, 1)
+                                    TrueHoverFill: =RGBA(16, 110, 190, 1)
+                                    TrueText: ="Required"
+                                    Width: =180
+                              - tglCT_Pinned_1:
+                                  Control: Classic/Toggle@2.1.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderStyle: =BorderStyle.None
+                                    Color: =RGBA(50, 49, 48, 1)
+                                    Default: =varCT_Edit_IsPinned
+                                    DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                                    FalseFill: =RGBA(96, 94, 92, 1)
+                                    FalseHoverFill: =RGBA(50, 49, 48, 1)
+                                    FalseText: ="Not pinned"
+                                    FocusedBorderThickness: =4
+                                    Font: =Font.'Segoe UI'
+                                    HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnChange: =Set(varCT_Edit_IsPinned, Self.Value)
+                                    PressedBorderColor: =RGBA(0, 0, 0, 0)
+                                    TrueFill: =RGBA(0, 120, 212, 1)
+                                    TrueHoverFill: =RGBA(16, 110, 190, 1)
+                                    TrueText: ="Pinned"
+                                    Width: =180
+                              - tglCT_Filterable_1:
+                                  Control: Classic/Toggle@2.1.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderStyle: =BorderStyle.None
+                                    Color: =RGBA(50, 49, 48, 1)
+                                    Default: =varCT_Edit_IsFilterable
+                                    DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                                    FalseFill: =RGBA(96, 94, 92, 1)
+                                    FalseHoverFill: =RGBA(50, 49, 48, 1)
+                                    FalseText: ="Not filterable"
+                                    FocusedBorderThickness: =4
+                                    Font: =Font.'Segoe UI'
+                                    HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnChange: |-
+                                      =Set(varCT_Edit_IsFilterable, Self.Value);
+
+                                      If(
+                                          !Self.Value,
+                                          Set(varCT_Edit_ShowInQuickFilters, false)
+                                      )
+                                    PressedBorderColor: =RGBA(0, 0, 0, 0)
+                                    TrueFill: =RGBA(0, 120, 212, 1)
+                                    TrueHoverFill: =RGBA(16, 110, 190, 1)
+                                    TrueText: ="Filterable"
+                                    Width: =180
+                              - tglCT_QuickFilter_1:
+                                  Control: Classic/Toggle@2.1.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderStyle: =BorderStyle.None
+                                    Color: =RGBA(50, 49, 48, 1)
+                                    Default: =varCT_Edit_ShowInQuickFilters
+                                    DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                                    DisplayMode: |-
+                                      =If(
+                                          varCT_Edit_IsFilterable,
+                                          DisplayMode.Edit,
+                                          DisplayMode.Disabled
+                                      )
+                                    FalseFill: =RGBA(96, 94, 92, 1)
+                                    FalseHoverFill: =RGBA(50, 49, 48, 1)
+                                    FalseText: ="More filters"
+                                    FocusedBorderThickness: =4
+                                    Font: =Font.'Segoe UI'
+                                    HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnChange: |-
+                                      =Set(
+                                          varCT_Edit_ShowInQuickFilters,
+                                          If(varCT_Edit_IsFilterable, Self.Value, false)
+                                      )
+                                    PressedBorderColor: =RGBA(0, 0, 0, 0)
+                                    TrueFill: =RGBA(0, 120, 212, 1)
+                                    TrueHoverFill: =RGBA(16, 110, 190, 1)
+                                    TrueText: ="Quick filter"
+                                    Width: =180
+                              - tglCT_Active_1:
+                                  Control: Classic/Toggle@2.1.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderStyle: =BorderStyle.None
+                                    Color: =RGBA(50, 49, 48, 1)
+                                    Default: =varCT_Edit_IsActive
+                                    DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                                    FalseFill: =RGBA(96, 94, 92, 1)
+                                    FalseHoverFill: =RGBA(50, 49, 48, 1)
+                                    FalseText: ="Inactive"
+                                    FocusedBorderThickness: =4
+                                    Font: =Font.'Segoe UI'
+                                    HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnChange: =Set(varCT_Edit_IsActive, Self.Value)
+                                    PressedBorderColor: =RGBA(0, 0, 0, 0)
+                                    TrueFill: =RGBA(0, 120, 212, 1)
+                                    TrueHoverFill: =RGBA(16, 110, 190, 1)
+                                    TrueText: ="Active"
+                                    Width: =180
+                              - numCT_SortOrder_1:
+                                  Control: ModernNumberInput@1.1.1
+                                  Properties:
+                                    Appearance: =Appearance.Outline
+                                    Default: =varCT_Edit_SortOrder
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnChange: =Set(varCT_Edit_SortOrder, Value(Self.Value))
+                              - lblCT_SaveFieldError_1:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Color: =RGBA(220,38,38,1)
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    Text: =varCT_SaveField_Error
+                                    Visible: =!IsBlank(varCT_SaveField_Error)
+                              - conCT_AddFieldFooter_1:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =52
+                                    LayoutAlignItems: =LayoutAlignItems.End
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =12
+                                    LayoutJustifyContent: =LayoutJustifyContent.End
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =8
+                                    PaddingLeft: =8
+                                    PaddingRight: =8
+                                    PaddingTop: =8
+                                  Children:
+                                    - btnCT_FieldCancel_1:
+                                        Control: Button@0.0.45
+                                        Properties:
+                                          BasePaletteColor: =RGBA(95,121,151,1)
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          OnSelect: |-
+                                            =
+
+                                            Set(varShowCustomAddFields, false);
+                                            Set(varCT_SaveField_Error, "");
+                                            Set(varCT_SaveField_IsLoading, false)
+                                          Text: ="Cancel"
+                                    - btnCT_FieldSave:
+                                        Control: ModernButton@1.0.0
+                                        Properties:
+                                          Align: =Align.Center
+                                          BasePaletteColor: =RGBA(95,121,151,1)
+                                          DisplayMode: |-
+                                            =If(
+                                                varCT_SaveField_IsLoading ||
+                                                IsBlank(Trim(varCT_Edit_Label)) ||
+                                                IsBlank(Trim(varCT_Edit_FieldType)),
+                                                DisplayMode.Disabled,
+                                                DisplayMode.Edit
+                                            )
+                                          FontWeight: =""
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          OnSelect: |-
+                                            =
+                                            Set(varCT_SaveField_Error, "");
+                                            Set(varCT_SaveField_IsLoading, true);
+
+                                            If(
+                                                varCT_FieldEditMode = "Add" && IsBlank(Trim(varCT_Edit_FieldKey)),
+                                                Set(
+                                                    varCT_Edit_FieldKey,
+                                                    Lower(
+                                                        Substitute(
+                                                            Substitute(
+                                                                Substitute(
+                                                                    Substitute(
+                                                                        Substitute(
+                                                                            Substitute(
+                                                                                Substitute(
+                                                                                    Trim(varCT_Edit_Label),
+                                                                                    " ",
+                                                                                    "_"
+                                                                                ),
+                                                                                "-",
+                                                                                "_"
+                                                                            ),
+                                                                            ".",
+                                                                            ""
+                                                                        ),
+                                                                        ",",
+                                                                        ""
+                                                                    ),
+                                                                    "/",
+                                                                    "_"
+                                                                ),
+                                                                "(",
+                                                                ""
+                                                            ),
+                                                            ")",
+                                                            ""
+                                                        )
+                                                    )
+                                                )
+                                            );
+
+                                            If(
+                                                varCT_Edit_FieldType = "Choice" || varCT_Edit_FieldType = "MultiChoice",
+
+                                                Set(varCT_Edit_OptionsText_Raw, varCT_Edit_OptionsJson);
+
+                                                Set(
+                                                    varCT_Edit_OptionsJson,
+                                                    "[" &
+                                                    Concat(
+                                                        Filter(
+                                                            Split(varCT_Edit_OptionsText_Raw, Char(10)),
+                                                            !IsBlank(Trim(Value))
+                                                        ),
+                                                        """" & Substitute(Trim(Value), """", "\""") & """",
+                                                        ","
+                                                    ) &
+                                                    "]"
+                                                )
+                                            );
+
+                                            cmp_DetailDrawer_old.OnSaveCustomField();
+                                          PaddingBottom: =5
+                                          PaddingLeft: =12
+                                          PaddingRight: =12
+                                          PaddingTop: =5
+                                          RadiusBottomLeft: =4
+                                          RadiusBottomRight: =4
+                                          RadiusTopLeft: =4
+                                          RadiusTopRight: =4
+                                          Text: ="Save"
+                                          VerticalAlign: =VerticalAlign.Middle
