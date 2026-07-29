@@ -1,5 +1,9 @@
 # Sprint I01 — Excel import foundations
 
+> Historical foundation record. Runtime export integration, contract version,
+> deployment artifacts and current limitations are defined by
+> `README_SPRINT_I01_1.md` and contract v3.
+
 ## Objective
 
 Create governed data, contract and export-request foundations for importing a

@@ -29,6 +29,15 @@
     "exportInfoJson"
   );
 
+  const rowsWithImportMetadata: GenericRow[] = rows.map((row) => ({
+    ...row,
+    ExportBatchId: row["PunchExportLogId"],
+    WorkItemId: row["PunchId"],
+    RowVersion: "",
+    ExportedAtUtc: exportInfo["ExportedOnUtc"],
+    RowChecksum: row["RowHash"]
+  }));
+
   const normalizedExportMode = normalizeExportMode(exportMode);
   const isClientExport = normalizedExportMode === "CLIENT";
 
@@ -80,7 +89,7 @@
       : exportInfo["CanBeImported"]
   };
 
-  if (rows.length === 0) {
+  if (rowsWithImportMetadata.length === 0) {
     writeEmptyPunchesSheet(punchesSheet);
     writeExportInformation(
       exportInfoSheet,
@@ -113,7 +122,9 @@
     return;
   }
 
-  const sourceHeaders = Object.keys(rows[0]);
+  const sourceHeaders = Object.keys(rowsWithImportMetadata[0]).filter(
+    (header) => header !== "OriginalValuesJson"
+  );
 
   if (sourceHeaders.length === 0) {
     throw new Error(
@@ -151,7 +162,7 @@
     : columnMap;
 
   const finalRows = buildFinalRows(
-    rows,
+    rowsWithImportMetadata,
     finalHeaders,
     preparedMap
   );
@@ -162,6 +173,11 @@
   );
 
   const technicalColumns = new Set<string>([
+    "ExportBatchId",
+    "WorkItemId",
+    "RowVersion",
+    "ExportedAtUtc",
+    "RowChecksum",
     "ProjectId",
     "PunchId",
     "PunchExportLogId",
@@ -303,6 +319,11 @@ function resolveClientColumns(
   const availableHeaderSet = new Set<string>(allHeaders);
 
   const forbiddenClientColumns = new Set<string>([
+    "ExportBatchId",
+    "WorkItemId",
+    "RowVersion",
+    "ExportedAtUtc",
+    "RowChecksum",
     "ProjectId",
     "PunchId",
     "PunchExportLogId",
@@ -549,7 +570,13 @@ function buildFinalHeaderOrder(
   ];
 
   const technicalOrder = [
+    "ExportBatchId",
     "ProjectId",
+    "TemplateId",
+    "WorkItemId",
+    "RowVersion",
+    "ExportedAtUtc",
+    "RowChecksum",
     "PunchId",
     "PunchExportLogId",
     "RowHash"
@@ -694,6 +721,11 @@ function getDisplayHeader(
     LastCommentText: "Last Comment",
     CommentCount: "Comment Count",
     NewComment: "New Comment",
+    ExportBatchId: "Export Batch ID",
+    WorkItemId: "Work Item ID",
+    RowVersion: "Row Version",
+    ExportedAtUtc: "Exported At UTC",
+    RowChecksum: "Row Checksum",
     OriginalRowHash: "Original Row Hash",
     ImportStatus: "Import Status",
     ImportMessage: "Import Message"

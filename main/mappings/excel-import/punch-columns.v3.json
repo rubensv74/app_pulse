@@ -1,0 +1,26 @@
+{
+  "mapping": "PULSE.PunchExcelImportColumns",
+  "version": 3,
+  "sourceContract": "PULSE.PunchExcelExportColumns/v3",
+  "defaultScope": { "template": "*", "projectId": null },
+  "columns": [
+    { "excelColumn": "ExportBatchId", "targetField": "ExportBatchId", "dataType": "integer", "editable": false, "required": true, "maxLength": null, "validationRule": "must equal PunchExportLogId and stored export batch", "template": "*", "projectId": null, "displayOrder": -700, "displayName": "Export batch" },
+    { "excelColumn": "ProjectId", "targetField": "ProjectId", "dataType": "integer", "editable": false, "required": true, "maxLength": null, "validationRule": "one positive value per file; must match export batch", "template": "*", "projectId": null, "displayOrder": -600, "displayName": "Project" },
+    { "excelColumn": "TemplateId", "targetField": "TemplateId", "dataType": "integer", "editable": false, "required": true, "maxLength": null, "validationRule": "one positive value per import file; must match work items", "template": "*", "projectId": null, "displayOrder": -500, "displayName": "Template" },
+    { "excelColumn": "WorkItemId", "targetField": "WorkItemId", "dataType": "integer", "editable": false, "required": true, "maxLength": null, "validationRule": "unique in file; must exist in ExportBatchRow", "template": "*", "projectId": null, "displayOrder": -400, "displayName": "Work item" },
+    { "excelColumn": "RowVersion", "targetField": "RowVersion", "dataType": "string", "editable": false, "required": false, "maxLength": 16, "validationRule": "optional until source rowversion is exposed", "template": "*", "projectId": null, "displayOrder": -300, "displayName": "Row version" },
+    { "excelColumn": "ExportedAtUtc", "targetField": "ExportedAtUtc", "dataType": "datetime", "editable": false, "required": true, "maxLength": null, "validationRule": "ISO 8601 UTC; must match export metadata", "template": "*", "projectId": null, "displayOrder": -200, "displayName": "Exported at UTC" },
+    { "excelColumn": "RowChecksum", "targetField": "RowChecksum", "dataType": "string", "editable": false, "required": true, "maxLength": 64, "validationRule": "uppercase SHA-256; must match ExportBatchRow", "template": "*", "projectId": null, "displayOrder": -100, "displayName": "Row checksum" }
+  ],
+  "businessColumns": {
+    "authority": "warroom.usp_GetPunchExportColumnMap",
+    "editableFlag": "IsEditableInExcel",
+    "snapshot": "warroom.ExportBatch.AllowedColumnsJson",
+    "rule": "A business field is importable only when present in both the stored batch allowlist and the active backend map."
+  },
+  "dynamicColumns": {
+    "prefix": "CF__",
+    "authority": "warroom.CustomFieldDef",
+    "editableByDefault": false
+  }
+}

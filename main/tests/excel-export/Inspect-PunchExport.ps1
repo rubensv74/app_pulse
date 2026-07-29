@@ -58,12 +58,13 @@ try {
     )
 
     $requiredCurrentHeaders = @(
+        'ExportBatchId',
         'ProjectId',
         'TemplateId',
-        'PunchId',
-        'PunchExportLogId',
-        'RowHash',
-        'Original Row Hash'
+        'WorkItemId',
+        'RowVersion',
+        'ExportedAtUtc',
+        'RowChecksum'
     )
 
     $missing = @($requiredCurrentHeaders | Where-Object { $_ -notin $headers })
@@ -102,13 +103,7 @@ try {
         Protected = $true
         HiddenSupportSheets = $hiddenNames
         CurrentTechnicalHeaders = $requiredCurrentHeaders
-        MissingI01Headers = @(
-            'ExportBatchId',
-            'WorkItemId',
-            'RowVersion',
-            'ExportedAtUtc',
-            'RowChecksum'
-        ) | Where-Object { $_ -notin $headers }
+        ContractVersion = 3
     }
 }
 finally {

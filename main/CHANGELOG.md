@@ -1,5 +1,41 @@
 # CHANGELOG
 
+## Sprint I01.1 - E2E-ready export foundation
+
+### Added
+
+- Deployable `Warroom_ExportPunchesToExcel_Codex` Flow package and definition.
+- Atomic `warroom.usp_RegisterPunchExportSnapshot` procedure.
+- Contract/mapping v3 and idempotent technical mapping seed.
+- Consolidated Microsoft-environment E2E checklist.
+- Successfully packed unmanaged Power Platform solution artifact.
+
+### Changed
+
+- Export checksum now covers canonical standard values and sorted custom values.
+- Office Script emits, hides and locks all seven canonical import metadata
+  fields and excludes `OriginalValuesJson` from the workbook.
+- Power Apps calls `Warroom_ExportPunchesToExcel_Codex`.
+- `ExportBatchRow.RowVersion` is nullable while checksum concurrency is active.
+
+### Fixed
+
+- Flow trigger expressions now use the real Power Apps V2 internal keys.
+- Export snapshot persistence must succeed before SharePoint file creation.
+- Flow now returns a structured failure response when the success path cannot
+  complete.
+
+### Removed
+
+- None.
+
+### Known Issues
+
+- Environment deployment, connector rebinding and Microsoft-editor compilation
+  remain pending as one consolidated E2E validation round.
+- Physical `RowVersion` remains unavailable from the Punch source; SHA-256 is
+  the authoritative concurrency mechanism.
+
 ## Sprint I01.1 - Office Script compatibility fix
 
 ### Added
@@ -84,7 +120,7 @@
   environments and have not been executed locally.
 - Logical target fields require verification against the production Punch schema.
 
-## EPIC-01 — Home1 instance stabilization
+## EPIC-01 â€” Home1 instance stabilization
 
 ### Modified
 

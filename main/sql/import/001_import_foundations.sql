@@ -48,7 +48,7 @@ BEGIN
     (
         [ExportBatchId]        bigint NOT NULL,
         [WorkItemId]           bigint NOT NULL,
-        [RowVersion]           binary(8) NOT NULL,
+        [RowVersion]           binary(8) NULL,
         [OriginalValuesJson]   nvarchar(max) NOT NULL,
         [RowChecksum]          char(64) NOT NULL,
         CONSTRAINT [PK_ExportBatchRow]

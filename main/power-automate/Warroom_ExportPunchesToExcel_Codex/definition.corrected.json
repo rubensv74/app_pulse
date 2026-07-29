@@ -1,52 +1,10 @@
 ﻿{
+    "name":  "60c0a0df-ec0f-49c5-8f04-cbe7ed132581",
+    "id":  "/providers/Microsoft.Flow/flows/60c0a0df-ec0f-49c5-8f04-cbe7ed132581",
+    "type":  "Microsoft.Flow/flows",
     "properties":  {
-                       "connectionReferences":  {
-                                                    "shared_sqldw_2":  {
-                                                                           "runtimeSource":  "invoker",
-                                                                           "connection":  {
-                                                                                              "connectionReferenceLogicalName":  "pls_sharedsqldw_771b7"
-                                                                                          },
-                                                                           "api":  {
-                                                                                       "name":  "shared_sqldw"
-                                                                                   }
-                                                                       },
-                                                    "shared_sqldw_3":  {
-                                                                           "runtimeSource":  "invoker",
-                                                                           "connection":  {
-                                                                                              "connectionReferenceLogicalName":  "pls_sharedsqldw_771b7"
-                                                                                          },
-                                                                           "api":  {
-                                                                                       "name":  "shared_sqldw"
-                                                                                   }
-                                                                       },
-                                                    "shared_excelonlinebusiness":  {
-                                                                                       "runtimeSource":  "invoker",
-                                                                                       "connection":  {
-                                                                                                          "connectionReferenceLogicalName":  "pls_sharedexcelonlinebusiness_1f1af"
-                                                                                                      },
-                                                                                       "api":  {
-                                                                                                   "name":  "shared_excelonlinebusiness"
-                                                                                               }
-                                                                                   },
-                                                    "shared_sharepointonline":  {
-                                                                                    "runtimeSource":  "invoker",
-                                                                                    "connection":  {
-                                                                                                       "connectionReferenceLogicalName":  "pls_sharedsharepointonline_facb1"
-                                                                                                   },
-                                                                                    "api":  {
-                                                                                                "name":  "shared_sharepointonline"
-                                                                                            }
-                                                                                },
-                                                    "shared_sqldw":  {
-                                                                         "runtimeSource":  "invoker",
-                                                                         "connection":  {
-                                                                                            "connectionReferenceLogicalName":  "pls_sharedsqldw_771b7"
-                                                                                        },
-                                                                         "api":  {
-                                                                                     "name":  "shared_sqldw"
-                                                                                 }
-                                                                     }
-                                                },
+                       "apiId":  "/providers/Microsoft.PowerApps/apis/shared_logicflows",
+                       "displayName":  "Warroom_ExportPunchesToExcel",
                        "definition":  {
                                           "metadata":  {
                                                            "workflowEntityId":  null,
@@ -354,7 +312,7 @@
                                                                                                     "ExportedOnUtc":  "@{utcNow()}",
                                                                                                     "ExportedByEmail":  "@{variables(\u0027varRequestedByEmail\u0027)}",
                                                                                                     "ExportedByName":  "@{variables(\u0027varRequestedByName\u0027)}",
-                                                                                                    "CanBeImported":  "@equals(outputs(\u0027Compose_ExportMode_Safe\u0027), \u0027INTERNAL\u0027)",
+                                                                                                    "CanBeImported":  true,
                                                                                                     "RowCount":  "@int(outputs(\u0027Compose_RowCount\u0027))",
                                                                                                     "ExportMode":  "@{outputs(\u0027Compose_ExportMode_Safe\u0027)}",
                                                                                                     "SelectedColumnCount":  "@length(body(\u0027Parse_Selected_Columns\u0027))"
@@ -573,9 +531,9 @@
                                                                                             },
                                                           "Respond_to_a_Power_App_or_flow":  {
                                                                                                  "runAfter":  {
-                                                                                                                  "SQL_CompleteExportBatch":  [
-                                                                                                                                                  "Succeeded"
-                                                                                                                                              ]
+                                                                                                                  "Execute_stored_procedure_(V2)":  [
+                                                                                                                                                        "Succeeded"
+                                                                                                                                                    ]
                                                                                                               },
                                                                                                  "metadata":  {
                                                                                                                   "operationMetadataId":  "9a1072da-4048-4df6-bc84-230b42478dd9"
@@ -625,9 +583,9 @@
                                                                                              },
                                                           "SP_GetTemplateFileContent":  {
                                                                                             "runAfter":  {
-                                                                                                             "SQL_RegisterExportSnapshot":  [
-                                                                                                                                                "Succeeded"
-                                                                                                                                            ]
+                                                                                                             "Compose_ExportInfo":  [
+                                                                                                                                        "Succeeded"
+                                                                                                                                    ]
                                                                                                          },
                                                                                             "metadata":  {
                                                                                                              "operationMetadataId":  "867d1ec2-e9f8-4c24-9043-739730e91ae5"
@@ -759,132 +717,55 @@
                                                                                                                                  }
                                                                                                                    }
                                                                                                     }
-                                                                                     },
-                                                          "SQL_RegisterExportSnapshot":  {
-                                                                                             "runAfter":  {
-                                                                                                              "Compose_ExportInfo":  [
-                                                                                                                                         "Succeeded"
-                                                                                                                                     ]
-                                                                                                          },
-                                                                                             "metadata":  {
-                                                                                                              "operationMetadataId":  "codex-register-export-snapshot"
-                                                                                                          },
-                                                                                             "type":  "OpenApiConnection",
-                                                                                             "inputs":  {
-                                                                                                            "host":  {
-                                                                                                                         "apiId":  "/providers/Microsoft.PowerApps/apis/shared_sqldw",
-                                                                                                                         "connectionName":  "shared_sqldw_2",
-                                                                                                                         "operationId":  "ExecuteProcedureV2"
-                                                                                                                     },
-                                                                                                            "parameters":  {
-                                                                                                                               "server":  "default",
-                                                                                                                               "database":  "default",
-                                                                                                                               "procedure":  "[warroom].[usp_RegisterPunchExportSnapshot]",
-                                                                                                                               "parameters/PunchExportLogId":  "@outputs(\u0027Compose_PunchExportLogId\u0027)",
-                                                                                                                               "parameters/ProjectId":  "@variables(\u0027varProjectId\u0027)",
-                                                                                                                               "parameters/TemplateId":  "@triggerBody()[\u0027number_1\u0027]",
-                                                                                                                               "parameters/ExportType":  "Punches",
-                                                                                                                               "parameters/CreatedBy":  "@variables(\u0027varRequestedByEmail\u0027)",
-                                                                                                                               "parameters/FileName":  "@variables(\u0027varFileName\u0027)",
-                                                                                                                               "parameters/AllowedColumnsJson":  "@outputs(\u0027Compose_SelectedColumns_Safe\u0027)",
-                                                                                                                               "parameters/RowsJson":  "@string(outputs(\u0027Compose_ExportRows\u0027))"
-                                                                                                                           },
-                                                                                                            "authentication":  {
-                                                                                                                                   "value":  "@json(decodeBase64(triggerOutputs().headers[\u0027X-MS-APIM-Tokens\u0027]))[\u0027$ConnectionKey\u0027]",
-                                                                                                                                   "type":  "Raw"
-                                                                                                                               }
-                                                                                                        }
-                                                                                         },
-                                                          "Respond_ExportFailure":  {
-                                                                                        "runAfter":  {
-                                                                                                         "Respond_to_a_Power_App_or_flow":  [
-                                                                                                                                                "Failed",
-                                                                                                                                                "TimedOut",
-                                                                                                                                                "Skipped"
-                                                                                                                                            ]
-                                                                                                     },
-                                                                                        "metadata":  {
-                                                                                                         "operationMetadataId":  "codex-export-failure-response"
-                                                                                                     },
-                                                                                        "type":  "Response",
-                                                                                        "kind":  "PowerApp",
-                                                                                        "inputs":  {
-                                                                                                       "statusCode":  500,
-                                                                                                       "body":  {
-                                                                                                                    "success":  false,
-                                                                                                                    "fileurl":  "",
-                                                                                                                    "filename":  "@{variables(\u0027varFileName\u0027)}",
-                                                                                                                    "rowcount":  0,
-                                                                                                                    "message":  "Export failed before completion. Review the failed Flow action and Punch export log."
-                                                                                                                },
-                                                                                                       "schema":  {
-                                                                                                                      "type":  "object",
-                                                                                                                      "properties":  {
-                                                                                                                                         "success":  {
-                                                                                                                                                         "title":  "success",
-                                                                                                                                                         "x-ms-dynamically-added":  true,
-                                                                                                                                                         "type":  "boolean"
-                                                                                                                                                     },
-                                                                                                                                         "fileurl":  {
-                                                                                                                                                         "title":  "fileUrl",
-                                                                                                                                                         "x-ms-dynamically-added":  true,
-                                                                                                                                                         "type":  "string"
-                                                                                                                                                     },
-                                                                                                                                         "filename":  {
-                                                                                                                                                          "title":  "fileName",
-                                                                                                                                                          "x-ms-dynamically-added":  true,
-                                                                                                                                                          "type":  "string"
-                                                                                                                                                      },
-                                                                                                                                         "rowcount":  {
-                                                                                                                                                          "title":  "rowCount",
-                                                                                                                                                          "x-ms-dynamically-added":  true,
-                                                                                                                                                          "type":  "number"
-                                                                                                                                                      },
-                                                                                                                                         "message":  {
-                                                                                                                                                         "title":  "message",
-                                                                                                                                                         "x-ms-dynamically-added":  true,
-                                                                                                                                                         "type":  "string"
-                                                                                                                                                     }
-                                                                                                                                     }
-                                                                                                                  }
-                                                                                                   }
-                                                                                    },
-                                                          "SQL_CompleteExportBatch":  {
-                                                                                          "runAfter":  {
-                                                                                                           "Execute_stored_procedure_(V2)":  [
-                                                                                                                                                 "Succeeded"
-                                                                                                                                             ]
-                                                                                                       },
-                                                                                          "metadata":  {
-                                                                                                           "operationMetadataId":  "codex-complete-export-batch"
-                                                                                                       },
-                                                                                          "type":  "OpenApiConnection",
-                                                                                          "inputs":  {
-                                                                                                         "host":  {
-                                                                                                                      "apiId":  "/providers/Microsoft.PowerApps/apis/shared_sqldw",
-                                                                                                                      "connectionName":  "shared_sqldw_2",
-                                                                                                                      "operationId":  "ExecuteProcedureV2"
-                                                                                                                  },
-                                                                                                         "parameters":  {
-                                                                                                                            "server":  "default",
-                                                                                                                            "database":  "default",
-                                                                                                                            "procedure":  "[warroom].[usp_CompletePunchExportBatch]",
-                                                                                                                            "parameters/PunchExportLogId":  "@outputs(\u0027Compose_PunchExportLogId\u0027)",
-                                                                                                                            "parameters/FileName":  "@variables(\u0027varFileName\u0027)",
-                                                                                                                            "parameters/RowCount":  "@outputs(\u0027Compose_RowCount\u0027)"
-                                                                                                                        },
-                                                                                                         "authentication":  {
-                                                                                                                                "value":  "@json(decodeBase64(triggerOutputs().headers[\u0027X-MS-APIM-Tokens\u0027]))[\u0027$ConnectionKey\u0027]",
-                                                                                                                                "type":  "Raw"
-                                                                                                                            }
-                                                                                                     }
-                                                                                      }
+                                                                                     }
                                                       },
                                           "outputs":  {
 
                                                       }
                                       },
-                       "templateName":  null
-                   },
-    "schemaVersion":  "1.0.0.0"
+                       "connectionReferences":  {
+                                                    "shared_sqldw_2":  {
+                                                                           "connectionName":  "shared-sqldw-39a77660-3c9d-44fb-a5c9-6e70fcf4b1ae",
+                                                                           "source":  "Invoker",
+                                                                           "id":  "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                                                                           "tier":  "NotSpecified",
+                                                                           "apiName":  "sqldw",
+                                                                           "isProcessSimpleApiReferenceConversionAlreadyDone":  false
+                                                                       },
+                                                    "shared_sqldw_3":  {
+                                                                           "connectionName":  "shared-sqldw-e9c75dca-06c6-41de-b20a-0f3acef3bfbd",
+                                                                           "source":  "Invoker",
+                                                                           "id":  "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                                                                           "tier":  "NotSpecified",
+                                                                           "apiName":  "sqldw",
+                                                                           "isProcessSimpleApiReferenceConversionAlreadyDone":  false
+                                                                       },
+                                                    "shared_excelonlinebusiness":  {
+                                                                                       "connectionName":  "shared-excelonlinebu-6f8713f8-afca-4839-aee5-0a8fdc4b58c7",
+                                                                                       "source":  "Invoker",
+                                                                                       "id":  "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+                                                                                       "tier":  "NotSpecified",
+                                                                                       "apiName":  "excelonlinebusiness",
+                                                                                       "isProcessSimpleApiReferenceConversionAlreadyDone":  false
+                                                                                   },
+                                                    "shared_sharepointonline":  {
+                                                                                    "connectionName":  "950299e4d12b429f9369acd179bf87f3",
+                                                                                    "source":  "Invoker",
+                                                                                    "id":  "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                                                                                    "tier":  "NotSpecified",
+                                                                                    "apiName":  "sharepointonline",
+                                                                                    "isProcessSimpleApiReferenceConversionAlreadyDone":  false
+                                                                                },
+                                                    "shared_sqldw":  {
+                                                                         "connectionName":  "8c9a525fcebb4423a04e486c3782c454",
+                                                                         "source":  "Invoker",
+                                                                         "id":  "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                                                                         "tier":  "NotSpecified",
+                                                                         "apiName":  "sqldw",
+                                                                         "isProcessSimpleApiReferenceConversionAlreadyDone":  false
+                                                                     }
+                                                },
+                       "flowFailureAlertSubscribed":  false,
+                       "isManaged":  false
+                   }
 }

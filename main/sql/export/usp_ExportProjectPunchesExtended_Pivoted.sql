@@ -431,6 +431,56 @@ BEGIN
     ON #ExportBase(PunchId);
 
     ---------------------------------------------------------------------
+    -- 5.1) Canonical immutable standard-field snapshot
+    ---------------------------------------------------------------------
+    ALTER TABLE #ExportBase
+        ADD OriginalValuesJson NVARCHAR(MAX) NULL;
+
+    UPDATE eb
+    SET OriginalValuesJson = snapshot.OriginalValuesJson
+    FROM #ExportBase eb
+    CROSS APPLY
+    (
+        SELECT
+            eb.ProjectId,
+            eb.PunchId,
+            eb.TemplateId,
+            eb.AreaCode,
+            eb.UnitCode,
+            eb.SystemCode,
+            eb.SubsystemCode,
+            eb.ElementCode,
+            eb.ElementDiscipline,
+            eb.Code,
+            eb.[Description],
+            eb.PunchCoordinator,
+            eb.Originator,
+            eb.CategoryCode,
+            eb.Category,
+            eb.Discipline,
+            eb.StatusCode,
+            eb.[Status],
+            eb.InspectionCode,
+            eb.InspectionName,
+            eb.InspectionType,
+            eb.EntryType,
+            eb.EntryTypeColor,
+            eb.Topic,
+            eb.RejectCount,
+            eb.ItemsRaw,
+            eb.SubcontractorId,
+            eb.SubcontractorCode,
+            eb.SubcontractorName,
+            eb.SubcontractorShortName,
+            eb.DepartmentAction,
+            eb.LastCommentOn,
+            eb.LastCommentText,
+            eb.LastCommentByEmail,
+            eb.CommentCount
+        FOR JSON PATH, WITHOUT_ARRAY_WRAPPER, INCLUDE_NULL_VALUES
+    ) snapshot(OriginalValuesJson);
+
+    ---------------------------------------------------------------------
     -- 6) Custom values normalized
     ---------------------------------------------------------------------
     CREATE TABLE #CustomFlat
@@ -530,15 +580,11 @@ BEGIN
                 NVARCHAR(64),
                 HASHBYTES(
                     'SHA2_256',
-                    CONCAT(
-                        eb.ProjectId,
-                        '|',
-                        eb.PunchId,
-                        '|'
-                    )
+                    CONVERT(varbinary(max), eb.OriginalValuesJson)
                 ),
                 2
             ) AS RowHash,
+            eb.OriginalValuesJson,
 
             eb.AreaCode,
             eb.UnitCode,
@@ -615,11 +661,18 @@ BEGIN
         HashSource AS
         (
             SELECT
-                PunchId,
-                STRING_AGG(CONCAT(ColumnName, ''='', ISNULL(FieldValue, '''')), ''|'')
-                    WITHIN GROUP (ORDER BY ColumnName) AS CustomHashSource
-            FROM #CustomFlat
-            GROUP BY PunchId
+                ids.PunchId,
+                CustomHashSource =
+                (
+                    SELECT
+                        valuesByKey.ColumnName,
+                        valuesByKey.FieldValue
+                    FROM #CustomFlat valuesByKey
+                    WHERE valuesByKey.PunchId = ids.PunchId
+                    ORDER BY valuesByKey.ColumnName
+                    FOR JSON PATH, INCLUDE_NULL_VALUES
+                )
+            FROM (SELECT DISTINCT PunchId FROM #CustomFlat) ids
         )
         SELECT
             eb.ProjectId,
@@ -630,16 +683,14 @@ BEGIN
                 NVARCHAR(64),
                 HASHBYTES(
                     ''SHA2_256'',
-                    CONCAT(
-                        eb.ProjectId,
-                        ''|'',
-                        eb.PunchId,
-                        ''|'',
-                        ISNULL(hs.CustomHashSource, '''')
+                    CONVERT(
+                        varbinary(max),
+                        JSON_MODIFY(eb.OriginalValuesJson, ''$.CustomValuesCanonical'', ISNULL(hs.CustomHashSource, ''''))
                     )
                 ),
                 2
             ) AS RowHash,
+            JSON_MODIFY(eb.OriginalValuesJson, ''$.CustomValuesCanonical'', ISNULL(hs.CustomHashSource, '''')) AS OriginalValuesJson,
 
             eb.AreaCode,
             eb.UnitCode,

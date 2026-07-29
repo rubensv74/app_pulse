@@ -1,100 +1,90 @@
-# PULSE — Excel import architecture
+# PULSE - Excel import architecture
 
-## Scope and baseline
+## Scope
 
-Sprint I01 defines the foundations for importing a PULSE-generated Punch Excel
-export. The existing export is initiated by
-`main/screens/Punches/scr_Punches_1.pa.yaml`, which calls
-`Warroom_ExportPunchesToExcel` with twelve positional parameters. The twelfth,
-`SelectedColumnsJson`, carries the requested columns.
-
-No reproducible Power Automate definition, SQL source object, data contract or
-backend mapping for that Flow existed in this repository at the start of I01.
-Staging/validation procedures, import Flows and import UI are not part of I01.
+Sprint I01.1 provides the export-side foundation required for safe Punch Excel
+imports. `scr_Punches_1.pa.yaml` calls
+`Warroom_ExportPunchesToExcel_Codex` with twelve positional parameters.
+Staging, validation and commit remain I02–I05 work.
 
 ## Trust boundary and lifecycle
 
-Excel protection is a usability control, not a security boundary. SQL is the
-authority for the export batch, project/template scope, work item membership,
-original values, row versions, checksums and active editable-column allowlist.
+Excel protection is a usability control, never a trust boundary. SQL owns the
+export identity, project/template scope, row membership, original values,
+checksums and business-column allowlist.
 
-The lifecycle is:
+`select → export/snapshot → upload → stage → validate → diff → preview →
+confirm → revalidate → apply → audit`
 
-`select → analyse → create batch → stage → validate → diff → preview → confirm
-→ revalidate → apply → audit`.
+Uploading a file never updates production Punch data.
 
-Uploading a file never updates a production Punch table.
+## Export contract v3
 
-## Export contract
+Every importable `INTERNAL` workbook contains hidden, locked columns:
 
-The real workbook carries `PunchExportLogId`, `ProjectId`, `TemplateId`,
-`PunchId`, `RowHash` and `Original Row Hash`. Contract v2 maps
-`PunchExportLogId` to logical `ExportBatchId`, `PunchId` to `WorkItemId`, and
-the hashes to export/original row checksums. `ExportedOnUtc` is stored once in
-the hidden Export Information sheet.
+- `ExportBatchId`
+- `ProjectId`
+- `TemplateId`
+- `WorkItemId`
+- `RowVersion` (reserved and currently blank)
+- `ExportedAtUtc`
+- `RowChecksum`
 
-The Office Script owns these columns, locks them and protects the Punches
-worksheet. Power Apps sends only user-selected business columns in
-`SelectedColumnsJson`.
+The Office Script derives canonical names from the existing physical
+`PunchExportLogId`, `PunchId` and `RowHash`. Contracts v1/v2 remain history;
+runtime uses `main/contracts/excel-import/export-columns.v3.json`.
 
-Contract v1 remains as design history. Runtime integration must use
-`main/contracts/excel-import/export-columns.v2.json`.
-
-The Flow must persist the export batch and its rows, populate the metadata,
-protect those columns, and return the file only after persistence succeeds.
-The exact request contract is
-`main/contracts/excel-import/export-columns.v1.json`.
+Power Apps sends only selected business columns. Technical columns are created
+and protected by the Office Script.
 
 ## Data model
 
-`main/sql/import/001_import_foundations.sql` creates:
+`001_import_foundations.sql` creates:
 
 | Object | Responsibility |
 |---|---|
-| `warroom.ExportBatch` | Extension keyed by the existing BIGINT `PunchExportLogId`; stores scope and allowlist snapshot. |
-| `warroom.ExportBatchRow` | Original state, row version and checksum. |
-| `warroom.ImportBatch` | Import lifecycle and aggregate counters. |
-| `warroom.ImportBatchRow` | Staged data, diff and validation/apply state. |
-| `warroom.ImportAudit` | Per-field applied-change audit. |
-| `warroom.ImportColumnDefinition` | Backend allowlist by project/template. |
+| `warroom.ExportBatch` | Extension keyed by existing BIGINT `PunchExportLogId`; scope and allowlist snapshot. |
+| `warroom.ExportBatchRow` | Immutable original JSON and SHA-256 per exported Punch. |
+| `warroom.ImportBatch` | Import lifecycle and counters. |
+| `warroom.ImportBatchRow` | Staged row, diff, validation and apply state. |
+| `warroom.ImportAudit` | Applied field-level audit. |
+| `warroom.ImportColumnDefinition` | Backend technical/business allowlist. |
 
-The unique import-to-export relationship prevents reuse of an export batch.
-Sprint I02 procedures must enforce lifecycle transitions and semantic
-invariants transactionally.
+`usp_RegisterPunchExportSnapshot` receives all exported rows once, validates
+them and creates the batch plus rows in one transaction. Repeating the same
+request is idempotent; different immutable data for the same ID is rejected.
 
-## Concurrency and integrity
+## Concurrency and checksum
 
-The supplied source does not expose a physical SQL `rowversion`. Concurrency
-therefore uses the SHA-256 `RowHash`/`Original Row Hash` mechanism. Validation
-must recompute the current canonical checksum and compare it with the immutable
-stored export checksum. A mismatch is a blocking `CONFLICT`.
+The Punch source does not expose physical SQL `rowversion`, so `RowVersion`
+remains nullable. Concurrency uses SHA-256 over canonical
+`OriginalValuesJson`, which includes all exported standard fields and sorted
+dynamic custom-field values.
 
-The supplied SQL checksum currently omits editable standard fields and must be
-expanded before imports can be committed safely.
+The immutable JSON/checksum is persisted before the workbook is created.
+Later validation must recompute the current canonical checksum. A mismatch is a
+blocking `CONFLICT`; no forced overwrite exists.
 
 ## Column governance
 
-`main/mappings/excel-import/punch-columns.v1.json` is the initial logical
-allowlist. Deployment loads approved entries into
-`warroom.ImportColumnDefinition`; runtime validation reads that table.
-Dynamic `CF__` fields are denied by default and require an active scoped
-backend definition.
+Contract/mapping v3 is current. `003_seed_import_columns_v3.sql` loads the
+technical mappings. Business editability comes from
+`warroom.usp_GetPunchExportColumnMap` and `IsEditableInExcel`; the selected
+allowlist is also frozen in `ExportBatch.AllowedColumnsJson`.
 
-## Performance baseline
+A field is importable only if both the stored batch allowlist and active
+backend mapping authorize it. `CF__` fields remain deny-by-default.
 
-- Current export Flow limit: 50,000 data rows.
-- Import limit remains a future I02 decision after payload/performance tests.
-- One structured Excel table per file.
-- Batch or bulk staging, never one SQL call per row.
-- Set-based validation/diff and paged row-error retrieval.
+## Performance
 
-## Deployment dependencies
+- Export Flow hard limit: 50,000 rows.
+- One structured table, `tblPunches`.
+- One SQL snapshot call for the complete dataset.
+- No SQL call per row.
+- Import limit will be set in I02 after payload/performance validation.
 
-1. Check logical field names and lengths against the production Punch schema,
-   which is not versioned here.
-2. Run the foundation script twice in non-production to verify idempotency.
-3. Load the approved backend mapping.
-4. Update and test `Warroom_ExportPunchesToExcel` against export contract v1.
-5. Begin I02 only after those dependencies are accepted.
+## Deployment boundary
 
-No credentials, connections or environment-specific secrets are included.
+All repository work for I01.1 is complete. Environment deployment and E2E
+validation are grouped exclusively in `docs/I01_1_E2E_VALIDATION.md`.
+I02 starts only after every checklist item passes.

@@ -4,7 +4,7 @@
     "type":  "Microsoft.Flow/flows",
     "properties":  {
                        "apiId":  "/providers/Microsoft.PowerApps/apis/shared_logicflows",
-                       "displayName":  "Warroom_ExportPunchesToExcel",
+                       "displayName":  "Warroom_ExportPunchesToExcel_Codex",
                        "definition":  {
                                           "metadata":  {
                                                            "workflowEntityId":  null,
@@ -312,7 +312,7 @@
                                                                                                     "ExportedOnUtc":  "@{utcNow()}",
                                                                                                     "ExportedByEmail":  "@{variables(\u0027varRequestedByEmail\u0027)}",
                                                                                                     "ExportedByName":  "@{variables(\u0027varRequestedByName\u0027)}",
-                                                                                                    "CanBeImported":  true,
+                                                                                                    "CanBeImported":  "@equals(outputs(\u0027Compose_ExportMode_Safe\u0027), \u0027INTERNAL\u0027)",
                                                                                                     "RowCount":  "@int(outputs(\u0027Compose_RowCount\u0027))",
                                                                                                     "ExportMode":  "@{outputs(\u0027Compose_ExportMode_Safe\u0027)}",
                                                                                                     "SelectedColumnCount":  "@length(body(\u0027Parse_Selected_Columns\u0027))"
@@ -531,9 +531,9 @@
                                                                                             },
                                                           "Respond_to_a_Power_App_or_flow":  {
                                                                                                  "runAfter":  {
-                                                                                                                  "Execute_stored_procedure_(V2)":  [
-                                                                                                                                                        "Succeeded"
-                                                                                                                                                    ]
+                                                                                                                  "SQL_CompleteExportBatch":  [
+                                                                                                                                                  "Succeeded"
+                                                                                                                                              ]
                                                                                                               },
                                                                                                  "metadata":  {
                                                                                                                   "operationMetadataId":  "9a1072da-4048-4df6-bc84-230b42478dd9"
@@ -583,9 +583,9 @@
                                                                                              },
                                                           "SP_GetTemplateFileContent":  {
                                                                                             "runAfter":  {
-                                                                                                             "Compose_ExportInfo":  [
-                                                                                                                                        "Succeeded"
-                                                                                                                                    ]
+                                                                                                             "SQL_RegisterExportSnapshot":  [
+                                                                                                                                                "Succeeded"
+                                                                                                                                            ]
                                                                                                          },
                                                                                             "metadata":  {
                                                                                                              "operationMetadataId":  "867d1ec2-e9f8-4c24-9043-739730e91ae5"
@@ -668,7 +668,7 @@
                                                                                                            "operationMetadataId":  "c54def83-5c81-4802-a6a1-f1b819fa7f19"
                                                                                                        },
                                                                                           "type":  "Compose",
-                                                                                          "inputs":  "@if(\r\n  equals(\r\n    toUpper(\r\n      trim(\r\n        string(\r\n          coalesce(\r\n            triggerBody()?[\u0027ExportMode\u0027],\r\n            \u0027CLIENT\u0027\r\n          )\r\n        )\r\n      )\r\n    ),\r\n    \u0027INTERNAL\u0027\r\n  ),\r\n  \u0027INTERNAL\u0027,\r\n  \u0027CLIENT\u0027\r\n)"
+                                                                                          "inputs":  "@if(\r\n  equals(\r\n    toUpper(\r\n      trim(\r\n        string(\r\n          coalesce(\r\n            triggerBody()?[\u0027text_8\u0027],\r\n            \u0027CLIENT\u0027\r\n          )\r\n        )\r\n      )\r\n    ),\r\n    \u0027INTERNAL\u0027\r\n  ),\r\n  \u0027INTERNAL\u0027,\r\n  \u0027CLIENT\u0027\r\n)"
                                                                                       },
                                                           "Compose_SelectedColumns_Safe":  {
                                                                                                "runAfter":  {
@@ -717,7 +717,126 @@
                                                                                                                                  }
                                                                                                                    }
                                                                                                     }
-                                                                                     }
+                                                                                     },
+                                                          "SQL_RegisterExportSnapshot":  {
+                                                                                             "runAfter":  {
+                                                                                                              "Compose_ExportInfo":  [
+                                                                                                                                         "Succeeded"
+                                                                                                                                     ]
+                                                                                                          },
+                                                                                             "metadata":  {
+                                                                                                              "operationMetadataId":  "codex-register-export-snapshot"
+                                                                                                          },
+                                                                                             "type":  "OpenApiConnection",
+                                                                                             "inputs":  {
+                                                                                                            "host":  {
+                                                                                                                         "apiId":  "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                                                                                                                         "connectionName":  "shared_sqldw_2",
+                                                                                                                         "operationId":  "ExecuteProcedureV2"
+                                                                                                                     },
+                                                                                                            "parameters":  {
+                                                                                                                               "server":  "default",
+                                                                                                                               "database":  "default",
+                                                                                                                               "procedure":  "[warroom].[usp_RegisterPunchExportSnapshot]",
+                                                                                                                               "parameters/PunchExportLogId":  "@outputs(\u0027Compose_PunchExportLogId\u0027)",
+                                                                                                                               "parameters/ProjectId":  "@variables(\u0027varProjectId\u0027)",
+                                                                                                                               "parameters/TemplateId":  "@triggerBody()[\u0027number_1\u0027]",
+                                                                                                                               "parameters/ExportType":  "Punches",
+                                                                                                                               "parameters/CreatedBy":  "@variables(\u0027varRequestedByEmail\u0027)",
+                                                                                                                               "parameters/FileName":  "@variables(\u0027varFileName\u0027)",
+                                                                                                                               "parameters/AllowedColumnsJson":  "@outputs(\u0027Compose_SelectedColumns_Safe\u0027)",
+                                                                                                                               "parameters/RowsJson":  "@string(outputs(\u0027Compose_ExportRows\u0027))"
+                                                                                                                           },
+                                                                                                            "authentication":  {
+                                                                                                                                   "value":  "@json(decodeBase64(triggerOutputs().headers[\u0027X-MS-APIM-Tokens\u0027]))[\u0027$ConnectionKey\u0027]",
+                                                                                                                                   "type":  "Raw"
+                                                                                                                               }
+                                                                                                        }
+                                                                                         },
+                                                          "Respond_ExportFailure":  {
+                                                                                        "runAfter":  {
+                                                                                                         "Respond_to_a_Power_App_or_flow":  [
+                                                                                                                                                "Failed",
+                                                                                                                                                "TimedOut",
+                                                                                                                                                "Skipped"
+                                                                                                                                            ]
+                                                                                                     },
+                                                                                        "metadata":  {
+                                                                                                         "operationMetadataId":  "codex-export-failure-response"
+                                                                                                     },
+                                                                                        "type":  "Response",
+                                                                                        "kind":  "PowerApp",
+                                                                                        "inputs":  {
+                                                                                                       "statusCode":  500,
+                                                                                                       "body":  {
+                                                                                                                    "success":  false,
+                                                                                                                    "fileurl":  "",
+                                                                                                                    "filename":  "@{variables(\u0027varFileName\u0027)}",
+                                                                                                                    "rowcount":  0,
+                                                                                                                    "message":  "Export failed before completion. Review the failed Flow action and Punch export log."
+                                                                                                                },
+                                                                                                       "schema":  {
+                                                                                                                      "type":  "object",
+                                                                                                                      "properties":  {
+                                                                                                                                         "success":  {
+                                                                                                                                                         "title":  "success",
+                                                                                                                                                         "x-ms-dynamically-added":  true,
+                                                                                                                                                         "type":  "boolean"
+                                                                                                                                                     },
+                                                                                                                                         "fileurl":  {
+                                                                                                                                                         "title":  "fileUrl",
+                                                                                                                                                         "x-ms-dynamically-added":  true,
+                                                                                                                                                         "type":  "string"
+                                                                                                                                                     },
+                                                                                                                                         "filename":  {
+                                                                                                                                                          "title":  "fileName",
+                                                                                                                                                          "x-ms-dynamically-added":  true,
+                                                                                                                                                          "type":  "string"
+                                                                                                                                                      },
+                                                                                                                                         "rowcount":  {
+                                                                                                                                                          "title":  "rowCount",
+                                                                                                                                                          "x-ms-dynamically-added":  true,
+                                                                                                                                                          "type":  "number"
+                                                                                                                                                      },
+                                                                                                                                         "message":  {
+                                                                                                                                                         "title":  "message",
+                                                                                                                                                         "x-ms-dynamically-added":  true,
+                                                                                                                                                         "type":  "string"
+                                                                                                                                                     }
+                                                                                                                                     }
+                                                                                                                  }
+                                                                                                   }
+                                                                                    },
+                                                          "SQL_CompleteExportBatch":  {
+                                                                                          "runAfter":  {
+                                                                                                           "Execute_stored_procedure_(V2)":  [
+                                                                                                                                                 "Succeeded"
+                                                                                                                                             ]
+                                                                                                       },
+                                                                                          "metadata":  {
+                                                                                                           "operationMetadataId":  "codex-complete-export-batch"
+                                                                                                       },
+                                                                                          "type":  "OpenApiConnection",
+                                                                                          "inputs":  {
+                                                                                                         "host":  {
+                                                                                                                      "apiId":  "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                                                                                                                      "connectionName":  "shared_sqldw_2",
+                                                                                                                      "operationId":  "ExecuteProcedureV2"
+                                                                                                                  },
+                                                                                                         "parameters":  {
+                                                                                                                            "server":  "default",
+                                                                                                                            "database":  "default",
+                                                                                                                            "procedure":  "[warroom].[usp_CompletePunchExportBatch]",
+                                                                                                                            "parameters/PunchExportLogId":  "@outputs(\u0027Compose_PunchExportLogId\u0027)",
+                                                                                                                            "parameters/FileName":  "@variables(\u0027varFileName\u0027)",
+                                                                                                                            "parameters/RowCount":  "@outputs(\u0027Compose_RowCount\u0027)"
+                                                                                                                        },
+                                                                                                         "authentication":  {
+                                                                                                                                "value":  "@json(decodeBase64(triggerOutputs().headers[\u0027X-MS-APIM-Tokens\u0027]))[\u0027$ConnectionKey\u0027]",
+                                                                                                                                "type":  "Raw"
+                                                                                                                            }
+                                                                                                     }
+                                                                                      }
                                                       },
                                           "outputs":  {
 
