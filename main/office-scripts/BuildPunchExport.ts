@@ -278,7 +278,9 @@ function parseJsonObject<T>(json: string, argumentName: string): T {
     if (parsed === null || Array.isArray(parsed) || typeof parsed !== "object") {
       throw new Error();
     }
-    return parsed as T;
+    // Office Scripts requires an explicit generic conversion at this validated
+    // JSON boundary.
+    return parsed as unknown as T;
   } catch {
     throw new Error(`${argumentName} does not contain a valid JSON object.`);
   }

@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## Sprint I01.1 - Office Script compatibility fix
+
+### Added
+
+- None.
+
+### Changed
+
+- The generic JSON-object parser now crosses the `unknown` boundary explicitly,
+  as required by the Office Scripts TypeScript compiler.
+
+### Fixed
+
+- Office Scripts compiler error TS2352 in `parseJsonObject<T>`.
+
+### Removed
+
+- None.
+
+### Known Issues
+
+- Office Scripts compilation must be confirmed again in the Microsoft editor.
+
 ## Sprint I01.1 - Real export integration
 
 ### Added
