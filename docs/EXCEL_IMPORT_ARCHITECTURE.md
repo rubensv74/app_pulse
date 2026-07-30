@@ -22,7 +22,7 @@ Uploading a file never updates production Punch data.
 
 Every importable `INTERNAL` workbook contains hidden, locked columns:
 
-- `ExportBatchId`
+- `ExportBatchId` (technical GUID)
 - `ProjectId`
 - `TemplateId`
 - `WorkItemId`
@@ -31,7 +31,7 @@ Every importable `INTERNAL` workbook contains hidden, locked columns:
 - `RowChecksum`
 
 The Office Script derives canonical names from the existing physical
-`PunchExportLogId`, `PunchId` and `RowHash`. Contracts v1/v2 remain history;
+`PunchExportLogId` (functional BIGINT), `PunchId` and `RowHash`. Contracts v1/v2 remain history;
 runtime uses `main/contracts/excel-import/export-columns.v3.json`.
 
 Power Apps sends only selected business columns. Technical columns are created
@@ -88,3 +88,7 @@ backend mapping authorize it. `CF__` fields remain deny-by-default.
 All repository work for I01.1 is complete. Environment deployment and E2E
 validation are grouped exclusively in `docs/I01_1_E2E_VALIDATION.md`.
 I02 starts only after every checklist item passes.
+
+## Canonical SQL identity (Block A)
+
+The canonical model separates `ExportBatchId uniqueidentifier` from unique `PunchExportLogId bigint`. `ExportBatchRow.RowVersion` is nullable and remains empty until the Punch source exposes a real version. See `docs/sql/PUNCH_EXPORT_SQL_CANONICAL_MODEL.md`.

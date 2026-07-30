@@ -5,20 +5,22 @@ target branch. Use a non-production environment.
 
 ## 1. Azure SQL
 
-- [ ] Execute `main/sql/import/001_import_foundations.sql`.
-- [ ] Execute `main/sql/export/usp_ExportProjectPunchesExtended_Pivoted.sql`.
-- [ ] Execute `main/sql/export/002_register_punch_export_snapshot.sql`.
-- [ ] Execute `main/sql/import/003_seed_import_columns_v3.sql`.
+- [ ] Execute `sql/migrations/20260730_align_punch_export_snapshot_model.sql` before procedure deployment in an existing environment.
+
+- [ ] Execute `sql/import/001_import_foundations.sql`.
+- [ ] Execute `sql/export/usp_ExportProjectPunchesExtended_Pivoted.sql`.
+- [ ] Execute `sql/export/002_register_punch_export_snapshot.sql`.
+- [ ] Execute `sql/import/003_seed_import_columns_v3.sql`.
 - [ ] Execute the four scripts again; confirm that the second execution
       completes without duplicate-object or duplicate-mapping errors.
-- [ ] Confirm `warroom.ExportBatch.ExportBatchId` is `bigint`.
+- [ ] Confirm `warroom.ExportBatch.ExportBatchId` is `uniqueidentifier`.
 - [ ] Confirm `warroom.ExportBatchRow.RowVersion` is nullable.
 - [ ] Confirm `warroom.usp_RegisterPunchExportSnapshot` returns `Success=1`, `Status=CREATED` and the expected `RowCount` when called by the Flow.
 - [ ] Confirm `warroom.usp_CompletePunchExportBatch` changes the same batch to `READY` only after file creation and export-log completion.
 
 ## 2. Office Scripts
 
-- [ ] Publish `main/office-scripts/BuildPunchExport.ts`.
+- [ ] Publish `office-scripts/BuildPunchExport.ts`.
 - [ ] Confirm the Office Scripts editor reports no TypeScript errors, including
       no TS2352 error.
 - [ ] Record/select the published script in the Flow action `Run_script`.
@@ -26,7 +28,7 @@ target branch. Use a non-production environment.
 ## 3. Power Automate
 
 - [ ] Import
-      `main/power-automate/Warroom_ExportPunchesToExcel_Codex/Warroom_ExportPunchesToExcel_Codex.zip`.
+      `flows/Warroom_ExportPunchesToExcel_Codex/Warroom_ExportPunchesToExcel_Codex.zip`.
 - [ ] Confirm the imported display name is
       `Warroom_ExportPunchesToExcel_Codex`.
 - [ ] Rebind all Azure SQL, SharePoint and Excel Online connections.
@@ -88,5 +90,3 @@ target branch. Use a non-production environment.
 - Export batch ID and row-count comparison.
 
 I01.1 passes only when every checkbox above succeeds. Any failure blocks I02.
-
-

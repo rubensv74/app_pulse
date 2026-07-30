@@ -73,3 +73,7 @@ The only environment work is the single ordered checklist in
 
 Execute the single E2E checklist. If every check passes, close I01.1 and begin
 I02 backend validation.
+
+## Block A stabilization
+
+The SQL snapshot model is now GUID/BIGINT canonical, includes an idempotent migration, nullable RowVersion, failure compensation and SQL tests. Non-production execution evidence is required before Block A is closed.
