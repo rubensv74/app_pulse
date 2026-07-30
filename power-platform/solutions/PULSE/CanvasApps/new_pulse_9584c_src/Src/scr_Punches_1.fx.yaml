@@ -3061,7 +3061,20 @@ scr_Punches_1 As screen:
                                             )
                                         );
                                     
-                                        Set(varShowPunchExportColumns, true)
+                                        If(
+                                            CountRows(colPunchExportColumns) <>
+                                            CountRows(Distinct(colPunchExportColumns, ColumnKey)),
+                                            Set(
+                                                varPunchExportConfigError,
+                                                "The export column catalog contains duplicate keys."
+                                            );
+                                            Notify(
+                                                varPunchExportConfigError,
+                                                NotificationType.Error
+                                            );
+                                            Clear(colPunchExportColumns),
+                                            Set(varShowPunchExportColumns, true)
+                                        )
                                     )
                                 Size: =0
                                 Text: ="Export Excel"
@@ -4503,7 +4516,7 @@ scr_Punches_1 As screen:
                             colPunchExportColumns,
                             true,
                             {
-                                IsSelected: !IsSensitive || IsRequired
+                                IsSelected: !IsSensitive
                             }
                         )
                     Size: =0
@@ -4523,13 +4536,13 @@ scr_Punches_1 As screen:
                     OnSelect: |-
                         =UpdateIf(
                             colPunchExportColumns,
-                            !IsRequired,
+                            true,
                             {
                                 IsSelected: false
                             }
                         )
                     Size: =0
-                    Text: ="Clear optional"
+                    Text: ="Clear all"
                     Width: =120
                     ZIndex: =4
 
@@ -4740,12 +4753,7 @@ scr_Punches_1 As screen:
                         =ColorValue("#94A3B8")
                     DisabledFill: |-
                         =ColorValue("#F8FAFC")
-                    DisplayMode: |-
-                        =If(
-                            ThisItem.IsRequired,
-                            DisplayMode.Disabled,
-                            DisplayMode.Edit
-                        )
+                    DisplayMode: =DisplayMode.Edit
                     Fill: |-
                         =If(
                             ThisItem.IsSelected,

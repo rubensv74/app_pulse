@@ -2225,7 +2225,20 @@ Screens:
                                                           )
                                                       );
 
-                                                      Set(varShowPunchExportColumns, true)
+                                                      If(
+                                                          CountRows(colPunchExportColumns) <>
+                                                          CountRows(Distinct(colPunchExportColumns, ColumnKey)),
+                                                          Set(
+                                                              varPunchExportConfigError,
+                                                              "The export column catalog contains duplicate keys."
+                                                          );
+                                                          Notify(
+                                                              varPunchExportConfigError,
+                                                              NotificationType.Error
+                                                          );
+                                                          Clear(colPunchExportColumns),
+                                                          Set(varShowPunchExportColumns, true)
+                                                      )
                                                   )
                                                 Text: ="Export Excel"
                                                 Width: =120
@@ -3308,7 +3321,7 @@ Screens:
                                     colPunchExportColumns,
                                     true,
                                     {
-                                        IsSelected: !IsSensitive || IsRequired
+                                        IsSelected: !IsSensitive
                                     }
                                 )
                               Text: ="Select public"
@@ -3323,12 +3336,12 @@ Screens:
                               OnSelect: |-
                                 =UpdateIf(
                                     colPunchExportColumns,
-                                    !IsRequired,
+                                    true,
                                     {
                                         IsSelected: false
                                     }
                                 )
-                              Text: ="Clear optional"
+                              Text: ="Clear all"
                               Width: =120
                   - conPunchExportColumnHeader_1:
                       Control: GroupContainer@1.5.0
@@ -3494,12 +3507,7 @@ Screens:
                               DisabledBorderColor: =ColorValue("#CBD5E1")
                               DisabledColor: =ColorValue("#94A3B8")
                               DisabledFill: =ColorValue("#F8FAFC")
-                              DisplayMode: |-
-                                =If(
-                                    ThisItem.IsRequired,
-                                    DisplayMode.Disabled,
-                                    DisplayMode.Edit
-                                )
+                              DisplayMode: =DisplayMode.Edit
                               Fill: |-
                                 =If(
                                     ThisItem.IsSelected,
