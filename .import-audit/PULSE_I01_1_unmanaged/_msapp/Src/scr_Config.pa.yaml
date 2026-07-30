@@ -1,0 +1,2769 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  scr_Config:
+    Properties:
+      Fill: =RGBA(255, 255, 255, 1)
+      LoadingSpinnerColor: =RGBA(0, 120, 212, 1)
+    Children:
+      - conConfigScreenRoot:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =varTheme_PageBg
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Center
+            LayoutDirection: =LayoutDirection.Horizontal
+            Width: =Parent.Width
+          Children:
+            - cmp_NavApp_Config:
+                Control: CanvasComponent
+                ComponentName: cmp_SidebarNav
+                Properties:
+                  ActiveKey: =varAppView
+                  Fill: =varTheme_PulseBlue
+                  Height: =Parent.Height
+                  IsCollapsed: =true
+                  Items: =colSidebarNavItems
+                  NavItems: =colSidebarNavItems
+                  OnSelectItem: |-
+                    =
+
+                    With(
+                        {
+                            _key: Lower(Trim(Self.SelectedItemKey)),
+                            _hasProject: !IsBlank(varProjectId)
+                        },
+                        If(
+                            _key <> "home" && !_hasProject,
+
+                            Notify("Please select a project first.", NotificationType.Warning);
+                            Set(varAppView, "Home");
+                            Navigate(scr_Home, ScreenTransition.None),
+
+                            Switch(
+                                _key,
+
+                                "home",
+                                    Set(varAppView, "Home");
+                                    Set(varHomeViewMode, "DASHBOARD");
+                                    Navigate(scr_Home, ScreenTransition.None),
+
+                                "overview",
+                                    Set(varAppView, "Overview");
+                                    Set(varOps_ViewMode, "OVERVIEW");
+                                    Navigate(scr_Overview, ScreenTransition.None),
+
+                                "tasks",
+                                    Set(varAppView, "Tasks");
+                                    Navigate(scr_Tasks, ScreenTransition.None),
+
+                                "punches",
+                                    Set(varAppView, "Punches");
+                                    Navigate(scr_Punches, ScreenTransition.None),
+
+                                "briefing",
+                                    Set(varAppView, "Briefing");
+                                    Navigate(scr_Briefing, ScreenTransition.None),
+
+                                "config",
+                                    Set(varAppView, "Config");
+                                    Navigate(scr_Config, ScreenTransition.None),
+
+                                "superadmin",
+                                    Set(varAppView, "SuperAdmin");
+                                    Navigate(scr_SuperAdmin, ScreenTransition.None),
+
+                                Notify("Key not mapped: [" & _key & "]", NotificationType.Error)
+                            )
+                        )
+                    )
+                  OnToggleCollapse: =
+                  UserRole: ="Text"
+                  Width: =154
+            - conConfigContent:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  Height: =Parent.Height
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutMinHeight: =16
+                  LayoutMinWidth: =16
+                  Width: =Parent.Width - cmp_NavApp_Config.Width
+                Children:
+                  - con_ConfigRoot:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        Fill: =RGBA(245,247,250,1)
+                        Height: =Parent.Height
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =10
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        Width: =Parent.Width
+                      Children:
+                        - conView_Home_Header_5:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_TopBg
+                              FillPortions: =0
+                              Height: =60
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              PaddingBottom: =8
+                              PaddingRight: =20
+                              PaddingTop: =8
+                              RadiusBottomLeft: =0
+                              RadiusBottomRight: =0
+                              RadiusTopLeft: =0
+                              RadiusTopRight: =0
+                              X: =40
+                              Y: =40
+                            Children:
+                              - lblHomeTitle_9:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Color: =varTheme_TextWhite
+                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =60
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =0
+                                    PaddingLeft: =10
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    RadiusBottomLeft: =0
+                                    RadiusBottomRight: =0
+                                    RadiusTopLeft: =0
+                                    RadiusTopRight: =0
+                                    Size: =22
+                                    Text: =varProjectCode & " - " & varProjectName
+                                    Width: =250
+                                    X: =40
+                                    Y: =40
+                        - conBody_ReportConfig_1:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              PaddingBottom: =8
+                              PaddingLeft: =8
+                              PaddingRight: =8
+                              PaddingTop: =8
+                            Children:
+                              - conLeftCard_1:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    AlignInContainer: =AlignInContainer.SetByContainer
+                                    BorderColor: =RGBA(226,232,240,1)
+                                    BorderStyle: =BorderStyle.None
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(245, 247, 250, 1)
+                                    FillPortions: =0.75
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =16
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =10
+                                    PaddingLeft: =10
+                                    PaddingRight: =5
+                                    PaddingTop: =10
+                                    RadiusBottomLeft: =16
+                                    RadiusBottomRight: =16
+                                    RadiusTopLeft: =16
+                                    RadiusTopRight: =16
+                                  Children:
+                                    - conTreeTop_1:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          AlignInContainer: =AlignInContainer.SetByContainer
+                                          DropShadow: =DropShadow.None
+                                          Fill: =RGBA(245, 247, 250, 1)
+                                          FillPortions: =0
+                                          Height: =50
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          RadiusBottomLeft: =14
+                                          RadiusBottomRight: =14
+                                          RadiusTopLeft: =14
+                                          RadiusTopRight: =14
+                                        Children:
+                                          - lblTreeTitle_1:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                AlignInContainer: =AlignInContainer.Start
+                                                Color: =RGBA(17,24,39,1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Bold
+                                                Height: =50
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                PaddingBottom: =0
+                                                PaddingLeft: =10
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                RadiusBottomLeft: =0
+                                                RadiusBottomRight: =0
+                                                RadiusTopLeft: =0
+                                                RadiusTopRight: =0
+                                                Size: =24
+                                                Text: ="Configuration"
+                                                VerticalAlign: =VerticalAlign.Top
+                                                Width: =230
+                                          - lblHomeTitle_10:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =RGBA(24,24,27,1)
+                                                FillPortions: =1
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Bold
+                                                Height: =60
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                RadiusBottomLeft: =0
+                                                RadiusBottomRight: =0
+                                                RadiusTopLeft: =0
+                                                RadiusTopRight: =0
+                                                Size: =24
+                                                Text: =varProjectCode & " - " & varProjectName
+                                                Width: =250
+                                                X: =40
+                                                Y: =40
+                                    - conTreeHeaderCard_1:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          AlignInContainer: =AlignInContainer.SetByContainer
+                                          BorderColor: =RGBA(226,232,240,1)
+                                          BorderThickness: =1
+                                          DropShadow: =DropShadow.None
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          FillPortions: =0
+                                          Height: =84
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =6
+                                          LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          PaddingBottom: =10
+                                          PaddingLeft: =20
+                                          PaddingRight: =20
+                                          PaddingTop: =10
+                                          RadiusBottomLeft: =14
+                                          RadiusBottomRight: =14
+                                          RadiusTopLeft: =14
+                                          RadiusTopRight: =14
+                                          Visible: =varConfigLoaded
+                                          X: =40
+                                          Y: =40
+                                        Children:
+                                          - lblCardSelectedNodeTitle_2:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =gblAppColors.TextPrimary
+                                                FontWeight: =FontWeight.Bold
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                RadiusBottomLeft: =0
+                                                RadiusBottomRight: =0
+                                                RadiusTopLeft: =0
+                                                RadiusTopRight: =0
+                                                Text: ="REPORT TREE"
+                                                Width: =Parent.Width
+                                                X: =40
+                                                Y: =40
+                                          - lblTreeSubtitle_1:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =gblAppColors.TextPrimary
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                PaddingLeft: =
+                                                Text: ="Build and navigate the hierarchy used to organize the report dictionary."
+                                                Width: =600
+                                    - conTreeColumns_1:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =12
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Visible: =varConfigLoaded
+                                          X: =40
+                                          Y: =40
+                                        Children:
+                                          - conL1Card_1:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: AutoLayout
+                                              Properties:
+                                                AlignInContainer: =AlignInContainer.SetByContainer
+                                                BorderColor: =RGBA(226,232,240,1)
+                                                BorderThickness: =1
+                                                DropShadow: =DropShadow.None
+                                                Fill: =RGBA(255, 255, 255, 1)
+                                                FillPortions: =3
+                                                LayoutAlignItems: =LayoutAlignItems.Stretch
+                                                LayoutDirection: =LayoutDirection.Vertical
+                                                LayoutGap: =12
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                PaddingBottom: =14
+                                                PaddingLeft: =14
+                                                PaddingRight: =14
+                                                PaddingTop: =14
+                                                RadiusBottomLeft: =16
+                                                RadiusBottomRight: =16
+                                                RadiusTopLeft: =16
+                                                RadiusTopRight: =16
+                                              Children:
+                                                - lblL1Hint_1:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      Color: =RGBA(53, 61, 63, 1)
+                                                      FontWeight: =FontWeight.Semibold
+                                                      LayoutMinHeight: =16
+                                                      LayoutMinWidth: =16
+                                                      PaddingBottom: =0
+                                                      PaddingLeft: =0
+                                                      PaddingRight: =0
+                                                      PaddingTop: =0
+                                                      RadiusBottomLeft: =0
+                                                      RadiusBottomRight: =0
+                                                      RadiusTopLeft: =0
+                                                      RadiusTopRight: =0
+                                                      Size: =14
+                                                      Text: ="LEVEL 1 - HEADERS"
+                                                      Underline: =true
+                                                      Width: =96
+                                                - galL1_1:
+                                                    Control: Gallery@2.15.0
+                                                    Variant: Vertical
+                                                    Properties:
+                                                      AlignInContainer: =AlignInContainer.SetByContainer
+                                                      BorderColor: =RGBA(245, 245, 245, 1)
+                                                      Items: |-
+                                                        =
+                                                        SortByColumns(
+                                                            Filter(colNodes, LevelNo = 1 && IsActive),
+                                                            "SortOrder", SortOrder.Ascending,
+                                                            "DisplayName", SortOrder.Ascending
+                                                        )
+                                                      LayoutMinHeight: =16
+                                                      LayoutMinWidth: =16
+                                                      OnSelect: |-
+                                                        =
+
+                                                        Set(varSelNodeId_L1, ThisItem.NodeId);
+                                                        Set(varSelectedL1DisplayName, ThisItem.DisplayName);
+
+                                                        // Reset niveles inferiores
+                                                        Set(varSelNodeId_L2, Blank());
+
+                                                        Set(varSelectedL2DisplayName, "");
+
+                                                        Set(varSelNodeId_L3, Blank());
+                                                        Set(varSelectedL3DisplayName, "");
+
+
+                                                        Select(btnCfg_RefreshSelectionContext_1);
+                                                      TemplateFill: |-
+                                                        =If(
+                                                            Text(ThisItem.NodeId) = Text(varSelNodeId_L1),
+                                                            RGBA(95,121,151,0.10),
+                                                            RGBA(255,255,255,1)
+                                                        )
+                                                      TemplatePadding: =0
+                                                      TemplateSize: =54
+                                                      X: =40
+                                                      Y: =40
+                                                    Children:
+                                                      - Text1_1:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            BorderStyle: =BorderStyle.Solid
+                                                            BorderThickness: =0
+                                                            Color: |-
+                                                              =
+                                                              If(
+                                                                  ThisItem.NodeId = galL1_1.Selected.NodeId,
+                                                                  RGBA(15,23,42,1),
+                                                                  RGBA(51,65,85,1)
+                                                              )
+                                                            Fill: |
+                                                              =
+
+                                                                  Color.Transparent
+                                                            FontWeight: |-
+                                                              =
+                                                              If(
+                                                                  ThisItem.NodeId = galL1_1.Selected.NodeId,
+                                                                  'TextCanvas.Weight'.Semibold,
+                                                                  'TextCanvas.Weight'.Regular
+                                                              )
+                                                            Height: =Parent.TemplateHeight
+                                                            OnSelect: =Select(Parent)
+                                                            RadiusBottomLeft: =4
+                                                            RadiusBottomRight: =4
+                                                            RadiusTopLeft: =4
+                                                            RadiusTopRight: =4
+                                                            Size: =13
+                                                            Text: =ThisItem.DisplayName
+                                                            VerticalAlign: =VerticalAlign.Top
+                                                            Width: =Parent.TemplateWidth - 2
+                                                - btnAddL1_1:
+                                                    Control: Button@0.0.45
+                                                    Properties:
+                                                      BasePaletteColor: =ColorValue("#6B3C78")
+                                                      BorderRadius: =12
+                                                      BorderRadiusTopLeft: =12
+                                                      FontSize: =13
+                                                      Height: =40
+                                                      OnSelect: |-
+                                                        =
+
+
+
+                                                        Set(varEditMode, "NEW");
+                                                        Set(varEditLevel, 1);
+                                                        Set(varEditParentNodeId, "");
+                                                        Set(varEditNodeId, "");
+
+                                                        Select(btnNode_OpenModal_1);
+                                                      Text: ="+ Add Header"
+                                                      Width: =Parent.Width - 28
+                                                      X: =40
+                                                      Y: =40
+                                          - conL2Card_1:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: AutoLayout
+                                              Properties:
+                                                AlignInContainer: =AlignInContainer.SetByContainer
+                                                BorderColor: =RGBA(226,232,240,1)
+                                                BorderThickness: =1
+                                                DropShadow: =DropShadow.None
+                                                Fill: =RGBA(255, 255, 255, 1)
+                                                FillPortions: =3.5
+                                                LayoutAlignItems: =LayoutAlignItems.Stretch
+                                                LayoutDirection: =LayoutDirection.Vertical
+                                                LayoutGap: =12
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                PaddingBottom: =14
+                                                PaddingLeft: =12
+                                                PaddingRight: =12
+                                                PaddingTop: =14
+                                                RadiusBottomLeft: =16
+                                                RadiusBottomRight: =16
+                                                RadiusTopLeft: =16
+                                                RadiusTopRight: =16
+                                              Children:
+                                                - lblL2Hint_1:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      Color: =RGBA(53, 61, 63, 1)
+                                                      FontWeight: =FontWeight.Semibold
+                                                      LayoutMinHeight: =16
+                                                      LayoutMinWidth: =16
+                                                      PaddingBottom: =0
+                                                      PaddingLeft: =0
+                                                      PaddingRight: =0
+                                                      PaddingTop: =0
+                                                      RadiusBottomLeft: =0
+                                                      RadiusBottomRight: =0
+                                                      RadiusTopLeft: =0
+                                                      RadiusTopRight: =0
+                                                      Size: =14
+                                                      Text: ="LEVEL 2 - SECTIONS"
+                                                      Underline: =true
+                                                      Width: =96
+                                                - galL2_1:
+                                                    Control: Gallery@2.15.0
+                                                    Variant: Vertical
+                                                    Properties:
+                                                      AlignInContainer: =AlignInContainer.SetByContainer
+                                                      BorderColor: =RGBA(245, 245, 245, 1)
+                                                      Items: |-
+                                                        =
+                                                        SortByColumns(
+                                                            Filter(
+                                                                colNodes,
+                                                                LevelNo = 2 &&
+                                                                IsActive &&
+                                                                Text(ParentNodeId) = Text(varSelNodeId_L1)
+                                                            ),
+                                                            "SortOrder", SortOrder.Ascending,
+                                                            "DisplayName", SortOrder.Ascending
+                                                        )
+                                                      LayoutMinHeight: =16
+                                                      LayoutMinWidth: =16
+                                                      OnSelect: |-
+                                                        =Set(varSelNodeId_L2, Text(ThisItem.NodeId));
+
+                                                        // Reset L3
+                                                        Set(varSelNodeId_L3, "");
+                                                        Set(varTargetSubsectionId, "");
+                                                        Set(varTargetSubsectionName, "");
+
+                                                        Select(btnCfg_RefreshSelectionContext_1);
+                                                      TemplateFill: |-
+                                                        =If(
+                                                            Text(ThisItem.NodeId) = Text(varSelNodeId_L2),
+                                                            RGBA(95,121,151,0.10),
+                                                            RGBA(255,255,255,1)
+                                                        )
+                                                      TemplatePadding: =0
+                                                      TemplateSize: =54
+                                                      X: =40
+                                                      Y: =40
+                                                    Children:
+                                                      - Text2_1:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            BorderStyle: =BorderStyle.Solid
+                                                            BorderThickness: =0
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =Parent.TemplateHeight
+                                                            OnSelect: =Select(Parent)
+                                                            Size: =13
+                                                            Text: =ThisItem.DisplayName
+                                                            VerticalAlign: =VerticalAlign.Top
+                                                            Width: =Parent.TemplateWidth
+                                                - btnAddL2_1:
+                                                    Control: Button@0.0.45
+                                                    Properties:
+                                                      AlignInContainer: =AlignInContainer.Center
+                                                      BasePaletteColor: =ColorValue("#6B3C78")
+                                                      BorderRadius: =12
+                                                      BorderRadiusTopLeft: =12
+                                                      DisplayMode: =If(!IsBlank(varSelNodeId_L1), DisplayMode.Edit, DisplayMode.Disabled)
+                                                      FontSize: =13
+                                                      Height: =40
+                                                      OnSelect: |-
+                                                        =
+                                                        If(
+                                                            IsBlank(varSelNodeId_L1),
+                                                            Notify("Select a Level 1 header first.", NotificationType.Warning),
+
+                                                            Set(varEditMode, "NEW");
+                                                            Set(varEditLevel, 2);
+                                                            Set(varEditParentNodeId, Text(varSelNodeId_L1));
+                                                            Set(varEditNodeId, "");
+
+                                                            Select(btnNode_OpenModal_1)
+                                                        );
+                                                      Text: ="+ Add Section"
+                                                      Width: =Parent.Width - 28
+                                                      X: =40
+                                                      Y: =40
+                                          - conL3Card_1:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: AutoLayout
+                                              Properties:
+                                                AlignInContainer: =AlignInContainer.SetByContainer
+                                                BorderColor: =RGBA(226,232,240,1)
+                                                BorderThickness: =1
+                                                DropShadow: =DropShadow.None
+                                                Fill: =RGBA(255, 255, 255, 1)
+                                                FillPortions: =3.5
+                                                LayoutAlignItems: =LayoutAlignItems.Stretch
+                                                LayoutDirection: =LayoutDirection.Vertical
+                                                LayoutGap: =10
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                PaddingBottom: =12
+                                                PaddingLeft: =20
+                                                PaddingRight: =12
+                                                PaddingTop: =14
+                                                RadiusBottomLeft: =16
+                                                RadiusBottomRight: =16
+                                                RadiusTopLeft: =16
+                                                RadiusTopRight: =16
+                                              Children:
+                                                - lblL3Hint_1:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      Color: =RGBA(53, 61, 63, 1)
+                                                      FontWeight: =FontWeight.Semibold
+                                                      LayoutMinHeight: =16
+                                                      LayoutMinWidth: =16
+                                                      PaddingBottom: =0
+                                                      PaddingLeft: =0
+                                                      PaddingRight: =0
+                                                      PaddingTop: =0
+                                                      RadiusBottomLeft: =0
+                                                      RadiusBottomRight: =0
+                                                      RadiusTopLeft: =0
+                                                      RadiusTopRight: =0
+                                                      Size: =14
+                                                      Text: ="LEVEL 3 - SUBSECTIONS"
+                                                      Underline: =true
+                                                      Width: =96
+                                                - galL3_1:
+                                                    Control: Gallery@2.15.0
+                                                    Variant: Vertical
+                                                    Properties:
+                                                      AlignInContainer: =AlignInContainer.SetByContainer
+                                                      BorderColor: =RGBA(245, 245, 245, 1)
+                                                      Items: |-
+                                                        =
+
+
+                                                        SortByColumns(
+                                                            Filter(
+                                                                colNodes,
+                                                                LevelNo = 3 &&
+                                                                IsActive &&
+                                                                Text(ParentNodeId) = Text(varSelNodeId_L2)
+                                                            ),
+                                                            "SortOrder", SortOrder.Ascending,
+                                                            "DisplayName", SortOrder.Ascending
+                                                        )
+                                                      LayoutMinHeight: =16
+                                                      LayoutMinWidth: =16
+                                                      OnSelect: |-
+                                                        =
+
+                                                        Set(varSelNodeId_L3, Text(ThisItem.NodeId));
+                                                        Set(varTargetSubsectionId, Text(ThisItem.NodeId));
+                                                        Set(varTargetSubsectionName, ThisItem.DisplayName);
+
+                                                        // resolver ancestros
+                                                        With(
+                                                            {
+                                                                n2: LookUp(
+                                                                    colNodes,
+                                                                    Text(NodeId) = Text(ThisItem.ParentNodeId)
+                                                                )
+                                                            },
+                                                            With(
+                                                                {
+                                                                    n1: LookUp(
+                                                                        colNodes,
+                                                                        Text(NodeId) = Text(n2.ParentNodeId)
+                                                                    )
+                                                                },
+                                                                Set(varSelNodeId_L1, Text(n1.NodeId));
+                                                                Set(varSelNodeId_L2, Text(n2.NodeId))
+                                                            )
+                                                        );
+
+                                                        // refrescar solo el contexto
+                                                        Select(btnCfg_RefreshSelectionContext_1);
+                                                      TemplateFill: |-
+                                                        =If(
+                                                            Text(ThisItem.NodeId) = Text(varSelNodeId_L3),
+                                                            RGBA(95,121,151,0.15),
+                                                            RGBA(255,255,255,1)
+                                                        )
+                                                      TemplatePadding: =0
+                                                      TemplateSize: =58
+                                                    Children:
+                                                      - Text3_1:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =Parent.TemplateHeight
+                                                            OnSelect: =Select(Parent)
+                                                            RadiusBottomLeft: =4
+                                                            RadiusBottomRight: =4
+                                                            RadiusTopLeft: =4
+                                                            RadiusTopRight: =4
+                                                            Size: =13
+                                                            Text: =ThisItem.DisplayName
+                                                            VerticalAlign: =VerticalAlign.Top
+                                                            Width: =Parent.TemplateWidth
+                                                - btnAddL3_1:
+                                                    Control: Button@0.0.45
+                                                    Properties:
+                                                      AlignInContainer: =AlignInContainer.Center
+                                                      BasePaletteColor: =ColorValue("#6B3C78")
+                                                      BorderRadius: =12
+                                                      BorderRadiusTopLeft: =12
+                                                      DisplayMode: =If(!IsBlank(varSelNodeId_L2), DisplayMode.Edit, DisplayMode.Disabled)
+                                                      FontSize: =13
+                                                      Height: =40
+                                                      OnSelect: |-
+                                                        =
+
+                                                        If(
+                                                            IsBlank(varSelNodeId_L2),
+                                                            Notify("Select a Level 2 section first.", NotificationType.Warning),
+
+                                                            Set(varEditMode, "NEW");
+                                                            Set(varEditLevel, 3);
+                                                            Set(varEditParentNodeId, Text(varSelNodeId_L2));
+                                                            Set(varEditNodeId, "");
+
+                                                            Select(btnNode_OpenModal_1)
+                                                        );
+                                                      Text: ="+ Add Subsection"
+                                                      Width: =Parent.Width - 28
+                                                      X: =40
+                                                      Y: =40
+                                    - conTreeFooterActions_1:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          AlignInContainer: =AlignInContainer.SetByContainer
+                                          BorderColor: =RGBA(226,232,240,1)
+                                          BorderThickness: =1
+                                          DropShadow: =DropShadow.None
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          FillPortions: =0
+                                          Height: =56
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =12
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          PaddingBottom: =10
+                                          PaddingLeft: =16
+                                          PaddingRight: =16
+                                          PaddingTop: =10
+                                          RadiusBottomLeft: =14
+                                          RadiusBottomRight: =14
+                                          RadiusTopLeft: =14
+                                          RadiusTopRight: =14
+                                          Visible: =varConfigLoaded
+                                        Children:
+                                          - conTreeActionsButtons_1:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: AutoLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                LayoutAlignItems: =LayoutAlignItems.Center
+                                                LayoutDirection: =LayoutDirection.Horizontal
+                                                LayoutGap: =10
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                PaddingBottom: =8
+                                                PaddingLeft: =8
+                                                PaddingRight: =8
+                                                PaddingTop: =8
+                                                RadiusBottomLeft: =0
+                                                RadiusBottomRight: =0
+                                                RadiusTopLeft: =0
+                                                RadiusTopRight: =0
+                                              Children:
+                                                - lblTreeActionsHint_1:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Color: =RGBA(100,116,139,1)
+                                                      LayoutMinHeight: =16
+                                                      LayoutMinWidth: =16
+                                                      PaddingBottom: =0
+                                                      PaddingLeft: =0
+                                                      PaddingRight: =0
+                                                      PaddingTop: =0
+                                                      Size: =12
+                                                      Text: |-
+                                                        =If(
+                                                            IsBlank(galL1_1.Selected.NodeId) && IsBlank(galL2_1.Selected.NodeId) && IsBlank(galL3_1.Selected.NodeId),
+                                                            "Select a node to manage it",
+                                                            "You can edit or deactivate the current selection"
+                                                        )
+                                                      Width: =280
+                                                - btnEditNode_1:
+                                                    Control: Button@0.0.45
+                                                    Properties:
+                                                      BasePaletteColor: =ColorValue("#6B3C78")
+                                                      BorderRadius: =8
+                                                      DisplayMode: =If(!IsBlank(varSelectedNodeId), DisplayMode.Edit, DisplayMode.Disabled)
+                                                      OnSelect: |-
+                                                        =
+
+
+                                                        Set(varEditNodeId, varSelectedNodeId);
+
+                                                        If(
+                                                            IsBlank(varEditNodeId),
+                                                            Notify("Select a node to edit.", NotificationType.Warning),
+
+                                                            Set(varEditMode, "EDIT");
+                                                            Select(btnNode_OpenModal_1)
+                                                        );
+                                                      Text: ="Edit"
+                                                      X: =40
+                                                      Y: =40
+                                                - btnDeactivateNode_1:
+                                                    Control: Button@0.0.45
+                                                    Properties:
+                                                      Appearance: ='ButtonCanvas.Appearance'.Outline
+                                                      BorderRadius: =8
+                                                      DisplayMode: |-
+                                                        =
+
+                                                        If(!IsBlank(varSelectedNodeId), DisplayMode.Edit, DisplayMode.Disabled)
+                                                      OnSelect: |-
+                                                        =
+
+
+                                                        Set(varEditNodeId, varSelectedNodeId);
+
+                                                        If(
+                                                            IsBlank(varEditNodeId),
+                                                            Notify("Select a node to deactivate.", NotificationType.Warning),
+
+                                                            Set(varCfg_IsLoading, true);
+                                                            Set(varCfg_Error, "");
+
+                                                            If(
+                                                                Text(varEditNodeId) = Text(varSelNodeId_L3),
+                                                                Set(varLastSavedNodeId, Text(varSelNodeId_L2)),
+
+                                                                If(
+                                                                    Text(varEditNodeId) = Text(varSelNodeId_L2),
+                                                                    Set(varLastSavedNodeId, Text(varSelNodeId_L1)),
+
+                                                                    Set(varLastSavedNodeId, "")
+                                                                )
+                                                            );
+
+                                                            Set(varPendingResolveSavedNode, false);
+
+                                                            IfError(
+                                                                WarRoom_ReportConfig_DeactivateNode.Run(
+                                                                    varProjectId,
+                                                                    Text(varEditNodeId),
+                                                                    User().Email
+                                                                ),
+                                                                Set(varCfg_Error, "Error deactivating node.");
+                                                                Notify("Error deactivating node.", NotificationType.Error)
+                                                            );
+
+                                                            If(IsBlank(varCfg_Error), Select(btnCfg_LoadTree_1));
+
+                                                            If(
+                                                                IsBlank(varCfg_Error),
+                                                                Notify("Node deactivated successfully.", NotificationType.Success);
+
+                                                                If(
+                                                                    Text(varEditNodeId) = Text(varSelNodeId_L1),
+                                                                    Set(varSelNodeId_L1, "");
+                                                                    Set(varSelNodeId_L2, "");
+                                                                    Set(varSelNodeId_L3, "");
+                                                                    Select(btnCfg_RefreshSelectionContext_1)
+                                                                )
+                                                            );
+
+                                                            Set(varCfg_IsLoading, false)
+                                                        );
+                                                      Text: ="Deactivate"
+                                                      X: =40
+                                                      Y: =40
+                              - conRight_Scope_1:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    AlignInContainer: =AlignInContainer.SetByContainer
+                                    BorderColor: =RGBA(226,232,240,1)
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(245, 247, 250, 1)
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =16
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =10
+                                    PaddingLeft: =5
+                                    PaddingRight: =10
+                                    PaddingTop: =10
+                                    RadiusBottomLeft: =16
+                                    RadiusBottomRight: =16
+                                    RadiusTopLeft: =16
+                                    RadiusTopRight: =16
+                                  Children:
+                                    - conRightTop_1:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          AlignInContainer: =AlignInContainer.SetByContainer
+                                          DropShadow: =DropShadow.None
+                                          Fill: =RGBA(245, 247, 250, 1)
+                                          FillPortions: =0
+                                          Height: =50
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =10
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          PaddingLeft: =10
+                                          RadiusBottomLeft: =14
+                                          RadiusBottomRight: =14
+                                          RadiusTopLeft: =14
+                                          RadiusTopRight: =14
+                                        Children:
+                                          - btnCfg_RefreshManual_1:
+                                              Control: Button@0.0.45
+                                              Properties:
+                                                BasePaletteColor: =varTheme_PulseBlueDark
+                                                BorderRadius: =12
+                                                Height: =40
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                OnSelect: |-
+                                                  =
+
+                                                  If(
+                                                      IsBlank(varProjectId),
+
+                                                      Notify("Please select a project first.", NotificationType.Warning),
+
+                                                      Set(varGlobalLoading, true);
+                                                      Set(varGlobalLoadingMsg, "Loading Configuration...");
+                                                      Set(varGlobalLoadingSubMsg, "Loading report tree and scope");
+                                                      Set(varGlobalLoadingScope, "CONFIG");
+
+                                                      Set(varGlobalLoadAction, "LOAD_CONFIG");
+                                                      Set(varGlobalLoadPending, true)
+                                                  )
+                                                Text: ="Load Config Data"
+                                                Width: =150
+                                          - lblCfg_NotLoaded_1:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =RGBA(255, 0, 0, 1)
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                Text: ="Config data is not loaded. Click 'Load Config Data' to continue."
+                                                Visible: =varAppView = "Config" && CountRows(colNodes) = 0 && !varCfg_IsLoading
+                                                Width: =600
+                                    - conScopeCard_SelectedNode_1:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          AlignInContainer: =AlignInContainer.SetByContainer
+                                          BorderColor: =RGBA(214, 221, 224, 1)
+                                          BorderThickness: =1
+                                          DropShadow: =DropShadow.None
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          FillPortions: =0
+                                          Height: =160
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =8
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          PaddingBottom: =16
+                                          PaddingLeft: =16
+                                          PaddingRight: =16
+                                          PaddingTop: =16
+                                          RadiusBottomLeft: =14
+                                          RadiusBottomRight: =14
+                                          RadiusTopLeft: =14
+                                          RadiusTopRight: =14
+                                          Visible: =varConfigLoaded
+                                        Children:
+                                          - lblCardSelectedNodeTitle_3:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =gblAppColors.TextPrimary
+                                                FontWeight: =FontWeight.Semibold
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                RadiusBottomLeft: =0
+                                                RadiusBottomRight: =0
+                                                RadiusTopLeft: =0
+                                                RadiusTopRight: =0
+                                                Size: =18
+                                                Text: ="SELECTED NODE"
+                                                Width: =Parent.Width
+                                          - lblCardL1_1:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =Color.Black
+                                                FontWeight: =FontWeight.Semibold
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                Size: =18
+                                                Text: |-
+                                                  =varCfg_SelectedL1Name & " > " &
+                                                  varCfg_SelectedL2Name & " > " &
+                                                  varCfg_SelectedL3Name
+                                                Width: =Parent.Width
+                                          - conSelectedNodeBadges_1:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: AutoLayout
+                                              Properties:
+                                                BorderStyle: =BorderStyle.None
+                                                DropShadow: =DropShadow.None
+                                                FillPortions: =0
+                                                Height: =46
+                                                LayoutAlignItems: =LayoutAlignItems.Center
+                                                LayoutDirection: =LayoutDirection.Horizontal
+                                                LayoutGap: =10
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                PaddingBottom: =8
+                                                PaddingLeft: =8
+                                                PaddingRight: =8
+                                                PaddingTop: =8
+                                              Children:
+                                                - groupsAssigned_1:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      BorderColor: =RGBA(210,220,232,1)
+                                                      BorderStyle: =BorderStyle.Solid
+                                                      BorderThickness: =1
+                                                      Fill: =RGBA(232,238,246,1)
+                                                      Height: =36
+                                                      LayoutMinHeight: =16
+                                                      LayoutMinWidth: =16
+                                                      RadiusBottomLeft: =20
+                                                      RadiusBottomRight: =20
+                                                      RadiusTopLeft: =20
+                                                      RadiusTopRight: =20
+                                                      Text: =CountRows(colAssignedForTarget) & " forms assigned"
+                                                      Width: =160
+                                                - readyforReview_1:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      BorderColor: |-
+                                                        =If(
+                                                            varCfg_ReadyForReview,
+                                                            RGBA(210,220,232,1),
+                                                            RGBA(244,244,245,1)
+                                                        )
+                                                      BorderStyle: =BorderStyle.Solid
+                                                      BorderThickness: =1
+                                                      Fill: |-
+                                                        =If(
+                                                            varCfg_ReadyForReview,
+                                                            RGBA(232,238,246,1),
+                                                            RGBA(244,244,245,1)
+                                                        )
+                                                      Height: =36
+                                                      LayoutMinHeight: =16
+                                                      LayoutMinWidth: =16
+                                                      RadiusBottomLeft: =20
+                                                      RadiusBottomRight: =20
+                                                      RadiusTopLeft: =20
+                                                      RadiusTopRight: =20
+                                                      Text: |-
+                                                        =If(
+                                                            !IsBlank(varTargetSubsectionId) && CountRows(colAssignedForTarget) > 0,
+                                                            "Ready for review",
+                                                            "No scope assigned"
+                                                        )
+                                    - conScopeCard_AssignedSummary_1:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          BorderColor: =RGBA(226,232,240,1)
+                                          BorderThickness: =1
+                                          DropShadow: =DropShadow.None
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          Height: =420
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =12
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          PaddingBottom: =16
+                                          PaddingLeft: =16
+                                          PaddingRight: =16
+                                          PaddingTop: =16
+                                          RadiusBottomLeft: =14
+                                          RadiusBottomRight: =14
+                                          RadiusTopLeft: =14
+                                          RadiusTopRight: =14
+                                          Visible: =varConfigLoaded
+                                        Children:
+                                          - lblAssignedSummaryTitle_1:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =gblAppColors.TextSecondary
+                                                FontWeight: =FontWeight.Semibold
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                RadiusBottomLeft: =0
+                                                RadiusBottomRight: =0
+                                                RadiusTopLeft: =0
+                                                RadiusTopRight: =0
+                                                Size: =18
+                                                Text: ="ASSIGNED SCOPE SUMMARY"
+                                                Width: =Parent.Width
+                                          - lblAssignedSummaryEmpty_1:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Text: ="No groups assigned to this subsection yet."
+                                                Visible: |-
+                                                  =
+                                                  CountRows(colAssignedForTargetSummary) = 0
+                                                Width: =295
+                                                X: =40
+                                                Y: =40
+                                          - galAssignedSummary_1:
+                                              Control: Gallery@2.15.0
+                                              Variant: Vertical
+                                              Properties:
+                                                BorderColor: =RGBA(245, 245, 245, 1)
+                                                Items: |-
+                                                  =
+                                                  colAssignedForTargetSummary
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                TemplateSize: =96
+                                                Visible: =CountRows(colAssignedForTargetSummary) > 0
+                                              Children:
+                                                - congalAssignedSummary_1:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: ManualLayout
+                                                    Properties:
+                                                      BorderColor: =RGBA(210, 220, 232, 1)
+                                                      Height: '=Parent.TemplateHeight '
+                                                      RadiusBottomLeft: =12
+                                                      RadiusBottomRight: =12
+                                                      RadiusTopLeft: =12
+                                                      RadiusTopRight: =12
+                                                      Width: =Parent.TemplateWidth - 10
+                                                    Children:
+                                                      - galAssignedSummaryBadge_1:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Align: =Align.Center
+                                                            BorderColor: =RGBA(24,130,84,1)
+                                                            BorderStyle: =BorderStyle.Solid
+                                                            BorderThickness: =1
+                                                            Fill: =RGBA(209,233,220,1)
+                                                            Height: =36
+                                                            OnSelect: |
+                                                              =
+                                                            RadiusBottomLeft: =14
+                                                            RadiusBottomRight: =14
+                                                            RadiusTopLeft: =14
+                                                            RadiusTopRight: =14
+                                                            Text: ="Assigned"
+                                                            Width: =100
+                                                            X: =Parent.Width - Self.Width - Parent.PaddingLeft - 10
+                                                            Y: =31
+                                                      - galAssignedSummary_Subtitle_1:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            OnSelect: |
+                                                              =
+                                                            Text: "=\"Form: \" & ThisItem.FormName &\n\" · SCT: \" & Text(ThisItem.Sct) "
+                                                            Width: =600
+                                                            X: =14
+                                                            Y: =52
+                                                      - galAssignedSummary_Title_1:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Color: =RGBA(0, 0, 0, 1)
+                                                            FontWeight: =FontWeight.Semibold
+                                                            OnSelect: =
+                                                            Size: =16
+                                                            Text: =ThisItem.PhaseName & " • " & ThisItem.ElementDiscipline & " • " & ThisItem.ElementLevel
+                                                            Width: =480
+                                                            X: =18
+                                                            Y: =10
+                                          - btnOpenScopeManager_1:
+                                              Control: Button@0.0.45
+                                              Properties:
+                                                BasePaletteColor: =ColorValue("#6B3C78")
+                                                BorderRadius: =14
+                                                DisplayMode: |-
+                                                  =If(
+                                                      IsBlank(varTargetSubsectionId),
+                                                      DisplayMode.Disabled,
+                                                      DisplayMode.Edit
+                                                  )
+                                                FontSize: =17
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =48
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                OnSelect: |-
+                                                  =
+
+
+                                                  // ---------------------------------------------
+                                                  // 1) Validación mínima
+                                                  // ---------------------------------------------
+                                                  If(
+                                                      IsBlank(varTargetSubsectionId),
+                                                      Notify("Select a Level 3 subsection first.", NotificationType.Warning),
+
+                                                      // ---------------------------------------------
+                                                      // 2) Preparar estado del modal
+                                                      // ---------------------------------------------
+                                                      Set(varUnassignedScope, false);
+                                                      Set(varScopeModalLoading, true);
+
+                                                      Set(varScopeModalTargetNodeId, Text(varTargetSubsectionId));
+
+                                                      Set(
+                                                          varScopeModalTargetL1,
+                                                          Coalesce(
+                                                              LookUp(
+                                                                  colNodes As nd,
+                                                                  Text(nd.NodeId) = Text(varSelNodeId_L1),
+                                                                  nd.DisplayName
+                                                              ),
+                                                              ""
+                                                          )
+                                                      );
+
+                                                      Set(
+                                                          varScopeModalTargetL2,
+                                                          Coalesce(
+                                                              LookUp(
+                                                                  colNodes As nd,
+                                                                  Text(nd.NodeId) = Text(varSelNodeId_L2),
+                                                                  nd.DisplayName
+                                                              ),
+                                                              ""
+                                                          )
+                                                      );
+
+                                                      Set(
+                                                          varScopeModalTargetL3,
+                                                          Coalesce(
+                                                              LookUp(
+                                                                  colNodes As nd,
+                                                                  Text(nd.NodeId) = Text(varTargetSubsectionId),
+                                                                  nd.DisplayName
+                                                              ),
+                                                              ""
+                                                          )
+                                                      );
+
+                                                      Set(varScopeModalMode, "assigned");
+                                                      Set(varScopeModalSearch, "");
+
+                                                      Clear(colScopeModalSelected);
+
+                                                      // ---------------------------------------------
+                                                      // 3) Reconstruir datos del modal en local
+                                                      // ---------------------------------------------
+                                                      Select(btnScopeModal_RebuildLocal);
+
+                                                      // ---------------------------------------------
+                                                      // 4) Abrir modal
+                                                      // ---------------------------------------------
+                                                      Set(varScopeModalOpen, true);
+                                                      Set(varScopeModalLoading, false);
+
+                                                      Set(varScopeModalFilterPhase, "");
+                                                      Set(varScopeModalFilterDiscipline, "");
+
+                                                      Reset(ddScopeModalPhase_);
+                                                      Reset(ddScopeModalDiscipline);
+
+                                                      Set(varScopeModalFilterSCTOnly, false);
+                                                      Reset(tglScopeModalSCT);
+
+
+                                                      Clear(colScopeModalSelected);
+
+
+                                                  );
+                                                Text: ="Manage scope"
+                                                Width: =Parent.Width - Parent.PaddingRight - Parent.PaddingLeft
+                                                X: =40
+                                                Y: =40
+                        - btnNode_OpenModal_1:
+                            Control: Button@0.0.45
+                            Properties:
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              OnSelect: |-
+                                =
+
+                                Set(varCfg_Error, "");
+
+                                If(
+                                    varEditMode = "NEW" && varEditLevel = 2 && IsBlank(varEditParentNodeId),
+                                    Notify("Select a header first.", NotificationType.Warning),
+
+                                    varEditMode = "NEW" && varEditLevel = 3 && IsBlank(varEditParentNodeId),
+                                    Notify("Select a section first.", NotificationType.Warning),
+
+                                    varEditMode = "EDIT" && IsBlank(varEditNodeId),
+                                    Notify("Select a node to edit.", NotificationType.Warning),
+
+                                    If(
+                                        varEditMode = "NEW",
+
+                                        Set(varTmp_DisplayName, "");
+                                        Set(varTmp_Description, "");
+                                        Set(varTmp_SqlKey, "");
+                                        Set(varTmp_GridKey, "");
+                                        Set(varTmp_SortOrder, 0);
+                                        Set(varTmp_IsActive, true);
+
+                                        Set(varNodeModalOpen, true);
+
+                                        Reset(txtNode_DisplayName);
+                                        Reset(txtNode_Description);
+
+                                        Reset(txtNode_SortOrder);
+                                        Reset(tglNode_IsActive),
+
+                                        With(
+                                            {
+                                                n: LookUp(
+                                                    colNodes,
+                                                    Text(NodeId) = Text(varEditNodeId)
+                                                )
+                                            },
+                                            If(
+                                                IsBlank(n.NodeId),
+                                                Notify("Selected node not found in current tree.", NotificationType.Error),
+
+                                                Set(varEditLevel, Value(n.LevelNo));
+                                                Set(varEditParentNodeId, Text(n.ParentNodeId));
+
+                                                Set(varTmp_DisplayName, Text(n.DisplayName));
+                                                Set(varTmp_Description, Text(n.Description));
+                                                Set(varTmp_SqlKey, Text(n.SqlKey));
+                                                Set(varTmp_GridKey, Text(n.GridKey));
+                                                Set(varTmp_SortOrder, Value(n.SortOrder));
+                                                Set(varTmp_IsActive, Boolean(n.IsActive));
+
+                                                Set(varNodeModalOpen, true);
+
+                                                Reset(txtNode_DisplayName);
+                                                Reset(txtNode_Description);
+
+                                                Reset(txtNode_SortOrder);
+                                                Reset(tglNode_IsActive)
+                                            )
+                                        )
+                                    )
+                                );
+                              Visible: =false
+                        - btnCfg_LoadTree_1:
+                            Control: Button@0.0.45
+                            Properties:
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              OnSelect: |-
+                                =
+
+                                Set(varCfg_Error, "");
+
+                                IfError(
+                                    With(
+                                        { r: WarRoom_ReportConfig_GetTree.Run(varProjectId) },
+                                        ClearCollect(
+                                            colNodes,
+                                            ForAll(
+                                                Table(ParseJSON(r.result)),
+                                                {
+                                                    NodeId: Text(Value.NodeId),
+                                                    ProjectId: Value(Value.ProjectId),
+                                                    LevelNo: Value(Value.LevelNo),
+                                                    ParentNodeId: Text(Value.ParentNodeId),
+                                                    DisplayName: Text(Value.DisplayName),
+                                                    Description: Text(Value.Description),
+                                                    SqlKey: Text(Value.SqlKey),
+                                                    GridKey: Text(Value.GridKey),
+                                                    SortOrder: Value(Value.SortOrder),
+                                                    IsActive: Boolean(Value.IsActive)
+                                                }
+                                            )
+                                        )
+                                    ),
+                                    Set(varCfg_Error, "Error loading report tree.")
+                                );
+
+                                If(IsBlank(varCfg_Error), Select(btnCfg_RestoreTreeSelection_1));
+                              Visible: =false
+                        - btnCfg_LoadAssignments_1:
+                            Control: Button@0.0.45
+                            Properties:
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              OnSelect: |-
+                                =
+
+                                Set(varCfg_Error, "");
+
+                                IfError(
+                                    With(
+                                        { r: WarRoom_ReportConfig_GetAssignments.Run(varProjectId) },
+                                        ClearCollect(
+                                            colAssign,
+                                            ForAll(
+                                                Table(ParseJSON(Coalesce(r.result, "[]"))),
+                                                {
+                                                    AssignmentId: Text(Value.AssignmentId),
+                                                    ProjectId: Value(Value.ProjectId),
+                                                    GroupKey: Text(Value.GroupKey),
+                                                    NodeId: Text(Value.NodeId),
+                                                    CreatedOn: Text(Value.CreatedOn),
+                                                    CreatedBy: Text(Value.CreatedBy)
+                                                }
+                                            )
+                                        )
+                                    ),
+                                    Set(varCfg_Error, "Error loading assignments.")
+                                );
+
+                                If(
+                                    IsBlank(varCfg_Error),
+                                    Select(btnCfg_BuildAssignedForTarget_1)
+                                );
+
+                                If(
+                                    IsBlank(varCfg_Error) && varScopeModalOpen,
+                                    Select(btnScopeModal_RebuildLocal)
+                                );
+                              Visible: =false
+                        - btnCfg_LoadScope_1:
+                            Control: Button@0.0.45
+                            Properties:
+                              DisplayMode: =If(varCfg_IsLoading, DisplayMode.Disabled, DisplayMode.Edit)
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              OnSelect: |+
+                                =Set(varCfg_Error, "");
+
+                                IfError(
+                                    With(
+                                        { r: WarRoom_ReportConfig_GetScope.Run(varProjectId) },
+                                        ClearCollect(
+                                            colScope,
+                                            ForAll(
+                                                Table(ParseJSON(Coalesce(r.result, "[]"))),
+                                                {
+                                                    GroupKey: Text(Value.GroupKey),
+
+                                                    ElementDiscipline: Text(Value.ElementDiscipline),
+                                                    ElementLevel: Text(Value.ElementLevel),
+                                                    PhaseName: Text(Value.PhaseName),
+                                                    FormName: Text(Value.FormName),
+                                                    FormDescription: Text(Value.FormDescription),
+
+                                                    Sct: Boolean(Value.Sct),
+                                                    MasterTask: Boolean(Value.MasterTask),
+                                                    DossierTask: Boolean(Value.DossierTask),
+
+                                                    TotalInspections: Value(Value.TotalInspections)
+                                                }
+                                            )
+                                        )
+                                    ),
+                                    Set(varCfg_Error, "Error loading project scope.")
+                                );
+
+                              Visible: =false
+                        - btnCfg_LoadReportDictionary_1:
+                            Control: Button@0.0.45
+                            Properties:
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              OnSelect: |-
+                                =
+
+                                Set(varCfg_Error, "");
+
+                                IfError(
+                                    With(
+                                        { r: WarRoom_ReportDictionary_Get.Run(varProjectId) },
+                                        ClearCollect(
+                                            colReportDictionary,
+                                            ForAll(
+                                                Table(ParseJSON(Coalesce(r.result, "[]"))),
+                                                {
+                                                    HeaderNodeId: Text(Value.HeaderNodeId),
+                                                    Header: Text(Value.Header),
+                                                    HeaderSort: Value(Value.HeaderSort),
+
+                                                    SectionNodeId: Text(Value.SectionNodeId),
+                                                    Section: Text(Value.Section),
+                                                    SectionSort: Value(Value.SectionSort),
+
+                                                    SubsectionNodeId: Text(Value.SubsectionNodeId),
+                                                    Subsection: Text(Value.Subsection),
+                                                    SubsectionSort: Value(Value.SubsectionSort),
+
+                                                    SqlKey: Text(Value.SqlKey),
+                                                    GridKey: Text(Value.GridKey),
+
+                                                    Total: Value(Value.Total),
+                                                    Done: If(IsBlank(Text(Value.Done)), Blank(), Value(Value.Done)),
+                                                    Pending: If(IsBlank(Text(Value.Pending)), Blank(), Value(Value.Pending))
+                                                }
+                                            )
+                                        )
+                                    ),
+                                    Set(varCfg_Error, "Error loading report dictionary.")
+                                );
+                              Visible: =false
+                        - btnCfg_LoadMapDebug_1:
+                            Control: Button@0.0.45
+                            Properties:
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              OnSelect: |-
+                                =Set(varCfg_Error, "");
+
+                                IfError(
+                                    With(
+                                        { r: WarRoom_ReportDictionary_MapDebug.Run(varProjectId) },
+                                        ClearCollect(
+                                            colReportMapDebug,
+                                            ForAll(
+                                                Table(ParseJSON(Coalesce(r.result, "[]"))),
+                                                {
+                                                    GroupKey: Text(Value.GroupKey),
+
+                                                    ElementDiscipline: Text(Value.ElementDiscipline),
+                                                    ElementLevel: Text(Value.ElementLevel),
+                                                    PhaseName: Text(Value.PhaseName),
+                                                    FormName: Text(Value.FormName),
+                                                    FormDescription: Text(Value.FormDescription),
+
+                                                    Sct: Boolean(Value.Sct),
+                                                    MasterTask: Boolean(Value.MasterTask),
+                                                    DossierTask: Boolean(Value.DossierTask),
+
+                                                    TotalInspections: Value(Value.TotalInspections),
+
+                                                    Header: Text(Value.Header),
+                                                    Section: Text(Value.Section),
+                                                    Subsection: Text(Value.Subsection),
+                                                    SqlKey: Text(Value.SqlKey),
+                                                    GridKey: Text(Value.GridKey),
+                                                    SubsectionNodeId: Text(Value.SubsectionNodeId)
+                                                }
+                                            )
+                                        )
+                                    ),
+                                    Set(varCfg_Error, "Error loading report mapping debug.")
+                                );
+                              Visible: =false
+                        - btnCfg_LoadAll_1:
+                            Control: Button@0.0.45
+                            Properties:
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              OnSelect: |-
+                                =// =====================================================
+                                // btnCfg_LoadAll.OnSelect
+                                // Load Report Configuration - Multi Project Safe
+                                // =====================================================
+
+                                Set(varGlobalLoading, true);
+                                Set(varGlobalLoadingMsg, "Loading Configuration...");
+                                Set(varGlobalLoadingScope, "CONFIG");
+
+                                If(
+                                    IsBlank(varProjectId),
+                                    Notify("Please select a project first.", NotificationType.Warning);
+                                    Set(varCfg_IsLoading, false);
+                                    Set(varLoadingMsg, "");
+
+
+                                Set(varGlobalLoading, false);
+                                Set(varGlobalLoadingMsg, "");
+                                Set(varGlobalLoadingScope, "");
+
+                                    Exit()
+                                );
+
+                                If(
+                                    varCfg_IsLoading,
+                                    Notify("Configuration is already loading.", NotificationType.Information);
+
+                                Set(varGlobalLoading, false);
+                                Set(varGlobalLoadingMsg, "");
+                                Set(varGlobalLoadingScope, "");
+
+                                    Exit()
+                                );
+
+                                Set(varLoadingMsg, "Loading report configuration...");
+                                Set(varCfg_IsLoading, true);
+                                Set(varCfg_Error, "");
+                                Set(varConfigLoaded, false);
+
+                                Clear(colNodes);
+                                Clear(colAssign);
+                                Clear(colScope);
+                                Clear(colReportDictionary);
+                                Clear(colReportMapDebug);
+                                Clear(colAssignedForTarget);
+                                Clear(colAssignedForTargetSummary);
+
+                                // --------------------------------------------------
+                                // 1) Tree
+                                // --------------------------------------------------
+                                IfError(
+                                    Set(
+                                        varCfg_TreeResult,
+                                        WarRoom_ReportConfig_GetTree.Run(varProjectId).result
+                                    ),
+                                    Set(varCfg_Error, "Error loading report tree.");
+                                    Notify(varCfg_Error, NotificationType.Error)
+                                );
+
+                                If(
+                                    IsBlank(varCfg_Error),
+                                    ClearCollect(
+                                        colNodes,
+                                        ForAll(
+                                            Table(ParseJSON(Coalesce(varCfg_TreeResult, "[]"))),
+                                            {
+                                                NodeId: Text(Value.NodeId),
+                                                ProjectId: Value(Value.ProjectId),
+                                                LevelNo: Value(Value.LevelNo),
+                                                ParentNodeId: Text(Value.ParentNodeId),
+                                                DisplayName: Text(Value.DisplayName),
+                                                Description: Text(Value.Description),
+                                                SqlKey: Text(Value.SqlKey),
+                                                GridKey: Text(Value.GridKey),
+                                                SortOrder: Value(Value.SortOrder),
+                                                IsActive: Boolean(Value.IsActive)
+                                            }
+                                        )
+                                    )
+                                );
+
+                                // --------------------------------------------------
+                                // 2) Assignments
+                                // --------------------------------------------------
+                                If(
+                                    IsBlank(varCfg_Error),
+                                    IfError(
+                                        Set(
+                                            varCfg_AssignResult,
+                                            WarRoom_ReportConfig_GetAssignments.Run(varProjectId).result
+                                        ),
+                                        Set(varCfg_Error, "Error loading assignments.");
+                                        Notify(varCfg_Error, NotificationType.Error)
+                                    )
+                                );
+
+                                If(
+                                    IsBlank(varCfg_Error),
+                                    ClearCollect(
+                                        colAssign,
+                                        ForAll(
+                                            Table(ParseJSON(Coalesce(varCfg_AssignResult, "[]"))),
+                                            {
+                                                AssignmentId: Text(Value.AssignmentId),
+                                                ProjectId: Value(Value.ProjectId),
+                                                GroupKey: Text(Value.GroupKey),
+                                                NodeId: Text(Value.NodeId),
+                                                CreatedOn: Text(Value.CreatedOn),
+                                                CreatedBy: Text(Value.CreatedBy)
+                                            }
+                                        )
+                                    )
+                                );
+
+                                // --------------------------------------------------
+                                // 3) Scope
+                                // --------------------------------------------------
+                                If(
+                                    IsBlank(varCfg_Error),
+                                    IfError(
+                                        Set(
+                                            varCfg_ScopeResult,
+                                            WarRoom_ReportConfig_GetScope.Run(varProjectId).result
+                                        ),
+                                        Set(varCfg_Error, "Error loading project scope.");
+                                        Notify(varCfg_Error, NotificationType.Error)
+                                    )
+                                );
+
+                                If(
+                                    IsBlank(varCfg_Error),
+                                    ClearCollect(
+                                        colScope,
+                                        ForAll(
+                                            Table(ParseJSON(Coalesce(varCfg_ScopeResult, "[]"))),
+                                            {
+                                                GroupKey: Text(Value.GroupKey),
+                                                ElementDiscipline: Text(Value.ElementDiscipline),
+                                                ElementLevel: Text(Value.ElementLevel),
+                                                PhaseName: Text(Value.PhaseName),
+                                                FormName: Text(Value.FormName),
+                                                FormDescription: Text(Value.FormDescription),
+                                                Sct: Boolean(Value.Sct),
+                                                MasterTask: Boolean(Value.MasterTask),
+                                                TotalInspections: Value(Value.TotalInspections)
+                                            }
+                                        )
+                                    )
+                                );
+
+                                // --------------------------------------------------
+                                // 4) Report Dictionary
+                                // --------------------------------------------------
+                                IfError(
+                                    With(
+                                        {
+                                            rDict: WarRoom_ReportDictionary_Get.Run(varProjectId)
+                                        },
+                                        With(
+                                            {
+                                                dictJson: Text(Coalesce(rDict.result, "[]"))
+                                            },
+                                            ClearCollect(
+                                                colReportDictionary,
+                                                ForAll(
+                                                    Table(ParseJSON(dictJson)),
+                                                    {
+                                                        HeaderNodeId: Text(Value.HeaderNodeId),
+                                                        Header: Text(Value.Header),
+                                                        HeaderSort: Value(Text(Value.HeaderSort)),
+
+                                                        SectionNodeId: Text(Value.SectionNodeId),
+                                                        Section: Text(Value.Section),
+                                                        SectionSort: Value(Text(Value.SectionSort)),
+
+                                                        SubsectionNodeId: Text(Value.SubsectionNodeId),
+                                                        Subsection: Text(Value.Subsection),
+                                                        SubsectionSort: Value(Text(Value.SubsectionSort)),
+
+                                                        SqlKey: Text(Value.SqlKey),
+                                                        GridKey: Text(Value.GridKey),
+
+                                                        Total: Value(Text(Value.Total)),
+                                                        Done: If(
+                                                            IsBlank(Text(Value.Done)) || Text(Value.Done) = "null",
+                                                            Blank(),
+                                                            Value(Text(Value.Done))
+                                                        ),
+                                                        Pending: If(
+                                                            IsBlank(Text(Value.Pending)) || Text(Value.Pending) = "null",
+                                                            Blank(),
+                                                            Value(Text(Value.Pending))
+                                                        )
+                                                    }
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    Set(varCfg_Error, "Error loading report dictionary.")
+                                );
+
+                                // --------------------------------------------------
+                                // 5) Map Debug
+                                // --------------------------------------------------
+                                If(
+                                    IsBlank(varCfg_Error),
+                                    IfError(
+                                        Set(
+                                            varCfg_MapResult,
+                                            WarRoom_ReportDictionary_MapDebug.Run(varProjectId).result
+                                        ),
+                                        Set(varCfg_Error, "Error loading report mapping debug.");
+                                        Notify(varCfg_Error, NotificationType.Error)
+                                    )
+                                );
+
+                                If(
+                                    IsBlank(varCfg_Error),
+                                    ClearCollect(
+                                        colReportMapDebug,
+                                        ForAll(
+                                            Table(ParseJSON(Coalesce(varCfg_MapResult, "[]"))),
+                                            {
+                                                GroupKey: Text(Value.GroupKey),
+                                                ElementDiscipline: Text(Value.ElementDiscipline),
+                                                ElementLevel: Text(Value.ElementLevel),
+                                                PhaseName: Text(Value.PhaseName),
+                                                FormName: Text(Value.FormName),
+                                                FormDescription: Text(Value.FormDescription),
+                                                Sct: Boolean(Value.Sct),
+                                                MasterTask: Boolean(Value.MasterTask),
+                                                TotalInspections: Value(Value.TotalInspections),
+                                                Header: Text(Value.Header),
+                                                Section: Text(Value.Section),
+                                                Subsection: Text(Value.Subsection),
+                                                SqlKey: Text(Value.SqlKey),
+                                                GridKey: Text(Value.GridKey),
+                                                SubsectionNodeId: Text(Value.SubsectionNodeId)
+                                            }
+                                        )
+                                    )
+                                );
+
+                                // --------------------------------------------------
+                                // 6) Restore selection / rebuild summary
+                                // --------------------------------------------------
+                                If(
+                                    IsBlank(varCfg_Error),
+                                    Select(btnCfg_RestoreTreeSelection_1);
+                                    Select(btnCfg_BuildAssignedForTarget_1);
+                                    Set(varConfigLoaded, true)
+                                );
+
+                                // --------------------------------------------------
+                                // 7) Finish
+                                // --------------------------------------------------
+                                Set(varCfg_IsLoading, false);
+                                Set(varLoadingMsg, "");
+
+                                Set(varConfigLoaded, true);
+                                Set(varGlobalLoading, false);
+                                Set(varGlobalLoadingMsg, "");
+                                Set(varGlobalLoadingScope, "");
+                              Visible: =false
+                        - btnCfg_BuildAssignedForTarget_1:
+                            Control: Button@0.0.45
+                            Properties:
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              OnSelect: |-
+                                =
+                                Clear(colAssignedForTarget);
+                                Clear(colAssignedForTargetSummary);
+
+                                Set(varCfg_Error, "");
+
+                                With(
+                                    {
+                                        _targetNodeId:
+                                            Upper(
+                                                Trim(
+                                                    Text(
+                                                        If(
+                                                            varScopeModalOpen && !IsBlank(varScopeModalTargetNodeId),
+                                                            varScopeModalTargetNodeId,
+                                                            varTargetSubsectionId
+                                                        )
+                                                    )
+                                                )
+                                            ),
+
+                                        _selL1NodeId: Upper(Trim(Text(varSelNodeId_L1))),
+                                        _selL2NodeId: Upper(Trim(Text(varSelNodeId_L2)))
+                                    },
+
+                                    If(
+                                        !IsBlank(_targetNodeId),
+
+                                        With(
+                                            {
+                                                _nodeAssigns:
+                                                    Filter(
+                                                        colAssign,
+                                                        ProjectId = varProjectId &&
+                                                        Upper(Trim(Text(NodeId))) = _targetNodeId
+                                                    )
+                                            },
+
+                                            ClearCollect(
+                                                colAssignedForTarget,
+                                                SortByColumns(
+                                                    AddColumns(
+                                                        Filter(
+                                                            colScope As sc,
+                                                            CountIf(_nodeAssigns, GroupKey = sc.GroupKey) > 0
+                                                        ),
+
+                                                        AssignedNodeId, _targetNodeId,
+
+                                                        AssignedNodeName,
+                                                        LookUp(
+                                                            colNodes As nd,
+                                                            Upper(Trim(Text(nd.NodeId))) = _targetNodeId,
+                                                            nd.DisplayName
+                                                        ),
+
+                                                        L1Name,
+                                                        LookUp(
+                                                            colNodes As nd,
+                                                            Upper(Trim(Text(nd.NodeId))) = _selL1NodeId,
+                                                            nd.DisplayName
+                                                        ),
+
+                                                        L2Name,
+                                                        LookUp(
+                                                            colNodes As nd,
+                                                            Upper(Trim(Text(nd.NodeId))) = _selL2NodeId,
+                                                            nd.DisplayName
+                                                        ),
+
+                                                        L3Name,
+                                                        LookUp(
+                                                            colNodes As nd,
+                                                            Upper(Trim(Text(nd.NodeId))) = _targetNodeId,
+                                                            nd.DisplayName
+                                                        )
+                                                    ),
+                                                    "PhaseName", SortOrder.Ascending,
+                                                    "ElementDiscipline", SortOrder.Ascending,
+                                                    "ElementLevel", SortOrder.Ascending,
+                                                    "FormName", SortOrder.Ascending,
+                                                    "FormDescription", SortOrder.Ascending
+                                                )
+                                            );
+
+                                            ClearCollect(
+                                                colAssignedForTargetSummary,
+                                                FirstN(colAssignedForTarget, 4)
+                                            )
+                                        )
+                                    );
+
+                                    Set(
+                                        varCfg_SelectedL1Name,
+                                        Coalesce(
+                                            LookUp(
+                                                colNodes As nd,
+                                                Upper(Trim(Text(nd.NodeId))) = _selL1NodeId,
+                                                nd.DisplayName
+                                            ),
+                                            ""
+                                        )
+                                    );
+
+                                    Set(
+                                        varCfg_SelectedL2Name,
+                                        Coalesce(
+                                            LookUp(
+                                                colNodes As nd,
+                                                Upper(Trim(Text(nd.NodeId))) = _selL2NodeId,
+                                                nd.DisplayName
+                                            ),
+                                            ""
+                                        )
+                                    );
+
+                                    Set(
+                                        varCfg_SelectedL3Name,
+                                        Coalesce(
+                                            LookUp(
+                                                colNodes As nd,
+                                                Upper(Trim(Text(nd.NodeId))) = _targetNodeId,
+                                                nd.DisplayName
+                                            ),
+                                            ""
+                                        )
+                                    );
+
+                                    Set(varCfg_AssignedCountForTarget, CountRows(colAssignedForTarget));
+
+                                    Set(
+                                        varCfg_ReadyForReview,
+                                        !IsBlank(_targetNodeId) &&
+                                        CountRows(colAssignedForTarget) > 0
+                                    )
+                                );
+                              Visible: =false
+                        - btnCfg_RecoverScopeState_1:
+                            Control: Button@0.0.45
+                            Properties:
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              OnSelect: |-
+                                =Set(varCfg_Error, "");
+
+                                // ------------------------------------------------------
+                                // 1) Cargar scope completo
+                                // ------------------------------------------------------
+                                IfError(
+                                    With(
+                                        { rScope: WarRoom_ReportConfig_GetScope.Run(varProjectId) },
+                                        ClearCollect(
+                                            colScope,
+                                            ForAll(
+                                                Table(ParseJSON(Coalesce(rScope.result, "[]"))),
+                                                {
+                                                    GroupKey: Text(Value.GroupKey),
+                                                    ElementDiscipline: Text(Value.ElementDiscipline),
+                                                    ElementLevel: Text(Value.ElementLevel),
+                                                    PhaseName: Text(Value.PhaseName),
+                                                    FormName: Text(Value.FormName),
+                                                    FormDescription: Text(Value.FormDescription),
+                                                    Sct: Boolean(Value.Sct),
+                                                    MasterTask: Boolean(Value.MasterTask),
+                                                    DossierTask: Boolean(Value.DossierTask),
+                                                    TotalInspections: Value(Value.TotalInspections)
+                                                }
+                                            )
+                                        )
+                                    ),
+                                    Set(varCfg_Error, "Error loading project scope.")
+                                );
+
+                                // ------------------------------------------------------
+                                // 2) Cargar assignments
+                                // ------------------------------------------------------
+                                IfError(
+                                    With(
+                                        { rAssign: WarRoom_ReportConfig_GetAssignments.Run(varProjectId) },
+                                        ClearCollect(
+                                            colAssign,
+                                            ForAll(
+                                                Table(ParseJSON(Coalesce(rAssign.result, "[]"))),
+                                                {
+                                                    AssignmentId: Text(Value.AssignmentId),
+                                                    ProjectId: Value(Value.ProjectId),
+                                                    GroupKey: Text(Value.GroupKey),
+                                                    NodeId: Text(Value.NodeId),
+                                                    CreatedOn: Text(Value.CreatedOn),
+                                                    CreatedBy: Text(Value.CreatedBy)
+                                                }
+                                            )
+                                        )
+                                    ),
+                                    Set(varCfg_Error, "Error loading assignments.")
+                                );
+
+                                // ------------------------------------------------------
+                                // 3) Rebuild único
+                                // ------------------------------------------------------
+                                If(
+                                    IsBlank(varCfg_Error),
+                                    Select(btnCfg_BuildAssignedForTarget_1)
+                                );
+                              Visible: =false
+                        - btnCfg_RestoreTreeSelection_1:
+                            Control: Button@0.0.45
+                            Properties:
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              OnSelect: |-
+                                =
+
+                                Set(varCfg_Error, "");
+
+                                If(
+                                    !IsBlank(varLastSavedNodeId),
+
+                                    With(
+                                        {
+                                            n: LookUp(colNodes, Text(NodeId) = Text(varLastSavedNodeId))
+                                        },
+                                        If(
+                                            !IsBlank(n.NodeId) && Value(n.LevelNo) = 1,
+                                            Set(varSelNodeId_L1, Text(n.NodeId));
+                                            Set(varSelNodeId_L2, "");
+                                            Set(varSelNodeId_L3, ""),
+
+                                            If(
+                                                !IsBlank(n.NodeId) && Value(n.LevelNo) = 2,
+                                                Set(varSelNodeId_L1, Text(n.ParentNodeId));
+                                                Set(varSelNodeId_L2, Text(n.NodeId));
+                                                Set(varSelNodeId_L3, ""),
+
+                                                If(
+                                                    !IsBlank(n.NodeId) && Value(n.LevelNo) = 3,
+                                                    With(
+                                                        {
+                                                            n2: LookUp(colNodes, Text(NodeId) = Text(n.ParentNodeId))
+                                                        },
+                                                        With(
+                                                            {
+                                                                n1: LookUp(colNodes, Text(NodeId) = Text(n2.ParentNodeId))
+                                                            },
+                                                            Set(varSelNodeId_L1, Text(n1.NodeId));
+                                                            Set(varSelNodeId_L2, Text(n2.NodeId));
+                                                            Set(varSelNodeId_L3, Text(n.NodeId))
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                );
+
+
+                                Select(btnCfg_RefreshSelectionContext_1);
+                              Visible: =false
+                        - btnCfg_RefreshSelectionContext_1:
+                            Control: Button@0.0.45
+                            Properties:
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              OnSelect: |-
+                                =Set(
+                                    varSelectedNodeId,
+                                    Coalesce(
+                                        varSelNodeId_L3,
+                                        varSelNodeId_L2,
+                                        varSelNodeId_L1
+                                    )
+                                );
+
+                                Set(
+                                    varSelectedNode,
+                                    LookUp(
+                                        colNodes,
+                                        Text(NodeId) = Text(varSelectedNodeId)
+                                    )
+                                );
+
+                                Set(
+                                    varSelectedNodeLevel,
+                                    If(
+                                        IsBlank(varSelectedNode.NodeId),
+                                        0,
+                                        Value(varSelectedNode.LevelNo)
+                                    )
+                                );
+
+                                Set(
+                                    varSelectedNodeName,
+                                    Coalesce(
+                                        varSelectedNode.DisplayName,
+                                        ""
+                                    )
+                                );
+
+                                Set(
+                                    varSelectedParentName,
+                                    Coalesce(
+                                        LookUp(
+                                            colNodes,
+                                            Text(NodeId) = Text(varSelectedNode.ParentNodeId),
+                                            DisplayName
+                                        ),
+                                        ""
+                                    )
+                                );
+
+                                Set(
+                                    varSelectedNodeIsActive,
+                                    If(
+                                        IsBlank(varSelectedNode.NodeId),
+                                        false,
+                                        Boolean(varSelectedNode.IsActive)
+                                    )
+                                );
+
+                                Set(varTargetSubsectionId, varSelNodeId_L3);
+
+                                Set(
+                                    varTargetSubsectionName,
+                                    If(
+                                        IsBlank(varSelNodeId_L3),
+                                        "",
+                                        LookUp(
+                                            colNodes,
+                                            Text(NodeId) = Text(varSelNodeId_L3),
+                                            DisplayName
+                                        )
+                                    )
+                                );
+
+                                // único constructor del summary
+                                Select(btnCfg_BuildAssignedForTarget_1);
+                              Visible: =false
+      - con_Config_Modal_CreateNodes_1:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            DropShadow: =DropShadow.Regular
+            Fill: =RGBA(255,255,255,1)
+            Height: =Min(520, App.Height * 0.72)
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =12
+            PaddingBottom: =20
+            PaddingLeft: =20
+            PaddingRight: =20
+            PaddingTop: =20
+            RadiusBottomLeft: =14
+            RadiusBottomRight: =14
+            RadiusTopLeft: =14
+            RadiusTopRight: =14
+            Visible: =varNodeModalOpen
+            Width: =Min(720, App.Width * 0.72)
+            X: =(App.Width - Self.Width)/2
+            Y: =(App.Height - Self.Height)/2
+          Children:
+            - conModalHeader_1:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.SetByContainer
+                  BorderColor: =RGBA(210, 220, 232, 1)
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  FillPortions: =0
+                  Height: =52
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                  LayoutMinHeight: =16
+                  LayoutMinWidth: =16
+                  PaddingLeft: =12
+                  PaddingRight: =10
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                Children:
+                  - lblModalTitle_1:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =36
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        RadiusBottomLeft: =0
+                        RadiusBottomRight: =0
+                        RadiusTopLeft: =0
+                        RadiusTopRight: =0
+                        Size: =18
+                        Text: |-
+                          =
+                          If(varEditMode="NEW",
+                             "Create Level " & varEditLevel & " Node",
+                             "Edit Level " & varEditLevel & " Node")
+                        Width: =Parent.Width - btnModalClose_1.Width - 20
+                  - btnModalClose_1:
+                      Control: Button@0.0.45
+                      Properties:
+                        Appearance: ='ButtonCanvas.Appearance'.Outline
+                        BasePaletteColor: =RGBA(141, 229, 250, 1)
+                        Height: =36
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        OnSelect: |-
+                          =
+                          Select(btnNode_Cancel_1)
+                        Text: ="✕"
+                        Width: =36
+            - conModalBody_1:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.SetByContainer
+                  Fill: =RGBA(245,245,245,1)
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =10
+                  LayoutMinHeight: =16
+                  LayoutMinWidth: =16
+                  PaddingLeft: =10
+                  PaddingRight: =10
+                Children:
+                  - lblModalContext_1:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Color: =RGBA(110,110,110,1)
+                        Height: =24
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        PaddingBottom: =0
+                        PaddingTop: =0
+                        Size: =12
+                        Text: |+
+                          =
+
+
+                          If(
+                              varEditMode = "NEW",
+                              "Creating Level " & Text(varEditLevel) &
+                              If(
+                                  varEditLevel = 1,
+                                  " (root node)",
+                                  " under parent: " &
+                                  Coalesce(
+                                      LookUp(colNodes, Text(NodeId) = Text(varEditParentNodeId), DisplayName),
+                                      "-"
+                                  )
+                              ),
+                              "Editing: " &
+                              Coalesce(
+                                  LookUp(colNodes, Text(NodeId) = Text(varEditNodeId), DisplayName),
+                                  "-"
+                              )
+                          )
+
+                        Width: =Parent.Width
+                        Wrap: =false
+                  - txtNode_DisplayName_1:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(245, 245, 245, 1)
+                        BorderThickness: =1
+                        Color: =RGBA(220,220,220,1)
+                        Default: =varTmp_DisplayName
+                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        DisabledFill: =RGBA(242, 242, 241, 0)
+                        Font: =Font.'Segoe UI'
+                        Height: =44
+                        HintText: ="Display name"
+                        HoverBorderColor: =RGBA(16, 110, 190, 1)
+                        HoverColor: =RGBA(50, 49, 48, 1)
+                        HoverFill: =RGBA(255, 255, 255, 1)
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        OnChange: =Set(varTmp_DisplayName, Self.Text)
+                        PressedBorderColor: =RGBA(0, 120, 212, 1)
+                        PressedColor: =RGBA(50, 49, 48, 1)
+                        PressedFill: =RGBA(255, 255, 255, 1)
+                        RadiusBottomLeft: =6
+                        RadiusBottomRight: =6
+                        RadiusTopLeft: =6
+                        RadiusTopRight: =6
+                        Width: =Parent.Width
+                  - txtNode_Description_1:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(245, 245, 245, 1)
+                        BorderThickness: =1
+                        Color: =RGBA(220,220,220,1)
+                        Default: =varTmp_Description
+                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        DisabledFill: =RGBA(242, 242, 241, 0)
+                        Font: =Font.'Segoe UI'
+                        Height: =60
+                        HintText: ="Description (optional)"
+                        HoverBorderColor: =RGBA(16, 110, 190, 1)
+                        HoverColor: =RGBA(50, 49, 48, 1)
+                        HoverFill: =RGBA(255, 255, 255, 1)
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        OnChange: =Set(varTmp_Description, Self.Text)
+                        PressedBorderColor: =RGBA(0, 120, 212, 1)
+                        PressedColor: =RGBA(50, 49, 48, 1)
+                        PressedFill: =RGBA(255, 255, 255, 1)
+                        RadiusBottomLeft: =6
+                        RadiusBottomRight: =6
+                        RadiusTopLeft: =6
+                        RadiusTopRight: =6
+                        Width: =Parent.Width
+                  - txtNode_SortOrder_1:
+                      Control: NumberInput@2.9.12
+                      Properties:
+                        Appearance: ='NumberInput.Appearance'.Outline
+                        Height: =40
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        OnChange: =Set(varTmp_SortOrder, Value(Self.Value))
+                        Value: =varTmp_SortOrder
+                        Width: =Parent.Width
+                  - tglNode_IsActive_1:
+                      Control: Classic/Toggle@2.1.0
+                      Properties:
+                        AlignInContainer: =AlignInContainer.Stretch
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderStyle: =BorderStyle.None
+                        Color: =RGBA(50, 49, 48, 1)
+                        Default: =varTmp_IsActive
+                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                        FalseFill: =RGBA(96, 94, 92, 1)
+                        FalseHoverFill: =RGBA(50, 49, 48, 1)
+                        FalseText: ="Inactive"
+                        FocusedBorderThickness: =4
+                        Font: =Font.'Segoe UI'
+                        Height: =32
+                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        OnChange: =Set(varTmp_IsActive, Self.Value)
+                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                        TextPosition: =TextPosition.Left
+                        TrueFill: =RGBA(0, 120, 212, 1)
+                        TrueHoverFill: =RGBA(16, 110, 190, 1)
+                        TrueText: ="Active"
+                        Width: =Parent.Width
+            - conModalFooter_1:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.SetByContainer
+                  FillPortions: =0
+                  Height: =52
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =12
+                  LayoutJustifyContent: =LayoutJustifyContent.End
+                  LayoutMinHeight: =16
+                  LayoutMinWidth: =16
+                  PaddingRight: =10
+                Children:
+                  - btnNode_Cancel_1:
+                      Control: Button@0.0.45
+                      Properties:
+                        BasePaletteColor: =RGBA(95,121,151,1)
+                        Height: =36
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        OnSelect: |-
+                          =
+
+
+                          Set(varNodeModalOpen, false);
+
+                          Set(varEditMode, "NEW");
+                          Set(varEditLevel, 1);
+                          Set(varEditParentNodeId, "");
+                          Set(varEditNodeId, "");
+
+                          Set(varTmp_DisplayName, "");
+                          Set(varTmp_Description, "");
+                          Set(varTmp_SqlKey, "");
+                          Set(varTmp_GridKey, "");
+                          Set(varTmp_SortOrder, 0);
+                          Set(varTmp_IsActive, true);
+                        Text: ="Cancel"
+                        Width: =100
+                  - btnNode_Save_1:
+                      Control: Button@0.0.45
+                      Properties:
+                        BasePaletteColor: =RGBA(95,121,151,1)
+                        FontWeight: =FontWeight.Normal
+                        Height: =36
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        OnSelect: |-
+                          =
+                          Set(varLoadingMsg, "Saving data...");
+                          Set(varCfg_IsLoading, true);
+                          Set(varCfg_Error, Blank());
+                          Set(varLastSavedNodeId, Blank());
+                          Set(varPendingResolveSavedNode, false);
+                          Set(varFlow_UpsertNode_Response, Blank());
+
+                          With(
+                              {
+                                  _nullText: "__NULL__",
+
+                                  _display: Trim(txtNode_DisplayName_1.Text),
+                                  _description: Trim(txtNode_Description_1.Text),
+
+                                  _normalizedDisplay:
+                                      Substitute(
+                                          Substitute(
+                                              Substitute(
+                                                  Substitute(
+                                                      Substitute(
+                                                          Lower(Trim(txtNode_DisplayName_1.Text)),
+                                                          "á", "a"
+                                                      ),
+                                                      "é", "e"
+                                                  ),
+                                                  "í", "i"
+                                              ),
+                                              "ó", "o"
+                                          ),
+                                          "ú", "u"
+                                      ),
+
+                                  _normalizedNodeId:
+                                      If(
+                                          IsBlank(varEditNodeId),
+                                          Blank(),
+                                          Upper(Trim(Text(varEditNodeId)))
+                                      ),
+
+                                  _normalizedParentNodeId:
+                                      If(
+                                          IsBlank(varEditParentNodeId),
+                                          Blank(),
+                                          Upper(Trim(Text(varEditParentNodeId)))
+                                      ),
+
+                                  _sortOrder:
+                                      If(
+                                          IsBlank(txtNode_SortOrder_1.Value) || IsBlank(Value(txtNode_SortOrder_1.Value)),
+                                          0,
+                                          Value(txtNode_SortOrder_1.Value)
+                                      )
+                              },
+
+                              With(
+                                  {
+                                      _sqlKey: Upper(Substitute(_normalizedDisplay, " ", "_")),
+                                      _gridKey: Substitute(_normalizedDisplay, " ", "")
+                                  },
+
+                                  With(
+                                      {
+                                          _duplicateL3Node:
+                                              LookUp(
+                                                  colNodes,
+                                                  Upper(Text(SqlKey)) = _sqlKey &&
+                                                  Upper(Text(ParentNodeId)) = Upper(Text(varEditParentNodeId)) &&
+                                                  Upper(Text(NodeId)) <> Upper(Text(varEditNodeId))
+                                              )
+                                      },
+
+                                      With(
+                                          {
+                                              _validationMessage:
+                                                  If(
+                                                      IsBlank(_display),
+                                                      "DisplayName is required.",
+
+                                                      varEditLevel in [2, 3] && IsBlank(varEditParentNodeId),
+                                                      "ParentNodeId missing before save.",
+
+                                                      varEditLevel = 3 && !IsBlank(_duplicateL3Node.NodeId),
+                                                      "Duplicate key generated. Change DisplayName.",
+
+                                                      Blank()
+                                                  )
+                                          },
+
+                                          If(
+                                              !IsBlank(_validationMessage),
+
+                                              Set(varCfg_Error, _validationMessage);
+                                              Notify(_validationMessage, NotificationType.Error);
+                                              Set(varCfg_IsLoading, false),
+
+                                              Set(varLastSavedLevel, Value(varEditLevel));
+                                              Set(varLastSavedParentNodeId, _normalizedParentNodeId);
+                                              Set(varLastSavedDisplayName, _display);
+                                              Set(varLastSavedSqlKey, If(varEditLevel = 3, _sqlKey, ""));
+                                              Set(varLastSavedGridKey, If(varEditLevel = 3, _gridKey, ""));
+
+                                              If(
+                                                  !IsBlank(varEditNodeId),
+                                                  Set(varLastSavedNodeId, _normalizedNodeId),
+                                                  Set(varPendingResolveSavedNode, true)
+                                              );
+
+                                              Set(varCfg_SaveStartedOn, Now());
+
+                                              With(
+                                                  {
+                                                      _flowDisplayName: If(IsBlank(_display), _nullText, _display),
+                                                      _flowDescription: If(IsBlank(_description), _nullText, _description),
+                                                      _flowSqlKey: If(varEditLevel = 3 && !IsBlank(_sqlKey), _sqlKey, _nullText),
+                                                      _flowGridKey: If(varEditLevel = 3 && !IsBlank(_gridKey), _gridKey, _nullText),
+                                                      _flowUserName: If(IsBlank(User().Email), _nullText, User().Email),
+                                                      _flowNodeId: If(IsBlank(_normalizedNodeId), _nullText, _normalizedNodeId),
+                                                      _flowParentNodeId: If(IsBlank(_normalizedParentNodeId), _nullText, _normalizedParentNodeId),
+                                                      _flowIsActive: tglNode_IsActive_1.Value
+                                                  },
+
+
+                                                  IfError(
+                                                      Set(
+                                                          varFlow_UpsertNode_Response,
+                                                          WarRoom_ReportConfig_UpsertNode.Run(
+                                                              varProjectId,
+                                                              varEditLevel,
+                                                              _flowDisplayName,
+                                                              _flowDescription,
+                                                              _flowSqlKey,
+                                                              _flowGridKey,
+                                                              _sortOrder,
+                                                              _flowIsActive,
+                                                              _flowUserName,
+                                                              _flowNodeId,
+                                                              _flowParentNodeId
+                                                          )
+                                                      ),
+                                                      Set(varCfg_Error, FirstError.Message);
+                                                      Notify(
+                                                          "Error saving node: " & FirstError.Message,
+                                                          NotificationType.Error
+                                                      )
+                                                  )
+                                              );
+
+                                              Set(varCfg_SaveFinishedOn, Now());
+
+                                              If(
+                                                  IsBlank(varCfg_Error),
+                                                  Notify("Flow called successfully.", NotificationType.Information)
+                                              );
+
+                                              If(
+                                                  IsBlank(varCfg_Error),
+                                                  Select(btnCfg_LoadTree_1)
+                                              );
+
+                                              If(
+                                                  IsBlank(varCfg_Error),
+                                                  Notify("Node saved successfully.", NotificationType.Success);
+
+                                                  Set(varNodeModalOpen, false);
+
+                                                  Set(varEditMode, "NEW");
+                                                  Set(varEditLevel, 1);
+                                                  Set(varEditParentNodeId, Blank());
+                                                  Set(varEditNodeId, Blank());
+
+                                                  Set(varTmp_DisplayName, Blank());
+                                                  Set(varTmp_Description, Blank());
+                                                  Set(varTmp_SqlKey, Blank());
+                                                  Set(varTmp_GridKey, Blank());
+                                                  Set(varTmp_SortOrder, 0);
+                                                  Set(varTmp_IsActive, true),
+
+                                                  Notify(varCfg_Error, NotificationType.Error)
+                                              );
+
+                                              Set(varCfg_IsLoading, false)
+                                          )
+                                      )
+                                  )
+                              )
+                          );
+                        Text: ="Save"
+                        Width: =100
+                        X: =40
+                        Y: =40
+      - conNodeModalOverlay_1:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =RGBA(0, 0, 0, 0.25)
+            Height: =App.Height
+            Visible: =varNodeModalOpen
+            Width: =App.Width
+          Children:
+            - rectNodeModalOverlay_1:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  BorderStyle: =BorderStyle.None
+                  BorderThickness: =2
+                  DisabledFill: =RGBA(0,0,0,0.25)
+                  Fill: =RGBA(0,0,0,0.25)
+                  FocusedBorderThickness: =4
+                  Height: =Parent.Height
+                  HoverFill: =RGBA(0,0,0,0.25)
+                  PressedFill: =RGBA(0,0,0,0.25)
+                  Width: =Parent.Width
+      - conGlobalOverlay_Config:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =RGBA(15, 23, 42, 0.32)
+            Height: =App.Height
+            Visible: =varGlobalLoading
+            Width: =App.Width
+          Children:
+            - conGlobalLoadingCard_5:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#E2E8F0")
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.Semilight
+                  Fill: =ColorValue("#FFFFFF")
+                  Height: =136
+                  RadiusBottomLeft: =16
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =16
+                  RadiusTopRight: =16
+                  Width: =340
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =(Parent.Height - Self.Height) / 2
+                Children:
+                  - Spinner3_5:
+                      Control: Spinner@1.4.6
+                      Properties:
+                        Height: =32
+                        SpinnerColor: =varTheme_PulseBlue
+                        Width: =32
+                        X: =24
+                        Y: =86
+                  - Text31_5:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_TextMuted
+                        Size: =11
+                        Text: |-
+                          =
+                          Coalesce(varGlobalLoadingSubMsg, "")
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =52
+                  - Text36_5:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_Text
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        Size: =14
+                        Text: |-
+                          =
+                          Coalesce(varGlobalLoadingMsg, "Loading...")
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =24
+                  - Rectangle2_5:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderStyle: =BorderStyle.None
+                        BorderThickness: =2
+                        DisabledFill: =RGBA(161, 159, 157, 1)
+                        Fill: =ColorValue("#E2E8F0")
+                        FocusedBorderThickness: =4
+                        Height: =4
+                        HoverFill: =RGBA(0, 120, 212, 1)
+                        PressedFill: =RGBA(0, 120, 212, 1)
+                        Width: =Parent.Width - 88
+                        X: =94
+                        Y: =98
+                  - Rectangle6_5:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderStyle: =BorderStyle.None
+                        BorderThickness: =2
+                        DisabledFill: =RGBA(161, 159, 157, 1)
+                        Fill: =varTheme_PulseBlue
+                        FocusedBorderThickness: =4
+                        Height: =4
+                        HoverFill: =RGBA(0, 120, 212, 1)
+                        PressedFill: =RGBA(0, 120, 212, 1)
+                        Width: =90
+                        X: =64
+                        Y: =98

@@ -1,0 +1,1115 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  scr_Briefing:
+    Properties:
+      Fill: =RGBA(255, 255, 255, 1)
+      LoadingSpinnerColor: =RGBA(0, 120, 212, 1)
+    Children:
+      - conBriefingScreenRoot:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =varTheme_PageBg
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Center
+            LayoutDirection: =LayoutDirection.Horizontal
+            Width: =Parent.Width
+          Children:
+            - cmp_NavApp_Briefing:
+                Control: CanvasComponent
+                ComponentName: cmp_SidebarNav
+                Properties:
+                  ActiveKey: =varAppView
+                  Fill: =varTheme_PulseBlue
+                  Height: =Parent.Height
+                  IsCollapsed: =true
+                  Items: =colSidebarNavItems
+                  NavItems: =colSidebarNavItems
+                  OnSelectItem: |-
+                    =
+
+                    With(
+                        {
+                            _key: Lower(Trim(Self.SelectedItemKey)),
+                            _hasProject: !IsBlank(varProjectId)
+                        },
+                        If(
+                            _key <> "home" && !_hasProject,
+
+                            Notify("Please select a project first.", NotificationType.Warning);
+                            Set(varAppView, "Home");
+                            Navigate(scr_Home, ScreenTransition.None),
+
+                            Switch(
+                                _key,
+
+                                "home",
+                                    Set(varAppView, "Home");
+                                    Set(varHomeViewMode, "DASHBOARD");
+                                    Navigate(scr_Home, ScreenTransition.None),
+
+                                "overview",
+                                    Set(varAppView, "Overview");
+                                    Set(varOps_ViewMode, "OVERVIEW");
+                                    Navigate(scr_Overview, ScreenTransition.None),
+
+                                "tasks",
+                                    Set(varAppView, "Tasks");
+                                    Navigate(scr_Tasks, ScreenTransition.None),
+
+                                "punches",
+                                    Set(varAppView, "Punches");
+                                    Navigate(scr_Punches, ScreenTransition.None),
+
+                                "briefing",
+                                    Set(varAppView, "Briefing");
+                                    Navigate(scr_Briefing, ScreenTransition.None),
+
+                                "config",
+                                    Set(varAppView, "Config");
+                                    Navigate(scr_Config, ScreenTransition.None),
+
+                                "superadmin",
+                                    Set(varAppView, "SuperAdmin");
+                                    Navigate(scr_SuperAdmin, ScreenTransition.None),
+
+                                Notify("Key not mapped: [" & _key & "]", NotificationType.Error)
+                            )
+                        )
+                    )
+                  OnToggleCollapse: =
+                  UserRole: ="Text"
+                  Width: =154
+            - conBriefingContent:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  Height: =Parent.Height
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutMinHeight: =16
+                  LayoutMinWidth: =16
+                  Width: =Parent.Width - cmp_NavApp_Briefing.Width
+                Children:
+                  - con_BriefingRoot:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        Height: =Parent.Height
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        RadiusBottomLeft: =0
+                        RadiusBottomRight: =0
+                        RadiusTopLeft: =0
+                        RadiusTopRight: =0
+                        Width: =Parent.Width
+                      Children:
+                        - conBriefing_Project_1:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_TopBg
+                              FillPortions: =0
+                              Height: =60
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              PaddingBottom: =8
+                              PaddingRight: =20
+                              PaddingTop: =8
+                              RadiusBottomLeft: =0
+                              RadiusBottomRight: =0
+                              RadiusTopLeft: =0
+                              RadiusTopRight: =0
+                              X: =40
+                              Y: =40
+                            Children:
+                              - lblHomeTitle_5:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Color: =varTheme_TextWhite
+                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =60
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =0
+                                    PaddingLeft: =10
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    RadiusBottomLeft: =0
+                                    RadiusBottomRight: =0
+                                    RadiusTopLeft: =0
+                                    RadiusTopRight: =0
+                                    Size: =22
+                                    Text: =varProjectCode & " - " & varProjectName
+                                    Width: =250
+                                    X: =40
+                                    Y: =40
+                        - conBriefing_Header_1:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_PageBg
+                              FillPortions: =0
+                              Height: =72
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              PaddingRight: =20
+                              PaddingTop: =4
+                              RadiusBottomLeft: =0
+                              RadiusBottomRight: =0
+                              RadiusTopLeft: =0
+                              RadiusTopRight: =0
+                              Width: =Parent.Width
+                            Children:
+                              - Text11_2:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =30
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =0
+                                    PaddingLeft: =10
+                                    PaddingTop: =0
+                                    Size: =20
+                                    Text: ="Daily Briefing"
+                                    Width: |+
+                                      =300
+
+                                    X: =40
+                                    Y: =40
+                              - Text4_1:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingLeft: =10
+                                    Text: ="Review what happened during a selected time range and generate meeting notes."
+                                    Width: =Parent.Width
+                        - conBriefing_Filters_1:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =60
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =20
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              PaddingBottom: =8
+                              PaddingLeft: =8
+                              PaddingRight: =8
+                              PaddingTop: =8
+                            Children:
+                              - dpBriefingDate_1:
+                                  Control: ModernDatePicker@1.0.0
+                                  Properties:
+                                    Appearance: =Appearance.Outline
+                                    DefaultDate: =varBriefingDate
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnChange: =Set(varBriefingDate, Self.SelectedDate)
+                                    Width: =200
+                              - txtBriefingFromTime_1:
+                                  Control: ModernTextInput@1.1.0
+                                  Properties:
+                                    Appearance: =Appearance.Outline
+                                    Default: =varBriefingFromTime
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnChange: =Set(varBriefingFromTime, Self.Text)
+                                    Placeholder: ="08:00"
+                                    Width: =70
+                              - txtBriefingToTime_1:
+                                  Control: ModernTextInput@1.1.0
+                                  Properties:
+                                    Appearance: =Appearance.Outline
+                                    Default: =varBriefingToTime
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnChange: =Set(varBriefingToTime, Self.Text)
+                                    Placeholder: ="17:00"
+                                    Width: =70
+                              - btnBriefingGenerate_1:
+                                  Control: ModernButton@1.0.0
+                                  Properties:
+                                    BasePaletteColor: =varTheme_PulseBlueDark
+                                    DisplayMode: |-
+                                      =If(
+                                          IsBlank(varBriefingDate) ||
+                                          IsBlank(varBriefingFromTime) ||
+                                          IsBlank(varBriefingToTime),
+                                          DisplayMode.Disabled,
+                                          DisplayMode.Edit
+                                      )
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnSelect: |-
+                                      =
+                                      Set(varBriefingLoading, true);
+
+                                      Set(
+                                          varBriefingResponse,
+                                          WarRoom_DailyBriefing_GetData.Run(
+                                              varProjectId,
+                                              Text(
+                                                  DateValue(varBriefingDate) + TimeValue(varBriefingFromTime),
+                                                  "yyyy-mm-ddTHH:mm:ss"
+                                              ),
+                                              Text(
+                                                  DateValue(varBriefingDate) + TimeValue(varBriefingToTime),
+                                                  "yyyy-mm-ddTHH:mm:ss"
+                                              ),
+                                              ""
+                                          )
+                                      );
+
+                                      ClearCollect(
+                                          colBriefingEvents,
+                                          ForAll(
+                                              Table(ParseJSON(varBriefingResponse.events)),
+                                              {
+                                                  ActivityLogId: Value(Value.ActivityLogId),
+                                                  ProjectId: Value(Value.ProjectId),
+                                                  EntityType: Text(Value.EntityType),
+                                                  EntityId: Text(Value.EntityId),
+                                                  EventType: Text(Value.EventType),
+                                                  Title: Text(Value.Title),
+                                                  Description: Text(Value.Description),
+                                                  Severity: Text(Value.Severity),
+                                                  SubsystemCode: Text(Value.SubsystemCode),
+                                                  Owner: Text(Value.Owner),
+                                                  ChangedBy: Text(Value.ChangedBy),
+                                                  ChangedAt: DateTimeValue(Text(Value.ChangedAt))
+                                              }
+                                          )
+                                      );
+
+                                      ClearCollect(
+                                          colBriefingKpis,
+                                          ForAll(
+                                              Table(ParseJSON(varBriefingResponse.kpis)),
+                                              {
+                                                  TotalEvents: Value(Value.TotalEvents),
+                                                  StatusChanges: Value(Value.StatusChanges),
+                                                  OwnerChanges: Value(Value.OwnerChanges),
+                                                  DueDateChanges: Value(Value.DueDateChanges),
+                                                  CommentsUpdated: Value(Value.CommentsUpdated),
+                                                  CriticalEvents: Value(Value.CriticalEvents)
+                                              }
+                                          )
+                                      );
+
+                                      Set(varBriefingLoading, false);
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Text: ="Generate Briefing"
+                                    Width: =170
+                              - btnGenerateNotes_1:
+                                  Control: ModernButton@1.0.0
+                                  Properties:
+                                    BasePaletteColor: =varTheme_PulseBlueDark
+                                    DisplayMode: |-
+                                      =If(
+                                          CountRows(colBriefingKpis) = 0,
+                                          DisplayMode.Disabled,
+                                          DisplayMode.Edit
+                                      )
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnSelect: |-
+                                      =If(
+                                          CountRows(colBriefingKpis) = 0,
+                                          Notify("Generate the briefing first.", NotificationType.Warning),
+
+                                          Set(
+                                              varBriefingNotes,
+                                              "WARROOM DAILY BRIEFING" & Char(10) &
+                                              Text(varBriefingDate, "dd/mm/yyyy") & Char(10) & Char(10) &
+
+                                              "TIME RANGE" & Char(10) &
+                                              varBriefingFromTime & " - " & varBriefingToTime & Char(10) & Char(10) &
+
+                                              "SUMMARY" & Char(10) &
+                                              "- Total operational events: " & Text(Coalesce(First(colBriefingKpis).TotalEvents, 0)) & Char(10) &
+                                              "- Status changes: " & Text(Coalesce(First(colBriefingKpis).StatusChanges, 0)) & Char(10) &
+                                              "- Owner changes: " & Text(Coalesce(First(colBriefingKpis).OwnerChanges, 0)) & Char(10) &
+                                              "- Due date changes: " & Text(Coalesce(First(colBriefingKpis).DueDateChanges, 0)) & Char(10) &
+                                              "- Comments updated: " & Text(Coalesce(First(colBriefingKpis).CommentsUpdated, 0)) & Char(10) &
+                                              "- Critical events: " & Text(Coalesce(First(colBriefingKpis).CriticalEvents, 0)) & Char(10) & Char(10) &
+
+                                              "KEY EVENTS" & Char(10) &
+                                              If(
+                                                  CountRows(colBriefingEvents) = 0,
+                                                  "- No operational activity detected." & Char(10),
+                                                  Concat(
+                                                      FirstN(SortByColumns(colBriefingEvents, "ChangedAt", SortOrder.Ascending), 15),
+                                                      "- " & Text(ChangedAt, "HH:mm") & " | " & Title & Char(10)
+                                                  )
+                                              ) & Char(10) &
+
+                                              "CRITICAL ITEMS" & Char(10) &
+                                              If(
+                                                  CountRows(Filter(colBriefingEvents, Severity = "CRITICAL")) = 0,
+                                                  "- No critical events detected.",
+                                                  Concat(
+                                                      Filter(colBriefingEvents, Severity = "CRITICAL"),
+                                                      "- " & Title & " · " & Description & Char(10)
+                                                  )
+                                              )
+                                          );
+
+                                          Notify("Meeting notes generated.", NotificationType.Success)
+                                      )
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Text: ="Generate Notes"
+                                    Width: =170
+                              - btnPrepareEmail_1:
+                                  Control: ModernButton@1.0.0
+                                  Properties:
+                                    BasePaletteColor: =varTheme_PulseBlueDark
+                                    DisplayMode: |-
+                                      =If(
+                                          IsBlank(varBriefingNotes),
+                                          DisplayMode.Disabled,
+                                          DisplayMode.Edit
+                                      )
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnSelect: |-
+                                      =
+
+                                      Set(
+                                          varBriefingEmailSubject,
+                                          "WARROOM DAILY BRIEFING | " &
+                                          varProjectCode &
+                                          " | " &
+                                          Text(varBriefingDate, "dd-mmm-yyyy")
+                                      );
+
+                                      Set(
+                                          varBriefingEmailBody,
+                                          "<div style='font-family:Segoe UI, Arial; color:#0F172A;'>" &
+                                          "<h2>WARROOM DAILY BRIEFING</h2>" &
+                                          "<p><b>Project:</b> " & varProjectCode & " - " & varProjectName & "</p>" &
+                                          "<p><b>Date:</b> " & Text(varBriefingDate, "dd/mm/yyyy") & "</p>" &
+                                          "<p><b>Time range:</b> " & varBriefingFromTime & " - " & varBriefingToTime & "</p>" &
+                                          "<hr>" &
+                                          "<div style='white-space:pre-wrap;line-height:1.6;'>" &
+                                          Substitute(varBriefingNotes, Char(10), "<br>") &
+                                          "</div>" &
+                                          "</div>"
+                                      );
+
+                                      Set(varBriefingEmailVisible, true);
+
+                                      Notify(
+                                          "Email prepared successfully.",
+                                          NotificationType.Success
+                                      );
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Text: ="Prepare Email"
+                                    Width: =150
+                        - conBriefing_NotLoaded_1:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =ColorValue("#E2E8F0")
+                              BorderThickness: =1
+                              Fill: =ColorValue("#FFFFFF")
+                              FillPortions: =0
+                              Height: =Parent.Height
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              RadiusBottomLeft: =16
+                              RadiusBottomRight: =16
+                              RadiusTopLeft: =16
+                              RadiusTopRight: =16
+                              Visible: =!varBriefingLoaded
+                            Children:
+                              - Text58_5:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    Color: =RGBA(0, 0, 0, 1)
+                                    Height: =64
+                                    Text: ="Select a date range and click Generate Briefing."
+                                    Width: =761
+                                    X: =152
+                                    Y: =72
+                        - conBriefing_Kpis_1:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =92
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =10
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              PaddingBottom: =8
+                              PaddingLeft: =8
+                              PaddingRight: =8
+                              PaddingTop: =8
+                            Children:
+                              - cntBriefingKpiTotal_1:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =8
+                                    PaddingLeft: =8
+                                    PaddingRight: =8
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Width: =(Parent.Width - 50) / 6
+                                  Children:
+                                    - Text5_6:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Text: ="Total Events"
+                                    - Text7_6:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Text: =Text(Coalesce(First(colBriefingKpis).TotalEvents, 0))
+                              - cntBriefingKpiCompleted_1:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =8
+                                    PaddingLeft: =8
+                                    PaddingRight: =8
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Width: =(Parent.Width - 50) / 6
+                                  Children:
+                                    - Text5_7:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Text: ="Status Changes"
+                                    - Text7_7:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Text: =Text(Coalesce(First(colBriefingKpis).StatusChanges, 0))
+                              - cntBriefingKpiReopened_1:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =8
+                                    PaddingLeft: =8
+                                    PaddingRight: =8
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Width: =(Parent.Width - 50) / 6
+                                  Children:
+                                    - Text5_8:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Text: ="Owner Changes"
+                                    - Text7_8:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Text: =Text(Coalesce(First(colBriefingKpis).OwnerChanges, 0))
+                              - cntBriefingKpiPunchCreated_1:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =8
+                                    PaddingLeft: =8
+                                    PaddingRight: =8
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Width: =(Parent.Width - 50) / 6
+                                  Children:
+                                    - Text5_9:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Text: ="Due Date Changes"
+                                    - Text7_9:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Text: =Text(Coalesce(First(colBriefingKpis).DueDateChanges, 0))
+                              - cntBriefingKpiPunchClosed_1:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =8
+                                    PaddingLeft: =8
+                                    PaddingRight: =8
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =14
+                                    RadiusBottomRight: =14
+                                    RadiusTopLeft: =14
+                                    RadiusTopRight: =14
+                                    Width: =(Parent.Width - 50) / 6
+                                  Children:
+                                    - Text5_10:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Text: ="Comments Updated"
+                                    - Text7_10:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Text: =Text(Coalesce(First(colBriefingKpis).CommentsUpdated, 0))
+                              - cntBriefingKpiCritical_1:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =8
+                                    PaddingLeft: =8
+                                    PaddingRight: =8
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =14
+                                    RadiusBottomRight: =14
+                                    RadiusTopLeft: =14
+                                    RadiusTopRight: =14
+                                    Width: =(Parent.Width - 50) / 6
+                                  Children:
+                                    - Text5_11:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Text: ="Critical Events"
+                                    - Text7_11:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Text: =Text(Coalesce(First(colBriefingKpis).CriticalEvents, 0))
+                        - conBriefing_Body_1:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Height: =Parent.Height - Self.Y - 24
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =10
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              PaddingBottom: =8
+                              PaddingLeft: =8
+                              PaddingRight: =8
+                              PaddingTop: =8
+                              Width: =Parent.Width - 48
+                            Children:
+                              - cntBriefingTimeline_1:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    Height: =Parent.Height
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =8
+                                    PaddingLeft: =8
+                                    PaddingRight: =8
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =14
+                                    RadiusBottomRight: =14
+                                    RadiusTopLeft: =14
+                                    RadiusTopRight: =14
+                                    Width: =Parent.Width * 0.62
+                                  Children:
+                                    - Text12_1:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Text: ="Operational Timeline"
+                                    - galBriefingTimeline_1:
+                                        Control: Gallery@2.15.0
+                                        Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                                        Properties:
+                                          BorderColor: =RGBA(245, 245, 245, 1)
+                                          Height: =Parent.Height - 70
+                                          Items: |-
+                                            =
+
+                                            SortByColumns(
+                                                colBriefingEvents,
+                                                "ChangedAt",
+                                                SortOrder.Ascending
+                                            )
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          TemplateSize: =82
+                                          Visible: =true //CountRows(colBriefingEvents) > 0
+                                          Width: =Parent.Width - 36
+                                        Children:
+                                          - Separator1_1:
+                                              Control: Rectangle@2.3.0
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                Fill: =RGBA(255, 255, 255, 1)
+                                                Height: =8
+                                                OnSelect: =Select(Parent)
+                                                Width: =Parent.TemplateWidth
+                                                Y: =Parent.TemplateHeight - Self.Height
+                                          - Rectangle3_1:
+                                              Control: Rectangle@2.3.0
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                Fill: |-
+                                                  =Switch(
+                                                      ThisItem.Severity,
+                                                      "CRITICAL", RGBA(239,68,68,1),
+                                                      "WARNING", RGBA(249,115,22,1),
+                                                      "INFO", RGBA(59,130,246,1),
+                                                      RGBA(95,121,151,1)
+                                                  )
+                                                Height: =Parent.TemplateHeight - Separator1_1.Height
+                                                OnSelect: =Select(Parent)
+                                                Visible: =ThisItem.IsSelected
+                                                Width: =1
+                                          - lbl_severity_1:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                OnSelect: =Select(Parent)
+                                                Text: =ThisItem.Severity
+                                                Width: =1
+                                                Y: =41
+                                          - lbl_user_1:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                OnSelect: =Select(Parent)
+                                                Text: ="By " & ThisItem.ChangedBy
+                                                Width: =1
+                                                Y: =40
+                                          - lbl_description_1:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                OnSelect: =Select(Parent)
+                                                Text: =ThisItem.Description
+                                                Width: =1
+                                                Y: =50
+                                          - lbl_title_1:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                OnSelect: =Select(Parent)
+                                                Text: =ThisItem.Title
+                                                Width: =1
+                                                Y: =8
+                                          - lbl_hour_1:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                OnSelect: =Select(Parent)
+                                                Text: =Text(ThisItem.ChangedAt, "HH:mm")
+                                                Width: =1
+                                                Y: =8
+                                    - Container12_1:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =0
+                                          Height: =50
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          PaddingBottom: =8
+                                          PaddingLeft: =8
+                                          PaddingRight: =8
+                                          PaddingTop: =8
+                                        Children:
+                                          - Icon7_1:
+                                              Control: Classic/Icon@2.5.0
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                Color: =ColorValue("#6B3C78")
+                                                DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                                                DisabledColor: =RGBA(225, 223, 221, 1)
+                                                DisabledFill: =RGBA(0, 0, 0, 0)
+                                                FocusedBorderThickness: =4
+                                                Height: =32
+                                                HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                                HoverColor: =RGBA(16, 110, 190, 1)
+                                                HoverFill: =RGBA(0, 0, 0, 0)
+                                                Icon: =Icon.Clock
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                PressedBorderColor: =RGBA(0, 0, 0, 0)
+                                                PressedColor: =RGBA(16, 110, 190, 1)
+                                                PressedFill: =RGBA(0, 0, 0, 0)
+                                                Visible: =CountRows(colBriefingEvents) = 0
+                                                Width: =32
+                                                X: =40
+                                                Y: =40
+                                          - Text16_1:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                LayoutMinHeight: =16
+                                                LayoutMinWidth: =16
+                                                Text: ="No operational activity detected for the selected time range."
+                                                Width: |
+                                                  =Parent.Width - 30
+                              - cntBriefingNotes_1:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    Height: = Parent.Height
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PaddingBottom: =8
+                                    PaddingLeft: =8
+                                    PaddingRight: =8
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =14
+                                    RadiusBottomRight: =14
+                                    RadiusTopLeft: =14
+                                    RadiusTopRight: =14
+                                    Width: = Parent.Width - cntBriefingTimeline_1.Width - 16
+                                  Children:
+                                    - Text18_1:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Text: ="Meeting Notes"
+                                    - txtBriefingNotes_1:
+                                        Control: ModernTextInput@1.1.0
+                                        Properties:
+                                          Default: =varBriefingNotes
+                                          DisplayMode: =DisplayMode.View
+                                          Fill: =RGBA(248,250,252,1)
+                                          Height: =Parent.Height - 80
+                                          LayoutMinHeight: =16
+                                          LayoutMinWidth: =16
+                                          Type: =TextInputType.Multiline
+                                          Visible: =!varBriefingEmailVisible
+                                          Width: =Parent.Width - 30
+      - conBriefingEmailDrawer_1:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =Color.White
+            Height: = App.Height
+            Visible: =varBriefingEmailVisible
+            Width: =Min(900, App.Width * 0.48)
+            X: =App.Width - Self.Width
+          Children:
+            - btnCopyEmailBody_1:
+                Control: ModernButton@1.0.0
+                Properties:
+                  Height: =36
+                  OnSelect: |-
+                    =
+
+                    Copy(
+                        "Subject: " & varBriefingEmailSubject &
+                        Char(10) & Char(10) &
+                        varBriefingNotes
+                    );
+
+                    Notify(
+                        "Email text copied to clipboard.",
+                        NotificationType.Success
+                    )
+                  Text: ="Copy Email Body"
+                  Width: =180
+                  X: =40
+                  Y: =Parent.Height - 48
+            - htmlBriefingEmailPreview_1:
+                Control: HtmlViewer@2.1.0
+                Properties:
+                  DisabledBorderColor: =RGBA(161, 159, 157, 1)
+                  Font: =Font.'Segoe UI'
+                  Height: =Parent.Height - 300
+                  HtmlText: =varBriefingEmailBody
+                  Visible: =varBriefingEmailVisible
+                  Width: =Parent.Width - 48
+                  X: =24
+                  Y: =210
+            - btnCreateEmailDraft_1:
+                Control: ModernButton@1.0.0
+                Properties:
+                  DisplayMode: |-
+                    =If(
+                        IsBlank(varBriefingEmailBody) || IsBlank(txtBriefingEmailTo_1.Text),
+                        DisplayMode.Disabled,
+                        DisplayMode.Edit
+                    )
+                  Height: =40
+                  OnSelect: |-
+                    =
+
+                    Set(varBriefingEmailSending, true);
+
+                    IfError(
+                        Set(
+                            varBriefingDraftResponse,
+                            WarRoom_DailyBriefing_CreateDraft.Run(
+                                txtBriefingEmailTo_1.Text,
+                                txtBriefingEmailCc_1.Text,
+                                varBriefingEmailSubject,
+                                varBriefingEmailBody
+                            )
+                        );
+
+                        Notify(
+                            "Outlook draft created successfully.",
+                            NotificationType.Success
+                        ),
+
+                        Notify(
+                            "Error creating Outlook draft.",
+                            NotificationType.Error
+                        )
+                    );
+
+                    Set(varBriefingEmailSending, false);
+                  Text: ="Create Outlook Draft"
+                  Width: =210
+                  X: =Parent.Width - 240
+                  Y: =Parent.Height - 56
+            - txtBriefingEmailCc_1:
+                Control: ModernTextInput@1.1.0
+                Properties:
+                  Height: =40
+                  Placeholder: ="Cc"
+                  Width: =Parent.Width - 48
+                  X: =24
+                  Y: =152
+            - txtBriefingEmailTo_1:
+                Control: ModernTextInput@1.1.0
+                Properties:
+                  Height: =40
+                  Width: =Parent.Width - 48
+                  X: =24
+                  Y: =104
+            - lblEmailSubject_1:
+                Control: ModernText@1.0.0
+                Properties:
+                  Color: =varTheme_TextMuted
+                  FontWeight: =FontWeight.Semibold
+                  Height: =40
+                  Text: =varBriefingEmailSubject
+                  Width: =Parent.Width - 48
+                  X: =24
+                  Y: =64
+            - icoCloseEmailDrawer_1:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Color: =varTheme_TextMuted
+                  DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                  DisabledColor: =RGBA(225, 223, 221, 1)
+                  DisabledFill: =RGBA(0, 0, 0, 0)
+                  FocusedBorderThickness: =4
+                  Height: =28
+                  HoverBorderColor: =RGBA(0, 0, 0, 0)
+                  HoverColor: =RGBA(16, 110, 190, 1)
+                  HoverFill: =RGBA(0, 0, 0, 0)
+                  Icon: =Icon.Cancel
+                  OnSelect: = Set(varBriefingEmailVisible, false)
+                  PressedBorderColor: =RGBA(0, 0, 0, 0)
+                  PressedColor: =RGBA(16, 110, 190, 1)
+                  PressedFill: =RGBA(0, 0, 0, 0)
+                  Width: =28
+                  X: =Parent.Width - 52
+                  Y: =20
+            - lblEmailPreviewTitle_1:
+                Control: ModernText@1.0.0
+                Properties:
+                  Color: =varTheme_Text
+                  FontWeight: =FontWeight.Bold
+                  Size: =22
+                  Text: ="Email Preview"
+                  Width: =Parent.Width - 80
+                  X: =24
+                  Y: =20
+      - rectBriefingEmailOverlay_1:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            DisabledFill: =RGBA(0,0,0,0.35)
+            Fill: =RGBA(0,0,0,0.35)
+            FocusedBorderThickness: =4
+            Height: =App.Height
+            HoverFill: =RGBA(0,0,0,0.35)
+            OnSelect: =Set(varBriefingEmailVisible, false)
+            PressedFill: =RGBA(0,0,0,0.35)
+            Visible: =varBriefingEmailVisible
+            Width: =App.Width
+      - conGlobalOverlay_Briefing:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =RGBA(15, 23, 42, 0.32)
+            Height: =App.Height
+            Visible: =varGlobalLoading
+            Width: =App.Width
+          Children:
+            - conGlobalLoadingCard_4:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#E2E8F0")
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.Semilight
+                  Fill: =ColorValue("#FFFFFF")
+                  Height: =136
+                  RadiusBottomLeft: =16
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =16
+                  RadiusTopRight: =16
+                  Width: =340
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =(Parent.Height - Self.Height) / 2
+                Children:
+                  - Spinner3_4:
+                      Control: Spinner@1.4.6
+                      Properties:
+                        Height: =32
+                        SpinnerColor: =varTheme_PulseBlue
+                        Width: =32
+                        X: =24
+                        Y: =86
+                  - Text31_4:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_TextMuted
+                        Size: =11
+                        Text: |-
+                          =
+                          Coalesce(varGlobalLoadingSubMsg, "")
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =52
+                  - Text36_4:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_Text
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        Size: =14
+                        Text: |-
+                          =
+                          Coalesce(varGlobalLoadingMsg, "Loading...")
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =24
+                  - Rectangle2_4:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderStyle: =BorderStyle.None
+                        BorderThickness: =2
+                        DisabledFill: =RGBA(161, 159, 157, 1)
+                        Fill: =ColorValue("#E2E8F0")
+                        FocusedBorderThickness: =4
+                        Height: =4
+                        HoverFill: =RGBA(0, 120, 212, 1)
+                        PressedFill: =RGBA(0, 120, 212, 1)
+                        Width: =Parent.Width - 88
+                        X: =94
+                        Y: =98
+                  - Rectangle6_4:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderStyle: =BorderStyle.None
+                        BorderThickness: =2
+                        DisabledFill: =RGBA(161, 159, 157, 1)
+                        Fill: =varTheme_PulseBlue
+                        FocusedBorderThickness: =4
+                        Height: =4
+                        HoverFill: =RGBA(0, 120, 212, 1)
+                        PressedFill: =RGBA(0, 120, 212, 1)
+                        Width: =90
+                        X: =64
+                        Y: =98

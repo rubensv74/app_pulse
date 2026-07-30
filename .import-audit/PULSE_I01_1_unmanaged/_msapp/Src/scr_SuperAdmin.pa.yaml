@@ -1,0 +1,587 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  scr_SuperAdmin:
+    Properties:
+      Fill: =RGBA(255, 255, 255, 1)
+      LoadingSpinnerColor: =RGBA(0, 120, 212, 1)
+    Children:
+      - conSuperAdminScreenRoot:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =varTheme_PageBg
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Center
+            LayoutDirection: =LayoutDirection.Horizontal
+            Width: =Parent.Width
+          Children:
+            - cmp_NavApp_SuperAdmin:
+                Control: CanvasComponent
+                ComponentName: cmp_SidebarNav
+                Properties:
+                  ActiveKey: =varAppView
+                  Fill: =varTheme_PulseBlue
+                  Height: =Parent.Height
+                  IsCollapsed: =true
+                  Items: =colSidebarNavItems
+                  NavItems: =colSidebarNavItems
+                  OnSelectItem: |-
+                    =
+
+
+                    With(
+                        {
+                            _key: Lower(Trim(Self.SelectedItemKey)),
+                            _hasProject: !IsBlank(varProjectId)
+                        },
+                        If(
+                            _key <> "home" && !_hasProject,
+
+                            Notify("Please select a project first.", NotificationType.Warning);
+                            Set(varAppView, "Home");
+                            Navigate(scr_Home, ScreenTransition.None),
+
+                            Switch(
+                                _key,
+
+                                "home",
+                                    Set(varAppView, "Home");
+                                    Set(varHomeViewMode, "DASHBOARD");
+                                    Navigate(scr_Home, ScreenTransition.None),
+
+                                "overview",
+                                    Set(varAppView, "Overview");
+                                    Set(varOps_ViewMode, "OVERVIEW");
+                                    Navigate(scr_Overview, ScreenTransition.None),
+
+                                "tasks",
+                                    Set(varAppView, "Tasks");
+                                    Navigate(scr_Tasks, ScreenTransition.None),
+
+                                "punches",
+                                    Set(varAppView, "Punches");
+                                    Navigate(scr_Punches, ScreenTransition.None),
+
+                                "briefing",
+                                    Set(varAppView, "Briefing");
+                                    Navigate(scr_Briefing, ScreenTransition.None),
+
+                                "config",
+                                    Set(varAppView, "Config");
+                                    Navigate(scr_Config, ScreenTransition.None),
+
+                                "superadmin",
+                                    Set(varAppView, "SuperAdmin");
+                                    Navigate(scr_SuperAdmin, ScreenTransition.None),
+
+                                Notify("Key not mapped: [" & _key & "]", NotificationType.Error)
+                            )
+                        )
+                    )
+                  OnToggleCollapse: =
+                  UserRole: ="Text"
+                  Width: =154
+            - conSuperAdminContent:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  Height: =Parent.Height
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutMinHeight: =16
+                  LayoutMinWidth: =16
+                  Width: =Parent.Width - cmp_NavApp_SuperAdmin.Width
+                Children:
+                  - con_SuperAdminRoot:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        Fill: =gblAppColors.Background
+                        Height: =Parent.Height
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =20
+                        Visible: =varSA_IsSuperAdminText = "1"
+                        Width: =Parent.Width
+                        X: =40
+                        Y: =40
+                      Children:
+                        - lblSA_Title_1:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Start
+                              FontWeight: =FontWeight.Semibold
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              Text: ="Super Admin · Project Management"
+                              Width: =Parent.Width
+                        - SA_tab_1:
+                            Control: ModernTabList@1.0.0
+                            Properties:
+                              BasePaletteColor: =ColorValue("#6B3C78")
+                              Items: |-
+                                =
+
+                                Table(
+                                    {Key: "Projects", Value: "Projects"},
+                                    {Key: "Users", Value: "Users"}
+                                )
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              OnChange: =Set(varSA_Tab, Self.Selected.Key);
+                              Width: =Parent.Width
+                        - btnSA_LoadUsers_1:
+                            Control: ModernButton@1.0.0
+                            Properties:
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              OnSelect: |-
+                                =Set(varSA_UsersLoading, true);
+                                Set(varSA_UsersError, "");
+
+                                Clear(colSA_Users);
+                                Clear(colSA_Roles);
+
+                                IfError(
+                                    Set(
+                                        varSA_UsersRaw,
+                                        WarRoom_Admin_Users_Get.Run(varProjectId).result
+                                    ),
+                                    Set(varSA_UsersError, "Error loading users.")
+                                );
+
+                                If(
+                                    IsBlank(varSA_UsersError),
+
+                                    ClearCollect(
+                                        colSA_Users,
+                                        ForAll(
+                                            Table(ParseJSON(Coalesce(varSA_UsersRaw, "{}")).Table1),
+                                            {
+                                                UserId: Value(Value.UserId),
+                                                Email: Text(Value.Email),
+                                                LoginEmail: Text(Value.LoginEmail),
+                                                DisplayName: Text(Value.DisplayName),
+                                                UserIsActive: Boolean(Value.UserIsActive),
+                                                UserProjectRoleId: If(IsBlank(Text(Value.UserProjectRoleId)), Blank(), Value(Value.UserProjectRoleId)),
+                                                ProjectId: If(IsBlank(Text(Value.ProjectId)), Blank(), Value(Value.ProjectId)),
+                                                RoleId: If(IsBlank(Text(Value.RoleId)), Blank(), Value(Value.RoleId)),
+                                                RoleCode: Text(Value.RoleCode),
+                                                RoleName: Text(Value.RoleName),
+                                                RoleIsActive: Boolean(Value.RoleIsActive)
+                                            }
+                                        )
+                                    )
+                                );
+
+                                IfError(
+                                    Set(
+                                        varSA_RolesRaw,
+                                        WarRoom_Admin_Roles_Get.Run().result
+                                    ),
+                                    Set(varSA_UsersError, "Error loading roles.")
+                                );
+
+                                If(
+                                    IsBlank(varSA_UsersError),
+
+                                    ClearCollect(
+                                        colSA_Roles,
+                                        ForAll(
+                                            Table(ParseJSON(Coalesce(varSA_RolesRaw, "{}")).Table1),
+                                            {
+                                                RoleId: Value(Value.RoleId),
+                                                RoleCode: Text(Value.RoleCode),
+                                                RoleName: Text(Value.RoleName),
+                                                Description: Text(Value.Description),
+                                                SortOrder: Value(Value.SortOrder)
+                                            }
+                                        )
+                                    )
+                                );
+
+                                Set(varSA_UsersLoading, false);
+                              Visible: =false
+                        - conSA_Projects_1:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =10
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              PaddingBottom: =8
+                              PaddingLeft: =8
+                              PaddingRight: =8
+                              PaddingTop: =8
+                              Visible: =varSA_Tab = "Projects"
+                            Children:
+                              - txtSA_SearchProject_1:
+                                  Control: Classic/TextInput@2.3.2
+                                  Properties:
+                                    AlignInContainer: =AlignInContainer.Start
+                                    BorderColor: =RGBA(245, 245, 245, 1)
+                                    Color: =RGBA(50, 49, 48, 1)
+                                    Default: ="Find projects"
+                                    DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                                    DisabledColor: =RGBA(161, 159, 157, 1)
+                                    DisabledFill: =RGBA(242, 242, 241, 0)
+                                    Font: =Font.'Segoe UI'
+                                    HintText: ="Search by project code, name or description..."
+                                    HoverBorderColor: =RGBA(16, 110, 190, 1)
+                                    HoverColor: =RGBA(50, 49, 48, 1)
+                                    HoverFill: =RGBA(255, 255, 255, 1)
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    PressedBorderColor: =RGBA(0, 120, 212, 1)
+                                    PressedColor: =RGBA(50, 49, 48, 1)
+                                    PressedFill: =RGBA(255, 255, 255, 1)
+                                    RadiusBottomLeft: =0
+                                    RadiusBottomRight: =0
+                                    RadiusTopLeft: =0
+                                    RadiusTopRight: =0
+                              - btnSA_SearchProjects_1:
+                                  Control: ModernButton@1.0.0
+                                  Properties:
+                                    AlignInContainer: =AlignInContainer.Start
+                                    BasePaletteColor: =varTheme_PulseBlueDark
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnSelect: |-
+                                      =
+
+                                      ClearCollect(
+                                          colSA_ProjectSearchRaw,
+                                          WarRoom_Projects_Search.Run(txtSA_SearchProject_1.Text)
+                                      );
+
+                                      Clear(colSA_ProjectSearch);
+
+                                      ForAll(
+                                          Table(ParseJSON(First(colSA_ProjectSearchRaw).result).Table1),
+                                          Collect(
+                                              colSA_ProjectSearch,
+                                              {
+                                                  Id: Value(Value.Id),
+                                                  Code: Text(Value.Code),
+                                                  Name: Text(Value.Name),
+                                                  Description: Text(Value.Description),
+                                                  Company: Text(Value.Company),
+                                                  Location: Text(Value.Location),
+                                                  IsEnabledInWarRoom: Value(Value.IsEnabledInWarRoom)
+                                              }
+                                          )
+                                      );
+                                    Text: ="Search projects"
+                                    Width: =150
+                              - galSA_ProjectSearch_1:
+                                  Control: Gallery@2.15.0
+                                  Variant: Vertical
+                                  Properties:
+                                    BorderColor: =RGBA(245, 245, 245, 1)
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =0
+                                    Height: =200
+                                    Items: =colSA_ProjectSearch
+                                    TemplateSize: =60
+                                  Children:
+                                    - btnSA_EnableProject_1:
+                                        Control: ModernButton@1.0.0
+                                        Properties:
+                                          BasePaletteColor: =varTheme_PulseBlueDark
+                                          DisplayMode: |-
+                                            =
+
+                                            If(
+                                                ThisItem.IsEnabledInWarRoom = 1,
+                                                DisplayMode.Disabled,
+                                                DisplayMode.Edit
+                                            )
+                                          OnSelect: |-
+                                            =
+
+                                            ClearCollect(
+                                                colSA_EnableResultRaw,
+                                                WarRoom_EnabledProjects_Enable.Run(
+                                                    ThisItem.Id,
+                                                    User().Email
+                                                )
+                                            );
+
+                                            Clear(colSA_EnableResult);
+
+                                            ForAll(
+                                                Table(ParseJSON(First(colSA_EnableResultRaw).result).Table1),
+                                                Collect(
+                                                    colSA_EnableResult,
+                                                    {
+                                                        Success: Boolean(Value.Success),
+                                                        Message: Text(Value.Message)
+                                                    }
+                                                )
+                                            );
+
+                                            Notify(
+                                                Coalesce(
+                                                    First(colSA_EnableResult).Message,
+                                                    "Project enabled."
+                                                ),
+                                                NotificationType.Success
+                                            );
+
+                                            ClearCollect(
+                                                colEnabledProjectsRaw,
+                                                WarRoom_EnabledProjects_GetActive.Run()
+                                            );
+
+                                            Clear(colEnabledProjects);
+
+                                            ForAll(
+                                                Table(ParseJSON(First(colEnabledProjectsRaw).result).Table1),
+                                                Collect(
+                                                    colEnabledProjects,
+                                                    {
+                                                        ProjectId: Value(Value.ProjectId),
+                                                        ProjectCode: Text(Value.ProjectCode),
+                                                        ProjectName: Text(Value.ProjectName),
+                                                        ProjectDescription: Text(Value.ProjectDescription),
+                                                        IsDefault: Boolean(Value.IsDefault)
+                                                    }
+                                                )
+                                            );
+
+                                            ClearCollect(
+                                                colEnabledProjectsUI,
+                                                AddColumns(
+                                                    colEnabledProjects,
+                                                    ProjectDisplayName,
+                                                    ProjectCode & " · " & ProjectName
+                                                )
+                                            );
+
+                                            Select(btnSA_SearchProjects_1);
+
+
+                                            ClearCollect(
+                                                colEnabledProjectsRaw,
+                                                WarRoom_EnabledProjects_GetActive.Run()
+                                            );
+
+                                            Clear(colEnabledProjects);
+
+                                            ForAll(
+                                                Table(ParseJSON(First(colEnabledProjectsRaw).result).Table1),
+                                                Collect(
+                                                    colEnabledProjects,
+                                                    {
+                                                        ProjectId: Value(Value.ProjectId),
+                                                        ProjectCode: Text(Value.ProjectCode),
+                                                        ProjectName: Text(Value.ProjectName),
+                                                        ProjectDescription: Text(Value.ProjectDescription),
+                                                        IsDefault: Boolean(Value.IsDefault)
+                                                    }
+                                                )
+                                            );
+
+                                            ClearCollect(
+                                                colEnabledProjectsUI,
+                                                AddColumns(
+                                                    colEnabledProjects,
+                                                    ProjectDisplayName,
+                                                    ProjectCode & " · " & ProjectName
+                                                )
+                                            );
+                                          Text: |-
+                                            =
+
+                                            If(
+                                                ThisItem.IsEnabledInWarRoom = 1,
+                                                "Already enabled",
+                                                "Enable"
+                                            )
+                                          X: =534
+                                          Y: =12
+                                    - Text8_1:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Align: =Align.Center
+                                          OnSelect: =Select(Parent)
+                                          Text: |-
+                                            =
+
+                                            If(
+                                                ThisItem.IsEnabledInWarRoom = 1,
+                                                "Enabled",
+                                                "Not enabled"
+                                            )
+                                          X: =480
+                                          Y: =15
+                                    - Text6_1:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          OnSelect: =Select(Parent)
+                                          Text: =ThisItem.Code & " · " & ThisItem.Name
+                                          Width: =624
+                                          Y: =12
+                              - galSA_EnabledProjects_1:
+                                  Control: Gallery@2.15.0
+                                  Variant: Vertical
+                                  Properties:
+                                    BorderColor: =RGBA(245, 245, 245, 1)
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =0
+                                    Height: =300
+                                    Items: =colEnabledProjects
+                                    TemplateSize: =40
+                                  Children:
+                                    - Text9_1:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Height: =40
+                                          OnSelect: =Select(Parent)
+                                          Text: =ThisItem.ProjectCode & " · " & ThisItem.ProjectName
+                                          Width: =358
+                                          X: =28
+                        - conSA_Users_1:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              PaddingBottom: =8
+                              PaddingLeft: =8
+                              PaddingRight: =8
+                              PaddingTop: =8
+                              Visible: =varSA_Tab = "Users"
+                            Children:
+                              - colSA_Users2_1:
+                                  Control: Gallery@2.15.0
+                                  Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                                  Properties:
+                                    BorderColor: =RGBA(245, 245, 245, 1)
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                  Children:
+                                    - Separator4_1:
+                                        Control: Rectangle@2.3.0
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          Height: =8
+                                          OnSelect: =Select(Parent)
+                                          Width: =Parent.TemplateWidth
+                                          Y: =Parent.TemplateHeight - Self.Height
+                                    - Text23_1:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          OnSelect: =Select(Parent)
+                                          Text: =""
+                                          X: =40
+                                          Y: =40
+                                    - Text30_1:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          OnSelect: =Select(Parent)
+                                          Text: =//ThisItem.LoginEmail & " · " & Coalesce(ThisItem.RoleCode, "No role")
+                                          X: =60
+                                          Y: =60
+      - conGlobalOverlay_SuperAdmin:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =RGBA(15, 23, 42, 0.32)
+            Height: =App.Height
+            Visible: =varGlobalLoading
+            Width: =App.Width
+          Children:
+            - conGlobalLoadingCard_6:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#E2E8F0")
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.Semilight
+                  Fill: =ColorValue("#FFFFFF")
+                  Height: =136
+                  RadiusBottomLeft: =16
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =16
+                  RadiusTopRight: =16
+                  Width: =340
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =(Parent.Height - Self.Height) / 2
+                Children:
+                  - Spinner3_6:
+                      Control: Spinner@1.4.6
+                      Properties:
+                        Height: =32
+                        SpinnerColor: =varTheme_PulseBlue
+                        Width: =32
+                        X: =24
+                        Y: =86
+                  - Text31_6:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_TextMuted
+                        Size: =11
+                        Text: |-
+                          =
+                          Coalesce(varGlobalLoadingSubMsg, "")
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =52
+                  - Text36_6:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_Text
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        Size: =14
+                        Text: |-
+                          =
+                          Coalesce(varGlobalLoadingMsg, "Loading...")
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =24
+                  - Rectangle2_6:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderStyle: =BorderStyle.None
+                        BorderThickness: =2
+                        DisabledFill: =RGBA(161, 159, 157, 1)
+                        Fill: =ColorValue("#E2E8F0")
+                        FocusedBorderThickness: =4
+                        Height: =4
+                        HoverFill: =RGBA(0, 120, 212, 1)
+                        PressedFill: =RGBA(0, 120, 212, 1)
+                        Width: =Parent.Width - 88
+                        X: =94
+                        Y: =98
+                  - Rectangle6_6:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderStyle: =BorderStyle.None
+                        BorderThickness: =2
+                        DisabledFill: =RGBA(161, 159, 157, 1)
+                        Fill: =varTheme_PulseBlue
+                        FocusedBorderThickness: =4
+                        Height: =4
+                        HoverFill: =RGBA(0, 120, 212, 1)
+                        PressedFill: =RGBA(0, 120, 212, 1)
+                        Width: =90
+                        X: =64
+                        Y: =98

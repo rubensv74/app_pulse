@@ -1,0 +1,509 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+App:
+  Properties:
+    OnStart: |-
+      =
+
+      // =====================================================
+      // App.OnStart
+      // Inicialización global WarRoom
+      // =====================================================
+
+      Set(varProjectSwitching, false);
+
+      // -----------------------------------------------------
+      // 1) Breakpoints / layout responsive
+      // -----------------------------------------------------
+      Set(varW, App.Width);
+      Set(varH, App.Height);
+      Set(varRatio, varW / varH);
+
+      Set(varCompactMode, App.Height < 850);
+
+      Set(
+          varBp,
+          If(
+              varW < 900, "S",
+              If(varW < 1400, "M", "L")
+          )
+      );
+
+      Set(
+          varBpH,
+          If(
+              varH < 700, "S",
+              If(varH < 900, "M", "L")
+          )
+      );
+
+      Set(
+          varFontBase,
+          Switch(
+              varBp,
+              "S", 12,
+              "M", 13,
+              "L", 14
+          )
+      );
+
+      Set(
+          varH_Header,
+          Switch(
+              varBp,
+              "S", 52,
+              "M", 56,
+              "L", 56
+          )
+      );
+
+      Set(
+          varH_Filters,
+          Switch(
+              varBp,
+              "S", 104,
+              "M", 88,
+              "L", 88
+          )
+      );
+
+      Set(varH_Status, 32);
+
+      Set(
+          varPad,
+          Switch(
+              varBp,
+              "S", 10,
+              "M", 12,
+              "L", 12
+          )
+      );
+
+      Set(
+          varGap,
+          Switch(
+              varBp,
+              "S", 8,
+              "M", 10,
+              "L", 10
+          )
+      );
+
+      // Drawer responsive
+      Set(
+          varDrawerMode,
+          If(varW < 1100 || varH < 750, "Overlay", "Side")
+      );
+
+      Set(
+          varDrawerMaxW,
+          Switch(
+              varDrawerMode,
+              "Side", 640,
+              "Overlay", Min(900, RoundDown(varW * 0.92, 0))
+          )
+      );
+
+      Set(
+          varDrawerMaxH,
+          Switch(
+              varDrawerMode,
+              "Side", varH - varH_Header - varPad * 2,
+              "Overlay", Min(820, RoundDown(varH * 0.9, 0))
+          )
+      );
+
+      // -----------------------------------------------------
+      // 2) Paleta global
+      // -----------------------------------------------------
+      Set(
+          gblAppColors,
+          {
+              Primary: RGBA(95,121,151,1),
+              PrimaryDark: RGBA(75,95,120,1),
+              Background: RGBA(245,247,250,1),
+              Surface: RGBA(255,255,255,1),
+              Border: RGBA(0,0,0,0.08),
+              TextPrimary: RGBA(30,30,30,1),
+              TextSecondary: RGBA(100,100,100,1),
+              Success: RGBA(24,130,84,1),
+              Warning: RGBA(194,120,3,1),
+              Danger: RGBA(200,60,60,1),
+              TagBg: RGBA(95,121,151,0.1)
+          }
+      );
+
+      // -----------------------------------------------------
+      // 3) Usuario / sesión
+      // -----------------------------------------------------
+      Set(varUserEmail, Lower(User().Email));
+      Set(varUserName, User().FullName);
+      Set(varUserRole, "manager");
+
+      Set(varCurrentUserEmail, varUserEmail);
+      Set(varIsSuperAdmin, false);
+
+      // -----------------------------------------------------
+      // 4) Navegación global
+      // -----------------------------------------------------
+      Set(gblNavKey, "Home");
+      Set(varAppView, "Home");
+      Set(varSelectedKey, "Home");
+      Set(varAppViewPrev, "Home");
+
+      // -----------------------------------------------------
+      // 5) Proyecto / app globals
+      // -----------------------------------------------------
+
+      Set(varProjectId, Value(Blank()));
+      Set(varProjectCode, "");
+      Set(varProjectName, "");
+      Set(varProjectDescription, "");
+      Set(varSelectedProject, Blank());
+
+      Set(varProjectLoaded, false);
+
+
+      Set(varApplySubsystemDefault, false);
+
+      // -----------------------------------------------------
+      // 5.1) Seguridad y proyectos habilitados WarRoom
+      // -----------------------------------------------------
+
+      ClearCollect(
+          colSecurity,
+          WarRoom_Security_IsSuperAdmin.Run(varCurrentUserEmail)
+      );
+
+      Set(
+          varSA_IsSuperAdminText,
+          Text(First(colSecurity).issuperadmin)
+      );
+
+
+      ClearCollect(
+          colEnabledProjectsRaw,
+          WarRoom_EnabledProjects_GetActive.Run()
+      );
+
+      Clear(colEnabledProjects);
+
+      ForAll(
+          Table(ParseJSON(First(colEnabledProjectsRaw).result).Table1),
+          Collect(
+              colEnabledProjects,
+              {
+                  ProjectId: Value(Value.ProjectId),
+                  ProjectCode: Text(Value.ProjectCode),
+                  ProjectName: Text(Value.ProjectName),
+                  ProjectDescription: Text(Value.ProjectDescription),
+                  IsDefault: Boolean(Value.IsDefault)
+              }
+          )
+      );
+
+      ClearCollect(
+          colEnabledProjectsUI,
+          AddColumns(
+              colEnabledProjects,
+              ProjectDisplayName,
+              ProjectCode & " · " & ProjectName
+          )
+      );
+
+
+
+      Set(varProjectId, Blank());
+      Set(varProjectCode, "");
+      Set(varProjectName, "");
+      Set(varProjectDescription, "");
+      Set(varSelectedProject, Blank());
+      Set(varProjectLoaded, false);
+
+
+
+
+      // -----------------------------------------------------
+      // 5.2) Sidebar navigation
+      // IMPORTANTE: usar solo texto en IconKey
+      // -----------------------------------------------------
+      Clear(colSidebarNavItems);
+
+      ClearCollect(
+          colSidebarNavItems,
+          {
+              Order: 10,
+              Key: "Home",
+              Label: "Home",
+              IconKey: "Home"
+          },
+          {
+              Order: 20,
+              Key: "overview",
+              Label: "Overview",
+              IconKey: "Trending"
+          },
+          {
+              Order: 30,
+              Key: "Tasks",
+              Label: "Tasks",
+              IconKey: "Document"
+          },
+          {
+              Order: 40,
+              Key: "Punches",
+              Label: "Punch List",
+              IconKey: "Flag"
+          },
+          {
+              Order: 41,
+              Key: "Briefing",
+              Label: "Briefing",
+              IconKey: "Message"
+          },
+          {
+              Order: 50,
+              Key: "Config",
+              Label: "Config",
+              IconKey: "Settings"
+          }
+      );
+
+      If(
+          varSA_IsSuperAdminText = "1",
+          Collect(
+              colSidebarNavItems,
+              {
+                  Order: 90,
+                  Key: "SuperAdmin",
+                  Label: "Super Admin",
+                  IconKey: "Lock"
+              }
+          )
+      );
+
+      // -----------------------------------------------------
+      // 6) Variables globales base PHR
+      // -----------------------------------------------------
+      Set(varPHR_LastError, "");
+      Set(varPHR_LastRawResult, "");
+
+      // -----------------------------------------------------
+      // 7) Tipado / schema PHR
+      // -----------------------------------------------------
+      If(
+          IsEmpty(colPHR_Groups),
+          Collect(
+              colPHR_Groups,
+              {
+                  GroupKey: "",
+                  GroupLabel: "",
+                  SortOrder: 0
+              }
+          );
+          RemoveIf(
+              colPHR_Groups,
+              GroupKey = "" && GroupLabel = "" && SortOrder = 0
+          )
+      );
+
+      If(
+          IsEmpty(colPHR_Subsystems),
+          Collect(
+              colPHR_Subsystems,
+              {
+                  SubsystemCode: ""
+              }
+          );
+          RemoveIf(colPHR_Subsystems, SubsystemCode = "")
+      );
+
+      If(
+          IsEmpty(colPHR_Metrics),
+          Collect(
+              colPHR_Metrics,
+              {
+                  SubsystemCode: "",
+                  MetricKey: "",
+                  MetricValue: 0
+              }
+          );
+          RemoveIf(
+              colPHR_Metrics,
+              SubsystemCode = "" && MetricKey = "" && MetricValue = 0
+          )
+      );
+
+      If(
+          IsEmpty(colPHR_Headers),
+          Collect(
+              colPHR_Headers,
+              {
+                  GroupKey: "",
+                  MetricKey: "",
+                  MetricLabel: "",
+                  SortOrder: 0,
+                  IsMapped: false
+              }
+          );
+          RemoveIf(
+              colPHR_Headers,
+              GroupKey = "" &&
+              MetricKey = "" &&
+              MetricLabel = "" &&
+              SortOrder = 0 &&
+              IsMapped = false
+          )
+      );
+
+      // -----------------------------------------------------
+      // 8) Tipado / schema Comments
+      // -----------------------------------------------------
+      ClearCollect(
+          colComments,
+          Table(
+              {
+                  CommentId: 0,
+                  CommentText: "",
+                  CommentType: "",
+                  CreatedOn: Now(),
+                  CreatedByEmail: "",
+                  CreatedByName: "",
+                  TotalRows: 0,
+                  TotalPages: 0,
+                  PageNumber: 1,
+                  PageSize: 20
+              }
+          )
+      );
+      Clear(colComments);
+
+      // -----------------------------------------------------
+      // 9) Tipado / schema Custom Tab
+      // -----------------------------------------------------
+      ClearCollect(
+          colCT_Merged,
+          {
+              FieldKey: "",
+              Label: "",
+              FieldType: "",
+              HelpText: "",
+              IsRequired: false,
+              IsPinned: false,
+              SortOrder: 0,
+              OptionsJson: "",
+              ValueText: "",
+              ValueNumber: Blank(),
+              ValueDate: Blank(),
+              ValueBool: false,
+              ValueJson: "",
+              LastUpdatedOn: Blank(),
+              LastUpdatedByEmail: ""
+          }
+      );
+      RemoveIf(colCT_Merged, FieldKey = "");
+
+      ClearCollect(
+          colCT_Quick,
+          {
+              FieldKey: "",
+              Label: "",
+              FieldType: "",
+              HelpText: "",
+              IsRequired: false,
+              IsPinned: false,
+              SortOrder: 0,
+              OptionsJson: "",
+              ValueText: "",
+              ValueNumber: Blank(),
+              ValueDate: Blank(),
+              ValueBool: false,
+              ValueJson: "",
+              LastUpdatedOn: Blank(),
+              LastUpdatedByEmail: ""
+          }
+      );
+      RemoveIf(colCT_Quick, FieldKey = "");
+
+      ClearCollect(
+          colCT_Dirty,
+          {
+              FieldKey: "",
+              FieldType: "",
+              ValueText: "",
+              ValueNumber: Blank(),
+              ValueDate: Blank(),
+              ValueBool: false,
+              ValueJson: ""
+          }
+      );
+      RemoveIf(colCT_Dirty, FieldKey = "");
+
+      // Dejar limpias tras tipado
+      Clear(colCT_Merged);
+      Clear(colCT_Merged_UI);
+      Clear(colCT_Quick);
+      Clear(colCT_Dirty);
+
+      // -----------------------------------------------------
+      // 10) Smart refresh
+      // -----------------------------------------------------
+      Set(varScrApp_Initialized, false);
+
+
+      ClearCollect(
+          colSubsystems,
+          Table(
+              {
+                  Code: ""
+              }
+          )
+      );
+      Clear(colSubsystems);
+
+
+      ClearCollect(
+          colSubcontractors,
+          Table(
+              {
+                  Code: ""
+              }
+          )
+      );
+      Clear(colSubcontractors);
+
+
+      // =====================================================
+      // GLOBAL LOADING OVERLAY
+      // =====================================================
+      Set(varGlobalLoading, false);
+      Set(varGlobalLoadingMsg, "");
+      Set(varGlobalLoadingScope, "");
+
+      // =====================================================
+      // DATA LOADED FLAGS
+      // =====================================================
+      Set(varHomeHiveLoaded, false);
+      Set(varOperationsLoaded, false);
+      Set(varTasksLoaded, false);
+      Set(varPunchesLoaded, false);
+      Set(varConfigLoaded, false);
+      Set(varBriefingLoaded, false);
+
+
+      Set(varAppView, "Home");
+      Set(varView_Home, true);
+      Set(varView_Overview, false);
+      Set(varView_Tasks, false);
+      Set(varView_Punches, false);
+      Set(varView_Briefing, false);
+      Set(varView_Config, false);
+      Set(varView_SuperAdmin, false);
+    StartScreen: =scr_Home
+    Theme: =PowerAppsTheme
