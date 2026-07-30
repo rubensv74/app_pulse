@@ -22,6 +22,10 @@ BEGIN
     SET NOCOUNT ON;
 
     IF @TemplateId = 0 SET @TemplateId = NULL;
+    SET XACT_ABORT ON;
+
+    IF @PunchExportLogId IS NULL OR @PunchExportLogId <= 0
+        THROW 50011, 'PunchExportLogId must be a positive integer.', 1;
 
     SET @SubsystemCode = NULLIF(LTRIM(RTRIM(@SubsystemCode)), '');
     SET @CategoryCode = NULLIF(LTRIM(RTRIM(@CategoryCode)), '');

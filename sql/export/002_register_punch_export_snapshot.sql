@@ -2,11 +2,11 @@
 /*
     PULSE Excel import - Sprint I01.1
 
-    Registra un snapshot inmutable de una exportación de Punches.
+    Registra un snapshot inmutable de una exportaciï¿½n de Punches.
 
     Identificadores:
-    - PunchExportLogId: bigint procedente del proceso de exportación.
-    - ExportBatchId: uniqueidentifier técnico del snapshot.
+    - PunchExportLogId: bigint procedente del proceso de exportaciï¿½n.
+    - ExportBatchId: uniqueidentifier tï¿½cnico del snapshot.
 
     Este procedimiento no modifica los datos productivos de Punches.
 */
@@ -16,7 +16,7 @@ SET XACT_ABORT ON;
 GO
 
 /* ==========================================================================
-   1. REGISTRAR SNAPSHOT DE EXPORTACIÓN
+   1. REGISTRAR SNAPSHOT DE EXPORTACIï¿½N
    ========================================================================== */
 
 CREATE OR ALTER PROCEDURE [warroom].[usp_RegisterPunchExportSnapshot]
@@ -36,7 +36,7 @@ BEGIN
 
     BEGIN TRY
         /* ------------------------------------------------------------------
-           1. Validación de parámetros
+           1. Validaciï¿½n de parï¿½metros
            ------------------------------------------------------------------ */
 
         IF @PunchExportLogId IS NULL OR @PunchExportLogId <= 0
@@ -78,7 +78,7 @@ BEGIN
            2. Carga inicial permisiva
 
            WorkItemId se permite NULL temporalmente para poder devolver
-           errores funcionales controlados en vez de errores de inserción.
+           errores funcionales controlados en vez de errores de inserciï¿½n.
            ------------------------------------------------------------------ */
 
         DECLARE @RowsStage TABLE
@@ -165,7 +165,7 @@ BEGIN
             THROW 51008, 'The export snapshot does not contain rows.', 1;
 
         /* ------------------------------------------------------------------
-           3. Validación del contenido
+           3. Validaciï¿½n del contenido
            ------------------------------------------------------------------ */
 
         IF EXISTS
@@ -363,7 +363,6 @@ BEGIN
         (
             ExportBatchId,
             WorkItemId,
-            RowVersion,
             OriginalValuesJson,
             RowChecksum
         )
@@ -373,9 +372,6 @@ BEGIN
 
             WorkItemId =
                 r.WorkItemId,
-
-            RowVersion =
-                NULL,
 
             OriginalValuesJson =
                 r.OriginalValuesJson,
@@ -415,7 +411,7 @@ END;
 GO
 
 /* ==========================================================================
-   2. COMPLETAR SNAPSHOT DE EXPORTACIÓN
+   2. COMPLETAR SNAPSHOT DE EXPORTACIï¿½N
    ========================================================================== */
 
 CREATE OR ALTER PROCEDURE [warroom].[usp_CompletePunchExportBatch]
@@ -429,7 +425,7 @@ BEGIN
 
     BEGIN TRY
         /* ------------------------------------------------------------------
-           1. Validación de parámetros
+           1. Validaciï¿½n de parï¿½metros
            ------------------------------------------------------------------ */
 
         IF @PunchExportLogId IS NULL OR @PunchExportLogId <= 0
@@ -445,7 +441,7 @@ BEGIN
             THROW 51022, 'RowCount must be positive.', 1;
 
         /* ------------------------------------------------------------------
-           2. Recuperar el ExportBatchId técnico
+           2. Recuperar el ExportBatchId tï¿½cnico
            ------------------------------------------------------------------ */
 
         BEGIN TRANSACTION;
@@ -465,7 +461,7 @@ BEGIN
             THROW 51023, 'The export batch snapshot does not exist.', 1;
 
         /* ------------------------------------------------------------------
-           3. Validación de consistencia
+           3. Validaciï¿½n de consistencia
            ------------------------------------------------------------------ */
 
         IF @StoredRows <> @RowCount
@@ -530,5 +526,50 @@ BEGIN
 
         THROW;
     END CATCH;
+END;
+GO
+/* ==========================================================================
+   3. MARCAR COMO FALLIDO UN INTENTO DE EXPORTACI?N
+   ========================================================================== */
+
+CREATE OR ALTER PROCEDURE [warroom].[usp_PunchExportLog_Fail]
+    @PunchExportLogId bigint,
+    @ErrorMessage     nvarchar(max)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    IF @PunchExportLogId IS NULL OR @PunchExportLogId <= 0
+        THROW 51030, 'PunchExportLogId must be a positive integer.', 1;
+
+    SET @ErrorMessage = NULLIF(LTRIM(RTRIM(@ErrorMessage)), N'');
+
+    IF @ErrorMessage IS NULL
+        THROW 51031, 'ErrorMessage is required.', 1;
+
+    UPDATE [warroom].[PunchExportLog]
+    SET
+        ExportStatus = N'Failed',
+        ErrorMessage = @ErrorMessage
+    WHERE PunchExportLogId = @PunchExportLogId
+      AND ExportStatus <> N'Completed';
+
+    IF @@ROWCOUNT = 0
+       AND NOT EXISTS
+       (
+           SELECT 1
+           FROM [warroom].[PunchExportLog]
+           WHERE PunchExportLogId = @PunchExportLogId
+       )
+        THROW 51032, 'PunchExportLogId does not exist.', 1;
+
+    SELECT
+        Success = CAST(1 AS bit),
+        PunchExportLogId = @PunchExportLogId,
+        ExportStatus = ExportStatus,
+        ErrorMessage = ErrorMessage
+    FROM [warroom].[PunchExportLog]
+    WHERE PunchExportLogId = @PunchExportLogId;
 END;
 GO

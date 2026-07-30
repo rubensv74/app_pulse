@@ -8,7 +8,8 @@
     "reason": "The workbook now emits the canonical I01 import metadata names while retaining legacy physical fields as hidden compatibility columns."
   },
   "technicalColumns": [
-    { "columnKey": "ExportBatchId", "type": "integer", "nullable": false, "editable": false, "required": true, "example": 4812, "validation": "Must equal PunchExportLogId and reference warroom.ExportBatch." },
+    { "columnKey": "ExportBatchId", "type": "string", "format": "uuid", "nullable": false, "editable": false, "required": true, "example": "5f26d91c-184f-4aa2-bf9e-c98de56c7374", "validation": "Technical GUID returned by snapshot registration; must reference warroom.ExportBatch." },
+    { "columnKey": "PunchExportLogId", "type": "integer", "nullable": false, "editable": false, "required": true, "example": 4812, "validation": "Functional export-attempt identifier; unique in warroom.ExportBatch." },
     { "columnKey": "ProjectId", "type": "integer", "nullable": false, "editable": false, "required": true, "example": 4049, "validation": "One value per file; must match warroom.ExportBatch." },
     { "columnKey": "TemplateId", "type": "integer", "nullable": false, "editable": false, "required": true, "example": 12, "validation": "One value per import file and must match every imported work item." },
     { "columnKey": "WorkItemId", "type": "integer", "nullable": false, "editable": false, "required": true, "example": 100234, "validation": "Unique in file and present in warroom.ExportBatchRow." },
@@ -17,7 +18,6 @@
     { "columnKey": "RowChecksum", "type": "string", "nullable": false, "editable": false, "required": true, "maxLength": 64, "example": "A1B2C3D4E5F6...", "validation": "Uppercase SHA-256; must match warroom.ExportBatchRow.RowChecksum." }
   ],
   "legacyHiddenColumns": [
-    { "columnKey": "PunchExportLogId", "canonicalColumn": "ExportBatchId" },
     { "columnKey": "PunchId", "canonicalColumn": "WorkItemId" },
     { "columnKey": "RowHash", "canonicalColumn": "RowChecksum" },
     { "columnKey": "Original Row Hash", "canonicalColumn": "RowChecksum" }

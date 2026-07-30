@@ -18,7 +18,9 @@ IF OBJECT_ID(N'[warroom].[ExportBatch]', N'U') IS NULL
 BEGIN
     CREATE TABLE [warroom].[ExportBatch]
     (
-        [ExportBatchId]        bigint NOT NULL,
+        [ExportBatchId]        uniqueidentifier NOT NULL
+            CONSTRAINT [DF_ExportBatch_ExportBatchId] DEFAULT NEWSEQUENTIALID(),
+        [PunchExportLogId]     bigint NOT NULL,
         [ProjectId]            bigint NOT NULL,
         [TemplateId]           bigint NOT NULL,
         [ExportType]           nvarchar(30) NOT NULL,
@@ -32,6 +34,9 @@ BEGIN
         [RowCount]             int NOT NULL,
         [AllowedColumnsJson]   nvarchar(max) NOT NULL,
         CONSTRAINT [PK_ExportBatch] PRIMARY KEY CLUSTERED ([ExportBatchId]),
+        CONSTRAINT [UX_ExportBatch_PunchExportLogId] UNIQUE ([PunchExportLogId]),
+        CONSTRAINT [CK_ExportBatch_PunchExportLogId]
+            CHECK ([PunchExportLogId] > 0),
         CONSTRAINT [CK_ExportBatch_RowCount] CHECK ([RowCount] >= 0),
         CONSTRAINT [CK_ExportBatch_Dates] CHECK ([ExpiresAtUtc] > [CreatedAtUtc]),
         CONSTRAINT [CK_ExportBatch_AllowedColumnsJson]
@@ -46,7 +51,7 @@ IF OBJECT_ID(N'[warroom].[ExportBatchRow]', N'U') IS NULL
 BEGIN
     CREATE TABLE [warroom].[ExportBatchRow]
     (
-        [ExportBatchId]        bigint NOT NULL,
+        [ExportBatchId]        uniqueidentifier NOT NULL,
         [WorkItemId]           bigint NOT NULL,
         [RowVersion]           binary(8) NULL,
         [OriginalValuesJson]   nvarchar(max) NOT NULL,
@@ -70,7 +75,7 @@ BEGIN
     (
         [ImportBatchId]        uniqueidentifier NOT NULL
             CONSTRAINT [DF_ImportBatch_ImportBatchId] DEFAULT NEWSEQUENTIALID(),
-        [ExportBatchId]        bigint NOT NULL,
+        [ExportBatchId]        uniqueidentifier NOT NULL,
         [ProjectId]            bigint NOT NULL,
         [TemplateId]           bigint NOT NULL,
         [FileName]             nvarchar(260) NOT NULL,

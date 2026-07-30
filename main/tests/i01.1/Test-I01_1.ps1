@@ -37,7 +37,7 @@ foreach ($file in $jsonFiles) {
 }
 
 $flowPath = Join-Path $repoRoot (
-    'main\power-automate\Warroom_ExportPunchesToExcel_Codex\definition.deploy.json'
+    'flows\Warroom_ExportPunchesToExcel_Codex\definition.deploy.json'
 )
 $flow = Get-Content -Raw -LiteralPath $flowPath | ConvertFrom-Json
 $actions = $flow.properties.definition.actions
@@ -74,7 +74,7 @@ Assert-True (
 
 
 $solutionFlowPath = Join-Path $repoRoot (
-    'power-platform\solutions\PULSE\pulse\src\Workflows\' +
+    'power-platform\solutions\PULSE\Workflows\' +
     'Warroom_ExportPunchesToExcel_Codex-1D37F98F-2D8B-F111-AB10-000D3A21CE45.json'
 )
 $solutionFlow = Get-Content -Raw -LiteralPath $solutionFlowPath |
@@ -88,7 +88,7 @@ Assert-True (
 ) 'Unpacked solution contains deployable snapshot lifecycle'
 Write-Output 'OFFICE SCRIPT'
 $officeScript = Get-Content -Raw -LiteralPath (
-    Join-Path $repoRoot 'main\office-scripts\BuildPunchExport.ts'
+    Join-Path $repoRoot 'office-scripts\BuildPunchExport.ts'
 )
 foreach ($column in @(
     'ExportBatchId',
@@ -112,20 +112,27 @@ Assert-True (
 
 Write-Output 'SQL'
 $foundation = Get-Content -Raw -LiteralPath (
-    Join-Path $repoRoot 'main\sql\import\001_import_foundations.sql'
+    Join-Path $repoRoot 'sql\import\001_import_foundations.sql'
 )
 $exportSql = Get-Content -Raw -LiteralPath (
-    Join-Path $repoRoot 'main\sql\export\usp_ExportProjectPunchesExtended_Pivoted.sql'
+    Join-Path $repoRoot 'sql\export\usp_ExportProjectPunchesExtended_Pivoted.sql'
 )
 $snapshotSql = Get-Content -Raw -LiteralPath (
-    Join-Path $repoRoot 'main\sql\export\002_register_punch_export_snapshot.sql'
+    Join-Path $repoRoot 'sql\export\002_register_punch_export_snapshot.sql'
 )
 Assert-True (
-    $foundation -match '\[ExportBatchId\]\s+bigint NOT NULL'
-) 'ExportBatchId uses BIGINT'
+    $foundation -match '\[ExportBatchId\]\s+uniqueidentifier NOT NULL'
+) 'ExportBatchId uses UNIQUEIDENTIFIER'
 Assert-True (
     $foundation -match '\[RowVersion\]\s+binary\(8\) NULL'
 ) 'RowVersion is nullable'
+Assert-True (
+    $foundation -match '\[PunchExportLogId\]\s+bigint NOT NULL'
+) 'PunchExportLogId uses BIGINT'
+Assert-True (
+    -not $snapshotSql.Contains('WorkItemId,' + [Environment]::NewLine + '            RowVersion,') -and
+    $snapshotSql.Contains('[warroom].[usp_PunchExportLog_Fail]')
+) 'Snapshot omits RowVersion and includes log failure compensation'
 Assert-True (
     $exportSql.Contains('FOR JSON PATH, WITHOUT_ARRAY_WRAPPER, INCLUDE_NULL_VALUES')
 ) 'Canonical standard JSON'
@@ -169,7 +176,7 @@ Assert-True (
     $contract.flow -eq 'Warroom_ExportPunchesToExcel_Codex'
 ) 'Contract Flow name'
 Assert-True (
-    $contractColumns.Count -eq 7 -and
+    $contractColumns.Count -eq 8 -and
     @($contractColumns | Where-Object { $_ -notin $mappingColumns }).Count -eq 0
 ) 'Contract and mapping technical columns'
 Assert-True (
