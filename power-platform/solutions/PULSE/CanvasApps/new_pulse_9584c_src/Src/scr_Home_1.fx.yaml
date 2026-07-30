@@ -1116,7 +1116,21 @@ scr_Home_1 As screen:
                                         Set(varPageKey, "PUNCHES");
                                         Set(varPageTitle, "Punch List");
                                         Set(varPageSubtitle, "Punch item management");
-                
+                                        Set(varPunches_ReturnView, "Home");
+                                        Set(varPunches_ContextSource, "Navigation");
+                                        Set(varPunches_FilterSource, "Manual");
+                                        Set(varPunchCustomFiltersJson, "[]");
+                                        Set(varFilter_PunchTemplateId, Blank());
+                                        Set(varFilter_PunchStatusCode, "");
+                                        Set(varFilter_PunchCategoryCode, "");
+                                        Set(varFilter_SubsystemsCsv, "");
+                                        Set(varFilter_Subsystem, Blank());
+                                        Set(varFilter_Subcontractor, Blank());
+                                        Set(varFilter_PunchDiscipline, "");
+                                        Set(varPunches_Page, 1);
+                                        Set(varPunches_HasSearched, false);
+                                        Set(varPunches_AutoLoad, false);
+                                        Clear(colPunches);
                                         Navigate(scr_Punches, ScreenTransition.None),
                 
                                     "briefing",
@@ -1590,7 +1604,7 @@ scr_Home_1 As screen:
                         DangerColor: =varTheme_Red
                         Icon: ="Warning"
                         MutedTextColor: =varTheme_TextMuted
-                        OnSelect: =Set(varPunches_ReturnView, "Home"); Set(varPunches_ContextSource, "ExecutiveKpi"); Set(varPunches_FilterSource, "Dashboard"); Set(varPunchCustomFiltersJson, "[]"); Navigate(scr_Punches, ScreenTransition.None)
+                        OnSelect: =Set(varPunches_ReturnView, "Home"); Set(varPunches_ContextSource, "ExecutiveKpi"); Set(varPunches_FilterSource, "Dashboard"); Set(varPunchCustomFiltersJson, "[]"); Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId)); Set(varFilter_PunchStatusCode, ""); Set(varFilter_PunchCategoryCode, ""); Set(varFilter_SubsystemsCsv, ""); Set(varFilter_Subsystem, Blank()); Set(varFilter_Subcontractor, Blank()); Set(varFilter_PunchDiscipline, ""); Set(varPunches_Page, 1); Set(varPunches_HasSearched, true); Set(varPunches_AutoLoad, true); Clear(colPunches); Set(varAppView, "Punches"); Navigate(scr_Punches, ScreenTransition.None)
                         Status: =If(CountRows(colPunchDashboardSummary) = 0, "NEUTRAL", If(Sum(Filter(colPunchDashboardSummary, !(Lower(StatusCode) in ["closed", "done"])), PunchCount) = 0, "SUCCESS", "WARNING"))
                         SuccessColor: =varTheme_Green
                         SupportingText: |-
@@ -4354,7 +4368,7 @@ scr_Home_1 As screen:
                                 AccentColor: =varTheme_PulseBlueDark
                                 ActionText: ="View punches"
                                 MutedTextColor: =varTheme_TextMuted
-                                OnAction: =Set(varAppView, "Punches"); Navigate(scr_Punches, ScreenTransition.None)
+                                OnAction: =Set(varPunches_ReturnView, "Home"); Set(varPunches_ContextSource, "ExecutiveInsights"); Set(varPunches_FilterSource, "Dashboard"); Set(varPunchCustomFiltersJson, "[]"); Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId)); Set(varFilter_PunchStatusCode, ""); Set(varFilter_PunchCategoryCode, ""); Set(varFilter_SubsystemsCsv, ""); Set(varFilter_Subsystem, Blank()); Set(varFilter_Subcontractor, Blank()); Set(varFilter_PunchDiscipline, ""); Set(varPunches_Page, 1); Set(varPunches_HasSearched, true); Set(varPunches_AutoLoad, true); Clear(colPunches); Set(varAppView, "Punches"); Navigate(scr_Punches, ScreenTransition.None)
                                 ShowAction: =true
                                 Subtitle: ="Prioritized operational signals generated from the current snapshot"
                                 TextColor: =varTheme_Text
@@ -4373,7 +4387,7 @@ scr_Home_1 As screen:
                                 MetricText: |-
                                     =If(CountRows(colPunchDashboardInsights) > 0 && !IsBlank(First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).MetricLabel), Text(First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).MetricValue, "[$-en-US]#,##0.0") & " " & First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).MetricLabel, "â€”")
                                 MutedTextColor: =varTheme_TextMuted
-                                OnSelect: =Set(varPunches_ReturnView, "Home"); Set(varPunches_ContextSource, "ExecutiveInsights"); Set(varPunches_FilterSource, "Dashboard"); Set(varPunchCustomFiltersJson, "[]"); Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId)); Navigate(scr_Punches, ScreenTransition.None)
+                                OnSelect: =Set(varPunches_ReturnView, "Home"); Set(varPunches_ContextSource, "ExecutiveInsights"); Set(varPunches_FilterSource, "Dashboard"); Set(varPunchCustomFiltersJson, "[]"); Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId)); Set(varFilter_PunchStatusCode, ""); Set(varFilter_PunchCategoryCode, ""); Set(varFilter_SubsystemsCsv, ""); Set(varFilter_Subsystem, Blank()); Set(varFilter_Subcontractor, Blank()); Set(varFilter_PunchDiscipline, ""); Set(varPunches_Page, 1); Set(varPunches_HasSearched, true); Set(varPunches_AutoLoad, true); Clear(colPunches); Set(varAppView, "Punches"); Navigate(scr_Punches, ScreenTransition.None)
                                 Severity: =If(CountRows(colPunchDashboardInsights) > 0, First(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending)).Severity, "INFO")
                                 SurfaceColor: =varTheme_SurfaceAlt
                                 TextColor: =varTheme_Text
@@ -4393,7 +4407,7 @@ scr_Home_1 As screen:
                                 MetricText: |-
                                     =If(CountRows(colPunchDashboardInsights) > 1 && !IsBlank(Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).MetricLabel), Text(Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).MetricValue, "[$-en-US]#,##0.0") & " " & Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).MetricLabel, "â€”")
                                 MutedTextColor: =varTheme_TextMuted
-                                OnSelect: =Set(varPunches_ReturnView, "Home"); Set(varPunches_ContextSource, "ExecutiveInsights"); Set(varPunches_FilterSource, "Dashboard"); Set(varPunchCustomFiltersJson, "[]"); Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId)); Navigate(scr_Punches, ScreenTransition.None)
+                                OnSelect: =Set(varPunches_ReturnView, "Home"); Set(varPunches_ContextSource, "ExecutiveInsights"); Set(varPunches_FilterSource, "Dashboard"); Set(varPunchCustomFiltersJson, "[]"); Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId)); Set(varFilter_PunchStatusCode, ""); Set(varFilter_PunchCategoryCode, ""); Set(varFilter_SubsystemsCsv, ""); Set(varFilter_Subsystem, Blank()); Set(varFilter_Subcontractor, Blank()); Set(varFilter_PunchDiscipline, ""); Set(varPunches_Page, 1); Set(varPunches_HasSearched, true); Set(varPunches_AutoLoad, true); Clear(colPunches); Set(varAppView, "Punches"); Navigate(scr_Punches, ScreenTransition.None)
                                 Severity: =If(CountRows(colPunchDashboardInsights) > 1, Last(FirstN(SortByColumns(colPunchDashboardInsights, "Priority", SortOrder.Ascending), 2)).Severity, "INFO")
                                 SurfaceColor: =varTheme_SurfaceAlt
                                 TextColor: =varTheme_Text
