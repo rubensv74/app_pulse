@@ -54,7 +54,7 @@ BEGIN
                 GeneratedOn = r.CompletedOn,
                 r.SourcePunchCount,
                 r.DurationMs,
-                DataVersion = N'3.0'
+                DataVersion = N'4.0'
             FROM warroom.PunchDashboardSnapshotRun r
             WHERE r.SnapshotRunId = @SnapshotRunId
             FOR JSON PATH
@@ -459,7 +459,7 @@ BEGIN
                 PunchId = CONVERT(BIGINT, p.Id), PunchCode = p.Code,
                 PunchDescription = p.[Description], p.StatusCode,
                 PunchStatus = p.[Status], p.CategoryCode, CategoryName = p.Category,
-                SubsystemCode = COALESCE(NULLIF(LTRIM(RTRIM(h.SubsystemCode)), N''), N'NO SUBSYSTEM'),
+                SubsystemCode = COALESCE(NULLIF(UPPER(LTRIM(RTRIM(h.SubsystemCode))), N''), N'NO_SUBSYSTEM'),
                 DisciplineCode = p.Discipline,
                 ResponsibleCompany = COALESCE(NULLIF(mc.DS_SHORT_COMPANY, N''), NULLIF(mc.DS_COMPANY, N''), N'Unassigned'),
                 ResponsiblePerson = COALESCE(NULLIF(p.PunchCoordinator, N''), N'Unassigned'),
