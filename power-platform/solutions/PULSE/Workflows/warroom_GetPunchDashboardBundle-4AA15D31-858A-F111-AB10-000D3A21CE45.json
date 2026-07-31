@@ -1,118 +1,162 @@
 {
-  "properties": {
-    "connectionReferences": {
-      "shared_sqldw_1": {
-        "runtimeSource": "invoker",
-        "connection": {
-          "connectionReferenceLogicalName": "new_sharedsqldw_bddb2"
-        },
-        "api": {
-          "name": "shared_sqldw"
-        }
-      }
-    },
-    "definition": {
-      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-      "contentVersion": "1.0.0.0",
-      "parameters": {
-        "$connections": {
-          "defaultValue": {},
-          "type": "Object"
-        },
-        "$authentication": {
-          "defaultValue": {},
-          "type": "SecureObject"
-        }
-      },
-      "triggers": {
-        "manual": {
-          "metadata": {
-            "operationMetadataId": "05b7d553-d8c8-4156-8954-457d418cde27"
-          },
-          "type": "Request",
-          "kind": "PowerAppV2",
-          "inputs": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "number": {
-                  "title": "ProjectId",
-                  "type": "number",
-                  "x-ms-dynamically-added": true,
-                  "description": "Please enter a number",
-                  "x-ms-content-hint": "NUMBER"
-                },
-                "number_1": {
-                  "title": "TemplateId",
-                  "type": "number",
-                  "x-ms-dynamically-added": true,
-                  "description": "Please enter a number",
-                  "x-ms-content-hint": "NUMBER"
-                }
-              },
-              "required": [
-                "number",
-                "number_1"
-              ]
-            }
-          }
-        }
-      },
-      "actions": {
-        "SP": {
-          "runAfter": {},
-          "metadata": {
-            "operationMetadataId": "456ec3ef-6d13-45cc-b202-5b00c9f6e2dc"
-          },
-          "type": "OpenApiConnection",
-          "inputs": {
-            "host": {
-              "connectionName": "shared_sqldw_1",
-              "operationId": "ExecuteProcedureV2",
-              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw"
-            },
-            "parameters": {
-              "server": "default",
-              "database": "default",
-              "procedure": "[warroom].[usp_GetPunchDashboardBundle]",
-              "parameters/ProjectId": "@triggerBody()['number']",
-              "parameters/TemplateId": "@triggerBody()['number_1']"
-            },
-            "authentication": "@parameters('$authentication')"
-          }
-        },
-        "Respond_to_a_Power_App_or_flow": {
-          "runAfter": {
-            "SP": [
-              "Succeeded"
-            ]
-          },
-          "metadata": {
-            "operationMetadataId": "30ef6aa3-1223-41af-ae8c-9f9839cc365a"
-          },
-          "type": "Response",
-          "kind": "PowerApp",
-          "inputs": {
-            "statusCode": 200,
-            "body": {
-              "result": "@{first(\r\n  body('SP')?['ResultSets']?['Table1']\r\n)?['result']}"
-            },
-            "schema": {
-              "type": "object",
-              "properties": {
-                "result": {
-                  "title": "result",
-                  "x-ms-dynamically-added": true,
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      },
-      "outputs": {}
-    },
-    "templateName": ""
-  },
-  "schemaVersion": "1.0.0.0"
+    "properties":  {
+                       "connectionReferences":  {
+                                                    "shared_sqldw_1":  {
+                                                                           "runtimeSource":  "invoker",
+                                                                           "connection":  {
+                                                                                              "connectionReferenceLogicalName":  "new_sharedsqldw_bddb2"
+                                                                                          },
+                                                                           "api":  {
+                                                                                       "name":  "shared_sqldw"
+                                                                                   }
+                                                                       }
+                                                },
+                       "definition":  {
+                                          "$schema":  "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                                          "contentVersion":  "1.0.0.0",
+                                          "parameters":  {
+                                                             "$connections":  {
+                                                                                  "defaultValue":  {
+
+                                                                                                   },
+                                                                                  "type":  "Object"
+                                                                              },
+                                                             "$authentication":  {
+                                                                                     "defaultValue":  {
+
+                                                                                                      },
+                                                                                     "type":  "SecureObject"
+                                                                                 }
+                                                         },
+                                          "triggers":  {
+                                                           "manual":  {
+                                                                          "metadata":  {
+                                                                                           "operationMetadataId":  "05b7d553-d8c8-4156-8954-457d418cde27"
+                                                                                       },
+                                                                          "type":  "Request",
+                                                                          "kind":  "PowerAppV2",
+                                                                          "inputs":  {
+                                                                                         "schema":  {
+                                                                                                        "type":  "object",
+                                                                                                        "properties":  {
+                                                                                                                           "number":  {
+                                                                                                                                          "title":  "ProjectId",
+                                                                                                                                          "type":  "number",
+                                                                                                                                          "x-ms-dynamically-added":  true,
+                                                                                                                                          "description":  "Please enter a number",
+                                                                                                                                          "x-ms-content-hint":  "NUMBER"
+                                                                                                                                      },
+                                                                                                                           "number_1":  {
+                                                                                                                                            "title":  "TemplateId",
+                                                                                                                                            "type":  "number",
+                                                                                                                                            "x-ms-dynamically-added":  true,
+                                                                                                                                            "description":  "Please enter a number",
+                                                                                                                                            "x-ms-content-hint":  "NUMBER"
+                                                                                                                                        },
+                                                                                                                           "text":  {
+                                                                                                                                        "title":  "RequestedBy",
+                                                                                                                                        "type":  "string",
+                                                                                                                                        "x-ms-dynamically-added":  true,
+                                                                                                                                        "description":  "Dashboard request identity",
+                                                                                                                                        "x-ms-content-hint":  "TEXT"
+                                                                                                                                    },
+                                                                                                                           "boolean":  {
+                                                                                                                                           "title":  "ForceRefresh",
+                                                                                                                                           "type":  "boolean",
+                                                                                                                                           "x-ms-dynamically-added":  true,
+                                                                                                                                           "description":  "Force snapshot refresh",
+                                                                                                                                           "x-ms-content-hint":  "BOOLEAN"
+                                                                                                                                       },
+                                                                                                                           "number_2":  {
+                                                                                                                                            "title":  "MaxSnapshotAgeMinutes",
+                                                                                                                                            "type":  "number",
+                                                                                                                                            "x-ms-dynamically-added":  true,
+                                                                                                                                            "description":  "Maximum completed snapshot age",
+                                                                                                                                            "x-ms-content-hint":  "NUMBER"
+                                                                                                                                        },
+                                                                                                                           "number_3":  {
+                                                                                                                                            "title":  "KeepCompletedRuns",
+                                                                                                                                            "type":  "number",
+                                                                                                                                            "x-ms-dynamically-added":  true,
+                                                                                                                                            "description":  "Completed snapshot retention",
+                                                                                                                                            "x-ms-content-hint":  "NUMBER"
+                                                                                                                                        }
+                                                                                                                       },
+                                                                                                        "required":  [
+                                                                                                                         "number",
+                                                                                                                         "number_1",
+                                                                                                                         "text",
+                                                                                                                         "boolean",
+                                                                                                                         "number_2",
+                                                                                                                         "number_3"
+                                                                                                                     ]
+                                                                                                    }
+                                                                                     }
+                                                                      }
+                                                       },
+                                          "actions":  {
+                                                          "SP":  {
+                                                                     "runAfter":  {
+
+                                                                                  },
+                                                                     "metadata":  {
+                                                                                      "operationMetadataId":  "456ec3ef-6d13-45cc-b202-5b00c9f6e2dc"
+                                                                                  },
+                                                                     "type":  "OpenApiConnection",
+                                                                     "inputs":  {
+                                                                                    "host":  {
+                                                                                                 "connectionName":  "shared_sqldw_1",
+                                                                                                 "operationId":  "ExecuteProcedureV2",
+                                                                                                 "apiId":  "/providers/Microsoft.PowerApps/apis/shared_sqldw"
+                                                                                             },
+                                                                                    "parameters":  {
+                                                                                                       "server":  "default",
+                                                                                                       "database":  "default",
+                                                                                                       "procedure":  "[warroom].[usp_GetOrRefreshPunchDashboardBundle]",
+                                                                                                       "parameters/ProjectId":  "@triggerBody()[\u0027number\u0027]",
+                                                                                                       "parameters/TemplateId":  "@triggerBody()[\u0027number_1\u0027]",
+                                                                                                       "parameters/RequestedBy":  "@triggerBody()[\u0027text\u0027]",
+                                                                                                       "parameters/ForceRefresh":  "@triggerBody()[\u0027boolean\u0027]",
+                                                                                                       "parameters/MaxSnapshotAgeMinutes":  "@triggerBody()[\u0027number_2\u0027]",
+                                                                                                       "parameters/KeepCompletedRuns":  "@triggerBody()[\u0027number_3\u0027]"
+                                                                                                   },
+                                                                                    "authentication":  "@parameters(\u0027$authentication\u0027)"
+                                                                                }
+                                                                 },
+                                                          "Respond_to_a_Power_App_or_flow":  {
+                                                                                                 "runAfter":  {
+                                                                                                                  "SP":  [
+                                                                                                                             "Succeeded"
+                                                                                                                         ]
+                                                                                                              },
+                                                                                                 "metadata":  {
+                                                                                                                  "operationMetadataId":  "30ef6aa3-1223-41af-ae8c-9f9839cc365a"
+                                                                                                              },
+                                                                                                 "type":  "Response",
+                                                                                                 "kind":  "PowerApp",
+                                                                                                 "inputs":  {
+                                                                                                                "statusCode":  200,
+                                                                                                                "body":  {
+                                                                                                                             "result":  "@{first(\r\n  body(\u0027SP\u0027)?[\u0027ResultSets\u0027]?[\u0027Table1\u0027]\r\n)?[\u0027result\u0027]}"
+                                                                                                                         },
+                                                                                                                "schema":  {
+                                                                                                                               "type":  "object",
+                                                                                                                               "properties":  {
+                                                                                                                                                  "result":  {
+                                                                                                                                                                 "title":  "result",
+                                                                                                                                                                 "x-ms-dynamically-added":  true,
+                                                                                                                                                                 "type":  "string"
+                                                                                                                                                             }
+                                                                                                                                              }
+                                                                                                                           }
+                                                                                                            }
+                                                                                             }
+                                                      },
+                                          "outputs":  {
+
+                                                      }
+                                      },
+                       "templateName":  ""
+                   },
+    "schemaVersion":  "1.0.0.0"
 }
