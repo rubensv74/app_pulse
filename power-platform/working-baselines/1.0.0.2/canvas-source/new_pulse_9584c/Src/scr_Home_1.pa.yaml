@@ -4098,8 +4098,9 @@ Screens:
                                                       - btnPunchExecutiveViewPunches:
                                                           Control: ModernButton@1.0.0
                                                           Properties:
-                                                            DisplayMode: =DisplayMode.Disabled
+                                                            DisplayMode: =If(CountRows(colPunchExecutiveSelection) = 0 || First(colPunchExecutiveSelection).PunchCount = 0, DisplayMode.Disabled, DisplayMode.Edit)
                                                             Height: =30
+                                                            OnSelect: =Set(varPunches_FilterSource, "Dashboard"); Set(varPunches_ReturnView, "Home"); Set(varFilter_SubsystemsCsv, Coalesce(varPunchDrillSubsystemCode, "")); Set(varFilter_Subsystem, If(IsBlank(varPunchDrillSubsystemCode), Blank(), varPunchDrillSubsystemCode)); Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId)); Set(varFilter_PunchCategoryCode, If(IsBlank(varPunchDrillCategoryCode), Blank(), varPunchDrillCategoryCode)); Set(varFilter_PunchStatusCode, If(IsBlank(varPunchDrillStatusCode), Blank(), varPunchDrillStatusCode)); Set(varFilter_PunchDiscipline, If(IsBlank(varPunchDrillDisciplineCode), Blank(), varPunchDrillDisciplineCode)); Set(varFilter_Subcontractor, If(Coalesce(varPunchDrillSubcontractorId, -1) < 0, Blank(), Text(varPunchDrillSubcontractorId))); Set(varPunchCustomFiltersJson, "[]"); Set(varPunches_Page, 1); Set(varPunches_PageSize, 50); Set(varPunches_HasSearched, true); Set(varPunches_AutoLoad, true); Navigate(scr_Punches_1, ScreenTransition.None)
                                                             Text: ="View Punches →"
                                                             Width: =140
                                                             X: =16
@@ -4176,8 +4177,9 @@ Screens:
                                           - btnPunchExecutiveGridGoToPunches:
                                               Control: ModernButton@1.0.0
                                               Properties:
-                                                DisplayMode: =DisplayMode.Disabled
+                                                DisplayMode: =If(CountRows(Filter(colPunchDashboardPunches, (IsBlank(varPunchDrillSubsystemCode) || SubsystemCode = varPunchDrillSubsystemCode) && (IsBlank(varPunchDrillCategoryCode) || CategoryCode = varPunchDrillCategoryCode))) = 0, DisplayMode.Disabled, DisplayMode.Edit)
                                                 Height: =30
+                                                OnSelect: =Select(btnPunchExecutiveViewPunches)
                                                 Text: ="Go to Punches"
                                                 Width: =112
                                                 X: =Parent.Width - 154
