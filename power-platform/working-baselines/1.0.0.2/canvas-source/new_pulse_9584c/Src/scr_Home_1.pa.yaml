@@ -5442,7 +5442,11 @@ Screens:
                               _resp:
                                   warroom_GetPunchDashboardBundle.Run(
                                       Value(varProjectId),
-                                      Value(varPunchDashboardTemplateId)
+                                      Value(varPunchDashboardTemplateId),
+                                      User().Email,
+                                      false,
+                                      30,
+                                      7
                                   )
                           },
                           With(
