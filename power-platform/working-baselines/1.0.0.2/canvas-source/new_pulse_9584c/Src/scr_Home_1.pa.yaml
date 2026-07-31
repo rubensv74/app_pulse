@@ -3708,7 +3708,18 @@ Screens:
                                                                   BorderColor: =If(varPunchDrillSubsystemCode = ThisItem.SubsystemCode && varPunchDrillCategoryCode = ThisItem.CategoryCode, varTheme_PulseBlueDark, Color.Transparent)
                                                                   BorderThickness: =If(varPunchDrillSubsystemCode = ThisItem.SubsystemCode && varPunchDrillCategoryCode = ThisItem.CategoryCode, 2, 0)
                                                                   Color: =If(ThisItem.PunchCount / Max(1, Max(colPunchExecutiveHeatmapCells, PunchCount)) > 0.65, Color.White, varTheme_Text)
-                                                                  Fill: =With({_ratio: ThisItem.PunchCount / Max(1, Max(colPunchExecutiveHeatmapCells, PunchCount))}, Switch(true, _ratio = 0, ColorValue("#F8FAFC"), _ratio <= 0.25, ColorValue("#DCFCE7"), _ratio <= 0.5, ColorValue("#FDE68A"), _ratio <= 0.75, ColorValue("#FB923C"), ColorValue("#DC2626")))
+                                                                  Fill: =Switch(
+                                                                          true,
+                                                                          ThisItem.PunchCount / Max(1, Max(colPunchExecutiveHeatmapCells, PunchCount)) = 0,
+                                                                          ColorValue("#F8FAFC"),
+                                                                          ThisItem.PunchCount / Max(1, Max(colPunchExecutiveHeatmapCells, PunchCount)) <= 0.25,
+                                                                          ColorValue("#DCFCE7"),
+                                                                          ThisItem.PunchCount / Max(1, Max(colPunchExecutiveHeatmapCells, PunchCount)) <= 0.5,
+                                                                          ColorValue("#FDE68A"),
+                                                                          ThisItem.PunchCount / Max(1, Max(colPunchExecutiveHeatmapCells, PunchCount)) <= 0.75,
+                                                                          ColorValue("#FB923C"),
+                                                                          ColorValue("#DC2626")
+                                                                      )
                                                                   FontWeight: =FontWeight.Semibold
                                                                   Height: =30
                                                                   RadiusBottomLeft: =4
@@ -4382,7 +4393,7 @@ Screens:
                                               Properties:
                                                 Height: =28
                                                 OnSelect: =Set(varPunchExecutiveGridPageSize, Switch(varPunchExecutiveGridPageSize, 25, 50, 50, 100, 25)); Set(varPunchExecutiveGridPage, 1)
-                                                Text: ="Rows per page: " & varPunchExecutiveGridPageSize
+                                                Text: ="Rows per page: " & varPunchExecutiveGridPageSize & " ▼"
                                                 Width: =150
                                                 X: =Parent.Width - 168
                                                 Y: =252
