@@ -1,6 +1,6 @@
 # EPIC 05 — Executive Grid Data Contract Blocker
 
-Status: **BLOCKED — DATA CONTRACT DECISION REQUIRED**
+Status: **SUPERSEDED — OPTION 1 APPROVED AND IMPLEMENTED**
 
 Date: 2026-07-31  
 Branch: `workstream/home-1-punches-1`
@@ -72,3 +72,7 @@ The selected contract must also define:
 ## Resume point
 
 After an approved contract is available, implement EPIC 05 from `conPunchExecutiveGridWorkspace` and retain the Heatmap as the only analytical-context controller. EPIC 06 remains dependent on the resulting Grid selection/navigation handoff.
+
+## Resolution
+
+The Product Owner approved Option 1 on 2026-07-31. Bundle contract v4.0 now includes bounded `punches`, and `Home_1` consumes it without invoking `Warroom_Punches_Filtered_Paged`. See `docs/contracts/PUNCH_DASHBOARD_BUNDLE_V4.md` and `EXECUTIVE_DASHBOARD_EPIC_05_VALIDATION.md`.

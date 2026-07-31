@@ -3176,6 +3176,7 @@ Screens:
                                                 Clear(colPunchDashboardInsights);
                                                 Clear(colPunchDashboardSubsystems);
                                                 Clear(colPunchDashboardSubcontractors);
+                                                Clear(colPunchDashboardPunches);
                                                 Clear(colPunchExecutiveHeatmapRows);
                                                 Clear(colPunchExecutiveHeatmapColumns);
                                                 Clear(colPunchExecutiveHeatmapCells);
@@ -4140,6 +4141,249 @@ Screens:
                                                 Width: =Parent.Width - 48
                                                 X: =24
                                                 Y: =(Parent.Height - Self.Height) / 2
+                                                Visible: =false
+                                          - btnPunchExecutiveGridRefresh:
+                                              Control: ModernButton@1.0.0
+                                              Properties:
+                                                Height: =30
+                                                OnSelect: =Select(btnHome_RequestDashboardLoad)
+                                                Text: ="Refresh"
+                                                Width: =82
+                                                X: =Parent.Width - 432
+                                                Y: =10
+                                          - btnPunchExecutiveGridExport:
+                                              Control: ModernButton@1.0.0
+                                              Properties:
+                                                Height: =30
+                                                OnSelect: |-
+                                                  =With(
+                                                      {_rows: Filter(colPunchDashboardPunches, (IsBlank(varPunchDrillSubsystemCode) || SubsystemCode = varPunchDrillSubsystemCode) && (IsBlank(varPunchDrillCategoryCode) || CategoryCode = varPunchDrillCategoryCode))},
+                                                      Download("data:text/csv;charset=utf-8," & EncodeUrl("Punch Code,Description,Status,Category,Subsystem,Discipline,Responsible Company,Responsible Person,Due Date,Priority" & Char(10) & Concat(_rows, Char(34) & Substitute(PunchCode, Char(34), Char(34) & Char(34)) & Char(34) & "," & Char(34) & Substitute(PunchDescription, Char(34), Char(34) & Char(34)) & Char(34) & "," & PunchStatus & "," & CategoryName & "," & SubsystemCode & "," & DisciplineCode & "," & ResponsibleCompany & "," & ResponsiblePerson & "," & Text(DueDate, "yyyy-mm-dd") & "," & PriorityCode & Char(10))))
+                                                  )
+                                                Text: ="Export"
+                                                Width: =76
+                                                X: =Parent.Width - 342
+                                                Y: =10
+                                          - btnPunchExecutiveGridColumns:
+                                              Control: ModernButton@1.0.0
+                                              Properties:
+                                                Height: =30
+                                                OnSelect: =Set(varPunchExecutiveGridCompact, !Coalesce(varPunchExecutiveGridCompact, false))
+                                                Text: =If(Coalesce(varPunchExecutiveGridCompact, false), "All columns", "Columns")
+                                                Width: =96
+                                                X: =Parent.Width - 258
+                                                Y: =10
+                                          - btnPunchExecutiveGridGoToPunches:
+                                              Control: ModernButton@1.0.0
+                                              Properties:
+                                                DisplayMode: =DisplayMode.Disabled
+                                                Height: =30
+                                                Text: ="Go to Punches"
+                                                Width: =112
+                                                X: =Parent.Width - 154
+                                                Y: =10
+                                          - conPunchExecutiveGridHeader:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                Fill: =ColorValue("#F8FAFC")
+                                                Height: =30
+                                                Width: =Parent.Width - 24
+                                                X: =12
+                                                Y: =48
+                                              Children:
+                                                - btnPunchExecutiveGridSortCode:
+                                                    Control: Classic/Button@2.2.0
+                                                    Properties:
+                                                      BorderThickness: =0
+                                                      Fill: =Color.Transparent
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =30
+                                                      OnSelect: =If(varPunchExecutiveGridSortColumn = "PunchCode", If(varPunchExecutiveGridSortDirection = SortOrder.Ascending, Set(varPunchExecutiveGridSortDirection, SortOrder.Descending), Set(varPunchExecutiveGridSortColumn, "SourceOrder"); Set(varPunchExecutiveGridSortDirection, SortOrder.Ascending)), Set(varPunchExecutiveGridSortColumn, "PunchCode"); Set(varPunchExecutiveGridSortDirection, SortOrder.Ascending)); Set(varPunchExecutiveGridPage, 1)
+                                                      Text: ="Punch Code" & If(varPunchExecutiveGridSortColumn = "PunchCode", If(varPunchExecutiveGridSortDirection = SortOrder.Ascending, " +", " -"), "")
+                                                      Width: =110
+                                                - lblPunchExecutiveGridHeaderDescription:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =30
+                                                      OnSelect: =If(varPunchExecutiveGridSortColumn = "PunchDescription", If(varPunchExecutiveGridSortDirection = SortOrder.Ascending, Set(varPunchExecutiveGridSortDirection, SortOrder.Descending), Set(varPunchExecutiveGridSortColumn, "SourceOrder"); Set(varPunchExecutiveGridSortDirection, SortOrder.Ascending)), Set(varPunchExecutiveGridSortColumn, "PunchDescription"); Set(varPunchExecutiveGridSortDirection, SortOrder.Ascending)); Set(varPunchExecutiveGridPage, 1)
+                                                      Text: ="Description"
+                                                      Width: =220
+                                                      X: =118
+                                                - lblPunchExecutiveGridHeaderStatus:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =30
+                                                      OnSelect: =If(varPunchExecutiveGridSortColumn = "PunchStatus", If(varPunchExecutiveGridSortDirection = SortOrder.Ascending, Set(varPunchExecutiveGridSortDirection, SortOrder.Descending), Set(varPunchExecutiveGridSortColumn, "SourceOrder"); Set(varPunchExecutiveGridSortDirection, SortOrder.Ascending)), Set(varPunchExecutiveGridSortColumn, "PunchStatus"); Set(varPunchExecutiveGridSortDirection, SortOrder.Ascending)); Set(varPunchExecutiveGridPage, 1)
+                                                      Text: ="Status"
+                                                      Width: =90
+                                                      X: =346
+                                                - lblPunchExecutiveGridHeaderContext:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =30
+                                                      OnSelect: =If(varPunchExecutiveGridSortColumn = "CategoryName", If(varPunchExecutiveGridSortDirection = SortOrder.Ascending, Set(varPunchExecutiveGridSortDirection, SortOrder.Descending), Set(varPunchExecutiveGridSortColumn, "SourceOrder"); Set(varPunchExecutiveGridSortDirection, SortOrder.Ascending)), Set(varPunchExecutiveGridSortColumn, "CategoryName"); Set(varPunchExecutiveGridSortDirection, SortOrder.Ascending)); Set(varPunchExecutiveGridPage, 1)
+                                                      Text: ="Category / Subsystem / Discipline"
+                                                      Width: =260
+                                                      X: =444
+                                                - lblPunchExecutiveGridHeaderResponsible:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =30
+                                                      OnSelect: =If(varPunchExecutiveGridSortColumn = "ResponsibleCompany", If(varPunchExecutiveGridSortDirection = SortOrder.Ascending, Set(varPunchExecutiveGridSortDirection, SortOrder.Descending), Set(varPunchExecutiveGridSortColumn, "SourceOrder"); Set(varPunchExecutiveGridSortDirection, SortOrder.Ascending)), Set(varPunchExecutiveGridSortColumn, "ResponsibleCompany"); Set(varPunchExecutiveGridSortDirection, SortOrder.Ascending)); Set(varPunchExecutiveGridPage, 1)
+                                                      Text: ="Responsible"
+                                                      Visible: =!Coalesce(varPunchExecutiveGridCompact, false)
+                                                      Width: =210
+                                                      X: =712
+                                                - lblPunchExecutiveGridHeaderDue:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =30
+                                                      OnSelect: =If(varPunchExecutiveGridSortColumn = "DueDate", If(varPunchExecutiveGridSortDirection = SortOrder.Ascending, Set(varPunchExecutiveGridSortDirection, SortOrder.Descending), Set(varPunchExecutiveGridSortColumn, "SourceOrder"); Set(varPunchExecutiveGridSortDirection, SortOrder.Ascending)), Set(varPunchExecutiveGridSortColumn, "DueDate"); Set(varPunchExecutiveGridSortDirection, SortOrder.Ascending)); Set(varPunchExecutiveGridPage, 1)
+                                                      Text: ="Due / Priority"
+                                                      Width: =150
+                                                      X: =If(Coalesce(varPunchExecutiveGridCompact, false), 712, 930)
+                                          - galPunchExecutiveGridRows:
+                                              Control: Gallery@2.15.0
+                                              Variant: Vertical
+                                              Properties:
+                                                Height: =160
+                                                Items: |-
+                                                  =With(
+                                                      {_sorted: SortByColumns(Filter(colPunchDashboardPunches, (IsBlank(varPunchDrillSubsystemCode) || SubsystemCode = varPunchDrillSubsystemCode) && (IsBlank(varPunchDrillCategoryCode) || CategoryCode = varPunchDrillCategoryCode)), varPunchExecutiveGridSortColumn, varPunchExecutiveGridSortDirection)},
+                                                      LastN(FirstN(_sorted, varPunchExecutiveGridPage * varPunchExecutiveGridPageSize), Min(varPunchExecutiveGridPageSize, Max(0, CountRows(_sorted) - ((varPunchExecutiveGridPage - 1) * varPunchExecutiveGridPageSize))))
+                                                  )
+                                                ShowScrollbar: =true
+                                                TemplatePadding: =0
+                                                TemplateSize: =38
+                                                Width: =Parent.Width - 24
+                                                X: =12
+                                                Y: =80
+                                              Children:
+                                                - recPunchExecutiveGridSelected:
+                                                    Control: Rectangle@2.3.0
+                                                    Properties:
+                                                      Fill: =If(varPunchExecutiveGridSelectedId = ThisItem.PunchId, RGBA(22,119,255,0.08), Color.Transparent)
+                                                      Height: =Parent.TemplateHeight - 1
+                                                      Width: =Parent.TemplateWidth
+                                                - lblPunchExecutiveGridCode:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =36
+                                                      Size: =8
+                                                      Text: =ThisItem.PunchCode
+                                                      Width: =110
+                                                - lblPunchExecutiveGridDescription:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Height: =36
+                                                      Size: =8
+                                                      Text: =ThisItem.PunchDescription
+                                                      Width: =220
+                                                      X: =118
+                                                - lblPunchExecutiveGridStatus:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Height: =36
+                                                      Size: =8
+                                                      Text: =ThisItem.PunchStatus
+                                                      Width: =90
+                                                      X: =346
+                                                - lblPunchExecutiveGridContext:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Height: =36
+                                                      Size: =8
+                                                      Text: =ThisItem.CategoryName & " · " & ThisItem.SubsystemCode & " · " & ThisItem.DisciplineCode
+                                                      Width: =260
+                                                      X: =444
+                                                - lblPunchExecutiveGridResponsible:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Height: =36
+                                                      Size: =8
+                                                      Text: =ThisItem.ResponsibleCompany & " · " & ThisItem.ResponsiblePerson
+                                                      Visible: =!Coalesce(varPunchExecutiveGridCompact, false)
+                                                      Width: =210
+                                                      X: =712
+                                                - lblPunchExecutiveGridDuePriority:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Height: =36
+                                                      Size: =8
+                                                      Text: =If(IsBlank(ThisItem.DueDate), "No due date", Text(ThisItem.DueDate, "dd/mm/yyyy")) & " · " & ThisItem.PriorityCode
+                                                      Width: =150
+                                                      X: =If(Coalesce(varPunchExecutiveGridCompact, false), 712, 930)
+                                                - btnPunchExecutiveGridRow:
+                                                    Control: Classic/Button@2.2.0
+                                                    Properties:
+                                                      BorderThickness: =0
+                                                      Fill: =Color.Transparent
+                                                      Height: =36
+                                                      HoverFill: =RGBA(22,119,255,0.04)
+                                                      OnSelect: |-
+                                                        =If(varPunchExecutiveGridSelectedId = ThisItem.PunchId && DateDiff(varPunchExecutiveGridLastClick, Now(), TimeUnit.Milliseconds) < 450,
+                                                            Set(varDrawerRecordId, ThisItem.PunchId); Set(varDrawerEntityType, "PUNCH"); Set(varDrawerSelectedRecord, ThisItem); Set(varShowDetailDrawer, true); Select(btnDrawerLoad_1),
+                                                            Set(varPunchExecutiveGridSelectedId, ThisItem.PunchId)
+                                                        );
+                                                        Set(varPunchExecutiveGridLastClick, Now())
+                                                      Text: =""
+                                                      Width: =Parent.TemplateWidth
+                                          - lblPunchExecutiveGridEmpty:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Align: =Align.Center
+                                                Color: =varTheme_TextMuted
+                                                Height: =80
+                                                Text: ="No Punches match the current analytical selection."
+                                                Visible: =CountRows(Filter(colPunchDashboardPunches, (IsBlank(varPunchDrillSubsystemCode) || SubsystemCode = varPunchDrillSubsystemCode) && (IsBlank(varPunchDrillCategoryCode) || CategoryCode = varPunchDrillCategoryCode))) = 0
+                                                Width: =Parent.Width - 48
+                                                X: =24
+                                                Y: =105
+                                          - btnPunchExecutiveGridPrevious:
+                                              Control: ModernButton@1.0.0
+                                              Properties:
+                                                DisplayMode: =If(varPunchExecutiveGridPage <= 1, DisplayMode.Disabled, DisplayMode.Edit)
+                                                Height: =28
+                                                OnSelect: =Set(varPunchExecutiveGridPage, Max(1, varPunchExecutiveGridPage - 1))
+                                                Text: ="Previous"
+                                                Width: =86
+                                                X: =18
+                                                Y: =252
+                                          - lblPunchExecutiveGridPage:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Align: =Align.Center
+                                                Height: =28
+                                                Text: ="Page " & varPunchExecutiveGridPage & " of " & Max(1, RoundUp(CountRows(Filter(colPunchDashboardPunches, (IsBlank(varPunchDrillSubsystemCode) || SubsystemCode = varPunchDrillSubsystemCode) && (IsBlank(varPunchDrillCategoryCode) || CategoryCode = varPunchDrillCategoryCode))) / varPunchExecutiveGridPageSize, 0))
+                                                Width: =150
+                                                X: =112
+                                                Y: =252
+                                          - btnPunchExecutiveGridNext:
+                                              Control: ModernButton@1.0.0
+                                              Properties:
+                                                DisplayMode: =If(varPunchExecutiveGridPage >= Max(1, RoundUp(CountRows(Filter(colPunchDashboardPunches, (IsBlank(varPunchDrillSubsystemCode) || SubsystemCode = varPunchDrillSubsystemCode) && (IsBlank(varPunchDrillCategoryCode) || CategoryCode = varPunchDrillCategoryCode))) / varPunchExecutiveGridPageSize, 0)), DisplayMode.Disabled, DisplayMode.Edit)
+                                                Height: =28
+                                                OnSelect: =Set(varPunchExecutiveGridPage, varPunchExecutiveGridPage + 1)
+                                                Text: ="Next"
+                                                Width: =72
+                                                X: =270
+                                                Y: =252
+                                          - btnPunchExecutiveGridPageSize:
+                                              Control: ModernButton@1.0.0
+                                              Properties:
+                                                Height: =28
+                                                OnSelect: =Set(varPunchExecutiveGridPageSize, Switch(varPunchExecutiveGridPageSize, 25, 50, 50, 100, 25)); Set(varPunchExecutiveGridPage, 1)
+                                                Text: ="Rows per page: " & varPunchExecutiveGridPageSize
+                                                Width: =150
+                                                X: =Parent.Width - 168
+                                                Y: =252
                                     - conPunchTimelineCard:
                                         Control: GroupContainer@1.5.0
                                         Variant: ManualLayout
@@ -5124,6 +5368,7 @@ Screens:
               Clear(colPunchDashboardInsights);
               Clear(colPunchDashboardSubsystems);
               Clear(colPunchDashboardSubcontractors);
+              Clear(colPunchDashboardPunches);
               Clear(colPunchExecutiveHeatmapRows);
               Clear(colPunchExecutiveHeatmapColumns);
               Clear(colPunchExecutiveHeatmapCells);
@@ -5214,7 +5459,7 @@ Screens:
                               ClearCollect(
                                   colPunchDashboardSnapshotInfo,
                                   ForAll(
-                                      Table(_bundle.snapshotInfo),
+                                      Table(_bundle.detail),
                                       {
                                           SnapshotRunId: Value(Text(Value.SnapshotRunId)),
                                           GeneratedOn:
@@ -5232,7 +5477,7 @@ Screens:
                               ClearCollect(
                                   colPunchDashboardSummary,
                                   ForAll(
-                                      Table(_bundle.summary),
+                                      Table(_bundle.kpis),
                                       {
                                           StatusCode: Text(Value.StatusCode),
                                           StatusName: Text(Value.StatusName),
@@ -5348,6 +5593,36 @@ Screens:
                                       }
                                   )
                               );
+
+                              ClearCollect(
+                                  colPunchDashboardPunches,
+                                  ForAll(
+                                      Table(_bundle.punches),
+                                      {
+                                          PunchId: Value(Coalesce(Text(Value.PunchId), "0")),
+                                          PunchCode: Coalesce(Text(Value.PunchCode), ""),
+                                          PunchDescription: Coalesce(Text(Value.PunchDescription), ""),
+                                          StatusCode: Coalesce(Text(Value.StatusCode), ""),
+                                          PunchStatus: Coalesce(Text(Value.PunchStatus), ""),
+                                          CategoryCode: Coalesce(Text(Value.CategoryCode), ""),
+                                          CategoryName: Coalesce(Text(Value.CategoryName), ""),
+                                          SubsystemCode: Coalesce(Text(Value.SubsystemCode), ""),
+                                          DisciplineCode: Coalesce(Text(Value.DisciplineCode), ""),
+                                          ResponsibleCompany: Coalesce(Text(Value.ResponsibleCompany), "Unassigned"),
+                                          ResponsiblePerson: Coalesce(Text(Value.ResponsiblePerson), "Unassigned"),
+                                          DueDate: If(IsBlank(Text(Value.DueDate)) || Text(Value.DueDate) = "null", Blank(), DateValue(Text(Value.DueDate))),
+                                          PriorityCode: Coalesce(Text(Value.PriorityCode), "Normal"),
+                                          PriorityColor: Coalesce(Text(Value.PriorityColor), "#64748B"),
+                                          SourceOrder: Value(Coalesce(Text(Value.SourceOrder), "0"))
+                                      }
+                                  )
+                              );
+
+                              Set(varPunchExecutiveGridPage, 1);
+                              Set(varPunchExecutiveGridPageSize, Coalesce(varPunchExecutiveGridPageSize, 25));
+                              Set(varPunchExecutiveGridSortColumn, Coalesce(varPunchExecutiveGridSortColumn, "SourceOrder"));
+                              Set(varPunchExecutiveGridSortDirection, Coalesce(varPunchExecutiveGridSortDirection, SortOrder.Ascending));
+                              Set(varPunchExecutiveGridSelectedId, Blank());
 
                               ClearCollect(
                                   colPunchExecutiveHeatmapColumns,
@@ -6036,7 +6311,9 @@ Screens:
               Set(varPunchDrillCategoryCode, "");
               Set(varPunchDrillSubsystemCode, "");
               Set(varPunchDrillSubcontractorId, -1);
-              Set(varPunchDrillDisciplineCode, "");
+                                                                    Set(varPunchDrillDisciplineCode, "");
+                                                                    Set(varPunchExecutiveGridPage, 1);
+                                                                    Set(varPunchExecutiveGridSelectedId, Blank());
 
               Clear(colPunchDashboardSnapshotInfo);
               Clear(colPunchDashboardSummary);
@@ -6045,6 +6322,7 @@ Screens:
               Clear(colPunchDashboardInsights);
               Clear(colPunchDashboardSubsystems);
               Clear(colPunchDashboardSubcontractors);
+              Clear(colPunchDashboardPunches);
               Clear(colPunchExecutiveHeatmapRows);
               Clear(colPunchExecutiveHeatmapColumns);
               Clear(colPunchExecutiveHeatmapCells);
