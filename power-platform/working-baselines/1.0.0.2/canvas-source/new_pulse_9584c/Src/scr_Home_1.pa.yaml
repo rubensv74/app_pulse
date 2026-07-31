@@ -3176,6 +3176,11 @@ Screens:
                                                 Clear(colPunchDashboardInsights);
                                                 Clear(colPunchDashboardSubsystems);
                                                 Clear(colPunchDashboardSubcontractors);
+                                                Clear(colPunchExecutiveHeatmapRows);
+                                                Clear(colPunchExecutiveHeatmapColumns);
+                                                Clear(colPunchExecutiveHeatmapCells);
+                                                Set(varPunchDrillSubsystemCode, "");
+                                                Set(varPunchDrillCategoryCode, "");
 
                                                 Set(varHomeDashboard, "PUNCHES");
                                                 Select(btnHome_RequestDashboardLoad)
@@ -3605,7 +3610,198 @@ Screens:
                                                       Align: =Align.Center
                                                       Color: =varTheme_TextMuted
                                                       Height: =80
+                                                      Visible: =false
                                                       Text: ="Executive Heatmap · EPIC 03"
+                                                      Width: =Parent.Width - 48
+                                                      X: =24
+                                                      Y: =(Parent.Height - Self.Height) / 2
+                                                - galPunchExecutiveHeatmapColumns:
+                                                    Control: Gallery@2.15.0
+                                                    Variant: Horizontal
+                                                    Properties:
+                                                      Height: =28
+                                                      Items: =colPunchExecutiveHeatmapColumns
+                                                      ShowScrollbar: =false
+                                                      TemplatePadding: =2
+                                                      TemplateSize: =(Parent.Width - 4) / Max(1, CountRows(colPunchExecutiveHeatmapColumns))
+                                                      Visible: =CountRows(colPunchExecutiveHeatmapColumns) > 0
+                                                      Width: =Parent.Width - 260
+                                                      X: =172
+                                                      Y: =48
+                                                    Children:
+                                                      - lblPunchExecutiveHeatmapColumn:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Align: =Align.Center
+                                                            Color: =varTheme_Text
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =26
+                                                            Size: =8
+                                                            Text: =Coalesce(ThisItem.SubsystemName, ThisItem.SubsystemCode)
+                                                            Width: =Parent.TemplateWidth - 4
+                                                - lblPunchExecutiveHeatmapRowAxis:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Color: =varTheme_TextMuted
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =24
+                                                      Size: =8
+                                                      Text: ="CATEGORY"
+                                                      Width: =148
+                                                      X: =16
+                                                      Y: =50
+                                                - lblPunchExecutiveHeatmapTotalAxis:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      Color: =varTheme_TextMuted
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =24
+                                                      Size: =8
+                                                      Text: ="TOTAL"
+                                                      Width: =70
+                                                      X: =Parent.Width - 82
+                                                      Y: =50
+                                                - galPunchExecutiveHeatmapRows:
+                                                    Control: Gallery@2.15.0
+                                                    Variant: Vertical
+                                                    Properties:
+                                                      Height: =270
+                                                      Items: =colPunchExecutiveHeatmapRows
+                                                      ShowScrollbar: =true
+                                                      TemplatePadding: =2
+                                                      TemplateSize: =38
+                                                      Visible: =CountRows(colPunchExecutiveHeatmapRows) > 0
+                                                      Width: =Parent.Width - 24
+                                                      X: =12
+                                                      Y: =78
+                                                    Children:
+                                                      - lblPunchExecutiveHeatmapRow:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =34
+                                                            Size: =9
+                                                            Text: =Coalesce(ThisItem.CategoryName, ThisItem.CategoryCode)
+                                                            Width: =152
+                                                            X: =4
+                                                      - galPunchExecutiveHeatmapCells:
+                                                          Control: Gallery@2.15.0
+                                                          Variant: Horizontal
+                                                          Properties:
+                                                            Height: =34
+                                                            Items: =SortByColumns(Filter(colPunchExecutiveHeatmapCells, CategoryCode = ThisItem.CategoryCode), "SubsystemCode", SortOrder.Ascending)
+                                                            ShowScrollbar: =false
+                                                            TemplatePadding: =2
+                                                            TemplateSize: =(Parent.Width - 4) / Max(1, CountRows(colPunchExecutiveHeatmapColumns))
+                                                            Width: =Parent.TemplateWidth - 260
+                                                            X: =160
+                                                          Children:
+                                                            - lblPunchExecutiveHeatmapCell:
+                                                                Control: ModernText@1.0.0
+                                                                Properties:
+                                                                  Align: =Align.Center
+                                                                  BorderColor: =If(varPunchDrillSubsystemCode = ThisItem.SubsystemCode && varPunchDrillCategoryCode = ThisItem.CategoryCode, varTheme_PulseBlueDark, Color.Transparent)
+                                                                  BorderThickness: =If(varPunchDrillSubsystemCode = ThisItem.SubsystemCode && varPunchDrillCategoryCode = ThisItem.CategoryCode, 2, 0)
+                                                                  Color: =If(ThisItem.PunchCount / Max(1, Max(colPunchExecutiveHeatmapCells, PunchCount)) > 0.65, Color.White, varTheme_Text)
+                                                                  Fill: =With({_ratio: ThisItem.PunchCount / Max(1, Max(colPunchExecutiveHeatmapCells, PunchCount))}, Switch(true, _ratio = 0, ColorValue("#F8FAFC"), _ratio <= 0.25, ColorValue("#DCFCE7"), _ratio <= 0.5, ColorValue("#FDE68A"), _ratio <= 0.75, ColorValue("#FB923C"), ColorValue("#DC2626")))
+                                                                  FontWeight: =FontWeight.Semibold
+                                                                  Height: =30
+                                                                  RadiusBottomLeft: =4
+                                                                  RadiusBottomRight: =4
+                                                                  RadiusTopLeft: =4
+                                                                  RadiusTopRight: =4
+                                                                  Size: =9
+                                                                  Text: =Text(ThisItem.PunchCount, "[$-en-US]#,##0")
+                                                                  Width: =Parent.TemplateWidth - 4
+                                                            - btnPunchExecutiveHeatmapCell:
+                                                                Control: Classic/Button@2.2.0
+                                                                Properties:
+                                                                  BorderThickness: =0
+                                                                  Fill: =Color.Transparent
+                                                                  Height: =30
+                                                                  HoverFill: =RGBA(22,119,255,0.08)
+                                                                  OnSelect: =Set(varPunchDrillSubsystemCode, Text(ThisItem.SubsystemCode)); Set(varPunchDrillCategoryCode, Text(ThisItem.CategoryCode)); Set(varPunchDrillStatusCode, ""); Set(varPunchDrillSubcontractorId, -1); Set(varPunchDrillDisciplineCode, "")
+                                                                  PressedFill: =RGBA(22,119,255,0.14)
+                                                                  Text: =""
+                                                                  Width: =Parent.TemplateWidth - 4
+                                                      - lblPunchExecutiveHeatmapRowTotal:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Align: =Align.Center
+                                                            Color: =varTheme_Text
+                                                            FontWeight: =FontWeight.Bold
+                                                            Height: =34
+                                                            Size: =9
+                                                            Text: =Text(ThisItem.PunchCount, "[$-en-US]#,##0")
+                                                            Width: =70
+                                                            X: =Parent.TemplateWidth - 78
+                                                - lblPunchExecutiveHeatmapTotalLabel:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Color: =varTheme_Text
+                                                      FontWeight: =FontWeight.Bold
+                                                      Height: =28
+                                                      Size: =9
+                                                      Text: ="TOTAL"
+                                                      Width: =148
+                                                      X: =16
+                                                      Y: =352
+                                                - galPunchExecutiveHeatmapColumnTotals:
+                                                    Control: Gallery@2.15.0
+                                                    Variant: Horizontal
+                                                    Properties:
+                                                      Height: =28
+                                                      Items: =colPunchExecutiveHeatmapColumns
+                                                      ShowScrollbar: =false
+                                                      TemplatePadding: =2
+                                                      TemplateSize: =(Parent.Width - 4) / Max(1, CountRows(colPunchExecutiveHeatmapColumns))
+                                                      Width: =Parent.Width - 260
+                                                      X: =172
+                                                      Y: =350
+                                                    Children:
+                                                      - lblPunchExecutiveHeatmapColumnTotal:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Align: =Align.Center
+                                                            Color: =varTheme_Text
+                                                            FontWeight: =FontWeight.Bold
+                                                            Height: =26
+                                                            Size: =9
+                                                            Text: =Text(ThisItem.PunchCount, "[$-en-US]#,##0")
+                                                            Width: =Parent.TemplateWidth - 4
+                                                - lblPunchExecutiveHeatmapGrandTotal:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      Color: =varTheme_Text
+                                                      FontWeight: =FontWeight.Bold
+                                                      Height: =28
+                                                      Size: =10
+                                                      Text: =Text(Sum(colPunchExecutiveHeatmapCells, PunchCount), "[$-en-US]#,##0")
+                                                      Width: =70
+                                                      X: =Parent.Width - 82
+                                                      Y: =350
+                                                - lblPunchExecutiveHeatmapLegend:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      Color: =varTheme_TextMuted
+                                                      Height: =22
+                                                      Size: =8
+                                                      Text: ="LOW       MEDIUM       HIGH       CRITICAL"
+                                                      Width: =Parent.Width - 48
+                                                      X: =24
+                                                      Y: =386
+                                                - lblPunchExecutiveHeatmapState:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      Color: =If(!IsBlank(varPunchDashboardError), varTheme_Red, varTheme_TextMuted)
+                                                      Height: =80
+                                                      Text: =If(varPunchDashboardLoading, "Loading Punch heatmap...", If(!IsBlank(varPunchDashboardError), "Heatmap unavailable.", "No Punch data available."))
+                                                      Visible: =varPunchDashboardLoading || !IsBlank(varPunchDashboardError) || CountRows(colPunchExecutiveHeatmapRows) = 0
                                                       Width: =Parent.Width - 48
                                                       X: =24
                                                       Y: =(Parent.Height - Self.Height) / 2
@@ -4711,6 +4907,11 @@ Screens:
               Clear(colPunchDashboardInsights);
               Clear(colPunchDashboardSubsystems);
               Clear(colPunchDashboardSubcontractors);
+              Clear(colPunchExecutiveHeatmapRows);
+              Clear(colPunchExecutiveHeatmapColumns);
+              Clear(colPunchExecutiveHeatmapCells);
+              Set(varPunchDrillSubsystemCode, "");
+              Set(varPunchDrillCategoryCode, "");
 
               // Load project punch templates only when the local catalog is empty.
               If(
@@ -4926,6 +5127,50 @@ Screens:
                                           StatusColor: Coalesce(Text(Value.StatusColor), "#64748B"),
                                           PunchCount: Value(Coalesce(Text(Value.PunchCount), "0"))
                                       }
+                                  )
+                              );
+
+                              ClearCollect(
+                                  colPunchExecutiveHeatmapColumns,
+                                  SortByColumns(
+                                      AddColumns(
+                                          GroupBy(colPunchDashboardSubsystems, SubsystemCode, SubsystemRows),
+                                          SubsystemName, First(SubsystemRows).SubsystemName,
+                                          PunchCount, Sum(SubsystemRows, PunchCount)
+                                      ),
+                                      "SubsystemCode",
+                                      SortOrder.Ascending
+                                  )
+                              );
+
+                              ClearCollect(
+                                  colPunchExecutiveHeatmapRows,
+                                  SortByColumns(
+                                      AddColumns(
+                                          GroupBy(colPunchDashboardSubsystems, CategoryCode, CategoryRows),
+                                          CategoryName, First(CategoryRows).CategoryName,
+                                          PunchCount, Sum(CategoryRows, PunchCount)
+                                      ),
+                                      "CategoryCode",
+                                      SortOrder.Ascending
+                                  )
+                              );
+
+                              Clear(colPunchExecutiveHeatmapCells);
+                              ForAll(
+                                  colPunchExecutiveHeatmapRows As _row,
+                                  ForAll(
+                                      colPunchExecutiveHeatmapColumns As _column,
+                                      Collect(
+                                          colPunchExecutiveHeatmapCells,
+                                          {
+                                              SubsystemCode: _column.SubsystemCode,
+                                              SubsystemName: _column.SubsystemName,
+                                              CategoryCode: _row.CategoryCode,
+                                              CategoryName: _row.CategoryName,
+                                              PunchCount: Sum(Filter(colPunchDashboardSubsystems, SubsystemCode = _column.SubsystemCode && CategoryCode = _row.CategoryCode), PunchCount)
+                                          }
+                                      )
                                   )
                               )
                           );
@@ -5554,6 +5799,9 @@ Screens:
               Clear(colPunchDashboardInsights);
               Clear(colPunchDashboardSubsystems);
               Clear(colPunchDashboardSubcontractors);
+              Clear(colPunchExecutiveHeatmapRows);
+              Clear(colPunchExecutiveHeatmapColumns);
+              Clear(colPunchExecutiveHeatmapCells);
 
               // Punch filters reset
               Set(varPunchCatalogs_ProjectId, Blank());
