@@ -1,6 +1,6 @@
 # Executive Dashboard Integration Checklist RC1
 
-Status: **BLOCKED — RC1-01 OPEN**
+Status: **BLOCKED — RC1-01 UNDER CONTRACT ANALYSIS**
 
 ## Release identity
 
@@ -41,7 +41,7 @@ Status: **BLOCKED — RC1-01 OPEN**
 - [ ] No broken `Select` or `Navigate` references.
 - [ ] Exactly one Dashboard Bundle call.
 - [ ] No direct `Warroom_Punches_Filtered_Paged` call in Home_1.
-- [ ] All five canonical sections are parsed. **BLOCKED in audited endpoint.**
+- [ ] Approved distribution authority/equivalence decision is recorded. **DATA CONTRACT AMBIGUITY — FUNCTIONAL EQUIVALENCE NOT PROVEN.**
 
 ## Functional integration
 

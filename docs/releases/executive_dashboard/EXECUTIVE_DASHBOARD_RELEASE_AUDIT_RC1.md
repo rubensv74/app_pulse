@@ -71,9 +71,9 @@ The exact path-level inventory is recorded in the RC1 changelog.
 | Direct paged Flow in Home_1 | 0 calls | PASS |
 | Rollback feasibility | Baseline and per-EPIC commits retained; SQL rollback defined | PASS |
 
-## Blocking finding RC1-01
+## Finding RC1-01 — under contract analysis
 
-Severity: **RELEASE BLOCKER**
+Classification: **DATA CONTRACT AMBIGUITY — FUNCTIONAL EQUIVALENCE NOT PROVEN**
 
 The v4 SQL payload exposes all five canonical sections, but Home_1 consumes only four explicitly:
 
@@ -85,15 +85,14 @@ The v4 SQL payload exposes all five canonical sections, but Home_1 consumes only
 
 Home_1 currently reconstructs the initial Donut distribution from the backward-compatible `subsystems` extension. This preserves visible behavior but violates the approved requirement that Home_1 consume the five canonical payload sections and leaves `distribution` contract drift undetected.
 
-Required remediation before a passing audit:
+Direct replacement is not approved. `distribution` is a global Status aggregate from the CategoryStatus snapshot table, while the current Home_1 distribution is derived from the Subsystem×Category×Status table and becomes cell-specific after Heatmap selection. Functional equivalence depends on snapshot-generator rules and runtime population reconciliation that are not present in the repository.
 
-1. parse `_bundle.distribution` into a typed dashboard collection;
-2. add project/template/refresh reset coverage;
-3. initialize and clear-selection restore the Donut from that collection;
-4. retain cell-specific distribution derivation in memory;
-5. repeat static audit and Studio integration compilation.
+The finding is analyzed in:
 
-No remediation was applied during this audit-only Gate.
+- `EXECUTIVE_DASHBOARD_DISTRIBUTION_LINEAGE_ANALYSIS.md`;
+- `EXECUTIVE_DASHBOARD_DISTRIBUTION_RECONCILIATION.md`.
+
+Required evidence is the snapshot generator definition plus controlled, read-only per-status/grand-total/null/zero reconciliation for representative SnapshotRunIds. No remediation was applied.
 
 ## Additional integration risks
 

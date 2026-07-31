@@ -100,4 +100,4 @@ Flow:
 
 ## Open release issue
 
-RC1-01: Home_1 does not explicitly parse the canonical `distribution` section. Release remains blocked.
+RC1-01: **DATA CONTRACT AMBIGUITY — FUNCTIONAL EQUIVALENCE NOT PROVEN**. Direct replacement is not approved. See the distribution lineage and reconciliation analyses.
