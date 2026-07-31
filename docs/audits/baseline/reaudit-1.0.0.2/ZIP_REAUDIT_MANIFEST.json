@@ -1,0 +1,30 @@
+{
+  "auditStatus": "FAIL",
+  "eligibleForOfficialUnpack": false,
+  "expectedPath": "baseline/incoming/baseline_pulse_DEV_unmanaged_1_0_0_2_20260731.zip",
+  "expectedPathExists": false,
+  "incomingZipCount": 2,
+  "candidates": [
+    {
+      "path": "baseline/incoming/baseline_pulse_1_0_0_1.zip",
+      "sizeBytes": 4924908,
+      "sha256": "C80249D24ECAA1BDF646595B00C2B8E951C4C8AB9825CA7DE5D7233B9D48B375",
+      "status": "PREVIOUS_REJECTED_EVIDENCE"
+    },
+    {
+      "path": "baseline/incoming/baseline_pulse_1_0_0_2.zip",
+      "sizeBytes": 5033101,
+      "sha256": "7E7646877DB8DF38CFCB5C2BF7896C598C4E772A1E2F667ACFDD9134C3959D77",
+      "status": "AMBIGUOUS_NAME_MISMATCH"
+    }
+  ],
+  "preservedPath": null,
+  "physicalAuditExecuted": false,
+  "officialUnpackExecuted": false,
+  "criticalFindings": [
+    "Expected candidate path does not exist",
+    "baseline/incoming contains two ZIP files instead of exactly one",
+    "The new physical ZIP has a different name from the declared candidate"
+  ],
+  "generatedAtUtc": "2026-07-31T10:43:12Z"
+}

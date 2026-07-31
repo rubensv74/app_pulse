@@ -1,0 +1,28 @@
+{
+  "auditStatus": "FAIL",
+  "eligibleForOfficialUnpack": false,
+  "zipPath": "baseline/exported/2026-07-31/baseline_pulse_1_0_0_1.zip",
+  "zipSha256": "C80249D24ECAA1BDF646595B00C2B8E951C4C8AB9825CA7DE5D7233B9D48B375",
+  "solutionUniqueName": "baseline_pulse",
+  "solutionDisplayName": "BASELINE_PULSE",
+  "solutionVersion": "1.0.0.1",
+  "packageType": "Unmanaged",
+  "publisher": "pulse / PULSE",
+  "canvasAppCount": 1,
+  "screenCount": 12,
+  "componentCount": 27,
+  "workflowCount": 2,
+  "connectionReferenceCount": 4,
+  "environmentVariableCount": 0,
+  "unexpectedComponents": ["Screen1", "Component ------------", "cmp_DetailDrawer_old"],
+  "unknownDependencies": ["71 externally referenced Power Automate flows", "runtime connection bindings", "environment configuration strategy"],
+  "criticalFindings": [
+    "Canvas App references 73 flows but only 2 workflows are packaged",
+    "Warroom_ExportPunchesToExcel is absent; only the Codex variant is packaged",
+    "Four referenced connection references are not solution root components",
+    "ZIP Canvas App does not match the repository Canvas App hash",
+    "Unexpected residual-looking screen/components are unexplained"
+  ],
+  "warnings": ["PAC CLI unavailable", "Git backup branch/tag could not be created because .git was read-only"],
+  "generatedAtUtc": "2026-07-31T10:27:50Z"
+}
