@@ -33,6 +33,9 @@ The canonical payload domains are `kpis`, `matrix`, `distribution`, `detail`, an
 
 Rows exclude `HOLD` and `VOID` and are deduplicated by `PunchId` where hierarchy joins expose multiple element rows.
 
+## Flow request contract
+
+The single Dashboard Flow invokes `warroom.usp_GetOrRefreshPunchDashboardBundle` with `ProjectId`, `TemplateId`, `RequestedBy`, `ForceRefresh`, `MaxSnapshotAgeMinutes`, and `KeepCompletedRuns`. The orchestrator captures snapshot-generation output internally and exposes only the final Bundle JSON to Power Apps.
 ## Ownership and compatibility
 
 - `Home_1` filters, sorts, paginates, selects and exports this in-memory subset.
