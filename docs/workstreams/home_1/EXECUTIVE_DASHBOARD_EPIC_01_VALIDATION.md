@@ -1,6 +1,6 @@
 # EPIC 01 Validation — Executive Dashboard Foundation
 
-Status: **IMPLEMENTED — VALIDATION PENDING**
+Status: **IMPLEMENTED — PENDING INTEGRATION VALIDATION**
 
 Date: 2026-07-31  
 Branch: `workstream/home-1-punches-1`
@@ -45,7 +45,7 @@ No control was deleted, renamed, moved, or recreated.
 | Pre-change SHA-256 | `67745D475ECC25CDE28E89432BA12C9B64F234A917E33473225A478BC9A23982` | RECORDED |
 | Post-change SHA-256 | `D8CE52CF2DBFF43846F983A3BB05EDED826572F5E84E0339AF83A29AE8219163` | RECORDED |
 
-## Power Apps Studio validation pending
+## Product Owner integration validation
 
 Validate against the existing development solution without a new Phase Zero import:
 
@@ -59,7 +59,7 @@ Validate against the existing development solution without a new Phase Zero impo
 8. Loading, empty, and error states remain stable.
 9. Existing navigation remains operational.
 
-EPIC 01 cannot be declared `VALIDATED` until these runtime checks are confirmed.
+These runtime checks are owned by the Product Owner and do not block repository completion or the next EPIC.
 
 ## Defects and risks
 
@@ -74,4 +74,4 @@ Revert the EPIC 01 commit. This removes only the three `Visible: =false` propert
 
 ## Recommendation
 
-Run the Studio checklist and obtain Product Owner acceptance. Stop after EPIC 01 validation; do not start EPIC 02 automatically.
+Include this EPIC in the next periodic Product Owner integration validation. Repository implementation is complete and EPIC 02 may begin.

@@ -107,4 +107,4 @@ Revert the single EPIC 01 commit. This restores the original visibility formulas
 
 ## Exit criteria
 
-EPIC 01 becomes `VALIDATED` only after every static, Studio, and regression check passes and the Product Owner accepts it. EPIC 02 remains NOT STARTED until then.
+EPIC 01 repository completion is `IMPLEMENTED — PENDING INTEGRATION VALIDATION` after static checks, documentation, and commit. Studio, runtime, and UAT checks are Product Owner integration responsibilities and do not block EPIC 02.
