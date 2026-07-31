@@ -3212,6 +3212,7 @@ Screens:
                                           FillPortions: =0
                                           Height: =132
                                           LayoutMinHeight: =132
+                                          Visible: =false
                                           Width: =Parent.Width
                                         Children:
                                           - lblPunchKpiSectionTitle:
@@ -3367,6 +3368,365 @@ Screens:
                                                             RadiusTopRight: =14
                                                             Text: =""
                                                             Width: =Parent.Width
+                                    - conPunchExecutiveKpiStrip:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: ManualLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          Fill: =Color.Transparent
+                                          FillPortions: =0
+                                          Height: =108
+                                          LayoutMinHeight: =108
+                                          Width: =Parent.Width
+                                        Children:
+                                          - conPunchExecutiveKpiTotal:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =varTheme_Border
+                                                BorderThickness: =1
+                                                Fill: =varTheme_Surface
+                                                Height: =104
+                                                RadiusBottomLeft: =12
+                                                RadiusBottomRight: =12
+                                                RadiusTopLeft: =12
+                                                RadiusTopRight: =12
+                                                Width: =(Parent.Width - 48) / 5
+                                              Children:
+                                                - lblPunchExecutiveKpiTotalTitle:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Color: =varTheme_TextMuted
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =18
+                                                      Size: =9
+                                                      Text: ="TOTAL PUNCHES"
+                                                      Width: =Parent.Width - 28
+                                                      X: =14
+                                                      Y: =14
+                                                - lblPunchExecutiveKpiTotalValue:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Color: =varTheme_Text
+                                                      FontWeight: =FontWeight.Bold
+                                                      Height: =38
+                                                      Size: =24
+                                                      Text: ="—"
+                                                      Width: =Parent.Width - 28
+                                                      X: =14
+                                                      Y: =38
+                                          - conPunchExecutiveKpiOpen:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =varTheme_Border
+                                                BorderThickness: =1
+                                                Fill: =varTheme_Surface
+                                                Height: =104
+                                                RadiusBottomLeft: =12
+                                                RadiusBottomRight: =12
+                                                RadiusTopLeft: =12
+                                                RadiusTopRight: =12
+                                                Width: =conPunchExecutiveKpiTotal.Width
+                                                X: =conPunchExecutiveKpiTotal.X + conPunchExecutiveKpiTotal.Width + 12
+                                              Children:
+                                                - lblPunchExecutiveKpiOpenTitle:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Color: =varTheme_TextMuted
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =18
+                                                      Size: =9
+                                                      Text: ="OPEN PUNCHES"
+                                                      Width: =Parent.Width - 28
+                                                      X: =14
+                                                      Y: =14
+                                                - lblPunchExecutiveKpiOpenValue:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Color: =varTheme_Text
+                                                      FontWeight: =FontWeight.Bold
+                                                      Height: =38
+                                                      Size: =24
+                                                      Text: ="—"
+                                                      Width: =Parent.Width - 28
+                                                      X: =14
+                                                      Y: =38
+                                          - conPunchExecutiveKpiOverdue:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =varTheme_Border
+                                                BorderThickness: =1
+                                                Fill: =varTheme_Surface
+                                                Height: =104
+                                                RadiusBottomLeft: =12
+                                                RadiusBottomRight: =12
+                                                RadiusTopLeft: =12
+                                                RadiusTopRight: =12
+                                                Width: =conPunchExecutiveKpiTotal.Width
+                                                X: =conPunchExecutiveKpiOpen.X + conPunchExecutiveKpiOpen.Width + 12
+                                              Children:
+                                                - lblPunchExecutiveKpiOverdueTitle:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Color: =varTheme_TextMuted
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =18
+                                                      Size: =9
+                                                      Text: ="OVERDUE PUNCHES"
+                                                      Width: =Parent.Width - 28
+                                                      X: =14
+                                                      Y: =14
+                                                - lblPunchExecutiveKpiOverdueValue:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Color: =varTheme_Text
+                                                      FontWeight: =FontWeight.Bold
+                                                      Height: =38
+                                                      Size: =24
+                                                      Text: ="—"
+                                                      Width: =Parent.Width - 28
+                                                      X: =14
+                                                      Y: =38
+                                          - conPunchExecutiveKpiClosed:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =varTheme_Border
+                                                BorderThickness: =1
+                                                Fill: =varTheme_Surface
+                                                Height: =104
+                                                RadiusBottomLeft: =12
+                                                RadiusBottomRight: =12
+                                                RadiusTopLeft: =12
+                                                RadiusTopRight: =12
+                                                Width: =conPunchExecutiveKpiTotal.Width
+                                                X: =conPunchExecutiveKpiOverdue.X + conPunchExecutiveKpiOverdue.Width + 12
+                                              Children:
+                                                - lblPunchExecutiveKpiClosedTitle:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Color: =varTheme_TextMuted
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =18
+                                                      Size: =9
+                                                      Text: ="CLOSED PUNCHES"
+                                                      Width: =Parent.Width - 28
+                                                      X: =14
+                                                      Y: =14
+                                                - lblPunchExecutiveKpiClosedValue:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Color: =varTheme_Text
+                                                      FontWeight: =FontWeight.Bold
+                                                      Height: =38
+                                                      Size: =24
+                                                      Text: ="—"
+                                                      Width: =Parent.Width - 28
+                                                      X: =14
+                                                      Y: =38
+                                          - conPunchExecutiveKpiWeek:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =varTheme_Border
+                                                BorderThickness: =1
+                                                Fill: =varTheme_Surface
+                                                Height: =104
+                                                RadiusBottomLeft: =12
+                                                RadiusBottomRight: =12
+                                                RadiusTopLeft: =12
+                                                RadiusTopRight: =12
+                                                Width: =conPunchExecutiveKpiTotal.Width
+                                                X: =conPunchExecutiveKpiClosed.X + conPunchExecutiveKpiClosed.Width + 12
+                                              Children:
+                                                - lblPunchExecutiveKpiWeekTitle:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Color: =varTheme_TextMuted
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =18
+                                                      Size: =9
+                                                      Text: ="THIS WEEK CLOSED"
+                                                      Width: =Parent.Width - 28
+                                                      X: =14
+                                                      Y: =14
+                                                - lblPunchExecutiveKpiWeekValue:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Color: =varTheme_Text
+                                                      FontWeight: =FontWeight.Bold
+                                                      Height: =38
+                                                      Size: =24
+                                                      Text: ="—"
+                                                      Width: =Parent.Width - 28
+                                                      X: =14
+                                                      Y: =38
+                                    - conPunchExecutiveAnalyticsWorkspace:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: ManualLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          Fill: =Color.Transparent
+                                          FillPortions: =0
+                                          Height: =420
+                                          LayoutMinHeight: =420
+                                          Width: =Parent.Width
+                                        Children:
+                                          - conPunchExecutiveHeatmapSlot:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =varTheme_Border
+                                                BorderThickness: =1
+                                                Fill: =varTheme_Surface
+                                                Height: =Parent.Height
+                                                RadiusBottomLeft: =14
+                                                RadiusBottomRight: =14
+                                                RadiusTopLeft: =14
+                                                RadiusTopRight: =14
+                                                Width: =(Parent.Width - 12) * 0.7
+                                              Children:
+                                                - lblPunchExecutiveHeatmapSlotTitle:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Color: =varTheme_Text
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =26
+                                                      Size: =14
+                                                      Text: ="Punches by Subsystem and Category"
+                                                      Width: =Parent.Width - 36
+                                                      X: =18
+                                                      Y: =14
+                                                - lblPunchExecutiveHeatmapSlotState:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      Color: =varTheme_TextMuted
+                                                      Height: =80
+                                                      Text: ="Executive Heatmap · EPIC 03"
+                                                      Width: =Parent.Width - 48
+                                                      X: =24
+                                                      Y: =(Parent.Height - Self.Height) / 2
+                                          - conPunchExecutiveRightColumn:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                Fill: =Color.Transparent
+                                                Height: =Parent.Height
+                                                Width: =(Parent.Width - 12) * 0.3
+                                                X: =conPunchExecutiveHeatmapSlot.Width + 12
+                                              Children:
+                                                - conPunchExecutiveDonutSlot:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: ManualLayout
+                                                    Properties:
+                                                      BorderColor: =varTheme_Border
+                                                      BorderThickness: =1
+                                                      Fill: =varTheme_Surface
+                                                      Height: =(Parent.Height - 12) * 0.56
+                                                      RadiusBottomLeft: =14
+                                                      RadiusBottomRight: =14
+                                                      RadiusTopLeft: =14
+                                                      RadiusTopRight: =14
+                                                      Width: =Parent.Width
+                                                    Children:
+                                                      - lblPunchExecutiveDonutSlotTitle:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =24
+                                                            Size: =14
+                                                            Text: ="Punches by Status"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =14
+                                                      - lblPunchExecutiveDonutSlotState:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Align: =Align.Center
+                                                            Color: =varTheme_TextMuted
+                                                            Height: =60
+                                                            Text: ="Executive Donut · EPIC 04"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =(Parent.Height - Self.Height) / 2
+                                                - conPunchExecutiveDetailSlot:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: ManualLayout
+                                                    Properties:
+                                                      BorderColor: =varTheme_Border
+                                                      BorderThickness: =1
+                                                      Fill: =varTheme_Surface
+                                                      Height: =(Parent.Height - 12) * 0.44
+                                                      RadiusBottomLeft: =14
+                                                      RadiusBottomRight: =14
+                                                      RadiusTopLeft: =14
+                                                      RadiusTopRight: =14
+                                                      Width: =Parent.Width
+                                                      Y: =conPunchExecutiveDonutSlot.Height + 12
+                                                    Children:
+                                                      - lblPunchExecutiveDetailSlotTitle:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =24
+                                                            Size: =14
+                                                            Text: ="Selected Cell Details"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =14
+                                                      - lblPunchExecutiveDetailSlotState:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Align: =Align.Center
+                                                            Color: =varTheme_TextMuted
+                                                            Height: =60
+                                                            Text: ="No selection"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =(Parent.Height - Self.Height) / 2
+                                    - conPunchExecutiveGridWorkspace:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: ManualLayout
+                                        Properties:
+                                          BorderColor: =varTheme_Border
+                                          BorderThickness: =1
+                                          Fill: =varTheme_Surface
+                                          FillPortions: =0
+                                          Height: =292
+                                          LayoutMinHeight: =292
+                                          RadiusBottomLeft: =14
+                                          RadiusBottomRight: =14
+                                          RadiusTopLeft: =14
+                                          RadiusTopRight: =14
+                                          Width: =Parent.Width
+                                        Children:
+                                          - lblPunchExecutiveGridTitle:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Color: =varTheme_Text
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =26
+                                                Size: =14
+                                                Text: ="Punches List"
+                                                Width: =240
+                                                X: =18
+                                                Y: =14
+                                          - lblPunchExecutiveGridState:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Align: =Align.Center
+                                                Color: =varTheme_TextMuted
+                                                Height: =80
+                                                Text: ="Executive Grid · EPIC 05"
+                                                Width: =Parent.Width - 48
+                                                X: =24
+                                                Y: =(Parent.Height - Self.Height) / 2
                                     - conPunchTimelineCard:
                                         Control: GroupContainer@1.5.0
                                         Variant: ManualLayout
@@ -3692,6 +4052,7 @@ Screens:
                                           RadiusBottomRight: =16
                                           RadiusTopLeft: =16
                                           RadiusTopRight: =16
+                                          Visible: =false
                                           Width: =Parent.Width
                                         Children:
                                           - lblPunchMatrixTitle:
