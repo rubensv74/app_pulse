@@ -43,7 +43,7 @@ The FDS requires every Phase Zero check to pass before controls are modified. EP
 | Current drilldown card | Supersede with FDS detail panel/grid | EPIC 04/05 |
 | Navigation | Preserve until navigation EPIC | EPIC 06 |
 
-## Major incompatibility in `bfc38f2`
+## Resolved incompatibility from `bfc38f2`
 
 The earlier incremental drilldown conflicts with the approved FDS:
 
@@ -53,7 +53,12 @@ The earlier incremental drilldown conflicts with the approved FDS:
 - The source was not rebuilt into the packaged `.msapp`, so the commit is not independently deployable.
 - Its layout does not implement the canonical Donut / Detail / Grid structure.
 
-This commit remains recoverable evidence and was not pushed or merged. It should be reverted or explicitly superseded before EPIC 01; history must not be rewritten silently.
+Resolved by normal history-preserving revert commit `1377cd0`. Static verification confirms:
+
+- temporary loader, panel and collection are absent;
+- `scr_Home_1.pa.yaml` matches baseline commit `453cd8e` exactly;
+- both revisions reference Git blob `2222d2f6a93b04dfbb7f737ef6b7e84227d24133`;
+- no history was rewritten and nothing was pushed or merged.
 
 ## Phase Zero modifications
 
@@ -66,7 +71,8 @@ No Canvas, Flow, or SQL control was modified. This report is documentation only.
 3. Confirm Home_1 opens and project, template, and refresh work.
 4. Confirm the dashboard bundle Flow completes in development.
 5. Record Product Owner acceptance of Phase Zero.
-6. Authorize either `git revert bfc38f2` or a superseding EPIC 01 change.
+
+The incompatible increment has already been reverted. The remaining gate is runtime evidence and Product Owner acceptance of Phase Zero.
 
 ## Rollback
 
