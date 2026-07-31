@@ -1,0 +1,123 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sqldw": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsqldw_ce25b"
+        },
+        "api": {
+          "name": "shared_sqldw"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "ef61ab78-acaf-430e-8cf7-5c9aacf4c452"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "number": {
+                  "title": "ProjectId",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Escriba un número.",
+                  "x-ms-content-hint": "NUMBER"
+                }
+              },
+              "required": [
+                "number"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Ejecutar_una_consulta_SQL_(V2)": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "9b6d9b96-2119-41ae-b0c4-08fb39f62824"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+              "connectionName": "shared_sqldw",
+              "operationId": "ExecutePassThroughNativeQueryV2"
+            },
+            "parameters": {
+              "server": "default",
+              "database": "default",
+              "query/query": "select [Name] as 'Discipline' from Disciplines"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "Redactar": {
+          "runAfter": {
+            "Ejecutar_una_consulta_SQL_(V2)": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "c2e24f6a-ebaa-4659-9270-7ace63e82f53"
+          },
+          "type": "Compose",
+          "inputs": "@outputs('Ejecutar_una_consulta_SQL_(V2)')?['body/resultsets/Table1']"
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Redactar": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "6b56bd34-228b-4f17-8e19-1320af93a69a"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "resultjson": "@{outputs('Redactar')}"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resultjson": {
+                  "title": "resultJson",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

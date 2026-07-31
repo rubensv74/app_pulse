@@ -1,0 +1,281 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sqldw": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsqldw_ce25b"
+        },
+        "api": {
+          "name": "shared_sqldw"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "25a00933-2a66-43c3-8f85-e7f5222b79b1"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "number": {
+                  "title": "ProjectId",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "text": {
+                  "title": "EntityType",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "number_1": {
+                  "title": "RecordId",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "boolean": {
+                  "title": "Flag1",
+                  "type": "boolean",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please select yes or no",
+                  "x-ms-content-hint": "BOOLEAN"
+                },
+                "boolean_1": {
+                  "title": "Flag2",
+                  "type": "boolean",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please select yes or no",
+                  "x-ms-content-hint": "BOOLEAN"
+                },
+                "text_1": {
+                  "title": "Text1",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_2": {
+                  "title": "Text2",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "date": {
+                  "title": "Date1",
+                  "type": "string",
+                  "format": "date",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter or select a date (YYYY-MM-DD)",
+                  "x-ms-content-hint": "DATE"
+                },
+                "number_2": {
+                  "title": "Number1",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "text_3": {
+                  "title": "CustomJson",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "email": {
+                  "title": "UserEmail",
+                  "type": "string",
+                  "format": "email",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter an e-mail address",
+                  "x-ms-content-hint": "EMAIL"
+                }
+              },
+              "required": [
+                "number",
+                "text",
+                "number_1",
+                "boolean",
+                "boolean_1",
+                "text_1",
+                "text_2",
+                "date",
+                "number_2",
+                "text_3",
+                "email"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Condition": {
+          "actions": {
+            "Execute_stored_procedure_(V2)": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "739200fd-feb1-4446-b1ad-bc424d9a9d25"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                  "connectionName": "shared_sqldw",
+                  "operationId": "ExecuteProcedureV2"
+                },
+                "parameters": {
+                  "server": "default",
+                  "database": "default",
+                  "procedure": "[warroom].[usp_UpsertTaskCustom]",
+                  "parameters/CustomDate1": "@triggerBody()['date']",
+                  "parameters/CustomFlag1": "@triggerBody()['boolean']",
+                  "parameters/CustomFlag2": "@triggerBody()['boolean_1']",
+                  "parameters/CustomJson": "@triggerBody()['text_3']",
+                  "parameters/CustomNumber1": "@triggerBody()['number_2']",
+                  "parameters/CustomText1": "@triggerBody()['text_1']",
+                  "parameters/CustomText2": "@triggerBody()['text_2']",
+                  "parameters/ProjectId": "@triggerBody()['number']",
+                  "parameters/TaskId": "@triggerBody()['number_1']",
+                  "parameters/UserEmail": "@triggerBody()['email']"
+                },
+                "authentication": {
+                  "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+                  "type": "Raw"
+                }
+              }
+            },
+            "Respond_to_a_Power_App_or_flow": {
+              "runAfter": {
+                "Execute_stored_procedure_(V2)": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "87b895f0-590c-43cd-8f9f-acb717d5e4ca"
+              },
+              "type": "Response",
+              "kind": "PowerApp",
+              "inputs": {
+                "statusCode": 200,
+                "body": {
+                  "result": "@{body('Execute_stored_procedure_(V2)')?['ResultSets']?['Table1']}"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "title": "result",
+                      "x-ms-dynamically-added": true,
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "runAfter": {},
+          "else": {
+            "actions": {
+              "Execute_stored_procedure_(V2)_2": {
+                "runAfter": {},
+                "metadata": {
+                  "operationMetadataId": "d06a49e0-777c-41e2-930a-95228f200da0"
+                },
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "host": {
+                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                    "connectionName": "shared_sqldw",
+                    "operationId": "ExecuteProcedureV2"
+                  },
+                  "parameters": {
+                    "server": "default",
+                    "database": "default",
+                    "procedure": "[warroom].[usp_UpsertPunchCustom]",
+                    "parameters/CustomDate1": "@triggerBody()['date']",
+                    "parameters/CustomFlag1": "@triggerBody()['boolean']",
+                    "parameters/CustomJson": "@triggerBody()['text_3']",
+                    "parameters/CustomNumber1": "@triggerBody()['number_2']",
+                    "parameters/CustomText1": "@triggerBody()['text_1']",
+                    "parameters/ProjectId": "@triggerBody()['number']",
+                    "parameters/PunchId": "@triggerBody()['number_1']",
+                    "parameters/UserEmail": "@triggerBody()['email']"
+                  },
+                  "authentication": {
+                    "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+                    "type": "Raw"
+                  }
+                }
+              },
+              "Respond_to_a_Power_App_or_flow_2": {
+                "runAfter": {
+                  "Execute_stored_procedure_(V2)_2": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "4cd5041e-d1b5-45b6-9ea3-7805427f54f6"
+                },
+                "type": "Response",
+                "kind": "PowerApp",
+                "inputs": {
+                  "statusCode": 200,
+                  "body": {
+                    "result": "@{body('Execute_stored_procedure_(V2)_2')?['ResultSets']?['Table1']}"
+                  },
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "result": {
+                        "title": "result",
+                        "x-ms-dynamically-added": true,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "expression": {
+            "equals": [
+              "@triggerBody()['text']",
+              "TASK"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "6cad2740-a362-4723-858b-bff21c431a2d"
+          },
+          "type": "If"
+        }
+      },
+      "outputs": {}
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

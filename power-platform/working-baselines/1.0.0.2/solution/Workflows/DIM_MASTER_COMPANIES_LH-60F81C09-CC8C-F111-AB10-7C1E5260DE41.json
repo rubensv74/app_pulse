@@ -1,0 +1,661 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sql_4": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "pls_sharedsql_395d5"
+        },
+        "api": {
+          "name": "shared_sql"
+        }
+      },
+      "shared_sqldw_1": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsqldw_8d7b12c454"
+        },
+        "api": {
+          "name": "shared_sqldw"
+        }
+      },
+      "shared_sqldw": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsqldw_ce25b"
+        },
+        "api": {
+          "name": "shared_sqldw"
+        }
+      },
+      "shared_office365_1": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "pls_sharedoffice365_48d03"
+        },
+        "api": {
+          "name": "shared_office365"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "950f365a-6e81-4e6b-9c98-3ba78c054334"
+          },
+          "type": "Request",
+          "kind": "Button",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "required": []
+            }
+          }
+        }
+      },
+      "actions": {
+        "server": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "3d495c6a-8732-4e0e-8dc9-f302b718bfd4"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "myServer",
+                "type": "string",
+                "value": "yywtcr4rbjzefkffamp4ueybre-osj6iyszz42ehj62uwz3xuc72e.datawarehouse.fabric.microsoft.com"
+              }
+            ]
+          }
+        },
+        "database": {
+          "runAfter": {
+            "server": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "a83c4293-8977-4a86-a374-05ba6ba5bf6c"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "myDB",
+                "type": "string",
+                "value": "LH_162_HCS_01"
+              }
+            ]
+          }
+        },
+        "procedure": {
+          "runAfter": {
+            "database": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "c78d21de-3fa9-4412-900f-435b766a3f94"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "mySP",
+                "type": "string",
+                "value": "dbo.usp_Upsert_MasterCompany_FromLakehouse"
+              }
+            ]
+          }
+        },
+        "pagesize": {
+          "runAfter": {
+            "procedure": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "395713d7-2d84-4d33-b778-39a89a0e5940"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "varPageSize",
+                "type": "integer",
+                "value": 1000
+              }
+            ]
+          }
+        },
+        "offset": {
+          "runAfter": {
+            "pagesize": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "89741903-b5a7-4a8e-a4c8-67bb3bff55ae"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "varOffset",
+                "type": "integer",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "rows_returned": {
+          "runAfter": {
+            "offset": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "0c1d4485-9146-492c-bf44-4d218be89dd9"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "varRowsReturned",
+                "type": "integer",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "rows_processed": {
+          "runAfter": {
+            "rows_returned": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "0babc3b5-22fe-4563-b324-2bc2e5261464"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "varTotalRowsProcessed",
+                "type": "integer",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "run_Id": {
+          "runAfter": {
+            "rows_processed": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "21d226ec-0956-4256-966a-71a26de86028"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "varRunId",
+                "type": "string",
+                "value": "@{guid()}"
+              }
+            ]
+          }
+        },
+        "start_date": {
+          "runAfter": {
+            "run_Id": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "f38efc17-145f-4b20-b7f3-6c4782509489"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "varRunStartDate",
+                "type": "string",
+                "value": "@{utcNow()}"
+              }
+            ]
+          }
+        },
+        "error_message": {
+          "runAfter": {
+            "process_name": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "45fc3560-e516-4ef5-a13f-3992b146d43d"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "varSyncErrorMessage",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "process_name": {
+          "runAfter": {
+            "start_date": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "a4470b18-2076-447c-bb76-db1df8ea89ba"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "varProcessName",
+                "type": "string",
+                "value": "DIM_MASTER_COMPANIES_LH"
+              }
+            ]
+          }
+        },
+        "Scope_-_Sync_Companies": {
+          "actions": {
+            "Execute_SQL_Count_Lakehouse": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "3810f424-3505-432a-a866-c9677ac523eb"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sql",
+                  "connectionName": "shared_sql_4",
+                  "operationId": "ExecutePassThroughNativeQuery_V2"
+                },
+                "parameters": {
+                  "server": "@variables('myServer')",
+                  "database": "@variables('myDB')",
+                  "query/query": "SELECT COUNT(*) AS TotalRows\nFROM\n(\n    SELECT\n        ID_COMPANY,\n        MAX(DS_COMPANY) AS DS_COMPANY,\n        MAX(DS_SHORT_COMPANY) AS DS_SHORT_COMPANY\n    FROM corp_itcs_trd272.DIM_MVW_MASTER_COMPANIES\n    WHERE ID_COMPANY IS NOT NULL\n    GROUP BY ID_COMPANY\n) d;"
+                },
+                "authentication": {
+                  "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+                  "type": "Raw"
+                }
+              }
+            },
+            "Set_variable_3": {
+              "runAfter": {
+                "Execute_SQL_Count_Lakehouse": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "2d34edf6-650a-4d98-8c8e-e54e6407bf6f"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "varExpectedRows",
+                "value": "@int(\r\n    first(\r\n        body('Execute_SQL_Count_Lakehouse')?['ResultSets']?['Table1']\r\n    )?['TotalRows']\r\n)"
+              }
+            },
+            "Do_until": {
+              "actions": {
+                "Execute_a_SQL_query_(V2)": {
+                  "runAfter": {
+                    "Compose_-_Lakehouse_paged_query": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "3810f424-3505-432a-a866-c9677ac523eb"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sql",
+                      "connectionName": "shared_sql_4",
+                      "operationId": "ExecutePassThroughNativeQuery_V2"
+                    },
+                    "parameters": {
+                      "server": "@variables('myServer')",
+                      "database": "@variables('myDB')",
+                      "query/query": "@outputs('Compose_-_Lakehouse_paged_query')"
+                    },
+                    "authentication": {
+                      "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+                      "type": "Raw"
+                    }
+                  }
+                },
+                "Set_variable": {
+                  "runAfter": {
+                    "Execute_a_SQL_query_(V2)": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "5373292b-1cbb-440f-b75f-7e5449259775"
+                  },
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "varRowsReturned",
+                    "value": "@length(body('Execute_a_SQL_query_(V2)')?['ResultSets']?['Table1'])"
+                  }
+                },
+                "Condition": {
+                  "actions": {
+                    "Execute_stored_procedure_(V2)": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "7d3cbdc9-da40-47e2-9651-c0ca6d8bc356"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                          "connectionName": "shared_sqldw_1",
+                          "operationId": "ExecuteProcedureV2"
+                        },
+                        "parameters": {
+                          "server": "default",
+                          "database": "default",
+                          "procedure": "[dbo].[usp_Upsert_MasterCompany_FromLakehouse_Batch]",
+                          "parameters/JsonData": "@string(body('Execute_a_SQL_query_(V2)')?['ResultSets']?['Table1'])"
+                        },
+                        "authentication": {
+                          "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+                          "type": "Raw"
+                        }
+                      }
+                    },
+                    "Increment_variable": {
+                      "runAfter": {
+                        "Execute_stored_procedure_(V2)": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "2e4c5349-4610-438f-aca1-d34bba4ed5bf"
+                      },
+                      "type": "IncrementVariable",
+                      "inputs": {
+                        "name": "varTotalRowsProcessed",
+                        "value": "@variables('varRowsReturned')"
+                      }
+                    },
+                    "Increment_variable_2": {
+                      "runAfter": {
+                        "Increment_variable": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "934dac25-5293-47a5-866c-2f9511be3b27"
+                      },
+                      "type": "IncrementVariable",
+                      "inputs": {
+                        "name": "varOffset",
+                        "value": "@variables('varPageSize')"
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "Set_variable": [
+                      "Succeeded"
+                    ]
+                  },
+                  "else": {
+                    "actions": {
+                      "Set_variable_2": {
+                        "runAfter": {},
+                        "metadata": {
+                          "operationMetadataId": "115c904c-6bef-448f-89fb-ec186a1007de"
+                        },
+                        "type": "SetVariable",
+                        "inputs": {
+                          "name": "varTotalRowsProcessed",
+                          "value": "@variables('varExpectedRows')"
+                        }
+                      }
+                    }
+                  },
+                  "expression": {
+                    "greater": [
+                      "@variables('varRowsReturned')",
+                      0
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "85df4fc9-99a5-40ae-b94b-0f5fb58c165d"
+                  },
+                  "type": "If"
+                },
+                "Compose_-_Debug_Start_Iteration": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "e6b21b6b-6c4e-4e7b-972e-b58d716a7f49"
+                  },
+                  "type": "Compose",
+                  "inputs": "@concat(\r\n'START | Offset: ',\r\nvariables('varOffset'),\r\n' | RowsReturned: ',\r\nvariables('varRowsReturned'),\r\n' | Total: ',\r\nvariables('varTotalRowsProcessed')\r\n)"
+                },
+                "Compose_-_Lakehouse_paged_query": {
+                  "runAfter": {
+                    "Compose_-_Debug_Start_Iteration": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "b643672c-feae-470d-87e2-adb875763937"
+                  },
+                  "type": "Compose",
+                  "inputs": "@concat(\r\n'SELECT ID_COMPANY, DS_COMPANY, DS_SHORT_COMPANY\r\nFROM (\r\n    SELECT\r\n        ID_COMPANY,\r\n        DS_COMPANY,\r\n        DS_SHORT_COMPANY,\r\n        ROW_NUMBER() OVER (ORDER BY ID_COMPANY) AS rn\r\n    FROM (\r\n        SELECT\r\n            ID_COMPANY,\r\n            MAX(DS_COMPANY) AS DS_COMPANY,\r\n            MAX(DS_SHORT_COMPANY) AS DS_SHORT_COMPANY\r\n        FROM corp_itcs_trd272.DIM_MVW_MASTER_COMPANIES\r\n        WHERE ID_COMPANY IS NOT NULL\r\n        GROUP BY ID_COMPANY\r\n    ) d\r\n) x\r\nWHERE rn > ', variables('varOffset'), '\r\nAND rn <= ', add(variables('varOffset'), variables('varPageSize')), '\r\nORDER BY rn'\r\n)"
+                },
+                "Compose_-_Debug_Offset": {
+                  "runAfter": {
+                    "Condition": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "051cc13d-71c5-4d6a-b270-ad1a80e1a12c"
+                  },
+                  "type": "Compose",
+                  "inputs": "@concat(\r\n'Offset: ',\r\nvariables('varOffset'),\r\n' | RowsReturned: ',\r\nvariables('varRowsReturned'),\r\n' | Total: ',\r\nvariables('varTotalRowsProcessed')\r\n)"
+                }
+              },
+              "runAfter": {
+                "Set_variable_3": [
+                  "Succeeded"
+                ]
+              },
+              "expression": "@greaterOrEquals(variables('varTotalRowsProcessed'), variables('varExpectedRows'))",
+              "limit": {
+                "count": 100,
+                "timeout": "PT6H"
+              },
+              "metadata": {
+                "operationMetadataId": "bf5dbaef-2385-4d8c-9c53-5ef2f9c23975"
+              },
+              "type": "Until"
+            }
+          },
+          "runAfter": {
+            "expected_rows": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "dc457035-351e-43ff-8b68-aaa2d0c7f08e"
+          },
+          "type": "Scope"
+        },
+        "expected_rows": {
+          "runAfter": {
+            "error_message": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "0e5dbdfc-5e8a-4fff-9cc5-f263eb9c9bde"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "varExpectedRows",
+                "type": "integer"
+              }
+            ]
+          }
+        },
+        "Scope_-_Success_Log": {
+          "actions": {
+            "Execute_a_SQL_query_(V2)_2": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "3810f424-3505-432a-a866-c9677ac523eb"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                  "connectionName": "shared_sqldw",
+                  "operationId": "ExecutePassThroughNativeQueryV2"
+                },
+                "parameters": {
+                  "server": "default",
+                  "database": "default",
+                  "query/query": "INSERT INTO dbo.LakehouseSyncLog\n(\n    ExecutionId,\n    ProcessName,\n    StartDate,\n    EndDate,\n    Status,\n    ExpectedRows,\n    ProcessedRows,\n    ErrorMessage\n)\nVALUES\n(\n    '@{variables('varRunId')}',\n    '@{variables('varProcessName')}',\n    '@{variables('varRunStartDate')}',\n    SYSUTCDATETIME(),\n    'SUCCESS',\n    @{variables('varExpectedRows')},\n    @{variables('varTotalRowsProcessed')},\n    NULL\n);"
+                },
+                "authentication": {
+                  "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+                  "type": "Raw"
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "Scope_-_Sync_Companies": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "079e9ddf-cc87-4f70-bbdf-a318a64756a2"
+          },
+          "type": "Scope"
+        },
+        "Scope_-_Error_Handling": {
+          "actions": {
+            "Terminate": {
+              "runAfter": {
+                "Execute_a_SQL_query_(V2)_3": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "7c9db9e6-dc7e-4b52-a22e-cfadbf5a5f95"
+              },
+              "type": "Terminate",
+              "inputs": {
+                "runStatus": "Failed",
+                "runError": {
+                  "code": "LAKEHOUSE_SYNC_FAILED",
+                  "message": "Lakehouse synchronization failed. Review sync log and Power Automate history."
+                }
+              }
+            },
+            "Send_an_email_(V2)": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "0b09e72d-1ab0-4ce8-9f78-582e021a06a4"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365",
+                  "connectionName": "shared_office365_1",
+                  "operationId": "SendEmailV2"
+                },
+                "parameters": {
+                  "emailMessage/To": "rseijo@tecnicasreunidas.es",
+                  "emailMessage/Subject": "[ALERT] Lakehouse Sync Failed - DIM_MASTER_COMPANIES_LH",
+                  "emailMessage/Body": "<p>The Lakehouse synchronization has failed.</p>\n\n<p><b>Process:</b><br>\n@{variables('varProcessName')}</p>\n\n<p><b>RunId:</b><br>\n@{variables('varRunId')}</p>\n\n<p><b>Start:</b><br>\n@{variables('varRunStartDate')}</p>\n\n<p><b>Expected rows:</b><br>\n@{variables('varExpectedRows')}</p>\n\n<p><b>Processed rows:</b><br>\n@{variables('varTotalRowsProcessed')}</p>\n\n<p>Please review the Power Automate run history.</p>",
+                  "emailMessage/Importance": "Normal"
+                },
+                "authentication": {
+                  "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+                  "type": "Raw"
+                }
+              }
+            },
+            "Execute_a_SQL_query_(V2)_3": {
+              "runAfter": {
+                "Send_an_email_(V2)": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "e9f4d191-5e61-4f50-91d6-dba2035db348"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                  "connectionName": "shared_sqldw",
+                  "operationId": "ExecutePassThroughNativeQueryV2"
+                },
+                "parameters": {
+                  "server": "default",
+                  "database": "default",
+                  "query/query": "INSERT INTO dbo.LakehouseSyncLog\n(\n    ExecutionId,\n    ProcessName,\n    StartDate,\n    EndDate,\n    Status,\n    ExpectedRows,\n    ProcessedRows,\n    ErrorMessage\n)\nVALUES\n(\n    '@{variables('varRunId')}',\n    '@{variables('varProcessName')}',\n    '@{variables('varRunStartDate')}',\n    SYSUTCDATETIME(),\n    'FAILED',\n    @{variables('varExpectedRows')},\n    @{variables('varTotalRowsProcessed')},\n    'Review Power Automate run history.'\n);"
+                },
+                "authentication": {
+                  "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+                  "type": "Raw"
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "Scope_-_Success_Log": [
+              "Failed",
+              "Skipped",
+              "TimedOut"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "64201d86-4b5f-4f8b-8313-3b49d901d041"
+          },
+          "type": "Scope"
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

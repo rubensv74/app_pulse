@@ -1,0 +1,249 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sqldw": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsqldw_ce25b"
+        },
+        "api": {
+          "name": "shared_sqldw"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "7e4c5a51-4dba-4eb8-a000-6d1ddf8e720e"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "number": {
+                  "title": "ProjectId",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                }
+              },
+              "required": [
+                "number"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Compose": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "02c74665-bc8c-402b-b86c-f161b0706a20"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "result": "@{variables('varFinalResponse')}"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "title": "result",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "Compose": {
+          "runAfter": {
+            "Scope_Final": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "a38aa7ea-596f-4eba-a5d7-9c4da4385176"
+          },
+          "type": "Compose",
+          "inputs": "@string(body('Execute_stored_procedure_(V2)')?['ResultSets']?['Table1'])"
+        },
+        "Scope_Try": {
+          "actions": {
+            "Execute_stored_procedure_(V2)": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "8d8f381e-0729-4001-9d7c-551d92c3fbab"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                  "connectionName": "shared_sqldw",
+                  "operationId": "ExecuteProcedureV2"
+                },
+                "parameters": {
+                  "server": "default",
+                  "database": "default",
+                  "procedure": "[warroom].[usp_Home_GetHiveNodesByDiscipline]",
+                  "parameters/ProjectId": "@triggerBody()['number']"
+                },
+                "authentication": {
+                  "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+                  "type": "Raw"
+                }
+              }
+            },
+            "Compose_TryResponse": {
+              "runAfter": {
+                "Execute_stored_procedure_(V2)": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "6686d7af-2af8-4bdc-b32b-501c149306d2"
+              },
+              "type": "Compose",
+              "inputs": {
+                "success": true,
+                "code": "OK",
+                "message": "",
+                "result": "@body('Execute_stored_procedure_(V2)')?['ResultSets']?['Table1']"
+              }
+            },
+            "Set_variable": {
+              "runAfter": {
+                "Compose_TryResponse": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "c45df147-6dfa-4b8f-8bd8-2cd9f4abf55b"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "varFinalResponse",
+                "value": "@{string(outputs('Compose_TryResponse'))}"
+              }
+            }
+          },
+          "runAfter": {
+            "var_FinalResponse": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "8a258f23-89b2-4ea1-9bf1-0bdb603dcde3"
+          },
+          "type": "Scope"
+        },
+        "Scope_Catch": {
+          "actions": {
+            "Compose_CatchResponse": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "78f664a7-517d-44c8-9401-50745a94febc"
+              },
+              "type": "Compose",
+              "inputs": {
+                "success": false,
+                "code": "NO_REPORT_CONFIG",
+                "message": "No published report configuration found for this project.",
+                "result": []
+              }
+            },
+            "Set_variable_2": {
+              "runAfter": {
+                "Compose_CatchResponse": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "7a7017f1-b311-4a87-8188-2e4cf0d0a85c"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "varFinalResponse",
+                "value": "@{string(outputs('Compose_CatchResponse'))}"
+              }
+            }
+          },
+          "runAfter": {
+            "Scope_Try": [
+              "Failed",
+              "TimedOut"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "2c731bb8-3076-4f1a-aca8-b357770df3c3"
+          },
+          "type": "Scope"
+        },
+        "Scope_Final": {
+          "actions": {
+            "Compose_Debug": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "f6c6828c-6c7b-4b6d-9297-1535432b20e2"
+              },
+              "type": "Compose",
+              "inputs": "@variables('varFinalResponse')"
+            }
+          },
+          "runAfter": {
+            "Scope_Catch": [
+              "Succeeded",
+              "Skipped"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "753f6e46-bfb6-463a-b9bd-f34b911c6e96"
+          },
+          "type": "Scope"
+        },
+        "var_FinalResponse": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "f08179c3-e251-4fa3-b4e8-e122bd91d14c"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "varFinalResponse",
+                "type": "string",
+                "value": "{}"
+              }
+            ]
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

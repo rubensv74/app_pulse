@@ -1,0 +1,211 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sqldw": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsqldw_ce25b"
+        },
+        "api": {
+          "name": "shared_sqldw"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "d58e6b94-d784-471a-9345-d4ffe7af9161"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "number": {
+                  "title": "ProjectId",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "number_1": {
+                  "title": "CommentId",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "text": {
+                  "title": "DeletedByEmail",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_1": {
+                  "title": "EntityType",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "number",
+                "number_1",
+                "text",
+                "text_1"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Condition": {
+          "actions": {
+            "Execute_stored_procedure_(V2)": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "09c5d819-5cc2-4578-861c-6c252328faa4"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                  "connectionName": "shared_sqldw",
+                  "operationId": "ExecuteProcedureV2"
+                },
+                "parameters": {
+                  "server": "default",
+                  "database": "default",
+                  "procedure": "[warroom].[usp_DeleteTaskComment]",
+                  "parameters/CommentId": "@triggerBody()['number_1']",
+                  "parameters/DeletedByEmail": "@triggerBody()['text']",
+                  "parameters/ProjectId": "@triggerBody()['number']"
+                },
+                "authentication": {
+                  "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+                  "type": "Raw"
+                }
+              }
+            },
+            "Respond_to_a_Power_App_or_flow": {
+              "runAfter": {
+                "Execute_stored_procedure_(V2)": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "1448dcf7-e546-4204-ac54-1eb0ead88be7"
+              },
+              "type": "Response",
+              "kind": "PowerApp",
+              "inputs": {
+                "statusCode": 200,
+                "body": {
+                  "rowsaffected": "@{body('Execute_stored_procedure_(V2)')?['Result']\r\n}"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rowsaffected": {
+                      "title": "RowsAffected",
+                      "x-ms-dynamically-added": true,
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "runAfter": {},
+          "else": {
+            "actions": {
+              "Execute_stored_procedure_(V2)_2": {
+                "runAfter": {},
+                "metadata": {
+                  "operationMetadataId": "09c5d819-5cc2-4578-861c-6c252328faa4"
+                },
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "host": {
+                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+                    "connectionName": "shared_sqldw",
+                    "operationId": "ExecuteProcedureV2"
+                  },
+                  "parameters": {
+                    "server": "default",
+                    "database": "default",
+                    "procedure": "[warroom].[usp_DeletePunchComment]",
+                    "parameters/CommentId": "@triggerBody()['number_1']",
+                    "parameters/DeletedByEmail": "@triggerBody()['text']",
+                    "parameters/ProjectId": "@triggerBody()['number']"
+                  },
+                  "authentication": {
+                    "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+                    "type": "Raw"
+                  }
+                }
+              },
+              "Respond_to_a_Power_App_or_flow_2": {
+                "runAfter": {
+                  "Execute_stored_procedure_(V2)_2": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "1448dcf7-e546-4204-ac54-1eb0ead88be7"
+                },
+                "type": "Response",
+                "kind": "PowerApp",
+                "inputs": {
+                  "statusCode": 200,
+                  "body": {
+                    "rowsaffected": "@{body('Execute_stored_procedure_(V2)_2')?['Result']\r\n}"
+                  },
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "rowsaffected": {
+                        "title": "RowsAffected",
+                        "x-ms-dynamically-added": true,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "expression": {
+            "equals": [
+              "@triggerBody()['text_1']",
+              "TASK"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "f7bd290c-feff-470c-90b5-761520499ee0"
+          },
+          "type": "If"
+        }
+      },
+      "outputs": {}
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

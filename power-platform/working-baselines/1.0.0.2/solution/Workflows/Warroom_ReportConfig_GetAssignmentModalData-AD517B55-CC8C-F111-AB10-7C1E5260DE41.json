@@ -1,0 +1,181 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sqldw": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsqldw_ce25b"
+        },
+        "api": {
+          "name": "shared_sqldw"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "0c3a6c59-9828-496b-a7b8-eb548758a5b0"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "number": {
+                  "title": "ProjectId",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "text": {
+                  "title": "NodeId",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "number",
+                "text"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Execute_stored_procedure_(V2)": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "cf5585b4-fab4-4969-b67a-d143f3bb982c"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+              "connectionName": "shared_sqldw",
+              "operationId": "ExecuteProcedureV2"
+            },
+            "parameters": {
+              "server": "default",
+              "database": "default",
+              "procedure": "[warroom].[usp_ReportConfig_GetAssignmentModalData]",
+              "parameters/NodeId": "@triggerBody()['text']",
+              "parameters/ProjectId": "@triggerBody()['number']"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "cmpRow": {
+          "runAfter": {
+            "Execute_stored_procedure_(V2)": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "3211c91f-b5c0-48b1-a08d-1344844a2bfd"
+          },
+          "type": "Compose",
+          "inputs": "@if(\r\n  greater(length(coalesce(body('Execute_stored_procedure_(V2)')?['ResultSets']?['Table1'], createArray())), 0),\r\n  first(body('Execute_stored_procedure_(V2)')?['ResultSets']?['Table1']),\r\n  json('{}')\r\n)"
+        },
+        "cmpTarget": {
+          "runAfter": {
+            "cmpRow": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "1229fc09-8b69-4b1d-a881-2929afc0f3e8"
+          },
+          "type": "Compose",
+          "inputs": "@json(coalesce(outputs('cmpRow')?['TargetJson'], '{}'))"
+        },
+        "cmpAvailable": {
+          "runAfter": {
+            "cmpAssigned": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "afb87a07-9189-44b6-8e61-be4ecea3a484"
+          },
+          "type": "Compose",
+          "inputs": "@json(coalesce(outputs('cmpRow')?['AvailableJson'], '[]'))"
+        },
+        "cmpPayload": {
+          "runAfter": {
+            "cmpAvailable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "ab85d979-6aeb-4aba-8c16-2f13a9990f83"
+          },
+          "type": "Compose",
+          "inputs": "@json(\r\n  concat(\r\n    '{',\r\n      '\"target\":', string(outputs('cmpTarget')), ',',\r\n      '\"assigned\":', string(outputs('cmpAssigned')), ',',\r\n      '\"available\":', string(outputs('cmpAvailable')),\r\n    '}'\r\n  )\r\n)"
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "cmpPayload": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "e5836cda-6515-4503-bfe3-c5c67933a812"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "result": "@{string(outputs('cmpPayload'))}"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "title": "result",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "cmpAssigned": {
+          "runAfter": {
+            "cmpTarget": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "3645a13e-2933-47c1-a092-d51f9b4d913d"
+          },
+          "type": "Compose",
+          "inputs": "@json(coalesce(outputs('cmpRow')?['AssignedJson'], '[]'))"
+        }
+      },
+      "outputs": {}
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}
