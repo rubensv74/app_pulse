@@ -3179,6 +3179,8 @@ Screens:
                                                 Clear(colPunchExecutiveHeatmapRows);
                                                 Clear(colPunchExecutiveHeatmapColumns);
                                                 Clear(colPunchExecutiveHeatmapCells);
+                                                Clear(colPunchExecutiveDistribution);
+                                                Clear(colPunchExecutiveSelection);
                                                 Set(varPunchDrillSubsystemCode, "");
                                                 Set(varPunchDrillCategoryCode, "");
 
@@ -3722,7 +3724,37 @@ Screens:
                                                                   Fill: =Color.Transparent
                                                                   Height: =30
                                                                   HoverFill: =RGBA(22,119,255,0.08)
-                                                                  OnSelect: =Set(varPunchDrillSubsystemCode, Text(ThisItem.SubsystemCode)); Set(varPunchDrillCategoryCode, Text(ThisItem.CategoryCode)); Set(varPunchDrillStatusCode, ""); Set(varPunchDrillSubcontractorId, -1); Set(varPunchDrillDisciplineCode, "")
+                                                                  OnSelect: |-
+                                                                    =Set(varPunchDrillSubsystemCode, Text(ThisItem.SubsystemCode));
+                                                                    Set(varPunchDrillCategoryCode, Text(ThisItem.CategoryCode));
+                                                                    Set(varPunchDrillStatusCode, "");
+                                                                    Set(varPunchDrillSubcontractorId, -1);
+                                                                    Set(varPunchDrillDisciplineCode, "");
+                                                                    ClearCollect(
+                                                                        colPunchExecutiveSelection,
+                                                                        {
+                                                                            SelectedRow: Text(ThisItem.CategoryName),
+                                                                            SelectedColumn: Text(ThisItem.SubsystemName),
+                                                                            PunchCount: Value(ThisItem.PunchCount),
+                                                                            PercentOfTotal: 100 * Value(ThisItem.PunchCount) / Max(1, Sum(colPunchExecutiveHeatmapCells, PunchCount)),
+                                                                            PercentOfRow: 100 * Value(ThisItem.PunchCount) / Max(1, Sum(Filter(colPunchExecutiveHeatmapCells, CategoryCode = ThisItem.CategoryCode), PunchCount)),
+                                                                            IsSelection: true
+                                                                        }
+                                                                    );
+                                                                    ClearCollect(
+                                                                        colPunchExecutiveDistribution,
+                                                                        SortByColumns(
+                                                                            AddColumns(
+                                                                                GroupBy(Filter(colPunchDashboardSubsystems, SubsystemCode = ThisItem.SubsystemCode && CategoryCode = ThisItem.CategoryCode), StatusCode, StatusRows),
+                                                                                StatusName, First(StatusRows).StatusName,
+                                                                                StatusOrder, First(StatusRows).StatusOrder,
+                                                                                StatusColor, First(StatusRows).StatusColor,
+                                                                                PunchCount, Sum(StatusRows, PunchCount)
+                                                                            ),
+                                                                            "StatusOrder",
+                                                                            SortOrder.Ascending
+                                                                        )
+                                                                    )
                                                                   PressedFill: =RGBA(22,119,255,0.14)
                                                                   Text: =""
                                                                   Width: =Parent.TemplateWidth - 4
@@ -3846,10 +3878,99 @@ Screens:
                                                             Align: =Align.Center
                                                             Color: =varTheme_TextMuted
                                                             Height: =60
+                                                            Visible: =false
                                                             Text: ="Executive Donut · EPIC 04"
                                                             Width: =Parent.Width - 32
                                                             X: =16
                                                             Y: =(Parent.Height - Self.Height) / 2
+                                                      - htmlPunchExecutiveDonut:
+                                                          Control: HtmlViewer@2.1.0
+                                                          Properties:
+                                                            Height: =132
+                                                            HtmlText: |-
+                                                              =With(
+                                                                  {
+                                                                      _total: Sum(colPunchExecutiveDistribution, PunchCount),
+                                                                      _segments:
+                                                                          Concat(
+                                                                              SortByColumns(colPunchExecutiveDistribution, "StatusOrder", SortOrder.Ascending) As _slice,
+                                                                              Coalesce(_slice.StatusColor, "#94A3B8") & " " &
+                                                                              Text(100 * Sum(Filter(colPunchExecutiveDistribution, StatusOrder < _slice.StatusOrder), PunchCount) / Max(1, Sum(colPunchExecutiveDistribution, PunchCount)), "[$-en-US]0.0") & "% " &
+                                                                              Text(100 * Sum(Filter(colPunchExecutiveDistribution, StatusOrder <= _slice.StatusOrder), PunchCount) / Max(1, Sum(colPunchExecutiveDistribution, PunchCount)), "[$-en-US]0.0") & "%",
+                                                                              ", "
+                                                                          )
+                                                                  },
+                                                                  "<div style='position:relative;width:124px;height:124px;margin:auto;border-radius:50%;background:conic-gradient(" &
+                                                                  If(_total = 0, "#E2E8F0 0% 100%", _segments) &
+                                                                  ");'><div style='position:absolute;inset:25px;background:#FFFFFF;border-radius:50%;'></div></div>"
+                                                              )
+                                                            Width: =150
+                                                            X: =8
+                                                            Y: =48
+                                                      - lblPunchExecutiveDonutTotal:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Align: =Align.Center
+                                                            Color: =varTheme_Text
+                                                            FontWeight: =FontWeight.Bold
+                                                            Height: =32
+                                                            Size: =18
+                                                            Text: =Text(Sum(colPunchExecutiveDistribution, PunchCount), "[$-en-US]#,##0")
+                                                            Width: =90
+                                                            X: =38
+                                                            Y: =96
+                                                      - galPunchExecutiveDonutLegend:
+                                                          Control: Gallery@2.15.0
+                                                          Variant: Vertical
+                                                          Properties:
+                                                            Height: =150
+                                                            Items: =SortByColumns(colPunchExecutiveDistribution, "StatusOrder", SortOrder.Ascending)
+                                                            ShowScrollbar: =false
+                                                            TemplatePadding: =1
+                                                            TemplateSize: =28
+                                                            Visible: =CountRows(colPunchExecutiveDistribution) > 0
+                                                            Width: =Parent.Width - 166
+                                                            X: =158
+                                                            Y: =48
+                                                          Children:
+                                                            - recPunchExecutiveDonutLegendColor:
+                                                                Control: Rectangle@2.3.0
+                                                                Properties:
+                                                                  Fill: =ColorValue(Coalesce(ThisItem.StatusColor, "#94A3B8"))
+                                                                  Height: =10
+                                                                  Width: =10
+                                                                  X: =2
+                                                                  Y: =8
+                                                            - lblPunchExecutiveDonutLegendName:
+                                                                Control: ModernText@1.0.0
+                                                                Properties:
+                                                                  Color: =varTheme_Text
+                                                                  Height: =26
+                                                                  Size: =8
+                                                                  Text: =Coalesce(ThisItem.StatusName, ThisItem.StatusCode)
+                                                                  Width: =Parent.TemplateWidth - 92
+                                                                  X: =18
+                                                            - lblPunchExecutiveDonutLegendValue:
+                                                                Control: ModernText@1.0.0
+                                                                Properties:
+                                                                  Align: =Align.Right
+                                                                  Color: =varTheme_TextMuted
+                                                                  Height: =26
+                                                                  Size: =8
+                                                                  Text: =Text(ThisItem.PunchCount, "[$-en-US]#,##0") & " (" & Text(100 * ThisItem.PunchCount / Max(1, Sum(colPunchExecutiveDistribution, PunchCount)), "0.0") & "%)"
+                                                                  Width: =78
+                                                                  X: =Parent.TemplateWidth - 82
+                                                      - lblPunchExecutiveDonutEmpty:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Align: =Align.Center
+                                                            Color: =varTheme_TextMuted
+                                                            Height: =50
+                                                            Text: ="No distribution available."
+                                                            Visible: =CountRows(colPunchExecutiveDistribution) = 0
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =96
                                                 - conPunchExecutiveDetailSlot:
                                                     Control: GroupContainer@1.5.0
                                                     Variant: ManualLayout
@@ -3882,10 +4003,106 @@ Screens:
                                                             Align: =Align.Center
                                                             Color: =varTheme_TextMuted
                                                             Height: =60
+                                                            Visible: =false
                                                             Text: ="No selection"
                                                             Width: =Parent.Width - 32
                                                             X: =16
                                                             Y: =(Parent.Height - Self.Height) / 2
+                                                      - btnPunchExecutiveClearSelection:
+                                                          Control: Classic/Button@2.2.0
+                                                          Properties:
+                                                            BorderThickness: =0
+                                                            Color: =varTheme_PulseBlueDark
+                                                            Fill: =Color.Transparent
+                                                            Height: =28
+                                                            HoverFill: =RGBA(22,119,255,0.06)
+                                                            OnSelect: |-
+                                                              =Set(varPunchDrillSubsystemCode, "");
+                                                              Set(varPunchDrillCategoryCode, "");
+                                                              ClearCollect(
+                                                                  colPunchExecutiveSelection,
+                                                                  {SelectedRow: "All Categories", SelectedColumn: "All Subsystems", PunchCount: Sum(colPunchExecutiveHeatmapCells, PunchCount), PercentOfTotal: 100, PercentOfRow: 100, IsSelection: false}
+                                                              );
+                                                              ClearCollect(
+                                                                  colPunchExecutiveDistribution,
+                                                                  SortByColumns(
+                                                                      AddColumns(
+                                                                          GroupBy(colPunchDashboardSubsystems, StatusCode, StatusRows),
+                                                                          StatusName, First(StatusRows).StatusName,
+                                                                          StatusOrder, First(StatusRows).StatusOrder,
+                                                                          StatusColor, First(StatusRows).StatusColor,
+                                                                          PunchCount, Sum(StatusRows, PunchCount)
+                                                                      ),
+                                                                      "StatusOrder",
+                                                                      SortOrder.Ascending
+                                                                  )
+                                                              )
+                                                            Text: ="Clear Selection"
+                                                            Visible: =CountRows(colPunchExecutiveSelection) > 0 && First(colPunchExecutiveSelection).IsSelection
+                                                            Width: =110
+                                                            X: =Parent.Width - 122
+                                                            Y: =8
+                                                      - lblPunchExecutiveDetailContext:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =34
+                                                            Size: =11
+                                                            Text: =If(CountRows(colPunchExecutiveSelection) = 0, "No selection", First(colPunchExecutiveSelection).SelectedRow & " × " & First(colPunchExecutiveSelection).SelectedColumn)
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =44
+                                                      - lblPunchExecutiveDetailCountCaption:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Color: =varTheme_TextMuted
+                                                            Height: =18
+                                                            Size: =8
+                                                            Text: ="PUNCHES"
+                                                            Width: =80
+                                                            X: =16
+                                                            Y: =82
+                                                      - lblPunchExecutiveDetailCount:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            FontWeight: =FontWeight.Bold
+                                                            Height: =30
+                                                            Size: =16
+                                                            Text: =If(CountRows(colPunchExecutiveSelection) = 0, "—", Text(First(colPunchExecutiveSelection).PunchCount, "[$-en-US]#,##0"))
+                                                            Width: =90
+                                                            X: =16
+                                                            Y: =100
+                                                      - lblPunchExecutiveDetailPercentTotal:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Color: =varTheme_TextMuted
+                                                            Height: =38
+                                                            Size: =9
+                                                            Text: =If(CountRows(colPunchExecutiveSelection) = 0, "", "% of Total  " & Text(First(colPunchExecutiveSelection).PercentOfTotal, "0.0") & "%")
+                                                            Width: =130
+                                                            X: =116
+                                                            Y: =88
+                                                      - lblPunchExecutiveDetailPercentRow:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Color: =varTheme_TextMuted
+                                                            Height: =38
+                                                            Size: =9
+                                                            Text: =If(CountRows(colPunchExecutiveSelection) = 0, "", "% of Category  " & Text(First(colPunchExecutiveSelection).PercentOfRow, "0.0") & "%")
+                                                            Width: =140
+                                                            X: =Parent.Width - 152
+                                                            Y: =88
+                                                      - btnPunchExecutiveViewPunches:
+                                                          Control: ModernButton@1.0.0
+                                                          Properties:
+                                                            DisplayMode: =DisplayMode.Disabled
+                                                            Height: =30
+                                                            Text: ="View Punches →"
+                                                            Width: =140
+                                                            X: =16
+                                                            Y: =136
                                     - conPunchExecutiveGridWorkspace:
                                         Control: GroupContainer@1.5.0
                                         Variant: ManualLayout
@@ -4910,6 +5127,8 @@ Screens:
               Clear(colPunchExecutiveHeatmapRows);
               Clear(colPunchExecutiveHeatmapColumns);
               Clear(colPunchExecutiveHeatmapCells);
+              Clear(colPunchExecutiveDistribution);
+              Clear(colPunchExecutiveSelection);
               Set(varPunchDrillSubsystemCode, "");
               Set(varPunchDrillCategoryCode, "");
 
@@ -5172,6 +5391,33 @@ Screens:
                                           }
                                       )
                                   )
+                              );
+
+                              ClearCollect(
+                                  colPunchExecutiveDistribution,
+                                  SortByColumns(
+                                      AddColumns(
+                                          GroupBy(colPunchDashboardSubsystems, StatusCode, StatusRows),
+                                          StatusName, First(StatusRows).StatusName,
+                                          StatusOrder, First(StatusRows).StatusOrder,
+                                          StatusColor, First(StatusRows).StatusColor,
+                                          PunchCount, Sum(StatusRows, PunchCount)
+                                      ),
+                                      "StatusOrder",
+                                      SortOrder.Ascending
+                                  )
+                              );
+
+                              ClearCollect(
+                                  colPunchExecutiveSelection,
+                                  {
+                                      SelectedRow: "All Categories",
+                                      SelectedColumn: "All Subsystems",
+                                      PunchCount: Sum(colPunchExecutiveHeatmapCells, PunchCount),
+                                      PercentOfTotal: 100,
+                                      PercentOfRow: 100,
+                                      IsSelection: false
+                                  }
                               )
                           );
                           true
@@ -5802,6 +6048,8 @@ Screens:
               Clear(colPunchExecutiveHeatmapRows);
               Clear(colPunchExecutiveHeatmapColumns);
               Clear(colPunchExecutiveHeatmapCells);
+              Clear(colPunchExecutiveDistribution);
+              Clear(colPunchExecutiveSelection);
 
               // Punch filters reset
               Set(varPunchCatalogs_ProjectId, Blank());
