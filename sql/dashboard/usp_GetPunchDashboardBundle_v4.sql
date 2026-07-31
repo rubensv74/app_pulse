@@ -1,6 +1,6 @@
 
 
-ALTER   PROCEDURE [warroom].[usp_GetPunchDashboardBundle]
+CREATE OR ALTER PROCEDURE [warroom].[usp_GetPunchDashboardBundle]
 (
     @ProjectId  BIGINT,
     @TemplateId BIGINT
