@@ -3718,7 +3718,7 @@ Screens:
                                               Variant: Vertical
                                               Properties:
                                                 BorderColor: =RGBA(0,0,0,0)
-                                                Height: =188
+                                                Height: =214
                                                 Items: |-
                                                   =
                                                   SortByColumns(
@@ -3742,7 +3742,7 @@ Screens:
                                                 TemplateSize: =44
                                                 Width: =Parent.Width - 24
                                                 X: =12
-                                                Y: =88
+                                                Y: =62
                                               Children:
                                                 - recPunchMatrixRow:
                                                     Control: Rectangle@2.3.0
@@ -3802,17 +3802,13 @@ Screens:
                                                             Align: =Align.Center
                                                             Color: =If(ThisItem.Intensity >= 65, Color.White, If(ThisItem.PunchCount > 0, varTheme_Text, varTheme_TextSoft))
                                                             Fill: |-
-                                                              =If(
-                                                                  varPunchDrillStatusCode = Text(ThisItem.StatusCode) && varPunchDrillCategoryCode = Text(ThisItem.ParentCategoryCode),
-                                                                  ColorFade(varTheme_PulseBlueDark, 72%),
-                                                                  Switch(
+                                                              =Switch(
                                                                   ThisItem.IntensityBand,
                                                                   "CRITICAL", ColorValue("#DC2626"),
                                                                   "HIGH", ColorValue("#F97316"),
                                                                   "MEDIUM", ColorValue("#FACC15"),
                                                                   "LOW", ColorValue("#DCFCE7"),
                                                                   ColorValue("#F8FAFC")
-                                                                  )
                                                               )
                                                             FontWeight: =FontWeight.Bold
                                                             RadiusBottomLeft: =8
@@ -3838,11 +3834,23 @@ Screens:
                                                               =
                                                               Set(varPunchDrillStatusCode, Text(ThisItem.StatusCode));
                                                               Set(varPunchDrillCategoryCode, Text(ThisItem.ParentCategoryCode));
-                                                              Set(varPunchDrillCategoryName, Text(ThisItem.CategoryName));
-                                                              Set(varPunchDrillStatusName, Text(ThisItem.StatusName));
-                                                              Set(varPunchDrillExpectedCount, Value(ThisItem.PunchCount));
-                                                              Set(varPunchDrillPage, 1);
-                                                              Select(btnHome_LoadPunchDrilldown)
+                                                              Set(varPunches_ReturnView, "Home");
+                                                              Set(varPunches_ContextSource, "Dashboard");
+                                                              Set(varPunches_FilterSource, "Dashboard");
+                                                              Set(varPunchCustomFiltersJson, "[]");
+                                                              Set(varFilter_PunchTemplateId, Value(varPunchDashboardTemplateId));
+                                                              Set(varFilter_PunchStatusCode, Text(ThisItem.StatusCode));
+                                                              Set(varFilter_PunchCategoryCode, Text(ThisItem.ParentCategoryCode));
+                                                              Set(varFilter_SubsystemsCsv, "");
+                                                              Set(varFilter_Subsystem, Blank());
+                                                              Set(varFilter_Subcontractor, Blank());
+                                                              Set(varFilter_PunchDiscipline, "");
+                                                              Set(varPunches_Page, 1);
+                                                              Set(varPunches_HasSearched, true);
+                                                              Set(varPunches_AutoLoad, true);
+                                                              Clear(colPunches);
+                                                              Set(varAppView, "Punches");
+                                                              Navigate(scr_Punches, ScreenTransition.None)
                                                             PressedFill: =RGBA(22,119,255,0.08)
                                                             RadiusBottomLeft: =8
                                                             RadiusBottomRight: =8
@@ -3852,40 +3860,6 @@ Screens:
                                                             Width: =104
                                                             X: =2
                                                             Y: =4
-                                          - lblPunchMatrixYAxis:
-                                              Control: ModernText@1.0.0
-                                              Properties:
-                                                Color: =varTheme_TextMuted
-                                                FontWeight: =FontWeight.Semibold
-                                                Height: =18
-                                                Size: =9
-                                                Text: ="CATEGORY / TOTAL"
-                                                Width: =250
-                                                X: =24
-                                                Y: =64
-                                          - galPunchMatrixXAxis:
-                                              Control: Gallery@2.15.0
-                                              Variant: Horizontal
-                                              Properties:
-                                                Height: =22
-                                                Items: =SortByColumns(AddColumns(GroupBy(colPunchDashboardMatrix, StatusCode, StatusRows), StatusOrder, First(StatusRows).StatusOrder), "StatusOrder", SortOrder.Ascending)
-                                                ShowScrollbar: =false
-                                                TemplatePadding: =2
-                                                TemplateSize: =112
-                                                Width: =Parent.Width - 300
-                                                X: =284
-                                                Y: =62
-                                              Children:
-                                                - lblPunchMatrixStatusAxis:
-                                                    Control: ModernText@1.0.0
-                                                    Properties:
-                                                      Align: =Align.Center
-                                                      Color: =varTheme_TextMuted
-                                                      FontWeight: =FontWeight.Semibold
-                                                      Height: =20
-                                                      Size: =8
-                                                      Text: =Coalesce(First(ThisItem.StatusRows).StatusName, ThisItem.StatusCode)
-                                                      Width: =104
                                           - lblPunchHeatLegend:
                                               Control: ModernText@1.0.0
                                               Properties:
@@ -3976,89 +3950,6 @@ Screens:
                                                 Width: =48
                                                 X: =340
                                                 Y: =288
-                                    - conPunchDrilldownCard:
-                                        Control: GroupContainer@1.5.0
-                                        Variant: ManualLayout
-                                        Properties:
-                                          BorderColor: =varTheme_Border
-                                          BorderThickness: =1
-                                          Fill: =varTheme_Surface
-                                          FillPortions: =0
-                                          Height: =340
-                                          LayoutMinHeight: =340
-                                          Visible: =!IsBlank(varPunchDrillCategoryCode) && !IsBlank(varPunchDrillStatusCode)
-                                          Width: =Parent.Width
-                                        Children:
-                                          - lblPunchDrilldownTitle:
-                                              Control: ModernText@1.0.0
-                                              Properties:
-                                                FontWeight: =FontWeight.Semibold
-                                                Height: =24
-                                                Text: =Coalesce(varPunchDrillCategoryName, varPunchDrillCategoryCode) & " / " & Coalesce(varPunchDrillStatusName, varPunchDrillStatusCode)
-                                                Width: =Parent.Width - 260
-                                                X: =18
-                                                Y: =12
-                                          - lblPunchDrilldownMeta:
-                                              Control: ModernText@1.0.0
-                                              Properties:
-                                                Color: =varTheme_TextMuted
-                                                Height: =18
-                                                Size: =9
-                                                Text: =Text(varPunchDrillTotalRows) & " matching · page " & Text(varPunchDrillPage) & " of " & Text(Max(1, varPunchDrillTotalPages)) & " · limit 25"
-                                                Width: =Parent.Width - 260
-                                                X: =18
-                                                Y: =38
-                                          - galPunchDrilldownRows:
-                                              Control: Gallery@2.15.0
-                                              Variant: Vertical
-                                              Properties:
-                                                Height: =220
-                                                Items: =colPunchDrillRows
-                                                TemplateSize: =42
-                                                Visible: =!varPunchDrillLoading && IsBlank(varPunchDrillError)
-                                                Width: =Parent.Width - 36
-                                                X: =18
-                                                Y: =64
-                                              Children:
-                                                - lblPunchDrillRow:
-                                                    Control: ModernText@1.0.0
-                                                    Properties:
-                                                      Height: =38
-                                                      Size: =9
-                                                      Text: =Coalesce(ThisItem.PunchCode, Text(ThisItem.PunchId)) & "  ·  " & ThisItem.PunchDescription & "  ·  " & ThisItem.SubsystemCode & "  ·  " & Coalesce(ThisItem.SubcontractorName, "Unassigned")
-                                                      Width: =Parent.TemplateWidth - 12
-                                                      X: =6
-                                          - lblPunchDrillState:
-                                              Control: ModernText@1.0.0
-                                              Properties:
-                                                Align: =Align.Center
-                                                Color: =If(!IsBlank(varPunchDrillError), varTheme_Red, varTheme_TextMuted)
-                                                Height: =80
-                                                Text: =If(varPunchDrillLoading, "Loading matching punches...", If(!IsBlank(varPunchDrillError), "Unable to load detail: " & varPunchDrillError, "No matching punches."))
-                                                Visible: =varPunchDrillLoading || !IsBlank(varPunchDrillError) || CountRows(colPunchDrillRows) = 0
-                                                Width: =Parent.Width - 48
-                                                X: =24
-                                                Y: =110
-                                          - btnPunchDrillPrevious:
-                                              Control: ModernButton@1.0.0
-                                              Properties:
-                                                DisplayMode: =If(varPunchDrillLoading || varPunchDrillPage <= 1, DisplayMode.Disabled, DisplayMode.Edit)
-                                                Height: =32
-                                                OnSelect: =Set(varPunchDrillPage, varPunchDrillPage - 1); Select(btnHome_LoadPunchDrilldown)
-                                                Text: ="Previous"
-                                                Width: =105
-                                                X: =18
-                                                Y: =296
-                                          - btnPunchDrillNext:
-                                              Control: ModernButton@1.0.0
-                                              Properties:
-                                                DisplayMode: =If(varPunchDrillLoading || varPunchDrillPage >= varPunchDrillTotalPages, DisplayMode.Disabled, DisplayMode.Edit)
-                                                Height: =32
-                                                OnSelect: =Set(varPunchDrillPage, varPunchDrillPage + 1); Select(btnHome_LoadPunchDrilldown)
-                                                Text: ="Next"
-                                                Width: =105
-                                                X: =133
-                                                Y: =296
                                     - conPunchOperationalSummaries:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
@@ -4715,31 +4606,6 @@ Screens:
             Visible: =false
             X: =180
             Y: =180
-      - btnHome_LoadPunchDrilldown:
-          Control: ModernButton@1.0.0
-          Properties:
-            OnSelect: |-
-              =
-              Set(varPunchDrillLoading, true);
-              Set(varPunchDrillError, "");
-              Clear(colPunchDrillRows);
-              IfError(
-                  With(
-                      {resp: Warroom_Punches_Filtered_Paged.Run(Value(varProjectId), " ", " ", " ", Value(varPunchDrillPage), 25, Value(varPunchDashboardTemplateId), varPunchDrillCategoryCode, varPunchDrillStatusCode, "[]")},
-                      ClearCollect(
-                          colPunchDrillRows,
-                          ForAll(
-                              Table(ParseJSON(Coalesce(resp.result, "[]"))),
-                              {PunchId: Value(Coalesce(Text(Value.Id), "0")), PunchCode: Text(Value.Code), PunchDescription: Text(Value.Description), SubsystemCode: Text(Value.SubsystemCode), SubcontractorName: Text(Value.SubcontractorName), TotalRows: Value(Coalesce(Text(Value.TotalRows), "0")), TotalPages: Value(Coalesce(Text(Value.TotalPages), "0"))}
-                          )
-                      )
-                  ),
-                  Set(varPunchDrillError, FirstError.Message)
-              );
-              Set(varPunchDrillTotalRows, If(CountRows(colPunchDrillRows) > 0, First(colPunchDrillRows).TotalRows, 0));
-              Set(varPunchDrillTotalPages, If(CountRows(colPunchDrillRows) > 0, First(colPunchDrillRows).TotalPages, 0));
-              Set(varPunchDrillLoading, false)
-            Visible: =false
       - btnHome_OpenNodeOperations_1:
           Control: ModernButton@1.0.0
           Properties:
@@ -5316,15 +5182,6 @@ Screens:
               Set(varPunchDrillSubsystemCode, "");
               Set(varPunchDrillSubcontractorId, -1);
               Set(varPunchDrillDisciplineCode, "");
-              Set(varPunchDrillCategoryName, "");
-              Set(varPunchDrillStatusName, "");
-              Set(varPunchDrillExpectedCount, 0);
-              Set(varPunchDrillPage, 1);
-              Set(varPunchDrillTotalRows, 0);
-              Set(varPunchDrillTotalPages, 0);
-              Set(varPunchDrillLoading, false);
-              Set(varPunchDrillError, "");
-              Clear(colPunchDrillRows);
 
               Clear(colPunchDashboardSnapshotInfo);
               Clear(colPunchDashboardSummary);
