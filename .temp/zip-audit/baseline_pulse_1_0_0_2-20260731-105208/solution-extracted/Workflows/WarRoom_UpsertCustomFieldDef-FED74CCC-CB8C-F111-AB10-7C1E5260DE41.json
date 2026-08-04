@@ -1,0 +1,256 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sqldw_1": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsqldw_8d7b12c454"
+        },
+        "api": {
+          "name": "shared_sqldw"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "f7dbe0c1-5fe7-4c00-b437-111eb6eda250"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "number": {
+                  "title": "FieldDefId",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "number_1": {
+                  "title": "ProjectId",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "text": {
+                  "title": "EntityType",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_1": {
+                  "title": "Label",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_2": {
+                  "title": "FieldType",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_3": {
+                  "title": "HelpText",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "number_5": {
+                  "title": "SortOrder",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "text_4": {
+                  "title": "OptionsJson",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_5": {
+                  "title": "UserEmail",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_6": {
+                  "title": "FieldKey",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "boolean": {
+                  "title": "IsRequired",
+                  "type": "boolean",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please select yes or no",
+                  "x-ms-content-hint": "BOOLEAN"
+                },
+                "boolean_1": {
+                  "title": "IsPinned",
+                  "type": "boolean",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please select yes or no",
+                  "x-ms-content-hint": "BOOLEAN"
+                },
+                "boolean_2": {
+                  "title": "IsActive",
+                  "type": "boolean",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please select yes or no",
+                  "x-ms-content-hint": "BOOLEAN"
+                },
+                "boolean_3": {
+                  "title": "IsFilterable",
+                  "type": "boolean",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please select yes or no",
+                  "x-ms-content-hint": "BOOLEAN"
+                },
+                "boolean_4": {
+                  "title": "ShowInQuickFilters",
+                  "type": "boolean",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please select yes or no",
+                  "x-ms-content-hint": "BOOLEAN"
+                },
+                "number_2": {
+                  "title": "FilterOrder",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "text_7": {
+                  "title": "FilterMode",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "number",
+                "number_1",
+                "text",
+                "text_1",
+                "text_2",
+                "text_3",
+                "number_5",
+                "text_4",
+                "text_5",
+                "text_6",
+                "boolean",
+                "boolean_1",
+                "boolean_2",
+                "boolean_3",
+                "boolean_4",
+                "number_2",
+                "text_7"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Execute_stored_procedure_(V2)": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "47e60908-a8de-4d3e-8816-88a9582dddea"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "result": "@{outputs('Execute_stored_procedure_(V2)')?['body/returncode']}"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "title": "result",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "Execute_stored_procedure_(V2)": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "c55a0bc5-9de2-41a8-83e7-c76d6e174257"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+              "connectionName": "shared_sqldw_1",
+              "operationId": "ExecuteProcedureV2"
+            },
+            "parameters": {
+              "server": "default",
+              "database": "default",
+              "procedure": "[warroom].[usp_CustomField_Upsert_AndListJson]",
+              "parameters/EntityType": "@triggerBody()['text']",
+              "parameters/FieldDefId": "@triggerBody()['number']",
+              "parameters/FieldKey": "@triggerBody()['text_6']",
+              "parameters/FieldType": "@triggerBody()['text_2']",
+              "parameters/FilterMode": "@triggerBody()['text_7']",
+              "parameters/FilterOrder": "@triggerBody()['number_2']",
+              "parameters/HelpText": "@triggerBody()['text_3']",
+              "parameters/IsActive": "@triggerBody()['boolean_2']",
+              "parameters/IsFilterable": "@triggerBody()['boolean_3']",
+              "parameters/IsPinned": "@triggerBody()['boolean_1']",
+              "parameters/IsRequired": "@triggerBody()['boolean']",
+              "parameters/Label": "@triggerBody()['text_1']",
+              "parameters/OptionsJson": "@triggerBody()['text_4']",
+              "parameters/ProjectId": "@triggerBody()['number_1']",
+              "parameters/ShowInQuickFilters": "@triggerBody()['boolean_4']",
+              "parameters/SortOrder": "@triggerBody()['number_5']",
+              "parameters/UserEmail": "@triggerBody()['text_5']"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

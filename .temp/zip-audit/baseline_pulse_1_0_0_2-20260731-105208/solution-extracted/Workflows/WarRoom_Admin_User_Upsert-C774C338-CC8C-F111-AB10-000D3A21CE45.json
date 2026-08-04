@@ -1,0 +1,148 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sqldw": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsqldw_ce25b"
+        },
+        "api": {
+          "name": "shared_sqldw"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "7c7eeb4e-f137-4a95-97ad-d67db7c0b8b2"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "Email",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_1": {
+                  "title": "LoginEmail",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_2": {
+                  "title": "DisplayName",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "boolean": {
+                  "title": "IsActive",
+                  "type": "boolean",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please select yes or no",
+                  "x-ms-content-hint": "BOOLEAN"
+                },
+                "text_3": {
+                  "title": "UserName",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "text",
+                "text_1",
+                "text_2",
+                "boolean",
+                "text_3"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Execute_stored_procedure_(V2)": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "2bd1a6ae-94e4-4f90-82be-df1958655925"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+              "connectionName": "shared_sqldw",
+              "operationId": "ExecuteProcedureV2"
+            },
+            "parameters": {
+              "server": "default",
+              "database": "default",
+              "procedure": "[warroom].[usp_Admin_User_Upsert]",
+              "parameters/DisplayName": "@triggerBody()['text_2']",
+              "parameters/Email": "@triggerBody()['text']",
+              "parameters/IsActive": "@triggerBody()['boolean']",
+              "parameters/LoginEmail": "@triggerBody()['text_1']",
+              "parameters/Username": "@triggerBody()['text_3']"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Execute_stored_procedure_(V2)": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "0eae5111-1484-4dc7-a5d7-e765f9841b8b"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "result": "@{string(body('Execute_stored_procedure_(V2)')?['ResultSets'])}"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "title": "result",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

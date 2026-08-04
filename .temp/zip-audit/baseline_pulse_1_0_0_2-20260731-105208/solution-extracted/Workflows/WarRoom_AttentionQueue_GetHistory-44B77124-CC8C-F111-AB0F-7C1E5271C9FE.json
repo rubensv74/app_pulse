@@ -1,0 +1,121 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sqldw": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsqldw_ce25b"
+        },
+        "api": {
+          "name": "shared_sqldw"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "57ae693b-6456-4c12-99d6-10d1ef4514cd"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "number": {
+                  "title": "ProjectId",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "number_1": {
+                  "title": "Top",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                }
+              },
+              "required": [
+                "number",
+                "number_1"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "SQL_GetHistory": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "39225c4a-d10d-40ed-9a4c-6af3b0416d5b"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+              "connectionName": "shared_sqldw",
+              "operationId": "ExecuteProcedureV2"
+            },
+            "parameters": {
+              "server": "default",
+              "database": "default",
+              "procedure": "[warroom].[usp_AttentionQueue_GetHistory]",
+              "parameters/ProjectId": "@triggerBody()['number']",
+              "parameters/Top": "@triggerBody()['number_1']"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "SQL_GetHistory": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "41945754-188a-4045-aa8d-2c8887feeac3"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "data": "@{string(body('SQL_GetHistory')?['ResultSets']?['Table1'])}"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "title": "data",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

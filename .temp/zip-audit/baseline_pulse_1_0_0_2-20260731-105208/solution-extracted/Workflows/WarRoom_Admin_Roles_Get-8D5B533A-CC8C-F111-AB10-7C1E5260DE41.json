@@ -1,0 +1,102 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sqldw": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsqldw_ce25b"
+        },
+        "api": {
+          "name": "shared_sqldw"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "3c24245b-2255-48c2-9253-15d0915dea4b"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "required": []
+            }
+          }
+        }
+      },
+      "actions": {
+        "Execute_stored_procedure_(V2)": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "b32018ee-c0eb-4fbc-a527-b4e4909fab42"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+              "connectionName": "shared_sqldw",
+              "operationId": "ExecuteProcedureV2"
+            },
+            "parameters": {
+              "server": "default",
+              "database": "default",
+              "procedure": "[warroom].[usp_Admin_Roles_Get]",
+              "parameters": {}
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Execute_stored_procedure_(V2)": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "c04df413-4a63-400e-a27d-5a699a53c1b3"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "result": "@{string(body('Execute_stored_procedure_(V2)')?['ResultSets'])}"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "title": "result",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

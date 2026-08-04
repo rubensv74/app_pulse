@@ -1,0 +1,633 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+ComponentDefinitions:
+  cmp_MultiValueFilter:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      AccentColor:
+        PropertyKind: Input
+        DisplayName: AccentColor
+        Description: A custom property
+        DataType: Color
+        Default: =ColorValue("#1677FF")
+      BackgroundColor:
+        PropertyKind: Input
+        DisplayName: 'BackgroundColor '
+        Description: A custom property
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        Description: A custom property
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      HasInvalidCodes:
+        PropertyKind: Output
+        DisplayName: HasInvalidCodes
+        Description: A custom property
+        DataType: Boolean
+      InvalidCodes:
+        PropertyKind: Output
+        DisplayName: InvalidCodes
+        Description: A custom property
+        DataType: Table
+      ItemCode:
+        PropertyKind: Input
+        DisplayName: ItemCode
+        Description: A custom property
+        DataType: Text
+        Default: ="Text"
+      ItemDisplay:
+        PropertyKind: Input
+        DisplayName: ItemDisplay
+        Description: A custom property
+        DataType: Text
+        Default: ="Text"
+      ItemId:
+        PropertyKind: Input
+        DisplayName: ItemId
+        Description: A custom property
+        DataType: Text
+        Default: ="Text"
+      ItemSortOrder:
+        PropertyKind: Input
+        DisplayName: ItemSortOrder
+        Description: A custom property
+        DataType: Number
+        Default: =100
+      Items:
+        PropertyKind: Input
+        DisplayName: Items
+        Description: A custom property
+        DataType: Table
+        Default: |-
+          =Table(
+              {
+                  Id: "",
+                  Code: "",
+                  Display: "",
+                  SortOrder: 0
+              }
+          )
+      MaxVisibleChips:
+        PropertyKind: Input
+        DisplayName: MaxVisibleChips
+        Description: A custom property
+        DataType: Number
+        Default: =100
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        Description: A custom property
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      OnClose:
+        PropertyKind: Event
+        DisplayName: OnClose
+        Description: A custom property
+        ReturnType: None
+        Default: =
+      Placeholder:
+        PropertyKind: Input
+        DisplayName: Placeholder
+        Description: A custom property
+        DataType: Text
+        Default: ="Text"
+      SelectedCodesCRLF:
+        PropertyKind: Output
+        DisplayName: SelectedCodesCRLF
+        Description: A custom property
+        DataType: Text
+      SelectedCodesCSV:
+        PropertyKind: Output
+        DisplayName: SelectedCodesCSV
+        Description: A custom property
+        DataType: Text
+      SelectedCount:
+        PropertyKind: Output
+        DisplayName: SelectedCount
+        Description: A custom property
+        DataType: Number
+      SelectedItems:
+        PropertyKind: Output
+        DisplayName: SelectedItems
+        Description: A custom property
+        DataType: Table
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        Description: A custom property
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      Title:
+        PropertyKind: Input
+        DisplayName: Title
+        Description: A custom property
+        DataType: Text
+        Default: ="Text"
+    Properties:
+      HasInvalidCodes: =CountRows(varMVF_Invalid) > 0
+      Height: =456
+      InvalidCodes: =varMVF_Invalid
+      OnReset: |-
+        =
+
+        Set(varMVF_Open, false);
+        Set(varMVF_Search, "");
+
+        ClearCollect(
+            varMVF_Selected,
+            FirstN(
+                Table(
+                    {
+                        Id: "",
+                        Code: "",
+                        Display: "",
+                        SortOrder: 0
+                    }
+                ),
+                0
+            )
+        );
+
+        ClearCollect(
+            varMVF_Invalid,
+            FirstN(
+                Table({ Code: "" }),
+                0
+            )
+        )
+      SelectedCodesCRLF: =Concat(varMVF_Selected, Code, Char(10))
+      SelectedCodesCSV: =Concat(varMVF_Selected, Code, ",")
+      SelectedCount: =CountRows(varMVF_Selected)
+      SelectedItems: =varMVF_Selected
+      Width: =360
+    Children:
+      - conMVF_Panel:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =ColorValue("#E2E8F0")
+            BorderThickness: =1
+            DropShadow: =DropShadow.Semibold
+            Fill: =cmp_MultiValueFilter.BackgroundColor
+            Height: =Parent.Height - 80
+            PaddingLeft: =2
+            PaddingRight: =2
+            RadiusBottomLeft: =12
+            RadiusBottomRight: =12
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Width: =Parent.Width - 16
+            X: =8
+            Y: =72
+          Children:
+            - btnMVF_Clear:
+                Control: ModernButton@1.0.0
+                Properties:
+                  Appearance: =ButtonAppearance.Secondary
+                  BorderColor: =cmp_MultiValueFilter.TextColor
+                  BorderStyle: =BorderStyle.Solid
+                  BorderThickness: =1
+                  Color: =cmp_MultiValueFilter.TextColor
+                  Height: =36
+                  OnSelect: |-
+                    =
+                    ClearCollect(
+                        varMVF_Selected,
+                        FirstN(
+                            Table(
+                                {
+                                    Id: "",
+                                    Code: "",
+                                    Display: "",
+                                    SortOrder: 0
+                                }
+                            ),
+                            0
+                        )
+                    );
+
+                    ClearCollect(
+                        varMVF_Invalid,
+                        FirstN(
+                            Table({ Code: "" }),
+                            0
+                        )
+                    );
+
+                    Set(varMVF_Search, "");
+
+                    Reset(txtMVF_Search);
+                    Reset(txtMVF_Paste);
+                    Reset(galMVF_Items)
+                  Text: ="Clear"
+                  Width: =(Parent.Width - 44) / 2
+                  X: =16
+                  Y: =Parent.Height - 48
+            - lblMVF_Validation:
+                Control: ModernText@1.0.0
+                Properties:
+                  Color: |-
+                    =If(
+                        CountRows(varMVF_Invalid) > 0,
+                        ColorValue("#EA580C"),
+                        ColorValue("#16A34A")
+                    )
+                  Height: =16
+                  Size: =9
+                  Text: |-
+                    =If(
+                        CountRows(varMVF_Selected) = 0 && CountRows(varMVF_Invalid) = 0,
+                        "",
+                        CountRows(varMVF_Selected) & " selected" &
+                        If(
+                            CountRows(varMVF_Invalid) > 0,
+                            " · " & CountRows(varMVF_Invalid) & " not found",
+                            ""
+                        )
+                    )
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =Parent.Height - 72
+            - btnMVF_ApplyPaste:
+                Control: ModernButton@1.0.0
+                Properties:
+                  BorderThickness: =0
+                  Color: =Color.White
+                  Height: =36
+                  OnSelect: |-
+                    =If(
+                        IsBlank(Trim(txtMVF_Paste.Text)),
+
+                        Reset(txtMVF_Paste);
+                        cmp_MultiValueFilter.OnClose(),
+
+                        With(
+                            {
+                                _rawCodes:
+                                    ForAll(
+                                        Split(
+                                            Substitute(
+                                                Substitute(
+                                                    Substitute(txtMVF_Paste.Text, Char(13), ""),
+                                                    ";",
+                                                    Char(10)
+                                                ),
+                                                ",",
+                                                Char(10)
+                                            ),
+                                            Char(10)
+                                        ),
+                                        { Code: Upper(Trim(Value)) }
+                                    )
+                            },
+                            With(
+                                {
+                                    _cleanCodes:
+                                        Distinct(
+                                            Filter(_rawCodes, !IsBlank(Code)),
+                                            Code
+                                        )
+                                },
+                                ClearCollect(
+                                    varMVF_Selected,
+                                    Filter(
+                                        cmp_MultiValueFilter.Items,
+                                        Code in _cleanCodes.Value
+                                    )
+                                );
+
+                                ClearCollect(
+                                    varMVF_Invalid,
+                                    RenameColumns(
+                                        Filter(
+                                            _cleanCodes,
+                                            !(Value in cmp_MultiValueFilter.Items.Code)
+                                        ),
+                                        Value,
+                                        Code
+                                    )
+                                );
+
+                                Reset(txtMVF_Paste);
+                                cmp_MultiValueFilter.OnClose()
+                            )
+                        )
+                    )
+                  Text: ="Apply"
+                  Width: =(Parent.Width - 44) / 2
+                  X: =btnMVF_Clear.X + btnMVF_Clear.Width + 12
+                  Y: =Parent.Height - 48
+            - txtMVF_Paste:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  BorderColor: =RGBA(245, 245, 245, 1)
+                  Color: =RGBA(50, 49, 48, 1)
+                  Default: =
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledColor: =RGBA(161, 159, 157, 1)
+                  DisabledFill: =RGBA(242, 242, 241, 0)
+                  Font: =Font.'Segoe UI'
+                  Height: =64
+                  HintText: ="Paste subsystem codes, one per line"
+                  HoverBorderColor: =RGBA(16, 110, 190, 1)
+                  HoverColor: =RGBA(50, 49, 48, 1)
+                  HoverFill: =RGBA(255, 255, 255, 1)
+                  Mode: =TextMode.MultiLine
+                  PressedBorderColor: =RGBA(0, 120, 212, 1)
+                  PressedColor: =RGBA(50, 49, 48, 1)
+                  PressedFill: =RGBA(255, 255, 255, 1)
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =11
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =galMVF_Items.Y + galMVF_Items.Height + 12
+            - galMVF_Items:
+                Control: Gallery@2.15.0
+                Variant: BrowseLayout_Vertical_OneTextVariant_ver5.0
+                Properties:
+                  BorderColor: =RGBA(245, 245, 245, 1)
+                  Height: =170
+                  Items: |-
+                    =
+                    SortByColumns(
+                        Filter(
+                            cmp_MultiValueFilter.Items,
+                            IsBlank(txtMVF_Search.Text) ||
+                            StartsWith(Display, txtMVF_Search.Text) ||
+                            StartsWith(Code, txtMVF_Search.Text)
+                        ),
+                        "SortOrder",
+                        SortOrder.Ascending,
+                        "Display",
+                        SortOrder.Ascending
+                    )
+                  TemplateSize: =44
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =txtMVF_Search.Y + txtMVF_Search.Height + 12
+                Children:
+                  - chkMVF_Item:
+                      Control: Classic/CheckBox@2.1.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderStyle: =BorderStyle.None
+                        BorderThickness: =2
+                        CheckboxBorderColor: =RGBA(96, 94, 92, 1)
+                        CheckmarkFill: =RGBA(0, 120, 212, 1)
+                        Color: =RGBA(50, 49, 48, 1)
+                        Default: =ThisItem.Code in varMVF_Selected.Code
+                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        FocusedBorderThickness: =4
+                        Font: =Font.'Segoe UI'
+                        Height: =32
+                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                        HoverColor: =RGBA(50, 49, 48, 1)
+                        HoverFill: =RGBA(0, 0, 0, 0)
+                        OnCheck: |-
+                          =
+                          If(
+                              IsBlank(
+                                  LookUp(
+                                      varMVF_Selected,
+                                      Code = ThisItem.Code
+                                  )
+                              ),
+                              Collect(
+                                  varMVF_Selected,
+                                  {
+                                      Id: ThisItem.Id,
+                                      Code: ThisItem.Code,
+                                      Display: ThisItem.Display,
+                                      SortOrder: ThisItem.SortOrder
+                                  }
+                              )
+                          )
+                        OnSelect: =Select(Parent)
+                        OnUncheck: |-
+                          =
+
+
+                          RemoveIf(
+                              varMVF_Selected,
+                              Code = ThisItem.Code
+                          )
+                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                        PressedColor: =RGBA(50, 49, 48, 1)
+                        PressedFill: =RGBA(0, 0, 0, 0)
+                        Text: =
+                        Width: =36
+                        Y: =8
+                  - lblMVF_Item:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Color: =cmp_MultiValueFilter.TextColor
+                        Height: =36
+                        OnSelect: =Select(Parent)
+                        Size: =11
+                        Text: =ThisItem.Display
+                        Width: =Parent.TemplateWidth - 40
+                        X: =39
+                        Y: =4
+            - txtMVF_Search:
+                Control: ModernTextInput@1.1.1
+                Properties:
+                  Appearance: =Appearance.Outline
+                  Default: =varMVF_Search
+                  Height: =38
+                  OnChange: =Set(varMVF_Search, Self.Text)
+                  Placeholder: ="Search subsystems..."
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =16
+      - conMVF_ChipsArea:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =Color.Transparent
+            Height: =32
+            PaddingLeft: =2
+            PaddingRight: =2
+            Visible: =false //CountRows(varMVF_Selected) > 0
+            Width: =Parent.Width - 32
+            X: =16
+            Y: =56
+          Children:
+            - galMVF_Chips:
+                Control: Gallery@2.15.0
+                Variant: BrowseLayout_Horizontal_TwoTextOneImageVariant_ver5.0
+                Properties:
+                  BorderColor: =RGBA(245, 245, 245, 1)
+                  Height: =32
+                  Items: =FirstN(varMVF_Selected, cmp_MultiValueFilter.MaxVisibleChips)
+                  TemplateSize: =96
+                  Width: =Parent.Width - 48
+                Children:
+                  - lblMVF_Chip:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Color: =RGBA(96, 94, 92, 1)
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =Self.Size * 1.8
+                        OnSelect: =Select(Parent)
+                        PaddingBottom: =0
+                        PaddingLeft: =12
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =12
+                        Text: =ThisItem.Code
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =100
+                  - icoMVF_RemoveChip:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =RGBA(0, 120, 212, 1)
+                        DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                        DisabledColor: =RGBA(225, 223, 221, 1)
+                        DisabledFill: =RGBA(0, 0, 0, 0)
+                        FocusedBorderThickness: =4
+                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                        HoverColor: =RGBA(16, 110, 190, 1)
+                        HoverFill: =RGBA(0, 0, 0, 0)
+                        Icon: =Icon.Cancel
+                        OnSelect: |-
+                          =Set(
+                              varMVF_Selected,
+                              Filter(
+                                  varMVF_Selected,
+                                  Code <> ThisItem.Code
+                              )
+                          )
+                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                        PressedColor: =RGBA(16, 110, 190, 1)
+                        PressedFill: =RGBA(0, 0, 0, 0)
+                  - lblMVF_More:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Height: =24
+                        OnSelect: =Select(Parent)
+                        Text: = "+" & CountRows(varMVF_Selected) - cmp_MultiValueFilter.MaxVisibleChips
+                        Visible: = CountRows(varMVF_Selected) > cmp_MultiValueFilter.MaxVisibleChips
+                        Width: =40
+                        X: =Parent.Width - 44
+                        Y: =4
+      - conMVF_Header:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =ColorValue("#E2E8F0")
+            BorderThickness: =1
+            DropShadow: =DropShadow.None
+            Fill: =ColorValue("#FFFFFF")
+            Height: =64
+            PaddingLeft: =12
+            PaddingRight: =12
+            Width: =Parent.Width - 16
+            X: =8
+            Y: =8
+          Children:
+            - btnMVF_HeaderClick:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  BorderStyle: =BorderStyle.None
+                  BorderThickness: =0
+                  Color: =RGBA(255, 255, 255, 1)
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledColor: =RGBA(161, 159, 157, 1)
+                  DisabledFill: =RGBA(242, 242, 241, 0)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =48
+                  HoverBorderColor: =RGBA(0, 0, 0, 0)
+                  HoverColor: =RGBA(255, 255, 255, 1)
+                  HoverFill: =RGBA(0,0,0,0.03)
+                  OnSelect: =Set(varPunchSubsystemPopup, false)
+                  PressedBorderColor: =RGBA(0, 69, 120, 1)
+                  PressedColor: =RGBA(255, 255, 255, 1)
+                  PressedFill: =RGBA(0,0,0,0.06)
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Text: =
+                  Width: =Parent.Width - 48
+            - lblMVF_Title:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =ColorValue("#64748B")
+                  Height: =16
+                  Size: =10
+                  Text: =cmp_MultiValueFilter.Title
+                  Width: =Parent.Width - 48
+                  X: =16
+                  Y: =10
+            - lblMVF_Summary:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =ColorValue("#0F172A")
+                  FontWeight: =FontWeight.Semibold
+                  Height: =18
+                  Size: =11
+                  Text: |-
+                    =If(
+                        CountRows(varMVF_Selected) = 0,
+                        "All subsystems",
+                        CountRows(varMVF_Selected) & " selected"
+                    )
+                  Width: =Parent.Width - 48
+                  X: =16
+                  Y: =30
+            - icoMVF_Close:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Color: =ColorValue("#64748B")
+                  DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                  DisabledColor: =RGBA(225, 223, 221, 1)
+                  DisabledFill: =RGBA(0, 0, 0, 0)
+                  FocusedBorderThickness: =4
+                  Height: =20
+                  HoverBorderColor: =RGBA(0, 0, 0, 0)
+                  HoverColor: =ColorValue("#1677FF")
+                  HoverFill: =RGBA(0, 0, 0, 0)
+                  Icon: =Icon.Cancel
+                  OnSelect: =cmp_MultiValueFilter.OnClose()
+                  PressedBorderColor: =RGBA(0, 0, 0, 0)
+                  PressedColor: =RGBA(16, 110, 190, 1)
+                  PressedFill: =RGBA(0, 0, 0, 0)
+                  Width: =20
+                  X: =Parent.Width - 38
+                  Y: =20
+            - rectMVF_HeaderSeparator:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  BorderStyle: =BorderStyle.None
+                  BorderThickness: =2
+                  DisabledFill: =RGBA(161, 159, 157, 1)
+                  Fill: =ColorValue("#E2E8F0")
+                  FocusedBorderThickness: =4
+                  Height: =1
+                  HoverFill: =RGBA(0, 120, 212, 1)
+                  PressedFill: =RGBA(0, 120, 212, 1)
+                  Width: =Parent.Width
+                  Y: =Parent.Height-1

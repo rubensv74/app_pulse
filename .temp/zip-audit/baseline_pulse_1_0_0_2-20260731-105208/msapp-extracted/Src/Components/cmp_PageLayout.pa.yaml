@@ -1,0 +1,777 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+ComponentDefinitions:
+  cmp_PageLayout:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      AccentColor:
+        PropertyKind: Input
+        DisplayName: AccentColor
+        Description: Main accent color
+        DataType: Color
+        Default: =ColorValue("#1677FF")
+      ActiveModule:
+        PropertyKind: Input
+        DisplayName: ActiveModule
+        Description: Active module key
+        DataType: Text
+        Default: ="Home"
+      AppName:
+        PropertyKind: Input
+        DisplayName: AppName
+        Description: App name shown in sidebar
+        DataType: Text
+        Default: ="PULSE"
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        Description: Border color
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      CommandBarHeight:
+        PropertyKind: Input
+        DisplayName: CommandBarHeight
+        Description: Command bar height
+        DataType: Number
+        Default: =64
+      CommandBarWidth:
+        PropertyKind: Output
+        DisplayName: CommandBarWidth
+        Description: Suggested width for command bar content
+        DataType: Number
+      CommandBarX:
+        PropertyKind: Output
+        DisplayName: CommandBarX
+        Description: Suggested X for command bar content
+        DataType: Number
+      CommandBarY:
+        PropertyKind: Output
+        DisplayName: CommandBarY
+        Description: Suggested Y for command bar content
+        DataType: Number
+      ContentHeight:
+        PropertyKind: Output
+        DisplayName: ContentHeight
+        Description: Suggested height for screen content
+        DataType: Number
+      ContentWidth:
+        PropertyKind: Output
+        DisplayName: ContentWidth
+        Description: Suggested width for screen content
+        DataType: Number
+      ContentX:
+        PropertyKind: Output
+        DisplayName: ContentX
+        Description: Suggested X for screen content
+        DataType: Number
+      ContentY:
+        PropertyKind: Output
+        DisplayName: ContentY
+        Description: Suggested Y for screen content
+        DataType: Number
+      DrawerHeight:
+        PropertyKind: Output
+        DisplayName: DrawerHeight
+        Description: Suggested drawer content height
+        DataType: Number
+      DrawerWidth:
+        PropertyKind: Input
+        DisplayName: DrawerWidth
+        Description: Drawer width
+        DataType: Number
+        Default: =520
+      DrawerX:
+        PropertyKind: Output
+        DisplayName: DrawerX
+        Description: Suggested X for drawer content
+        DataType: Number
+      DrawerY:
+        PropertyKind: Output
+        DisplayName: DrawerY
+        Description: Suggested Y for drawer content
+        DataType: Number
+      FooterHeight:
+        PropertyKind: Input
+        DisplayName: FooterHeight
+        Description: Footer height
+        DataType: Number
+        Default: =36
+      FooterText:
+        PropertyKind: Input
+        DisplayName: FooterText
+        Description: Footer text
+        DataType: Text
+        Default: =""
+      HeaderHeight:
+        PropertyKind: Input
+        DisplayName: HeaderHeight
+        Description: Header height
+        DataType: Number
+        Default: =72
+      IsDrawerOpen:
+        PropertyKind: Input
+        DisplayName: IsDrawerOpen
+        Description: Shows right drawer slot
+        DataType: Boolean
+        Default: =false
+      IsLoading:
+        PropertyKind: Input
+        DisplayName: IsLoading
+        Description: Shows loading overlay
+        DataType: Boolean
+        Default: =false
+      LoadingText:
+        PropertyKind: Input
+        DisplayName: LoadingText
+        Description: Loading text
+        DataType: Text
+        Default: ="Loading..."
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        Description: Muted text color
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      NavBackgroundColor:
+        PropertyKind: Input
+        DisplayName: NavBackgroundColor
+        Description: Left nav background color
+        DataType: Color
+        Default: =ColorValue("#07111F")
+      NavItems:
+        PropertyKind: Input
+        DisplayName: NavItems
+        Description: Normalized nav table with Key, Label, IconKey, SortOrder
+        DataType: Table
+        Default: |-
+          =Table(
+              {Key:"Home", Label:"Home", IconKey:"home", SortOrder:1},
+              {Key:"Overview", Label:"Overview", IconKey:"dashboard", SortOrder:2},
+              {Key:"Tasks", Label:"Tasks", IconKey:"check", SortOrder:3},
+              {Key:"Punches", Label:"Punches", IconKey:"warning", SortOrder:4},
+              {Key:"Skyline", Label:"Skyline", IconKey:"timeline", SortOrder:5},
+              {Key:"Config", Label:"Config", IconKey:"settings", SortOrder:6}
+          )
+      NavTextColor:
+        PropertyKind: Input
+        DisplayName: NavTextColor
+        Description: Left nav text color
+        DataType: Color
+        Default: =ColorValue("#E5E7EB")
+      OnCloseDrawer:
+        PropertyKind: Event
+        DisplayName: OnCloseDrawer
+        Description: Executes close drawer action
+        ReturnType: None
+        Default: =
+      OnNavigate:
+        PropertyKind: Event
+        DisplayName: OnNavigate
+        Description: Executes when nav item is selected
+        ReturnType: None
+        Default: =
+      OnPrimaryAction:
+        PropertyKind: Event
+        DisplayName: OnPrimaryAction
+        Description: Executes primary action
+        ReturnType: None
+        Default: =
+      OnSecondaryAction:
+        PropertyKind: Event
+        DisplayName: OnSecondaryAction
+        Description: Executes secondary action
+        ReturnType: None
+        Default: =
+      PageBackgroundColor:
+        PropertyKind: Input
+        DisplayName: PageBackgroundColor
+        Description: Page background color
+        DataType: Color
+        Default: =ColorValue("#F6F8FB")
+      PageSubtitle:
+        PropertyKind: Input
+        DisplayName: PageSubtitle
+        Description: Page subtitle
+        DataType: Text
+        Default: =""
+      PageTitle:
+        PropertyKind: Input
+        DisplayName: PageTitle
+        Description: Page title
+        DataType: Text
+        Default: ="Page"
+      PrimaryActionText:
+        PropertyKind: Input
+        DisplayName: PrimaryActionText
+        Description: Primary action button text
+        DataType: Text
+        Default: ="Refresh"
+      ProjectText:
+        PropertyKind: Input
+        DisplayName: ProjectText
+        Description: Current project text
+        DataType: Text
+        Default: ="No project selected"
+      SecondaryActionText:
+        PropertyKind: Input
+        DisplayName: SecondaryActionText
+        Description: Secondary action button text
+        DataType: Text
+        Default: ="Export"
+      SelectedNavKey:
+        PropertyKind: Output
+        DisplayName: SelectedNavKey
+        Description: Last selected nav key
+        DataType: Text
+      ShowCommandBar:
+        PropertyKind: Input
+        DisplayName: ShowCommandBar
+        Description: Shows command bar
+        DataType: Boolean
+        Default: =true
+      ShowFooter:
+        PropertyKind: Input
+        DisplayName: ShowFooter
+        Description: Shows footer
+        DataType: Boolean
+        Default: =false
+      ShowHeader:
+        PropertyKind: Input
+        DisplayName: ShowHeader
+        Description: Shows top header
+        DataType: Boolean
+        Default: =true
+      ShowPrimaryAction:
+        PropertyKind: Input
+        DisplayName: ShowPrimaryAction
+        Description: Shows primary action
+        DataType: Boolean
+        Default: =true
+      ShowSecondaryAction:
+        PropertyKind: Input
+        DisplayName: ShowSecondaryAction
+        Description: Shows secondary action
+        DataType: Boolean
+        Default: =true
+      ShowSidebar:
+        PropertyKind: Input
+        DisplayName: ShowSidebar
+        Description: Shows left sidebar
+        DataType: Boolean
+        Default: =true
+      SidebarWidth:
+        PropertyKind: Input
+        DisplayName: SidebarWidth
+        Description: Sidebar width
+        DataType: Number
+        Default: =156
+      SurfaceAltColor:
+        PropertyKind: Input
+        DisplayName: SurfaceAltColor
+        Description: Alternate surface color
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      SurfaceColor:
+        PropertyKind: Input
+        DisplayName: SurfaceColora
+        Description: Surface/card color
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        Description: Main text color
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      UserText:
+        PropertyKind: Input
+        DisplayName: UserText
+        Description: Current user text
+        DataType: Text
+        Default: =""
+    Properties:
+      CommandBarWidth: =cmp_PageLayout.Width - If(cmp_PageLayout.ShowSidebar, cmp_PageLayout.SidebarWidth, 0) - If(cmp_PageLayout.IsDrawerOpen, cmp_PageLayout.DrawerWidth, 0) - 32
+      CommandBarX: =If(cmp_PageLayout.ShowSidebar, cmp_PageLayout.SidebarWidth, 0) + 16
+      CommandBarY: =If(cmp_PageLayout.ShowHeader, cmp_PageLayout.HeaderHeight, 0) + 8
+      ContentHeight: =cmp_PageLayout.Height - cmp_PageLayout.ContentY - If(cmp_PageLayout.ShowFooter, cmp_PageLayout.FooterHeight, 0) - 16
+      ContentWidth: =cmp_PageLayout.Width - If(cmp_PageLayout.ShowSidebar, cmp_PageLayout.SidebarWidth, 0) - If(cmp_PageLayout.IsDrawerOpen, cmp_PageLayout.DrawerWidth, 0) - 32
+      ContentX: =If(cmp_PageLayout.ShowSidebar, cmp_PageLayout.SidebarWidth, 0) + 16
+      ContentY: =If(cmp_PageLayout.ShowHeader, cmp_PageLayout.HeaderHeight, 0) + If(cmp_PageLayout.ShowCommandBar, cmp_PageLayout.CommandBarHeight, 0) + 16
+      DrawerHeight: =cmp_PageLayout.Height
+      DrawerX: =cmp_PageLayout.Width - cmp_PageLayout.DrawerWidth
+      DrawerY: =0
+      Height: =768
+      OnReset: =Set(varPL_SelectedNavKey, cmp_PageLayout.ActiveModule)
+      SelectedNavKey: =varPL_SelectedNavKey
+      Width: =1366
+    Children:
+      - conPL_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            DropShadow: =DropShadow.None
+            Fill: =cmp_PageLayout.PageBackgroundColor
+            Height: =Parent.Height
+            Width: =Parent.Width
+          Children:
+            - conPL_Sidebar:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_PageLayout.NavBackgroundColor
+                  Height: =Parent.Height
+                  Visible: =cmp_PageLayout.ShowSidebar
+                  Width: =cmp_PageLayout.SidebarWidth
+                Children:
+                  - lblPL_AppName:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =Color.White
+                        FontWeight: =FontWeight.Semibold
+                        Height: =28
+                        Size: =18
+                        Text: =cmp_PageLayout.AppName
+                        Width: =Parent.Width - 24
+                        X: =12
+                        Y: =18
+                  - lblPL_AppSub:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =ColorValue("#94A3B8")
+                        Height: =16
+                        Size: =8
+                        Text: ="Component Framework"
+                        Width: =Parent.Width - 24
+                        X: =12
+                        Y: =48
+                  - galPL_Nav:
+                      Control: Gallery@2.15.0
+                      Variant: BrowseLayout_Vertical_OneTextVariant_ver5.0
+                      Properties:
+                        BorderColor: =RGBA(245, 245, 245, 1)
+                        Height: =Parent.Height - 96
+                        Items: =SortByColumns(cmp_PageLayout.NavItems, "SortOrder", SortOrder.Ascending)
+                        TemplateSize: =44
+                        Width: =Parent.Width - 16
+                        X: =8
+                        Y: =84
+                      Children:
+                        - btnPL_NavRow:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderStyle: =BorderStyle.None
+                              BorderThickness: =0
+                              Color: =Color.White
+                              DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                              DisabledColor: =RGBA(161, 159, 157, 1)
+                              DisabledFill: =RGBA(242, 242, 241, 0)
+                              Fill: =If(ThisItem.Key = cmp_PageLayout.ActiveModule, ColorValue("#111827"), Color.Transparent)
+                              Font: =Font.'Segoe UI'
+                              Height: =36
+                              HoverBorderColor: =RGBA(0, 0, 0, 0)
+                              HoverColor: =Color.White
+                              HoverFill: =ColorValue("#111827")
+                              OnSelect: |-
+                                =
+                                Set(varPL_SelectedNavKey, ThisItem.Key);
+                                cmp_PageLayout.OnNavigate()
+                              PressedBorderColor: =RGBA(0, 0, 0, 0)
+                              PressedColor: =Color.White
+                              PressedFill: =ColorValue("#1F2937")
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Text: =""
+                              Width: =Parent.TemplateWidth
+                              Y: =4
+                        - icoPL_Nav:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              Color: =If(ThisItem.Key = cmp_PageLayout.ActiveModule, cmp_PageLayout.AccentColor, ColorValue("#94A3B8"))
+                              DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                              DisabledColor: =RGBA(225, 223, 221, 1)
+                              DisabledFill: =RGBA(0, 0, 0, 0)
+                              FocusedBorderThickness: =4
+                              Height: =16
+                              HoverBorderColor: =RGBA(0, 0, 0, 0)
+                              HoverColor: =cmp_PageLayout.AccentColor
+                              HoverFill: =RGBA(0, 0, 0, 0)
+                              Icon: |-
+                                =Switch(
+                                    Lower(ThisItem.IconKey),
+                                    "home", Icon.Home,
+                                    "dashboard", Icon.Trending,
+                                    "check", Icon.Check,
+                                    "warning", Icon.Warning,
+                                    "timeline", Icon.Clock,
+                                    "settings", Icon.Settings,
+                                    "table", Icon.DetailList,
+                                    Icon.Information
+                                )
+                              OnSelect: =Select(btnPL_NavRow)
+                              PressedBorderColor: =RGBA(0, 0, 0, 0)
+                              PressedColor: =cmp_PageLayout.AccentColor
+                              PressedFill: =RGBA(0, 0, 0, 0)
+                              Width: =16
+                              X: =10
+                              Y: =14
+                        - lblPL_Nav:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              Color: =If(ThisItem.Key = cmp_PageLayout.ActiveModule, Color.White, cmp_PageLayout.NavTextColor)
+                              DisabledColor: =RGBA(161, 159, 157, 1)
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =If(ThisItem.Key = cmp_PageLayout.ActiveModule, FontWeight.Semibold, FontWeight.Normal)
+                              Height: =36
+                              OnSelect: =Select(btnPL_NavRow)
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =10
+                              Text: =ThisItem.Label
+                              VerticalAlign: =VerticalAlign.Top
+                              Width: =Parent.TemplateWidth - 42
+                              X: =34
+                              Y: =13
+            - conPL_Header:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_PageLayout.BorderColor
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_PageLayout.SurfaceColor
+                  Height: =cmp_PageLayout.HeaderHeight
+                  Visible: =cmp_PageLayout.ShowHeader
+                  Width: =Parent.Width - If(cmp_PageLayout.ShowSidebar, cmp_PageLayout.SidebarWidth, 0)
+                  X: =If(cmp_PageLayout.ShowSidebar, cmp_PageLayout.SidebarWidth, 0)
+                Children:
+                  - lblPL_PageTitle:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =cmp_PageLayout.TextColor
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        Size: =16
+                        Text: =cmp_PageLayout.PageTitle
+                        Width: =Parent.Width - 420
+                        X: =18
+                        Y: =12
+                  - lblPL_PageSubtitle:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =cmp_PageLayout.MutedTextColor
+                        Height: =18
+                        Size: =10
+                        Text: =cmp_PageLayout.PageSubtitle
+                        Visible: =!IsBlank(cmp_PageLayout.PageSubtitle)
+                        Width: =Parent.Width - 420
+                        X: =18
+                        Y: =40
+                  - conPL_ProjectPill:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: =cmp_PageLayout.BorderColor
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =cmp_PageLayout.SurfaceAltColor
+                        Height: =34
+                        RadiusBottomLeft: =17
+                        RadiusBottomRight: =17
+                        RadiusTopLeft: =17
+                        RadiusTopRight: =17
+                        Width: =220
+                        X: =Parent.Width - 392
+                        Y: =19
+                      Children:
+                        - lblPL_Project:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              Color: =cmp_PageLayout.TextColor
+                              DisabledColor: =RGBA(161, 159, 157, 1)
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =34
+                              PaddingBottom: =0
+                              PaddingLeft: =8
+                              PaddingRight: =8
+                              PaddingTop: =0
+                              Size: =9
+                              Text: =cmp_PageLayout.ProjectText
+                              VerticalAlign: =VerticalAlign.Top
+                              Width: =Parent.Width
+                              Y: =9
+                  - lblPL_User:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =cmp_PageLayout.MutedTextColor
+                        Height: =18
+                        Size: =9
+                        Text: =cmp_PageLayout.UserText
+                        X: =Parent.Width - 156
+                        Y: =27
+                  - rectPL_HeaderLine:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderStyle: =BorderStyle.None
+                        DisabledFill: =RGBA(161, 159, 157, 1)
+                        Fill: =cmp_PageLayout.BorderColor
+                        FocusedBorderThickness: =4
+                        Height: =1
+                        HoverFill: =cmp_PageLayout.BorderColor
+                        PressedFill: =cmp_PageLayout.BorderColor
+                        Width: =Parent.Width
+                        Y: =Parent.Height - 1
+            - conPL_CommandBar:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_PageLayout.BorderColor
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_PageLayout.SurfaceColor
+                  Height: =cmp_PageLayout.CommandBarHeight - 16
+                  RadiusBottomLeft: =12
+                  RadiusBottomRight: =12
+                  RadiusTopLeft: =12
+                  RadiusTopRight: =12
+                  Visible: =cmp_PageLayout.ShowCommandBar
+                  Width: =cmp_PageLayout.CommandBarWidth
+                  X: =cmp_PageLayout.CommandBarX
+                  Y: =cmp_PageLayout.CommandBarY
+                Children:
+                  - lblPL_CommandHint:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =cmp_PageLayout.MutedTextColor
+                        Height: =18
+                        Size: =9
+                        Text: ="Command bar host"
+                        Width: =220
+                        X: =16
+                        Y: =15
+                  - btnPL_Secondary:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =cmp_PageLayout.BorderColor
+                        BorderThickness: =1
+                        Color: =cmp_PageLayout.TextColor
+                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        DisabledFill: =RGBA(242, 242, 241, 0)
+                        Fill: =cmp_PageLayout.SurfaceColor
+                        Font: =Font.'Segoe UI'
+                        Height: =32
+                        HoverBorderColor: =cmp_PageLayout.BorderColor
+                        HoverColor: =cmp_PageLayout.TextColor
+                        HoverFill: =cmp_PageLayout.SurfaceAltColor
+                        OnSelect: =cmp_PageLayout.OnSecondaryAction()
+                        PressedBorderColor: =cmp_PageLayout.BorderColor
+                        PressedColor: =cmp_PageLayout.TextColor
+                        PressedFill: =ColorValue("#F1F5F9")
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =10
+                        Text: =cmp_PageLayout.SecondaryActionText
+                        Visible: =cmp_PageLayout.ShowSecondaryAction
+                        Width: =104
+                        X: =Parent.Width - 224
+                        Y: =8
+                  - btnPL_Primary:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =cmp_PageLayout.AccentColor
+                        BorderStyle: =BorderStyle.None
+                        BorderThickness: =0
+                        Color: =Color.White
+                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        DisabledFill: =RGBA(242, 242, 241, 0)
+                        Fill: =cmp_PageLayout.AccentColor
+                        Font: =Font.'Segoe UI'
+                        Height: =32
+                        HoverBorderColor: =cmp_PageLayout.AccentColor
+                        HoverColor: =Color.White
+                        HoverFill: =cmp_PageLayout.AccentColor
+                        OnSelect: =cmp_PageLayout.OnPrimaryAction()
+                        PressedBorderColor: =cmp_PageLayout.AccentColor
+                        PressedColor: =Color.White
+                        PressedFill: =cmp_PageLayout.AccentColor
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =10
+                        Text: =cmp_PageLayout.PrimaryActionText
+                        Visible: =cmp_PageLayout.ShowPrimaryAction
+                        Width: =104
+                        X: =Parent.Width - 112
+                        Y: =8
+            - conPL_ContentHost:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  DropShadow: =DropShadow.None
+                  Fill: =Color.Transparent
+                  Height: =cmp_PageLayout.ContentHeight
+                  Width: =cmp_PageLayout.ContentWidth
+                  X: =cmp_PageLayout.ContentX
+                  Y: =cmp_PageLayout.ContentY
+            - conPL_Drawer:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_PageLayout.BorderColor
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.Semibold
+                  Fill: =cmp_PageLayout.SurfaceColor
+                  Height: =cmp_PageLayout.DrawerHeight
+                  Visible: =cmp_PageLayout.IsDrawerOpen
+                  Width: =cmp_PageLayout.DrawerWidth
+                  X: =cmp_PageLayout.DrawerX
+                  Y: =cmp_PageLayout.DrawerY
+                Children:
+                  - lblPL_DrawerHost:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =cmp_PageLayout.MutedTextColor
+                        Height: =20
+                        Size: =10
+                        Text: ="Drawer host"
+                        Width: =Parent.Width - 60
+                        X: =20
+                        Y: =20
+                  - icoPL_CloseDrawer:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =cmp_PageLayout.MutedTextColor
+                        DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                        DisabledColor: =RGBA(225, 223, 221, 1)
+                        DisabledFill: =RGBA(0, 0, 0, 0)
+                        FocusedBorderThickness: =4
+                        Height: =18
+                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                        HoverColor: =cmp_PageLayout.AccentColor
+                        HoverFill: =RGBA(0, 0, 0, 0)
+                        Icon: =Icon.Cancel
+                        OnSelect: =cmp_PageLayout.OnCloseDrawer()
+                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                        PressedColor: =cmp_PageLayout.AccentColor
+                        PressedFill: =RGBA(0, 0, 0, 0)
+                        Width: =18
+                        X: =Parent.Width - 34
+                        Y: =20
+            - conPL_Footer:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_PageLayout.BorderColor
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_PageLayout.SurfaceColor
+                  Height: =cmp_PageLayout.FooterHeight
+                  Visible: =cmp_PageLayout.ShowFooter
+                  Width: =Parent.Width - If(cmp_PageLayout.ShowSidebar, cmp_PageLayout.SidebarWidth, 0)
+                  X: =If(cmp_PageLayout.ShowSidebar, cmp_PageLayout.SidebarWidth, 0)
+                  Y: =Parent.Height - cmp_PageLayout.FooterHeight
+                Children:
+                  - lblPL_Footer:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =cmp_PageLayout.MutedTextColor
+                        Height: =16
+                        Size: =8
+                        Text: =cmp_PageLayout.FooterText
+                        Width: =Parent.Width - 32
+                        X: =16
+                        Y: =10
+            - conPL_LoadingOverlay:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(15, 23, 42, 0.22)
+                  Height: =Parent.Height
+                  Visible: =cmp_PageLayout.IsLoading
+                  Width: =Parent.Width
+                Children:
+                  - conPL_LoadingCard:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: =cmp_PageLayout.BorderColor
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.Semibold
+                        Fill: =cmp_PageLayout.SurfaceColor
+                        Height: =96
+                        RadiusBottomLeft: =16
+                        RadiusBottomRight: =16
+                        RadiusTopLeft: =16
+                        RadiusTopRight: =16
+                        Width: =300
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =(Parent.Height - Self.Height) / 2
+                      Children:
+                        - icoPL_Loading:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              Color: =cmp_PageLayout.AccentColor
+                              DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                              DisabledColor: =RGBA(225, 223, 221, 1)
+                              DisabledFill: =RGBA(0, 0, 0, 0)
+                              FocusedBorderThickness: =4
+                              Height: =24
+                              HoverBorderColor: =RGBA(0, 0, 0, 0)
+                              HoverColor: =cmp_PageLayout.AccentColor
+                              HoverFill: =RGBA(0, 0, 0, 0)
+                              Icon: =Icon.Reload
+                              PressedBorderColor: =RGBA(0, 0, 0, 0)
+                              PressedColor: =cmp_PageLayout.AccentColor
+                              PressedFill: =RGBA(0, 0, 0, 0)
+                              Width: =24
+                              X: =24
+                              Y: =36
+                        - lblPL_Loading:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              AutoHeight: =true
+                              Color: =cmp_PageLayout.TextColor
+                              FontWeight: =FontWeight.Semibold
+                              Height: =24
+                              Size: =12
+                              Text: =cmp_PageLayout.LoadingText
+                              Width: =220
+                              X: =64
+                              Y: =38

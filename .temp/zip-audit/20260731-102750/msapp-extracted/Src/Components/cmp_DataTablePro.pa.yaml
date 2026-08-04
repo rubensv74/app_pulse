@@ -1,0 +1,1035 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+ComponentDefinitions:
+  cmp_DataTablePro:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      AccentColor:
+        PropertyKind: Input
+        DisplayName: AccentColor
+        Description: Main accent color
+        DataType: Color
+        Default: =ColorValue("#1677FF")
+      BackgroundColor:
+        PropertyKind: Input
+        DisplayName: BackgroundColor
+        Description: Table background color
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        Description: Border/grid color
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      Col10Title:
+        PropertyKind: Input
+        DisplayName: Col10Title
+        Description: Column 10 title
+        DataType: Text
+        Default: ="Column 10"
+      Col10Width:
+        PropertyKind: Input
+        DataType: Number
+        Default: =120
+      Col1Title:
+        PropertyKind: Input
+        DisplayName: Col1Title
+        Description: Column 1 title
+        DataType: Text
+        Default: ="Column 1"
+      Col1Width:
+        PropertyKind: Input
+        DataType: Number
+        Default: =150
+      Col2Title:
+        PropertyKind: Input
+        DisplayName: Col2Title
+        Description: Column 2 title
+        DataType: Text
+        Default: ="Column 2"
+      Col2Width:
+        PropertyKind: Input
+        DataType: Number
+        Default: =150
+      Col3Title:
+        PropertyKind: Input
+        DisplayName: Col3Title
+        Description: Column 3 title
+        DataType: Text
+        Default: ="Column 3"
+      Col3Width:
+        PropertyKind: Input
+        DataType: Number
+        Default: =130
+      Col4Title:
+        PropertyKind: Input
+        DisplayName: Col4Title
+        Description: Column 4 title
+        DataType: Text
+        Default: ="Column 4"
+      Col4Width:
+        PropertyKind: Input
+        DataType: Number
+        Default: =130
+      Col5Title:
+        PropertyKind: Input
+        DisplayName: Col5Title
+        Description: Column 5 title
+        DataType: Text
+        Default: ="Column 5"
+      Col5Width:
+        PropertyKind: Input
+        DataType: Number
+        Default: =120
+      Col6Title:
+        PropertyKind: Input
+        DisplayName: Col6Title
+        Description: Column 6 title
+        DataType: Text
+        Default: ="Column 6"
+      Col6Width:
+        PropertyKind: Input
+        DataType: Number
+        Default: =120
+      Col7Title:
+        PropertyKind: Input
+        DisplayName: Col7Title
+        Description: Column 7 title
+        DataType: Text
+        Default: ="Column 7"
+      Col7Width:
+        PropertyKind: Input
+        DataType: Number
+        Default: =120
+      Col8Title:
+        PropertyKind: Input
+        DisplayName: Col8Title
+        Description: Column 8 title
+        DataType: Text
+        Default: ="Column 8"
+      Col8Width:
+        PropertyKind: Input
+        DataType: Number
+        Default: =120
+      Col9Title:
+        PropertyKind: Input
+        DisplayName: Col9Title
+        Description: Column 9 title
+        DataType: Text
+        Default: ="Column 9"
+      Col9Width:
+        PropertyKind: Input
+        DataType: Number
+        Default: =120
+      CurrentPage:
+        PropertyKind: Input
+        DataType: Number
+        Default: =1
+      DangerColor:
+        PropertyKind: Input
+        DisplayName: DangerColor
+        Description: Danger color
+        DataType: Color
+        Default: =ColorValue("#DC2626")
+      EmptyText:
+        PropertyKind: Input
+        DataType: Text
+        Default: ="No records found"
+      EnableMultiSelect:
+        PropertyKind: Input
+        DisplayName: EnableMultiSelect
+        Description: Enables checkbox multiselect
+        DataType: Boolean
+        Default: =false
+      EnableSelection:
+        PropertyKind: Input
+        DisplayName: EnableSelection
+        Description: Enables row selection
+        DataType: Boolean
+        Default: =true
+      ErrorText:
+        PropertyKind: Input
+        DataType: Text
+        Default: ="Unable to load records"
+      HasSelection:
+        PropertyKind: Output
+        DataType: Boolean
+      HeaderColor:
+        PropertyKind: Input
+        DisplayName: HeaderColor
+        Description: Header background color
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      HeaderHeight:
+        PropertyKind: Input
+        DataType: Number
+        Default: =42
+      IsEmpty:
+        PropertyKind: Output
+        DataType: Boolean
+      IsError:
+        PropertyKind: Output
+        DataType: Boolean
+      IsLoading:
+        PropertyKind: Output
+        DataType: Boolean
+      Items:
+        PropertyKind: Input
+        DisplayName: Items
+        Description: Normalized table with Id, Col1-Col10, RowState, IsSelectable
+        DataType: Table
+        Default: |-
+          =Table(
+              {
+                  Id: "",
+                  Col1: "",
+                  Col2: "",
+                  Col3: "",
+                  Col4: "",
+                  Col5: "",
+                  Col6: "",
+                  Col7: "",
+                  Col8: "",
+                  Col9: "",
+                  Col10: "",
+                  RowState: "normal",
+                  IsSelectable: true
+              }
+          )
+      LoadingText:
+        PropertyKind: Input
+        DataType: Text
+        Default: ="Loading records..."
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        Description: Muted text color
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      OnExport:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      OnNext:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      OnOpen:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      OnPrevious:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      OnRefresh:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      OnRowSelect:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      OnSortCol1:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      OnSortCol2:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      OnSortCol3:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      OnSortCol4:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      OnSortCol5:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      OnSortCol6:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      RowHeight:
+        PropertyKind: Input
+        DataType: Number
+        Default: =44
+      SelectedCount:
+        PropertyKind: Output
+        DataType: Number
+      SelectedId:
+        PropertyKind: Output
+        DataType: Text
+      SelectedItem:
+        PropertyKind: Output
+        DataType: Record
+      SelectedItems:
+        PropertyKind: Output
+        DataType: Table
+      ShowCol1:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowCol10:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =false
+      ShowCol2:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowCol3:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowCol4:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowCol5:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowCol6:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowCol7:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =false
+      ShowCol8:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =false
+      ShowCol9:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =false
+      ShowExport:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowFooter:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowHeader:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowRefresh:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowToolbar:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      SortAscending:
+        PropertyKind: Input
+        DisplayName: SortAscending
+        Description: Sort direction
+        DataType: Boolean
+        Default: =true
+      SortColumn:
+        PropertyKind: Input
+        DisplayName: SortColumn
+        Description: Active sort column key Col1-Col10
+        DataType: Text
+        Default: =""
+      State:
+        PropertyKind: Input
+        Description: Success, Loading, Empty, Error
+        DataType: Text
+        Default: ="Success"
+      Subtitle:
+        PropertyKind: Input
+        DisplayName: Subtitle
+        Description: Table subtitle
+        DataType: Text
+        Default: =""
+      SuccessColor:
+        PropertyKind: Input
+        DisplayName: SuccessColor
+        Description: Success color
+        DataType: Color
+        Default: =ColorValue("#16A34A")
+      SurfaceAltColor:
+        PropertyKind: Input
+        DisplayName: SurfaceAltColor
+        Description: Alternate row color
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        Description: Main text color
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      Title:
+        PropertyKind: Input
+        DisplayName: Title
+        Description: Table title
+        DataType: Text
+        Default: ="Data table"
+      TotalPages:
+        PropertyKind: Input
+        DataType: Number
+        Default: =1
+      TotalRows:
+        PropertyKind: Input
+        DataType: Number
+        Default: =0
+      VisibleColumnWidth:
+        PropertyKind: Output
+        DataType: Number
+      WarningColor:
+        PropertyKind: Input
+        DisplayName: WarningColor
+        Description: Warning color
+        DataType: Color
+        Default: =ColorValue("#EA580C")
+    Properties:
+      HasSelection: =cmp_DataTablePro.SelectedCount > 0
+      Height: =620
+      IsEmpty: =Lower(cmp_DataTablePro.State) = "empty" || CountRows(cmp_DataTablePro.Items) = 0
+      IsError: =Lower(cmp_DataTablePro.State) = "error"
+      IsLoading: =Lower(cmp_DataTablePro.State) = "loading"
+      OnReset: |-
+        =
+        Set(varDTP_SelectedId, "");
+        ClearCollect(varDTP_SelectedItems, FirstN(cmp_DataTablePro.Items, 0))
+      SelectedCount: =If(cmp_DataTablePro.EnableMultiSelect, CountRows(varDTP_SelectedItems), If(IsBlank(varDTP_SelectedId), 0, 1))
+      SelectedId: =varDTP_SelectedId
+      SelectedItem: =LookUp(cmp_DataTablePro.Items, Id = varDTP_SelectedId)
+      SelectedItems: =varDTP_SelectedItems
+      VisibleColumnWidth: =If(cmp_DataTablePro.ShowCol1, cmp_DataTablePro.Col1Width, 0) + If(cmp_DataTablePro.ShowCol2, cmp_DataTablePro.Col2Width, 0) + If(cmp_DataTablePro.ShowCol3, cmp_DataTablePro.Col3Width, 0) + If(cmp_DataTablePro.ShowCol4, cmp_DataTablePro.Col4Width, 0) + If(cmp_DataTablePro.ShowCol5, cmp_DataTablePro.Col5Width, 0) + If(cmp_DataTablePro.ShowCol6, cmp_DataTablePro.Col6Width, 0) + If(cmp_DataTablePro.ShowCol7, cmp_DataTablePro.Col7Width, 0) + If(cmp_DataTablePro.ShowCol8, cmp_DataTablePro.Col8Width, 0) + If(cmp_DataTablePro.ShowCol9, cmp_DataTablePro.Col9Width, 0) + If(cmp_DataTablePro.ShowCol10, cmp_DataTablePro.Col10Width, 0)
+      Width: =1180
+    Children:
+      - conDTP_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =cmp_DataTablePro.BorderColor
+            BorderThickness: =1
+            DropShadow: =DropShadow.None
+            Fill: =cmp_DataTablePro.BackgroundColor
+            Height: =Parent.Height
+            RadiusBottomLeft: =14
+            RadiusBottomRight: =14
+            RadiusTopLeft: =14
+            RadiusTopRight: =14
+            Width: =Parent.Width
+          Children:
+            - lblDTP_Title:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =cmp_DataTablePro.TextColor
+                  FontWeight: =FontWeight.Semibold
+                  Height: =22
+                  Size: =14
+                  Text: =cmp_DataTablePro.Title
+                  Visible: =cmp_DataTablePro.ShowToolbar
+                  Width: =360
+                  X: =16
+                  Y: =14
+            - lblDTP_Subtitle:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =cmp_DataTablePro.MutedTextColor
+                  Height: =16
+                  Size: =9
+                  Text: =cmp_DataTablePro.Subtitle
+                  Visible: =cmp_DataTablePro.ShowToolbar && !IsBlank(cmp_DataTablePro.Subtitle)
+                  Width: =460
+                  X: =16
+                  Y: =38
+            - icoDTP_Refresh:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Color: =cmp_DataTablePro.MutedTextColor
+                  DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                  DisabledColor: =RGBA(225, 223, 221, 1)
+                  DisabledFill: =RGBA(0, 0, 0, 0)
+                  FocusedBorderThickness: =4
+                  Height: =18
+                  HoverBorderColor: =RGBA(0, 0, 0, 0)
+                  HoverColor: =cmp_DataTablePro.AccentColor
+                  HoverFill: =RGBA(0, 0, 0, 0)
+                  Icon: =Icon.Reload
+                  OnSelect: =cmp_DataTablePro.OnRefresh()
+                  PressedBorderColor: =RGBA(0, 0, 0, 0)
+                  PressedColor: =cmp_DataTablePro.AccentColor
+                  PressedFill: =RGBA(0, 0, 0, 0)
+                  Visible: =cmp_DataTablePro.ShowToolbar && cmp_DataTablePro.ShowRefresh
+                  Width: =18
+                  X: =Parent.Width - 74
+                  Y: =22
+            - icoDTP_Export:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Color: =cmp_DataTablePro.MutedTextColor
+                  DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                  DisabledColor: =RGBA(225, 223, 221, 1)
+                  DisabledFill: =RGBA(0, 0, 0, 0)
+                  FocusedBorderThickness: =4
+                  Height: =18
+                  HoverBorderColor: =RGBA(0, 0, 0, 0)
+                  HoverColor: =cmp_DataTablePro.AccentColor
+                  HoverFill: =RGBA(0, 0, 0, 0)
+                  Icon: =Icon.Download
+                  OnSelect: =cmp_DataTablePro.OnExport()
+                  PressedBorderColor: =RGBA(0, 0, 0, 0)
+                  PressedColor: =cmp_DataTablePro.AccentColor
+                  PressedFill: =RGBA(0, 0, 0, 0)
+                  Visible: =cmp_DataTablePro.ShowToolbar && cmp_DataTablePro.ShowExport
+                  Width: =18
+                  X: =Parent.Width - 36
+                  Y: =22
+            - rectDTP_ToolbarLine:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  BorderStyle: =BorderStyle.None
+                  DisabledFill: =RGBA(161, 159, 157, 1)
+                  Fill: =cmp_DataTablePro.BorderColor
+                  FocusedBorderThickness: =4
+                  Height: =1
+                  HoverFill: =cmp_DataTablePro.BorderColor
+                  PressedFill: =cmp_DataTablePro.BorderColor
+                  Visible: =cmp_DataTablePro.ShowToolbar
+                  Width: =Parent.Width
+                  Y: =64
+            - conDTP_Header:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_DataTablePro.BorderColor
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_DataTablePro.HeaderColor
+                  Height: =cmp_DataTablePro.HeaderHeight
+                  Visible: =cmp_DataTablePro.ShowHeader
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =If(cmp_DataTablePro.ShowToolbar, 76, 16)
+                Children:
+                  - lblDTP_H1:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =If(cmp_DataTablePro.SortColumn = "Col1", cmp_DataTablePro.AccentColor, cmp_DataTablePro.MutedTextColor)
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =cmp_DataTablePro.HeaderHeight
+                        OnSelect: =cmp_DataTablePro.OnSortCol1()
+                        PaddingBottom: =0
+                        PaddingLeft: =10
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =10
+                        Text: =cmp_DataTablePro.Col1Title & If(cmp_DataTablePro.SortColumn = "Col1", If(cmp_DataTablePro.SortAscending, " ▲", " ▼"), "")
+                        VerticalAlign: =VerticalAlign.Top
+                        Visible: =cmp_DataTablePro.ShowCol1
+                        Width: =cmp_DataTablePro.Col1Width
+                        Y: =13
+                  - lblDTP_H2:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =If(cmp_DataTablePro.SortColumn = "Col2", cmp_DataTablePro.AccentColor, cmp_DataTablePro.MutedTextColor)
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =cmp_DataTablePro.HeaderHeight
+                        OnSelect: =cmp_DataTablePro.OnSortCol2()
+                        PaddingBottom: =0
+                        PaddingLeft: =10
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =10
+                        Text: =cmp_DataTablePro.Col2Title & If(cmp_DataTablePro.SortColumn = "Col2", If(cmp_DataTablePro.SortAscending, " ▲", " ▼"), "")
+                        VerticalAlign: =VerticalAlign.Top
+                        Visible: =cmp_DataTablePro.ShowCol2
+                        Width: =cmp_DataTablePro.Col2Width
+                        X: =lblDTP_H1.X + If(cmp_DataTablePro.ShowCol1, lblDTP_H1.Width, 0)
+                        Y: =13
+                  - lblDTP_H3:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =If(cmp_DataTablePro.SortColumn = "Col3", cmp_DataTablePro.AccentColor, cmp_DataTablePro.MutedTextColor)
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =cmp_DataTablePro.HeaderHeight
+                        OnSelect: =cmp_DataTablePro.OnSortCol3()
+                        PaddingBottom: =0
+                        PaddingLeft: =10
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =10
+                        Text: =cmp_DataTablePro.Col3Title & If(cmp_DataTablePro.SortColumn = "Col3", If(cmp_DataTablePro.SortAscending, " ▲", " ▼"), "")
+                        VerticalAlign: =VerticalAlign.Top
+                        Visible: =cmp_DataTablePro.ShowCol3
+                        Width: =cmp_DataTablePro.Col3Width
+                        X: =lblDTP_H2.X + If(cmp_DataTablePro.ShowCol2, lblDTP_H2.Width, 0)
+                        Y: =13
+                  - lblDTP_H4:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =If(cmp_DataTablePro.SortColumn = "Col4", cmp_DataTablePro.AccentColor, cmp_DataTablePro.MutedTextColor)
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =cmp_DataTablePro.HeaderHeight
+                        OnSelect: =cmp_DataTablePro.OnSortCol4()
+                        PaddingBottom: =0
+                        PaddingLeft: =10
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =10
+                        Text: =cmp_DataTablePro.Col4Title & If(cmp_DataTablePro.SortColumn = "Col4", If(cmp_DataTablePro.SortAscending, " ▲", " ▼"), "")
+                        VerticalAlign: =VerticalAlign.Top
+                        Visible: =cmp_DataTablePro.ShowCol4
+                        Width: =cmp_DataTablePro.Col4Width
+                        X: =lblDTP_H3.X + If(cmp_DataTablePro.ShowCol3, lblDTP_H3.Width, 0)
+                        Y: =13
+                  - lblDTP_H5:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =If(cmp_DataTablePro.SortColumn = "Col5", cmp_DataTablePro.AccentColor, cmp_DataTablePro.MutedTextColor)
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =cmp_DataTablePro.HeaderHeight
+                        OnSelect: =cmp_DataTablePro.OnSortCol5()
+                        PaddingBottom: =0
+                        PaddingLeft: =10
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =10
+                        Text: =cmp_DataTablePro.Col5Title & If(cmp_DataTablePro.SortColumn = "Col5", If(cmp_DataTablePro.SortAscending, " ▲", " ▼"), "")
+                        VerticalAlign: =VerticalAlign.Top
+                        Visible: =cmp_DataTablePro.ShowCol5
+                        Width: =cmp_DataTablePro.Col5Width
+                        X: =lblDTP_H4.X + If(cmp_DataTablePro.ShowCol4, lblDTP_H4.Width, 0)
+                        Y: =13
+                  - lblDTP_H6:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =If(cmp_DataTablePro.SortColumn = "Col6", cmp_DataTablePro.AccentColor, cmp_DataTablePro.MutedTextColor)
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =cmp_DataTablePro.HeaderHeight
+                        OnSelect: =cmp_DataTablePro.OnSortCol6()
+                        PaddingBottom: =0
+                        PaddingLeft: =10
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =10
+                        Text: =cmp_DataTablePro.Col6Title & If(cmp_DataTablePro.SortColumn = "Col6", If(cmp_DataTablePro.SortAscending, " ▲", " ▼"), "")
+                        VerticalAlign: =VerticalAlign.Top
+                        Visible: =cmp_DataTablePro.ShowCol6
+                        Width: =cmp_DataTablePro.Col6Width
+                        X: =lblDTP_H5.X + If(cmp_DataTablePro.ShowCol5, lblDTP_H5.Width, 0)
+                        Y: =13
+            - galDTP_Rows:
+                Control: Gallery@2.15.0
+                Variant: BrowseLayout_Vertical_OneTextVariant_ver5.0
+                Properties:
+                  BorderColor: =RGBA(245, 245, 245, 1)
+                  Height: =Parent.Height - If(cmp_DataTablePro.ShowToolbar, 178, 130)
+                  Items: =cmp_DataTablePro.Items
+                  TemplateSize: =cmp_DataTablePro.RowHeight
+                  Visible: =!cmp_DataTablePro.IsLoading && !cmp_DataTablePro.IsEmpty && !cmp_DataTablePro.IsError
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =If(cmp_DataTablePro.ShowHeader, conDTP_Header.Y + conDTP_Header.Height, If(cmp_DataTablePro.ShowToolbar, 76, 16))
+                Children:
+                  - btnDTP_Row:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderStyle: =BorderStyle.None
+                        BorderThickness: =0
+                        Color: =Color.White
+                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        DisabledFill: =RGBA(242, 242, 241, 0)
+                        Fill: |-
+                          =If(
+                              ThisItem.Id = varDTP_SelectedId,
+                              ColorValue("#EFF6FF"),
+                              If(
+                                  Lower(ThisItem.RowState) = "warning",
+                                  ColorValue("#FFF7ED"),
+                                  If(
+                                      Lower(ThisItem.RowState) = "error" || Lower(ThisItem.RowState) = "danger",
+                                      ColorValue("#FEF2F2"),
+                                      If(ThisItem.IsSelected, cmp_DataTablePro.SurfaceAltColor, cmp_DataTablePro.BackgroundColor)
+                                  )
+                              )
+                          )
+                        Font: =Font.'Segoe UI'
+                        Height: =Parent.TemplateHeight
+                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                        HoverColor: =Color.White
+                        HoverFill: =ColorValue("#EFF6FF")
+                        OnSelect: |-
+                          =
+                          If(
+                              cmp_DataTablePro.EnableSelection && ThisItem.IsSelectable,
+                              Set(varDTP_SelectedId, ThisItem.Id)
+                          );
+                          cmp_DataTablePro.OnRowSelect()
+                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                        PressedColor: =Color.White
+                        PressedFill: =ColorValue("#DBEAFE")
+                        RadiusBottomLeft: =0
+                        RadiusBottomRight: =0
+                        RadiusTopLeft: =0
+                        RadiusTopRight: =0
+                        Text: =""
+                        Width: =Parent.TemplateWidth
+                  - chkDTP_Select:
+                      Control: Classic/CheckBox@2.1.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderStyle: =BorderStyle.None
+                        BorderThickness: =2
+                        CheckboxBorderColor: =cmp_DataTablePro.MutedTextColor
+                        CheckmarkFill: =cmp_DataTablePro.AccentColor
+                        Color: =cmp_DataTablePro.TextColor
+                        Default: =ThisItem.Id in varDTP_SelectedItems.Id
+                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        FocusedBorderThickness: =4
+                        Font: =Font.'Segoe UI'
+                        Height: =28
+                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                        HoverColor: =cmp_DataTablePro.TextColor
+                        HoverFill: =RGBA(0, 0, 0, 0)
+                        OnCheck: =Collect(varDTP_SelectedItems, ThisItem)
+                        OnSelect: =Select(Parent)
+                        OnUncheck: =RemoveIf(varDTP_SelectedItems, Id = ThisItem.Id)
+                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                        PressedColor: =cmp_DataTablePro.TextColor
+                        PressedFill: =RGBA(0, 0, 0, 0)
+                        Text: =""
+                        Visible: =cmp_DataTablePro.EnableMultiSelect
+                        Width: =30
+                        X: =4
+                        Y: =8
+                  - lblDTP_C1:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =cmp_DataTablePro.TextColor
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =Parent.TemplateHeight
+                        OnSelect: =Select(btnDTP_Row)
+                        PaddingBottom: =0
+                        PaddingLeft: =If(cmp_DataTablePro.EnableMultiSelect, 40, 10)
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =10
+                        Text: =ThisItem.Col1
+                        VerticalAlign: =VerticalAlign.Top
+                        Visible: =cmp_DataTablePro.ShowCol1
+                        Width: =cmp_DataTablePro.Col1Width
+                        Y: =12
+                  - lblDTP_C2:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =cmp_DataTablePro.TextColor
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =Parent.TemplateHeight
+                        OnSelect: =Select(btnDTP_Row)
+                        PaddingBottom: =0
+                        PaddingLeft: =10
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =10
+                        Text: =ThisItem.Col2
+                        VerticalAlign: =VerticalAlign.Top
+                        Visible: =cmp_DataTablePro.ShowCol2
+                        Width: =cmp_DataTablePro.Col2Width
+                        X: =lblDTP_C1.X + If(cmp_DataTablePro.ShowCol1, lblDTP_C1.Width, 0)
+                        Y: =12
+                  - lblDTP_C3:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =cmp_DataTablePro.TextColor
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =Parent.TemplateHeight
+                        OnSelect: =Select(btnDTP_Row)
+                        PaddingBottom: =0
+                        PaddingLeft: =10
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =10
+                        Text: =ThisItem.Col3
+                        VerticalAlign: =VerticalAlign.Top
+                        Visible: =cmp_DataTablePro.ShowCol3
+                        Width: =cmp_DataTablePro.Col3Width
+                        X: =lblDTP_C2.X + If(cmp_DataTablePro.ShowCol2, lblDTP_C2.Width, 0)
+                        Y: =12
+                  - lblDTP_C4:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =cmp_DataTablePro.TextColor
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =Parent.TemplateHeight
+                        OnSelect: =Select(btnDTP_Row)
+                        PaddingBottom: =0
+                        PaddingLeft: =10
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =10
+                        Text: =ThisItem.Col4
+                        VerticalAlign: =VerticalAlign.Top
+                        Visible: =cmp_DataTablePro.ShowCol4
+                        Width: =cmp_DataTablePro.Col4Width
+                        X: =lblDTP_C3.X + If(cmp_DataTablePro.ShowCol3, lblDTP_C3.Width, 0)
+                        Y: =12
+                  - lblDTP_C5:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =cmp_DataTablePro.TextColor
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =Parent.TemplateHeight
+                        OnSelect: =Select(btnDTP_Row)
+                        PaddingBottom: =0
+                        PaddingLeft: =10
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =10
+                        Text: =ThisItem.Col5
+                        VerticalAlign: =VerticalAlign.Top
+                        Visible: =cmp_DataTablePro.ShowCol5
+                        Width: =cmp_DataTablePro.Col5Width
+                        X: =lblDTP_C4.X + If(cmp_DataTablePro.ShowCol4, lblDTP_C4.Width, 0)
+                        Y: =12
+                  - lblDTP_C6:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =cmp_DataTablePro.TextColor
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =Parent.TemplateHeight
+                        OnSelect: =Select(btnDTP_Row)
+                        PaddingBottom: =0
+                        PaddingLeft: =10
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =10
+                        Text: =ThisItem.Col6
+                        VerticalAlign: =VerticalAlign.Top
+                        Visible: =cmp_DataTablePro.ShowCol6
+                        Width: =cmp_DataTablePro.Col6Width
+                        X: =lblDTP_C5.X + If(cmp_DataTablePro.ShowCol5, lblDTP_C5.Width, 0)
+                        Y: =12
+            - lblDTP_State:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =If(cmp_DataTablePro.IsError, cmp_DataTablePro.DangerColor, cmp_DataTablePro.MutedTextColor)
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  Size: =13
+                  Text: |-
+                    =If(
+                        cmp_DataTablePro.IsLoading,
+                        cmp_DataTablePro.LoadingText,
+                        If(
+                            cmp_DataTablePro.IsError,
+                            cmp_DataTablePro.ErrorText,
+                            cmp_DataTablePro.EmptyText
+                        )
+                    )
+                  Visible: =cmp_DataTablePro.IsLoading || cmp_DataTablePro.IsEmpty || cmp_DataTablePro.IsError
+                  Width: =Parent.Width - 64
+                  X: =32
+                  Y: =(Parent.Height - 24) / 2
+            - rectDTP_FooterLine:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  BorderStyle: =BorderStyle.None
+                  DisabledFill: =RGBA(161, 159, 157, 1)
+                  Fill: =cmp_DataTablePro.BorderColor
+                  FocusedBorderThickness: =4
+                  Height: =1
+                  HoverFill: =cmp_DataTablePro.BorderColor
+                  PressedFill: =cmp_DataTablePro.BorderColor
+                  Visible: =cmp_DataTablePro.ShowFooter
+                  Width: =Parent.Width
+                  Y: =Parent.Height - 50
+            - lblDTP_Footer:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =cmp_DataTablePro.MutedTextColor
+                  Height: =18
+                  Size: =9
+                  Text: =cmp_DataTablePro.TotalRows & " rows" & If(cmp_DataTablePro.HasSelection, " · " & cmp_DataTablePro.SelectedCount & " selected", "")
+                  Visible: =cmp_DataTablePro.ShowFooter
+                  Width: =260
+                  X: =16
+                  Y: =Parent.Height - 32
+            - btnDTP_Open:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =cmp_DataTablePro.BorderColor
+                  BorderThickness: =1
+                  Color: =cmp_DataTablePro.TextColor
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledColor: =RGBA(161, 159, 157, 1)
+                  DisabledFill: =RGBA(242, 242, 241, 0)
+                  DisplayMode: =If(cmp_DataTablePro.HasSelection, DisplayMode.Edit, DisplayMode.Disabled)
+                  Fill: =cmp_DataTablePro.BackgroundColor
+                  Font: =Font.'Segoe UI'
+                  Height: =32
+                  HoverBorderColor: =cmp_DataTablePro.BorderColor
+                  HoverColor: =cmp_DataTablePro.TextColor
+                  HoverFill: =cmp_DataTablePro.SurfaceAltColor
+                  OnSelect: =cmp_DataTablePro.OnOpen()
+                  PressedBorderColor: =cmp_DataTablePro.BorderColor
+                  PressedColor: =cmp_DataTablePro.TextColor
+                  PressedFill: =ColorValue("#F1F5F9")
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =10
+                  Text: ="Open"
+                  Visible: =cmp_DataTablePro.ShowFooter
+                  Width: =80
+                  X: =Parent.Width - 356
+                  Y: =Parent.Height - 40
+            - btnDTP_Previous:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =cmp_DataTablePro.BorderColor
+                  BorderThickness: =1
+                  Color: =cmp_DataTablePro.TextColor
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledColor: =RGBA(161, 159, 157, 1)
+                  DisabledFill: =RGBA(242, 242, 241, 0)
+                  DisplayMode: =If(cmp_DataTablePro.CurrentPage <= 1, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =cmp_DataTablePro.BackgroundColor
+                  Font: =Font.'Segoe UI'
+                  Height: =32
+                  HoverBorderColor: =cmp_DataTablePro.BorderColor
+                  HoverColor: =cmp_DataTablePro.TextColor
+                  HoverFill: =cmp_DataTablePro.SurfaceAltColor
+                  OnSelect: =cmp_DataTablePro.OnPrevious()
+                  PressedBorderColor: =cmp_DataTablePro.BorderColor
+                  PressedColor: =cmp_DataTablePro.TextColor
+                  PressedFill: =ColorValue("#F1F5F9")
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =10
+                  Text: ="Previous"
+                  Visible: =cmp_DataTablePro.ShowFooter
+                  Width: =92
+                  X: =Parent.Width - 264
+                  Y: =Parent.Height - 40
+            - lblDTP_Page:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Color: =cmp_DataTablePro.MutedTextColor
+                  DisabledColor: =RGBA(161, 159, 157, 1)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =32
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =10
+                  Text: =cmp_DataTablePro.CurrentPage & " / " & cmp_DataTablePro.TotalPages
+                  VerticalAlign: =VerticalAlign.Top
+                  Visible: =cmp_DataTablePro.ShowFooter
+                  Width: =64
+                  X: =Parent.Width - 166
+                  Y: =Parent.Height - 32
+            - btnDTP_Next:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =cmp_DataTablePro.AccentColor
+                  BorderStyle: =BorderStyle.None
+                  BorderThickness: =0
+                  Color: =Color.White
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledColor: =RGBA(161, 159, 157, 1)
+                  DisabledFill: =RGBA(242, 242, 241, 0)
+                  DisplayMode: =If(cmp_DataTablePro.CurrentPage >= cmp_DataTablePro.TotalPages, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =cmp_DataTablePro.AccentColor
+                  Font: =Font.'Segoe UI'
+                  Height: =32
+                  HoverBorderColor: =cmp_DataTablePro.AccentColor
+                  HoverColor: =Color.White
+                  HoverFill: =cmp_DataTablePro.AccentColor
+                  OnSelect: =cmp_DataTablePro.OnNext()
+                  PressedBorderColor: =cmp_DataTablePro.AccentColor
+                  PressedColor: =Color.White
+                  PressedFill: =cmp_DataTablePro.AccentColor
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =10
+                  Text: ="Next"
+                  Visible: =cmp_DataTablePro.ShowFooter
+                  Width: =92
+                  X: =Parent.Width - 100
+                  Y: =Parent.Height - 40

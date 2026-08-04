@@ -1,0 +1,176 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sqldw": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsqldw_ce25b"
+        },
+        "api": {
+          "name": "shared_sqldw"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "3b878675-dc86-42d4-8191-3f70cf6b9e52"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "number": {
+                  "title": "ProjectId",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "text": {
+                  "title": "Subsystem",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_1": {
+                  "title": "Discipline",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_2": {
+                  "title": "Subcontractor",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "number_1": {
+                  "title": "PageNumber",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Escriba un número.",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "text_3": {
+                  "title": "L3NodeId",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "number_2": {
+                  "title": "TaskStatusId",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "boolean": {
+                  "title": "ApplyReportScope",
+                  "type": "boolean",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please select yes or no",
+                  "x-ms-content-hint": "BOOLEAN"
+                }
+              },
+              "required": [
+                "number",
+                "text",
+                "text_1",
+                "text_2",
+                "number_1",
+                "text_3",
+                "number_2",
+                "boolean"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Execute_stored_procedure_(V2)": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "4035661b-d813-40ec-881d-3bd1cc1f9594"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "result": "@{string(body('Execute_stored_procedure_(V2)')?['ResultSets']?['Table1'])}"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "title": "result",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "Execute_stored_procedure_(V2)": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "5b2d85b4-8125-41cd-8e93-45b2b73e5bb4"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+              "connectionName": "shared_sqldw",
+              "operationId": "ExecuteProcedureV2"
+            },
+            "parameters": {
+              "server": "default",
+              "database": "default",
+              "procedure": "[warroom].[usp_GetProjectInspectionTasksExtended_FilteredPaged]",
+              "parameters/ApplyReportScope": "@triggerBody()['boolean']",
+              "parameters/ElementDiscipline": "@triggerBody()['text_1']",
+              "parameters/L3NodeId": "@triggerBody()['text_3']",
+              "parameters/PageNumber": "@triggerBody()['number_1']",
+              "parameters/PageSize": 50,
+              "parameters/ProjectId": "@triggerBody()['number']",
+              "parameters/Subcontractor": "@triggerBody()['text_2']",
+              "parameters/SubsystemCode": "@triggerBody()['text']",
+              "parameters/TaskStatusId": "@triggerBody()['number_2']"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

@@ -1,0 +1,617 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+ComponentDefinitions:
+  cmp_MultiSelectFilter:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      AccentColor:
+        PropertyKind: Input
+        DisplayName: AccentColor
+        Description: Main accent color
+        DataType: Color
+        Default: =ColorValue("#1677FF")
+      AllText:
+        PropertyKind: Input
+        DisplayName: AllText
+        Description: Text shown when no item is selected
+        DataType: Text
+        Default: ="All"
+      ApplyText:
+        PropertyKind: Input
+        DisplayName: ApplyText
+        Description: Apply button text
+        DataType: Text
+        Default: ="Apply"
+      BackgroundColor:
+        PropertyKind: Input
+        DisplayName: BackgroundColor
+        Description: Component background color
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        Description: Component border color
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      ClearText:
+        PropertyKind: Input
+        DisplayName: ClearText
+        Description: Clear button text
+        DataType: Text
+        Default: ="Clear"
+      EnablePaste:
+        PropertyKind: Input
+        DisplayName: EnablePaste
+        Description: Show paste box
+        DataType: Boolean
+        Default: =true
+      HasInvalidCodes:
+        PropertyKind: Output
+        DisplayName: HasInvalidCodes
+        Description: True when InvalidCodes has records
+        DataType: Boolean
+      HasSelection:
+        PropertyKind: Output
+        DisplayName: HasSelection
+        Description: True when at least one item is selected
+        DataType: Boolean
+      InvalidCodes:
+        PropertyKind: Output
+        DisplayName: InvalidCodes
+        Description: Pasted codes not found in Items
+        DataType: Table
+      Items:
+        PropertyKind: Input
+        DisplayName: Items
+        Description: Normalized table with Id, Code, Display and SortOrder columns
+        DataType: Table
+        Default: |-
+          =Table(
+              {
+                  Id: "",
+                  Code: "",
+                  Display: "",
+                  SortOrder: 0
+              }
+          )
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        Description: Muted text color
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      NotFoundText:
+        PropertyKind: Input
+        DisplayName: NotFoundText
+        Description: Invalid pasted values suffix
+        DataType: Text
+        Default: ="not found"
+      OnApply:
+        PropertyKind: Event
+        DisplayName: OnApply
+        Description: Executes when selection is applied
+        ReturnType: None
+        Default: =
+      OnClose:
+        PropertyKind: Event
+        DisplayName: OnClose
+        Description: Executes when component requests close
+        ReturnType: None
+        Default: =
+      PastePlaceholder:
+        PropertyKind: Input
+        DisplayName: PastePlaceholder
+        Description: Paste box placeholder
+        DataType: Text
+        Default: ="Paste values, one per line"
+      SearchPlaceholder:
+        PropertyKind: Input
+        DisplayName: SearchPlaceholder
+        Description: Search placeholder
+        DataType: Text
+        Default: ="Search..."
+      SelectedCodesCRLF:
+        PropertyKind: Output
+        DisplayName: SelectedCodesCRLF
+        Description: Selected codes separated by line break
+        DataType: Text
+      SelectedCodesCSV:
+        PropertyKind: Output
+        DisplayName: SelectedCodesCSV
+        Description: Selected codes separated by comma
+        DataType: Text
+      SelectedCount:
+        PropertyKind: Output
+        DisplayName: SelectedCount
+        Description: Selected record count
+        DataType: Number
+      SelectedDisplayCSV:
+        PropertyKind: Output
+        DisplayName: SelectedDisplayCSV
+        Description: Selected display values separated by comma
+        DataType: Text
+      SelectedItems:
+        PropertyKind: Output
+        DisplayName: SelectedItems
+        Description: Selected records
+        DataType: Table
+      SelectedText:
+        PropertyKind: Input
+        DisplayName: SelectedText
+        Description: Selected count suffix
+        DataType: Text
+        Default: ="selected"
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        Description: Main text color
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      Title:
+        PropertyKind: Input
+        DisplayName: Title
+        Description: Filter title
+        DataType: Text
+        Default: ="Filter"
+    Properties:
+      HasInvalidCodes: =CountRows(varMSF_Invalid) > 0
+      HasSelection: =CountRows(varMSF_Selected) > 0
+      Height: =456
+      InvalidCodes: =varMSF_Invalid
+      OnReset: |-
+        =
+        Set(varMSF_Search, "");
+
+        ClearCollect(
+            varMSF_Selected,
+            FirstN(
+                Table(
+                    {
+                        Id: "",
+                        Code: "",
+                        Display: "",
+                        SortOrder: 0
+                    }
+                ),
+                0
+            )
+        );
+
+        ClearCollect(
+            varMSF_Invalid,
+            FirstN(
+                Table({ Code: "" }),
+                0
+            )
+        )
+      SelectedCodesCRLF: =Concat(varMSF_Selected, Code, Char(10))
+      SelectedCodesCSV: =Concat(varMSF_Selected, Code, ",")
+      SelectedCount: =CountRows(varMSF_Selected)
+      SelectedDisplayCSV: =Concat(varMSF_Selected, Display, ", ")
+      SelectedItems: =varMSF_Selected
+      Width: =360
+    Children:
+      - conMSF_Header:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =cmp_MultiSelectFilter.BorderColor
+            BorderThickness: =1
+            DropShadow: =DropShadow.None
+            Fill: =cmp_MultiSelectFilter.BackgroundColor
+            Height: =64
+            PaddingLeft: =12
+            PaddingRight: =12
+            Width: =Parent.Width - 16
+            X: =8
+            Y: =8
+          Children:
+            - btnMSF_HeaderClick:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  BorderStyle: =BorderStyle.None
+                  BorderThickness: =0
+                  Color: =Color.White
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledColor: =RGBA(161, 159, 157, 1)
+                  DisabledFill: =RGBA(242, 242, 241, 0)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =48
+                  HoverBorderColor: =RGBA(0, 0, 0, 0)
+                  HoverColor: =Color.White
+                  HoverFill: =RGBA(0,0,0,0.03)
+                  OnSelect: =cmp_MultiSelectFilter.OnClose()
+                  PressedBorderColor: =RGBA(0, 0, 0, 0)
+                  PressedColor: =Color.White
+                  PressedFill: =RGBA(0,0,0,0.06)
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Text: =""
+                  Width: =Parent.Width - 48
+                  Y: =8
+            - lblMSF_Title:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =cmp_MultiSelectFilter.MutedTextColor
+                  Height: =16
+                  Size: =10
+                  Text: =cmp_MultiSelectFilter.Title
+                  Width: =Parent.Width - 56
+                  X: =16
+                  Y: =10
+            - lblMSF_Summary:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =cmp_MultiSelectFilter.TextColor
+                  FontWeight: =FontWeight.Semibold
+                  Height: =18
+                  Size: =11
+                  Text: |-
+                    =If(
+                        CountRows(varMSF_Selected) = 0,
+                        cmp_MultiSelectFilter.AllText,
+                        CountRows(varMSF_Selected) & " " & cmp_MultiSelectFilter.SelectedText
+                    )
+                  Width: =Parent.Width - 56
+                  X: =16
+                  Y: =30
+            - icoMSF_Close:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Color: =cmp_MultiSelectFilter.MutedTextColor
+                  DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                  DisabledColor: =RGBA(225, 223, 221, 1)
+                  DisabledFill: =RGBA(0, 0, 0, 0)
+                  FocusedBorderThickness: =4
+                  Height: =20
+                  HoverBorderColor: =RGBA(0, 0, 0, 0)
+                  HoverColor: =cmp_MultiSelectFilter.AccentColor
+                  HoverFill: =RGBA(0, 0, 0, 0)
+                  Icon: =Icon.Cancel
+                  OnSelect: =cmp_MultiSelectFilter.OnClose()
+                  PressedBorderColor: =RGBA(0, 0, 0, 0)
+                  PressedColor: =cmp_MultiSelectFilter.AccentColor
+                  PressedFill: =RGBA(0, 0, 0, 0)
+                  Width: =20
+                  X: =Parent.Width - 38
+                  Y: =20
+            - rectMSF_HeaderSeparator:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  BorderStyle: =BorderStyle.None
+                  DisabledFill: =RGBA(161, 159, 157, 1)
+                  Fill: =cmp_MultiSelectFilter.BorderColor
+                  FocusedBorderThickness: =4
+                  Height: =1
+                  HoverFill: =cmp_MultiSelectFilter.BorderColor
+                  PressedFill: =cmp_MultiSelectFilter.BorderColor
+                  Width: =Parent.Width
+                  Y: =Parent.Height - 1
+      - conMSF_Panel:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =cmp_MultiSelectFilter.BorderColor
+            BorderThickness: =1
+            DropShadow: =DropShadow.Semibold
+            Fill: =cmp_MultiSelectFilter.BackgroundColor
+            Height: =Parent.Height - 80
+            PaddingLeft: =2
+            PaddingRight: =2
+            RadiusBottomLeft: =12
+            RadiusBottomRight: =12
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Width: =Parent.Width - 16
+            X: =8
+            Y: =72
+          Children:
+            - txtMSF_Search:
+                Control: ModernTextInput@1.1.1
+                Properties:
+                  Appearance: =Appearance.Outline
+                  Default: =varMSF_Search
+                  Height: =38
+                  OnChange: =Set(varMSF_Search, Self.Text)
+                  Placeholder: =cmp_MultiSelectFilter.SearchPlaceholder
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =16
+            - galMSF_Items:
+                Control: Gallery@2.15.0
+                Variant: BrowseLayout_Vertical_OneTextVariant_ver5.0
+                Properties:
+                  BorderColor: =RGBA(245, 245, 245, 1)
+                  Height: =If(cmp_MultiSelectFilter.EnablePaste, 170, Parent.Height - 154)
+                  Items: |-
+                    =
+                    SortByColumns(
+                        Filter(
+                            cmp_MultiSelectFilter.Items,
+                            IsBlank(txtMSF_Search.Text) ||
+                            StartsWith(Display, txtMSF_Search.Text) ||
+                            StartsWith(Code, txtMSF_Search.Text)
+                        ),
+                        "SortOrder",
+                        SortOrder.Ascending,
+                        "Display",
+                        SortOrder.Ascending
+                    )
+                  TemplateSize: =44
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =txtMSF_Search.Y + txtMSF_Search.Height + 12
+                Children:
+                  - chkMSF_Item:
+                      Control: Classic/CheckBox@2.1.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderStyle: =BorderStyle.None
+                        BorderThickness: =2
+                        CheckboxBorderColor: =cmp_MultiSelectFilter.MutedTextColor
+                        CheckmarkFill: =cmp_MultiSelectFilter.AccentColor
+                        Color: =cmp_MultiSelectFilter.TextColor
+                        Default: =ThisItem.Code in varMSF_Selected.Code
+                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        FocusedBorderThickness: =4
+                        Font: =Font.'Segoe UI'
+                        Height: =32
+                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                        HoverColor: =cmp_MultiSelectFilter.TextColor
+                        HoverFill: =RGBA(0, 0, 0, 0)
+                        OnCheck: |-
+                          =
+                          If(
+                              IsBlank(
+                                  LookUp(
+                                      varMSF_Selected,
+                                      Code = ThisItem.Code
+                                  )
+                              ),
+                              Collect(
+                                  varMSF_Selected,
+                                  {
+                                      Id: ThisItem.Id,
+                                      Code: ThisItem.Code,
+                                      Display: ThisItem.Display,
+                                      SortOrder: ThisItem.SortOrder
+                                  }
+                              )
+                          )
+                        OnSelect: =Select(Parent)
+                        OnUncheck: |-
+                          =
+                          RemoveIf(
+                              varMSF_Selected,
+                              Code = ThisItem.Code
+                          )
+                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                        PressedColor: =cmp_MultiSelectFilter.TextColor
+                        PressedFill: =RGBA(0, 0, 0, 0)
+                        Text: =""
+                        Width: =36
+                        Y: =8
+                  - lblMSF_Item:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Color: =cmp_MultiSelectFilter.TextColor
+                        Height: =36
+                        OnSelect: =Select(Parent)
+                        Size: =11
+                        Text: =ThisItem.Display
+                        Width: =Parent.TemplateWidth - 44
+                        X: =40
+                        Y: =4
+            - txtMSF_Paste:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  BorderColor: =RGBA(245, 245, 245, 1)
+                  Color: =cmp_MultiSelectFilter.TextColor
+                  Default: =""
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledColor: =RGBA(161, 159, 157, 1)
+                  DisabledFill: =RGBA(242, 242, 241, 0)
+                  Font: =Font.'Segoe UI'
+                  Height: =64
+                  HintText: =cmp_MultiSelectFilter.PastePlaceholder
+                  HoverBorderColor: =cmp_MultiSelectFilter.AccentColor
+                  HoverColor: =cmp_MultiSelectFilter.TextColor
+                  HoverFill: =Color.White
+                  Mode: =TextMode.MultiLine
+                  PressedBorderColor: =cmp_MultiSelectFilter.AccentColor
+                  PressedColor: =cmp_MultiSelectFilter.TextColor
+                  PressedFill: =Color.White
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =11
+                  Visible: =cmp_MultiSelectFilter.EnablePaste
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =galMSF_Items.Y + galMSF_Items.Height + 12
+            - lblMSF_Validation:
+                Control: ModernText@1.0.0
+                Properties:
+                  Color: |-
+                    =If(
+                        CountRows(varMSF_Invalid) > 0,
+                        ColorValue("#EA580C"),
+                        ColorValue("#16A34A")
+                    )
+                  Height: =16
+                  Size: =9
+                  Text: |-
+                    =If(
+                        CountRows(varMSF_Selected) = 0 && CountRows(varMSF_Invalid) = 0,
+                        "",
+                        CountRows(varMSF_Selected) & " " & cmp_MultiSelectFilter.SelectedText &
+                        If(
+                            CountRows(varMSF_Invalid) > 0,
+                            " · " & CountRows(varMSF_Invalid) & " " & cmp_MultiSelectFilter.NotFoundText,
+                            ""
+                        )
+                    )
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =Parent.Height - 72
+            - btnMSF_Clear:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =cmp_MultiSelectFilter.TextColor
+                  BorderThickness: =1
+                  Color: =cmp_MultiSelectFilter.TextColor
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledColor: =RGBA(161, 159, 157, 1)
+                  DisabledFill: =RGBA(242, 242, 241, 0)
+                  Fill: =cmp_MultiSelectFilter.BackgroundColor
+                  Font: =Font.'Segoe UI'
+                  Height: =36
+                  HoverBorderColor: =cmp_MultiSelectFilter.TextColor
+                  HoverColor: =cmp_MultiSelectFilter.TextColor
+                  HoverFill: =ColorValue("#F8FAFC")
+                  OnSelect: |-
+                    =
+                    ClearCollect(
+                        varMSF_Selected,
+                        FirstN(
+                            Table(
+                                {
+                                    Id: "",
+                                    Code: "",
+                                    Display: "",
+                                    SortOrder: 0
+                                }
+                            ),
+                            0
+                        )
+                    );
+
+                    ClearCollect(
+                        varMSF_Invalid,
+                        FirstN(
+                            Table({ Code: "" }),
+                            0
+                        )
+                    );
+
+                    Set(varMSF_Search, "");
+
+                    Reset(txtMSF_Search);
+                    Reset(txtMSF_Paste);
+                    Reset(galMSF_Items)
+                  PressedBorderColor: =cmp_MultiSelectFilter.TextColor
+                  PressedColor: =cmp_MultiSelectFilter.TextColor
+                  PressedFill: =ColorValue("#F1F5F9")
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =11
+                  Text: =cmp_MultiSelectFilter.ClearText
+                  Width: =(Parent.Width - 44) / 2
+                  X: =16
+                  Y: =Parent.Height - 48
+            - btnMSF_Apply:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =cmp_MultiSelectFilter.AccentColor
+                  BorderStyle: =BorderStyle.None
+                  BorderThickness: =0
+                  Color: =Color.White
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledColor: =RGBA(161, 159, 157, 1)
+                  DisabledFill: =RGBA(242, 242, 241, 0)
+                  Fill: =cmp_MultiSelectFilter.AccentColor
+                  Font: =Font.'Segoe UI'
+                  Height: =36
+                  HoverBorderColor: =cmp_MultiSelectFilter.AccentColor
+                  HoverColor: =Color.White
+                  HoverFill: =cmp_MultiSelectFilter.AccentColor
+                  OnSelect: |-
+                    =
+                    If(
+                        cmp_MultiSelectFilter.EnablePaste && !IsBlank(Trim(txtMSF_Paste.Text)),
+
+                        With(
+                            {
+                                _rawCodes:
+                                    ForAll(
+                                        Split(
+                                            Substitute(
+                                                Substitute(
+                                                    Substitute(txtMSF_Paste.Text, Char(13), ""),
+                                                    ";",
+                                                    Char(10)
+                                                ),
+                                                ",",
+                                                Char(10)
+                                            ),
+                                            Char(10)
+                                        ),
+                                        { Code: Upper(Trim(Value)) }
+                                    )
+                            },
+                            With(
+                                {
+                                    _cleanCodes:
+                                        Distinct(
+                                            Filter(_rawCodes, !IsBlank(Code)),
+                                            Code
+                                        )
+                                },
+                                ClearCollect(
+                                    varMSF_Selected,
+                                    Filter(
+                                        cmp_MultiSelectFilter.Items,
+                                        Code in _cleanCodes.Value
+                                    )
+                                );
+
+                                ClearCollect(
+                                    varMSF_Invalid,
+                                    RenameColumns(
+                                        Filter(
+                                            _cleanCodes,
+                                            !(Value in cmp_MultiSelectFilter.Items.Code)
+                                        ),
+                                        Value,
+                                        Code
+                                    )
+                                );
+
+                                Reset(txtMSF_Paste)
+                            )
+                        )
+                    );
+
+                    cmp_MultiSelectFilter.OnApply();
+                    cmp_MultiSelectFilter.OnClose()
+                  PressedBorderColor: =cmp_MultiSelectFilter.AccentColor
+                  PressedColor: =Color.White
+                  PressedFill: =cmp_MultiSelectFilter.AccentColor
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =11
+                  Text: =cmp_MultiSelectFilter.ApplyText
+                  Width: =(Parent.Width - 44) / 2
+                  X: =btnMSF_Clear.X + btnMSF_Clear.Width + 12
+                  Y: =Parent.Height - 48

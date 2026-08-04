@@ -1,0 +1,864 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_excelonlinebusiness": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "pls_sharedexcelonlinebusiness_1f1af"
+        },
+        "api": {
+          "name": "shared_excelonlinebusiness"
+        }
+      },
+      "shared_sharepointonline": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "pls_sharedsharepointonline_facb1"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_sqldw": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "pls_sharedsqldw_771b7"
+        },
+        "api": {
+          "name": "shared_sqldw"
+        }
+      }
+    },
+    "definition": {
+      "metadata": {
+        "workflowEntityId": null,
+        "processAdvisorMetadata": null,
+        "flowChargedByPaygo": null,
+        "flowclientsuspensionreason": "None",
+        "flowclientsuspensiontime": null,
+        "flowclientsuspensionreasondetails": null,
+        "creator": {
+          "id": "b96fb1eb-ced6-41a9-9294-233f5f6f2c3b",
+          "type": "User",
+          "tenantId": "47312dc6-0a91-4272-a8a5-031fca130189"
+        },
+        "provisioningMethod": "FromDefinition",
+        "failureAlertSubscription": true,
+        "clientLastModifiedTime": "2026-07-28T14:06:12.8224399Z",
+        "lastModifiedBy": "b96fb1eb-ced6-41a9-9294-233f5f6f2c3b",
+        "connectionKeySavedTimeKey": "2026-07-28T14:06:12.8224399Z",
+        "creationSource": null
+      },
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "21d8db9d-9c5b-4d72-9b43-4b0642f1ea2c"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "number": {
+                  "title": "ProjectId",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "text": {
+                  "title": "SubsystemCode",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "number_1": {
+                  "title": "TemplateId",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "text_1": {
+                  "title": "CategoryCode",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_2": {
+                  "title": "StatusCode",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_3": {
+                  "title": "PunchDiscipline",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_4": {
+                  "title": "Subcontractor",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_5": {
+                  "title": "CustomFiltersJson",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_6": {
+                  "title": "RequestedByEmail",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_7": {
+                  "title": "RequestedByName",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_8": {
+                  "title": "ExportMode",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_9": {
+                  "title": "SelectedColumnsJson",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "number",
+                "text",
+                "number_1",
+                "text_1",
+                "text_2",
+                "text_3",
+                "text_4",
+                "text_5",
+                "text_6",
+                "text_7",
+                "text_8",
+                "text_9"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Init_varProjectId": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "976d4a48-f16b-4272-97ed-70f5904351ac"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "varProjectId",
+                "type": "integer",
+                "value": "@triggerBody()['number']"
+              }
+            ]
+          }
+        },
+        "SQL_StartExportLog": {
+          "runAfter": {
+            "Compose_FilterJson": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "bde34338-a9bf-4f1c-a7db-ead82866036f"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+              "connectionName": "shared_sqldw",
+              "operationId": "ExecuteProcedureV2"
+            },
+            "parameters": {
+              "server": "default",
+              "database": "default",
+              "procedure": "[warroom].[usp_PunchExportLog_Start]",
+              "parameters/CreatedByEmail": "@triggerBody()['text_6']",
+              "parameters/CreatedByName": "@triggerBody()['text_7']",
+              "parameters/FilterJson": "@triggerBody()['text_5']",
+              "parameters/ProjectId": "@triggerBody()['number']",
+              "parameters/TemplateSelector": "@triggerBody()['number_1']"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "SQL_ExportPunchesPivoted": {
+          "runAfter": {
+            "Compose_PunchExportLogId": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "0d4df1a5-4eff-4a3c-b692-e200a069b8ad"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+              "connectionName": "shared_sqldw",
+              "operationId": "ExecuteProcedureV2"
+            },
+            "parameters": {
+              "server": "default",
+              "database": "default",
+              "procedure": "[warroom].[usp_ExportProjectPunchesExtended_Pivoted]",
+              "parameters/CategoryCode": "@triggerBody()['text_1']",
+              "parameters/CustomFiltersJson": "@triggerBody()['text_5']",
+              "parameters/MaxRows": 50000,
+              "parameters/ProjectId": "@variables('varProjectId')",
+              "parameters/PunchDiscipline": "@triggerBody()['text_3']",
+              "parameters/PunchExportLogId": "@outputs('Compose_PunchExportLogId')",
+              "parameters/StatusCode": "@triggerBody()['text_2']",
+              "parameters/Subcontractor": "@triggerBody()['text_4']",
+              "parameters/SubsystemCode": "@triggerBody()['text']",
+              "parameters/TemplateId": "@triggerBody()['number_1']"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "SQL_GetColumnMap": {
+          "runAfter": {
+            "SQL_ExportPunchesPivoted": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "16fdce58-a330-4e00-89aa-39b50cd14e5d"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+              "connectionName": "shared_sqldw",
+              "operationId": "ExecuteProcedureV2"
+            },
+            "parameters": {
+              "server": "default",
+              "database": "default",
+              "procedure": "[warroom].[usp_GetPunchExportColumnMap]",
+              "parameters/ProjectId": "@variables('varProjectId')"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "Compose_ExportRows": {
+          "runAfter": {
+            "SQL_GetColumnMap": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "a4a56d67-a195-4825-a09c-1c1ea3568948"
+          },
+          "type": "Compose",
+          "inputs": "@body('SQL_ExportPunchesPivoted')?['ResultSets']?['Table1']"
+        },
+        "Compose_ColumnMap": {
+          "runAfter": {
+            "Compose_ExportRows": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "c7c598f1-3e9b-4d37-bb65-44460a6ba3ec"
+          },
+          "type": "Compose",
+          "inputs": "@body('SQL_GetColumnMap')?['ResultSets']?['Table1']"
+        },
+        "Compose_ExportInfo": {
+          "runAfter": {
+            "Compose_RowCount": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "a43edb77-c98a-419f-8e47-3acb567d7a7c"
+          },
+          "type": "Compose",
+          "inputs": {
+            "ExportType": "Punches",
+            "ProjectId": "@{variables('varProjectId')}",
+            "PunchExportLogId": "@{outputs('Compose_PunchExportLogId')}",
+            "ExportedOnUtc": "@{utcNow()}",
+            "ExportedByEmail": "@{variables('varRequestedByEmail')}",
+            "ExportedByName": "@{variables('varRequestedByName')}",
+            "CanBeImported": "@equals(outputs('Compose_ExportMode_Safe'), 'INTERNAL')",
+            "RowCount": "@int(outputs('Compose_RowCount'))",
+            "ExportMode": "@{outputs('Compose_ExportMode_Safe')}",
+            "SelectedColumnCount": "@length(body('Parse_Selected_Columns'))"
+          }
+        },
+        "Compose_PunchExportLogId": {
+          "runAfter": {
+            "SQL_StartExportLog": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "56a9582c-2778-4879-835e-62e46c4dd1fb"
+          },
+          "type": "Compose",
+          "inputs": "@first(\r\n    body('SQL_StartExportLog')?['ResultSets']?['Table1']\r\n)?['PunchExportLogId']"
+        },
+        "Init_varRequestedByEmail": {
+          "runAfter": {
+            "Init_varProjectId": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "3576bf76-4138-42e6-befa-11623c0ec5ae"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "varRequestedByEmail",
+                "type": "string",
+                "value": "@triggerBody()['text_6']"
+              }
+            ]
+          }
+        },
+        "Init_varRequestedByName": {
+          "runAfter": {
+            "Init_varRequestedByEmail": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "1cd7cbc2-1ee7-4376-a933-d31d6cc1228e"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "varRequestedByName",
+                "type": "string",
+                "value": "@triggerBody()['text_7']"
+              }
+            ]
+          }
+        },
+        "Init_FileName": {
+          "runAfter": {
+            "Init_varRequestedByName": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "9cf6a5d7-f694-440e-868a-8db36fd12d1b"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "varFileName",
+                "type": "string",
+                "value": "@{concat(\r\n    'PULSE_Punches_Project_',\r\n    string(variables('varProjectId')),\r\n    '_',\r\n    formatDateTime(\r\n        utcNow(),\r\n        'yyyyMMdd_HHmmss'\r\n    ),\r\n    '.xlsx'\r\n)}"
+              }
+            ]
+          }
+        },
+        "Compose_FilterJson": {
+          "runAfter": {
+            "Parse_Selected_Columns": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "b2640d80-369a-4b5e-a2c6-22a2fc2d3037"
+          },
+          "type": "Compose",
+          "inputs": {
+            "ProjectId": "@{triggerBody()?['number']}",
+            "SubsystemCode": "@{triggerBody()?['text']}",
+            "TemplateId": "@{triggerBody()?['number_1']}",
+            "CategoryCode": "@{triggerBody()?['text_1']}",
+            "StatusCode": "@{triggerBody()?['text_2']}",
+            "PunchDiscipline": "@{triggerBody()?['text_3']}",
+            "Subcontractor": "@{triggerBody()?['text_4']}",
+            "CustomFiltersJson": "@{triggerBody()?['text_5']}"
+          }
+        },
+        "Compose_RowCount": {
+          "runAfter": {
+            "Compose_ColumnMap": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "1b63b831-2d61-4e60-a465-3b7abe5bbcf0"
+          },
+          "type": "Compose",
+          "inputs": "@length(outputs('Compose_ExportRows'))"
+        },
+        "Run_script": {
+          "runAfter": {
+            "Delay": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "5fd71c8b-88a4-40c1-b385-a65466d242f6",
+            "tableId": null
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+              "connectionName": "shared_excelonlinebusiness",
+              "operationId": "RunScriptProd"
+            },
+            "parameters": {
+              "source": "sites/trsa.sharepoint.com,d892b689-83ab-4011-848c-900b6dc9017c,9cc85727-1e6a-4d5c-980c-2c970ea0158b",
+              "drive": "b!ibaS2KuDEUCEjJALbckBfCdXyJxqHlxNmAwslw6gFYtgSLbDrR19T6MXIO-NLA14",
+              "file": "@outputs('SP_CreateExportFile')?['body/Id']",
+              "scriptId": "ms-officescript%3A%2F%2Fonedrive_business_itemlink%2F01U46ZCL4OIB6TOPXNUFG2FWLM2XYTCEYA",
+              "ScriptParameters/rowsJson": "@outputs('Compose_ExportRows')",
+              "ScriptParameters/columnMapJson": "@outputs('Compose_ColumnMap')",
+              "ScriptParameters/exportInfoJson": "@outputs('Compose_ExportInfo')",
+              "ScriptParameters/exportMode": "@outputs('Compose_ExportMode_Safe')",
+              "ScriptParameters/selectedColumnsJson": "@outputs('Compose_SelectedColumns_Safe')"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "SP_CreateExportSharingLink": {
+          "runAfter": {
+            "Run_script": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "3678a8f8-93ae-4716-a5b5-8e086be34a81"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "connectionName": "shared_sharepointonline",
+              "operationId": "CreateSharingLink"
+            },
+            "parameters": {
+              "dataset": "https://trsa.sharepoint.com/sites/rpa_flows/Pulse",
+              "table": "c3b64860-1dad-4f7d-a317-20ef8d2c0d78",
+              "id": "@outputs('SP_CreateExportFile')?['body/ItemId']",
+              "permission/type": "view",
+              "permission/scope": "organization"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "Compose_ExportFileUrl": {
+          "runAfter": {
+            "SP_CreateExportSharingLink": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "d2e7a201-af8c-45f3-85cb-ec0b26d5d4f7"
+          },
+          "type": "Compose",
+          "inputs": "@body('SP_CreateExportSharingLink')?['link']?['webUrl']"
+        },
+        "Execute_stored_procedure_(V2)": {
+          "runAfter": {
+            "Compose_ExportFileUrl": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "29e225d4-e0bd-442b-b273-6cfa0fd64883"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+              "connectionName": "shared_sqldw",
+              "operationId": "ExecuteProcedureV2"
+            },
+            "parameters": {
+              "server": "default",
+              "database": "default",
+              "procedure": "[warroom].[usp_PunchExportLog_Complete]",
+              "parameters/FileName": "@variables('varFileName')",
+              "parameters/FileUrl": "@outputs('Compose_ExportFileUrl')",
+              "parameters/PunchExportLogId": "@outputs('Compose_PunchExportLogId')",
+              "parameters/RowCount": "@outputs('Compose_RowCount')"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "SQL_CompleteExportBatch": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "9a1072da-4048-4df6-bc84-230b42478dd9"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "success": true,
+              "fileurl": "@{outputs('Compose_ExportFileUrl')}",
+              "filename": "@{variables('varFileName')}",
+              "rowcount": "@{outputs('Compose_RowCount')}",
+              "message": "Export generated successfully."
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "title": "success",
+                  "x-ms-dynamically-added": true,
+                  "type": "boolean"
+                },
+                "fileurl": {
+                  "title": "fileUrl",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                },
+                "filename": {
+                  "title": "fileName",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                },
+                "rowcount": {
+                  "title": "rowCount",
+                  "x-ms-dynamically-added": true,
+                  "type": "number"
+                },
+                "message": {
+                  "title": "message",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "SP_GetTemplateFileContent": {
+          "runAfter": {
+            "SQL_RegisterExportSnapshot": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "867d1ec2-e9f8-4c24-9043-739730e91ae5"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetFileContentByPath"
+            },
+            "parameters": {
+              "dataset": "https://trsa.sharepoint.com/sites/rpa_flows",
+              "path": "/Documentos compartidos/General/04_Scripts/Template.xlsx",
+              "inferContentType": true
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "SP_CreateExportFile": {
+          "runAfter": {
+            "SP_GetTemplateFileContent": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "cff5b4cb-6dc8-44e6-ac81-f7304bc5374b"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "connectionName": "shared_sharepointonline",
+              "operationId": "CreateFile"
+            },
+            "parameters": {
+              "dataset": "https://trsa.sharepoint.com/sites/rpa_flows/Pulse",
+              "folderPath": "/Documentos compartidos/Exports",
+              "name": "@variables('varFileName')",
+              "body": "@body('SP_GetTemplateFileContent')"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          },
+          "runtimeConfiguration": {
+            "contentTransfer": {
+              "transferMode": "Chunked"
+            }
+          }
+        },
+        "Delay": {
+          "runAfter": {
+            "SP_CreateExportFile": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "db50d794-f44c-49d0-ab8e-17d7d4c383a3"
+          },
+          "type": "Wait",
+          "inputs": {
+            "interval": {
+              "count": 15,
+              "unit": "Second"
+            }
+          }
+        },
+        "Compose_ExportMode_Safe": {
+          "runAfter": {
+            "Init_FileName": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "c54def83-5c81-4802-a6a1-f1b819fa7f19"
+          },
+          "type": "Compose",
+          "inputs": "@if(\r\n  equals(\r\n    toUpper(\r\n      trim(\r\n        string(\r\n          coalesce(\r\n            triggerBody()?['text_8'],\r\n            'CLIENT'\r\n          )\r\n        )\r\n      )\r\n    ),\r\n    'INTERNAL'\r\n  ),\r\n  'INTERNAL',\r\n  'CLIENT'\r\n)"
+        },
+        "Compose_SelectedColumns_Safe": {
+          "runAfter": {
+            "Compose_ExportMode_Safe": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "20c758cc-2bb3-41cc-9260-4cc260deca66"
+          },
+          "type": "Compose",
+          "inputs": "@if(\r\n  or(\r\n    empty(triggerBody()?['text_9']),\r\n    equals(trim(triggerBody()?['text_9']), '')\r\n  ),\r\n  '[]',\r\n  triggerBody()?['text_9']\r\n)"
+        },
+        "Parse_Selected_Columns": {
+          "runAfter": {
+            "Compose_SelectedColumns_Safe": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "39db83f5-bb93-4c9a-9fcc-358b258c67c4"
+          },
+          "type": "ParseJson",
+          "inputs": {
+            "content": "@outputs('Compose_SelectedColumns_Safe')",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "ColumnKey": {
+                    "type": "string"
+                  },
+                  "ColumnLabel": {
+                    "type": "string"
+                  },
+                  "SortOrder": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "ColumnKey",
+                  "ColumnLabel",
+                  "SortOrder"
+                ]
+              }
+            }
+          }
+        },
+        "SQL_RegisterExportSnapshot": {
+          "runAfter": {
+            "Compose_ExportInfo": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "codex-register-export-snapshot"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+              "connectionName": "shared_sqldw",
+              "operationId": "ExecuteProcedureV2"
+            },
+            "parameters": {
+              "server": "default",
+              "database": "default",
+              "procedure": "[warroom].[usp_RegisterPunchExportSnapshot]",
+              "parameters/PunchExportLogId": "@outputs('Compose_PunchExportLogId')",
+              "parameters/ProjectId": "@variables('varProjectId')",
+              "parameters/TemplateId": "@triggerBody()['number_1']",
+              "parameters/ExportType": "Punches",
+              "parameters/CreatedBy": "@variables('varRequestedByEmail')",
+              "parameters/FileName": "@variables('varFileName')",
+              "parameters/AllowedColumnsJson": "@outputs('Compose_SelectedColumns_Safe')",
+              "parameters/RowsJson": "@string(outputs('Compose_ExportRows'))"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "Respond_ExportFailure": {
+          "runAfter": {
+            "Respond_to_a_Power_App_or_flow": [
+              "Failed",
+              "TimedOut",
+              "Skipped"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "codex-export-failure-response"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 500,
+            "body": {
+              "success": false,
+              "fileurl": "",
+              "filename": "@{variables('varFileName')}",
+              "rowcount": 0,
+              "message": "Export failed before completion. Review the failed Flow action and Punch export log."
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "title": "success",
+                  "x-ms-dynamically-added": true,
+                  "type": "boolean"
+                },
+                "fileurl": {
+                  "title": "fileUrl",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                },
+                "filename": {
+                  "title": "fileName",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                },
+                "rowcount": {
+                  "title": "rowCount",
+                  "x-ms-dynamically-added": true,
+                  "type": "number"
+                },
+                "message": {
+                  "title": "message",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "SQL_CompleteExportBatch": {
+          "runAfter": {
+            "Execute_stored_procedure_(V2)": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "codex-complete-export-batch"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+              "connectionName": "shared_sqldw",
+              "operationId": "ExecuteProcedureV2"
+            },
+            "parameters": {
+              "server": "default",
+              "database": "default",
+              "procedure": "[warroom].[usp_CompletePunchExportBatch]",
+              "parameters/PunchExportLogId": "@outputs('Compose_PunchExportLogId')",
+              "parameters/FileName": "@variables('varFileName')",
+              "parameters/RowCount": "@outputs('Compose_RowCount')"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

@@ -1,0 +1,352 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+ComponentDefinitions:
+  cmp_ProjectSelector:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      AccentColor:
+        PropertyKind: Input
+        DataType: Color
+        Default: =ColorValue("#1677FF")
+      BackgroundColor:
+        PropertyKind: Input
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      BorderColor:
+        PropertyKind: Input
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      EmptyText:
+        PropertyKind: Input
+        DataType: Text
+        Default: ="No projects found"
+      HasSelection:
+        PropertyKind: Output
+        DataType: Boolean
+      IsOpen:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =false
+      Items:
+        PropertyKind: Input
+        DataType: Table
+        Default: |-
+          =Table(
+              {
+                  ProjectId: "",
+                  ProjectCode: "",
+                  ProjectName: "",
+                  StatusText: "",
+                  SortOrder: 0
+              }
+          )
+      MutedTextColor:
+        PropertyKind: Input
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      OnClose:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      OnOpen:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      OnProjectSelect:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      Placeholder:
+        PropertyKind: Input
+        DataType: Text
+        Default: ="Search project..."
+      SearchText:
+        PropertyKind: Output
+        DataType: Text
+      SelectedProject:
+        PropertyKind: Output
+        DataType: Record
+      SelectedProjectId:
+        PropertyKind: Output
+        DataType: Text
+      SelectedProjectIdIn:
+        PropertyKind: Input
+        DataType: Text
+        Default: =""
+      ShowStatus:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      SurfaceAltColor:
+        PropertyKind: Input
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      TextColor:
+        PropertyKind: Input
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      Title:
+        PropertyKind: Input
+        DataType: Text
+        Default: ="Project"
+    Properties:
+      HasSelection: =!IsBlank(cmp_ProjectSelector.SelectedProjectId)
+      Height: =360
+      OnReset: |-
+        =
+        Set(varPS_Search, "");
+        Set(varPS_SelectedProjectId, cmp_ProjectSelector.SelectedProjectIdIn)
+      SearchText: =varPS_Search
+      SelectedProject: =LookUp(cmp_ProjectSelector.Items, ProjectId = cmp_ProjectSelector.SelectedProjectId)
+      SelectedProjectId: =If(!IsBlank(varPS_SelectedProjectId), varPS_SelectedProjectId, cmp_ProjectSelector.SelectedProjectIdIn)
+      Width: =360
+    Children:
+      - conPS_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =cmp_ProjectSelector.BorderColor
+            BorderThickness: =1
+            DropShadow: =DropShadow.None
+            Fill: =cmp_ProjectSelector.BackgroundColor
+            Height: =Parent.Height
+            RadiusBottomLeft: =14
+            RadiusBottomRight: =14
+            RadiusTopLeft: =14
+            RadiusTopRight: =14
+            Width: =Parent.Width
+          Children:
+            - lblPS_Title:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =cmp_ProjectSelector.MutedTextColor
+                  Height: =16
+                  Size: =9
+                  Text: =cmp_ProjectSelector.Title
+                  Width: =Parent.Width - 48
+                  X: =16
+                  Y: =10
+            - lblPS_Selected:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Color: =cmp_ProjectSelector.TextColor
+                  DisabledColor: =RGBA(161, 159, 157, 1)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =11
+                  Text: |-
+                    =If(
+                        cmp_ProjectSelector.HasSelection,
+                        Coalesce(cmp_ProjectSelector.SelectedProject.ProjectCode, "") & If(!IsBlank(cmp_ProjectSelector.SelectedProject.ProjectName), " · " & cmp_ProjectSelector.SelectedProject.ProjectName, ""),
+                        "Select project"
+                    )
+                  VerticalAlign: =VerticalAlign.Top
+                  Width: =Parent.Width - 64
+                  X: =16
+                  Y: =28
+            - icoPS_Open:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Color: =cmp_ProjectSelector.MutedTextColor
+                  DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                  DisabledColor: =RGBA(225, 223, 221, 1)
+                  DisabledFill: =RGBA(0, 0, 0, 0)
+                  FocusedBorderThickness: =4
+                  Height: =18
+                  HoverBorderColor: =RGBA(0, 0, 0, 0)
+                  HoverColor: =cmp_ProjectSelector.AccentColor
+                  HoverFill: =RGBA(0, 0, 0, 0)
+                  Icon: =If(cmp_ProjectSelector.IsOpen, Icon.ChevronUp, Icon.ChevronDown)
+                  OnSelect: =If(cmp_ProjectSelector.IsOpen, cmp_ProjectSelector.OnClose(), cmp_ProjectSelector.OnOpen())
+                  PressedBorderColor: =RGBA(0, 0, 0, 0)
+                  PressedColor: =cmp_ProjectSelector.AccentColor
+                  PressedFill: =RGBA(0, 0, 0, 0)
+                  Width: =18
+                  X: =Parent.Width - 34
+                  Y: =28
+            - btnPS_Header:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  BorderStyle: =BorderStyle.None
+                  BorderThickness: =0
+                  Color: =Color.White
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledColor: =RGBA(161, 159, 157, 1)
+                  DisabledFill: =RGBA(242, 242, 241, 0)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =60
+                  HoverBorderColor: =RGBA(0, 0, 0, 0)
+                  HoverColor: =Color.White
+                  HoverFill: =RGBA(0,0,0,0.02)
+                  OnSelect: =If(cmp_ProjectSelector.IsOpen, cmp_ProjectSelector.OnClose(), cmp_ProjectSelector.OnOpen())
+                  PressedBorderColor: =RGBA(0, 0, 0, 0)
+                  PressedColor: =Color.White
+                  PressedFill: =RGBA(0,0,0,0.04)
+                  RadiusBottomLeft: =14
+                  RadiusBottomRight: =14
+                  RadiusTopLeft: =14
+                  RadiusTopRight: =14
+                  Text: =""
+                  Width: =Parent.Width
+            - rectPS_Line:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  BorderStyle: =BorderStyle.None
+                  DisabledFill: =RGBA(161, 159, 157, 1)
+                  Fill: =cmp_ProjectSelector.BorderColor
+                  FocusedBorderThickness: =4
+                  Height: =1
+                  HoverFill: =cmp_ProjectSelector.BorderColor
+                  PressedFill: =cmp_ProjectSelector.BorderColor
+                  Visible: =cmp_ProjectSelector.IsOpen
+                  Width: =Parent.Width
+                  Y: =64
+            - txtPS_Search:
+                Control: ModernTextInput@1.1.1
+                Properties:
+                  Appearance: =Appearance.Outline
+                  Default: =varPS_Search
+                  Height: =36
+                  OnChange: =Set(varPS_Search, Self.Text)
+                  Placeholder: =cmp_ProjectSelector.Placeholder
+                  Visible: =cmp_ProjectSelector.IsOpen
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =76
+            - galPS_Items:
+                Control: Gallery@2.15.0
+                Variant: BrowseLayout_Vertical_OneTextVariant_ver5.0
+                Properties:
+                  BorderColor: =RGBA(245, 245, 245, 1)
+                  Height: =Parent.Height - 124
+                  Items: |-
+                    =
+                    SortByColumns(
+                        Filter(
+                            cmp_ProjectSelector.Items,
+                            IsBlank(txtPS_Search.Text) ||
+                            StartsWith(ProjectCode, txtPS_Search.Text) ||
+                            StartsWith(ProjectName, txtPS_Search.Text)
+                        ),
+                        "SortOrder",
+                        SortOrder.Ascending,
+                        "ProjectCode",
+                        SortOrder.Ascending
+                    )
+                  TemplateSize: =58
+                  Visible: =cmp_ProjectSelector.IsOpen && CountRows(cmp_ProjectSelector.Items) > 0
+                  Width: =Parent.Width - 16
+                  X: =8
+                  Y: =120
+                Children:
+                  - btnPS_Row:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =If(ThisItem.ProjectId = cmp_ProjectSelector.SelectedProjectId, cmp_ProjectSelector.AccentColor, cmp_ProjectSelector.BorderColor)
+                        BorderThickness: =If(ThisItem.ProjectId = cmp_ProjectSelector.SelectedProjectId, 2, 1)
+                        Color: =Color.White
+                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        DisabledFill: =RGBA(242, 242, 241, 0)
+                        Fill: =If(ThisItem.ProjectId = cmp_ProjectSelector.SelectedProjectId, ColorValue("#EFF6FF"), cmp_ProjectSelector.BackgroundColor)
+                        Font: =Font.'Segoe UI'
+                        Height: =Parent.TemplateHeight - 8
+                        HoverBorderColor: =cmp_ProjectSelector.AccentColor
+                        HoverColor: =Color.White
+                        HoverFill: =ColorValue("#EFF6FF")
+                        OnSelect: |-
+                          =
+                          Set(varPS_SelectedProjectId, ThisItem.ProjectId);
+                          cmp_ProjectSelector.OnProjectSelect()
+                        PressedBorderColor: =cmp_ProjectSelector.AccentColor
+                        PressedColor: =Color.White
+                        PressedFill: =ColorValue("#DBEAFE")
+                        Text: =""
+                        Width: =Parent.TemplateWidth
+                        Y: =4
+                  - lblPS_Code:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =cmp_ProjectSelector.TextColor
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =20
+                        OnSelect: =Select(btnPS_Row)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =10
+                        Text: =ThisItem.ProjectCode
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =120
+                        X: =12
+                        Y: =12
+                  - lblPS_Name:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =cmp_ProjectSelector.MutedTextColor
+                        Height: =16
+                        Size: =8
+                        Text: =ThisItem.ProjectName
+                        Width: =Parent.TemplateWidth - 120
+                        X: =12
+                        Y: =34
+                  - lblPS_Status:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Right
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =cmp_ProjectSelector.AccentColor
+                        DisabledColor: =RGBA(161, 159, 157, 1)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =18
+                        OnSelect: =Select(btnPS_Row)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: =ThisItem.StatusText
+                        VerticalAlign: =VerticalAlign.Top
+                        Visible: =cmp_ProjectSelector.ShowStatus
+                        Width: =90
+                        X: =Parent.TemplateWidth - 104
+                        Y: =20
+            - lblPS_Empty:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =cmp_ProjectSelector.MutedTextColor
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  Size: =11
+                  Text: =cmp_ProjectSelector.EmptyText
+                  Visible: =cmp_ProjectSelector.IsOpen && CountRows(cmp_ProjectSelector.Items) = 0
+                  Width: =Parent.Width - 48
+                  X: =24
+                  Y: =160

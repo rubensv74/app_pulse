@@ -1,0 +1,13 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="C:\Users\rseijo\.nuget\packages\microsoft.powerapps.msbuild.solution\1.52.1\tasks\Microsoft.PowerApps.MSBuild.Solution.tasks" />
+  <Target Name="OfficialUnpack">
+    <SolutionPackagerTask
+      Action="Extract"
+      PackageType="Unmanaged"
+      SolutionRootDirectory="$(DestinationPath)"
+      PathToZipFile="$(ZipPath)"
+      ErrorLevel="Info"
+      LogFilePath="$(LogPath)"
+      Localize="false" />
+  </Target>
+</Project>

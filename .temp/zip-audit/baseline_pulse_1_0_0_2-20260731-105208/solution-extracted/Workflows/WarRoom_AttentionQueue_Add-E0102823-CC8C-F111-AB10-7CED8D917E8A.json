@@ -1,0 +1,166 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sqldw": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsqldw_ce25b"
+        },
+        "api": {
+          "name": "shared_sqldw"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "d45add67-1a35-4e44-ab34-1279a130699b"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "number": {
+                  "title": "ProjectId",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "text": {
+                  "title": "SubsystemCode",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_1": {
+                  "title": "AttentionReason",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_2": {
+                  "title": "AttentionCategory",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_3": {
+                  "title": "Username",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "number",
+                "text",
+                "text_1",
+                "text_2",
+                "text_3"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "SQL_Add": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "88418dce-6865-444e-805c-8c5e3097f92d"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+              "connectionName": "shared_sqldw",
+              "operationId": "ExecuteProcedureV2"
+            },
+            "parameters": {
+              "server": "default",
+              "database": "default",
+              "procedure": "[warroom].[usp_AttentionQueue_Add]",
+              "parameters/AttentionCategory": "@triggerBody()['text_2']",
+              "parameters/AttentionReason": "@triggerBody()['text_1']",
+              "parameters/ProjectId": "@triggerBody()['number']",
+              "parameters/SubsystemCode": "@triggerBody()['text']",
+              "parameters/Username": "@triggerBody()['text_3']"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "SQL_Add": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "d5743199-6a6a-4215-9bde-ff49a8bdce8a"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "success": "@{bool(first(body('SQL_Add')?['ResultSets']?['Table1'])?['Success'])}",
+              "message": "string(first(body('SQL_Add')?['ResultSets']?['Table1'])?['Message'])",
+              "queueitemid": "@{int(coalesce(first(body('SQL_Add')?['ResultSets']?['Table1'])?['QueueItemId'], 0))}",
+              "queuerank": "@{int(coalesce(first(body('SQL_Add')?['ResultSets']?['Table1'])?['QueueRank'], 0))}"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "title": "success",
+                  "x-ms-dynamically-added": true,
+                  "type": "boolean"
+                },
+                "message": {
+                  "title": "message",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                },
+                "queueitemid": {
+                  "title": "queueItemId",
+                  "x-ms-dynamically-added": true,
+                  "type": "number"
+                },
+                "queuerank": {
+                  "title": "queueRank",
+                  "x-ms-dynamically-added": true,
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

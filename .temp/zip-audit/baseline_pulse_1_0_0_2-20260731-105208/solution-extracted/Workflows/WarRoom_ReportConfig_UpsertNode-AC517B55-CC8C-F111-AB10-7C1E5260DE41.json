@@ -1,0 +1,334 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sqldw": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsqldw_ce25b"
+        },
+        "api": {
+          "name": "shared_sqldw"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "afa24990-eeef-4238-80aa-e1b54a150b72"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "number": {
+                  "title": "ProjectId",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "number_2": {
+                  "title": "LevelNo",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "text": {
+                  "title": "DisplayName",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_1": {
+                  "title": "Description",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_2": {
+                  "title": "SqlKey",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_3": {
+                  "title": "GridKey",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "number_4": {
+                  "title": "SortOrder",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "boolean": {
+                  "title": "IsActive",
+                  "type": "boolean",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please select yes or no",
+                  "x-ms-content-hint": "BOOLEAN"
+                },
+                "text_4": {
+                  "title": "UserName",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_5": {
+                  "title": "NodeId",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_6": {
+                  "title": "ParentNodeId",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "number",
+                "number_2",
+                "text",
+                "text_1",
+                "text_2",
+                "text_3",
+                "number_4",
+                "boolean",
+                "text_4",
+                "text_5",
+                "text_6"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Execute_stored_procedure_(V2)": {
+          "runAfter": {
+            "IsActive_ForSql": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "efba2805-0a2a-46fb-98ce-05d91c7f95b6"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+              "connectionName": "shared_sqldw",
+              "operationId": "ExecuteProcedureV2"
+            },
+            "parameters": {
+              "server": "default",
+              "database": "default",
+              "procedure": "[warroom].[usp_ReportNode_Upsert]",
+              "parameters/Description": "@outputs('Description_ForSql')",
+              "parameters/DisplayName": "@outputs('DisplayName_ForSql')",
+              "parameters/GridKey": "@outputs('GridKey_ForSql')",
+              "parameters/IsActive": "@outputs('IsActive_ForSql')",
+              "parameters/LevelNo": "@outputs('LevelNo_ForSql')",
+              "parameters/NodeId": "@outputs('NodeId_ForSql')",
+              "parameters/ParentNodeId": "@outputs('ParentNodeId_ForSql')",
+              "parameters/ProjectId": "@outputs('ProjectId_ForSql')",
+              "parameters/SortOrder": "@outputs('SortOrder_ForSql')",
+              "parameters/SqlKey": "@outputs('SqlKey_ForSql')",
+              "parameters/Username": "@outputs('UserName_ForSql')"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Execute_stored_procedure_(V2)": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "4e6a7856-83f2-4031-8832-3c59d5affa6e"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "result": "@outputs('Execute_stored_procedure_(V2)')?['body/returncode']"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "title": "result",
+                  "x-ms-dynamically-added": true,
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "NodeId_ForSql": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "a749f505-24df-41ac-b2db-32a6e3d5edf0"
+          },
+          "type": "Compose",
+          "inputs": "@if(equals(triggerBody()?['text_5'], '__NULL__'), null, triggerBody()?['text_5'])"
+        },
+        "ParentNodeId_ForSql": {
+          "runAfter": {
+            "NodeId_ForSql": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "bf8cc066-d203-4f88-ae5f-bfaebac8cff1"
+          },
+          "type": "Compose",
+          "inputs": "@if(equals(triggerBody()?['text_6'], '__NULL__'), null, triggerBody()?['text_6'])"
+        },
+        "Description_ForSql": {
+          "runAfter": {
+            "ParentNodeId_ForSql": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "0d8d4c0b-2ee0-41e6-ad8b-1d1948098961"
+          },
+          "type": "Compose",
+          "inputs": "@if(equals(triggerBody()?['text_1'], '__NULL__'), null, triggerBody()?['text_1'])"
+        },
+        "SqlKey_ForSql": {
+          "runAfter": {
+            "Description_ForSql": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "eb72c239-9ea2-41cf-8ab8-1a32f6dfeec8"
+          },
+          "type": "Compose",
+          "inputs": "@if(equals(triggerBody()?['text_2'], '__NULL__'), null, triggerBody()?['text_2'])"
+        },
+        "GridKey_ForSql": {
+          "runAfter": {
+            "SqlKey_ForSql": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "e2bd4884-817a-4ec3-8724-a8f56429cb39"
+          },
+          "type": "Compose",
+          "inputs": "@if(equals(triggerBody()?['text_3'], '__NULL__'), null, triggerBody()?['text_3'])"
+        },
+        "UserName_ForSql": {
+          "runAfter": {
+            "GridKey_ForSql": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "d941cf18-13c9-4c07-93ad-348926f7e7e6"
+          },
+          "type": "Compose",
+          "inputs": "@if(equals(triggerBody()?['text_4'], '__NULL__'), null, triggerBody()?['text_4'])"
+        },
+        "DisplayName_ForSql": {
+          "runAfter": {
+            "UserName_ForSql": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "b508806e-07e8-4b5f-8ce2-b20ddc56b422"
+          },
+          "type": "Compose",
+          "inputs": "@if(equals(triggerBody()?['text'], '__NULL__'), null, triggerBody()?['text'])"
+        },
+        "ProjectId_ForSql": {
+          "runAfter": {
+            "DisplayName_ForSql": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "e887a9e3-eefd-4dda-be27-082fb9889c86"
+          },
+          "type": "Compose",
+          "inputs": "@triggerBody()?['number']"
+        },
+        "LevelNo_ForSql": {
+          "runAfter": {
+            "ProjectId_ForSql": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "e6a614f3-abc8-4837-81e4-05aeb7bc4cc3"
+          },
+          "type": "Compose",
+          "inputs": "@triggerBody()?['number_2']"
+        },
+        "SortOrder_ForSql": {
+          "runAfter": {
+            "LevelNo_ForSql": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "122dd394-a7c2-496e-a824-90b5dc38ff5e"
+          },
+          "type": "Compose",
+          "inputs": "@triggerBody()?['number_4']"
+        },
+        "IsActive_ForSql": {
+          "runAfter": {
+            "SortOrder_ForSql": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "f8bac9c7-d592-4c91-8066-7d97cdb798c1"
+          },
+          "type": "Compose",
+          "inputs": "@triggerBody()?['boolean']"
+        }
+      },
+      "outputs": {}
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

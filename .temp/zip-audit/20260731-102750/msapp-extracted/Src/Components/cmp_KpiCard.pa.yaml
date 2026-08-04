@@ -1,0 +1,277 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+ComponentDefinitions:
+  cmp_KpiCard:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      AccentColor:
+        PropertyKind: Input
+        DisplayName: AccentColor
+        Description: Main accent color
+        DataType: Color
+        Default: =ColorValue("#1677FF")
+      BackgroundColor:
+        PropertyKind: Input
+        DisplayName: BackgroundColor
+        Description: Card background color
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        Description: Card border color
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      DeltaText:
+        PropertyKind: Input
+        DisplayName: DeltaText
+        Description: Optional delta text
+        DataType: Text
+        Default: =""
+      FooterText:
+        PropertyKind: Input
+        DisplayName: FooterText
+        Description: Optional footer text
+        DataType: Text
+        Default: =""
+      Icon:
+        PropertyKind: Input
+        DisplayName: Icon
+        Description: KPI icon
+        DataType: Text
+        Default: ="Trending"
+      IsSelected:
+        PropertyKind: Input
+        DisplayName: IsSelected
+        Description: Selected visual state
+        DataType: Boolean
+        Default: =false
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        Description: Muted text color
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      OnSelectCard:
+        PropertyKind: Event
+        DisplayName: OnSelectCard
+        Description: Executes when card is selected
+        ReturnType: None
+        Default: =
+      ShowDelta:
+        PropertyKind: Input
+        DisplayName: ShowDelta
+        Description: Shows delta text
+        DataType: Boolean
+        Default: =true
+      ShowFooter:
+        PropertyKind: Input
+        DisplayName: ShowFooter
+        Description: Shows footer text
+        DataType: Boolean
+        Default: =true
+      ShowIcon:
+        PropertyKind: Input
+        DisplayName: ShowIcon
+        Description: Shows icon area
+        DataType: Boolean
+        Default: =true
+      Subtitle:
+        PropertyKind: Input
+        DisplayName: Subtitle
+        Description: KPI subtitle
+        DataType: Text
+        Default: =""
+      SurfaceAltColor:
+        PropertyKind: Input
+        DisplayName: SurfaceAltColor
+        Description: Soft surface color
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        Description: Main text color
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      Title:
+        PropertyKind: Input
+        DisplayName: Title
+        Description: KPI title
+        DataType: Text
+        Default: ="KPI"
+      ValueText:
+        PropertyKind: Input
+        DisplayName: ValueText
+        Description: KPI main value as text
+        DataType: Text
+        Default: ="0"
+    Properties:
+      Height: =132
+      Width: =240
+    Children:
+      - conKPI_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =If(cmp_KpiCard.IsSelected, cmp_KpiCard.AccentColor, cmp_KpiCard.BorderColor)
+            BorderThickness: =If(cmp_KpiCard.IsSelected, 2, 1)
+            DropShadow: =DropShadow.Semibold
+            Fill: =cmp_KpiCard.BackgroundColor
+            Height: =Parent.Height
+            RadiusBottomLeft: =14
+            RadiusBottomRight: =14
+            RadiusTopLeft: =14
+            RadiusTopRight: =14
+            Width: =Parent.Width
+          Children:
+            - btnKPI_Click:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  BorderStyle: =BorderStyle.None
+                  BorderThickness: =0
+                  Color: =Color.White
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledColor: =RGBA(161, 159, 157, 1)
+                  DisabledFill: =RGBA(242, 242, 241, 0)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =Parent.Height
+                  HoverBorderColor: =RGBA(0, 0, 0, 0)
+                  HoverColor: =Color.White
+                  HoverFill: =RGBA(0,0,0,0.02)
+                  OnSelect: =cmp_KpiCard.OnSelectCard()
+                  PressedBorderColor: =RGBA(0, 0, 0, 0)
+                  PressedColor: =Color.White
+                  PressedFill: =RGBA(0,0,0,0.04)
+                  RadiusBottomLeft: =14
+                  RadiusBottomRight: =14
+                  RadiusTopLeft: =14
+                  RadiusTopRight: =14
+                  Text: =""
+                  Width: =Parent.Width
+            - conKPI_IconBg:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_KpiCard.SurfaceAltColor
+                  Height: =36
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Visible: =cmp_KpiCard.ShowIcon
+                  Width: =36
+                  X: =Parent.Width - 52
+                  Y: =16
+                Children:
+                  - icoKPI_Main:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =cmp_KpiCard.AccentColor
+                        DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                        DisabledColor: =RGBA(225, 223, 221, 1)
+                        DisabledFill: =RGBA(0, 0, 0, 0)
+                        FocusedBorderThickness: =4
+                        Height: =18
+                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                        HoverColor: =cmp_KpiCard.AccentColor
+                        HoverFill: =RGBA(0, 0, 0, 0)
+                        Icon: |-
+                          =Switch(
+                              Lower(cmp_KpiCard.Icon),
+                              "warning", Icon.Warning,
+                              "check", Icon.Check,
+                              "document", Icon.Document,
+                              "filter", Icon.Filter,
+                              "search", Icon.Search,
+                              "people", Icon.People,
+                              "calendar", Icon.CalendarBlank,
+                              "error", Icon.Error,
+                              Icon.Trending
+                          )
+                        OnSelect: =cmp_KpiCard.OnSelectCard()
+                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                        PressedColor: =cmp_KpiCard.AccentColor
+                        PressedFill: =RGBA(0, 0, 0, 0)
+                        Width: =18
+                        X: =9
+                        Y: =9
+            - lblKPI_Title:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =cmp_KpiCard.MutedTextColor
+                  Height: =18
+                  Size: =10
+                  Text: =cmp_KpiCard.Title
+                  Width: =If(cmp_KpiCard.ShowIcon, Parent.Width - 76, Parent.Width - 32)
+                  X: =16
+                  Y: =16
+            - lblKPI_Value:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =cmp_KpiCard.TextColor
+                  FontWeight: =FontWeight.Semibold
+                  Height: =34
+                  Size: =24
+                  Text: =cmp_KpiCard.ValueText
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =40
+            - lblKPI_Subtitle:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =cmp_KpiCard.MutedTextColor
+                  Height: =18
+                  Size: =10
+                  Text: =cmp_KpiCard.Subtitle
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =76
+            - lblKPI_Delta:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Color: =cmp_KpiCard.AccentColor
+                  DisabledColor: =RGBA(161, 159, 157, 1)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =20
+                  OnSelect: =cmp_KpiCard.OnSelectCard()
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =10
+                  Text: =cmp_KpiCard.DeltaText
+                  VerticalAlign: =VerticalAlign.Top
+                  Visible: =cmp_KpiCard.ShowDelta && !IsBlank(cmp_KpiCard.DeltaText)
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =100
+            - lblKPI_Footer:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =cmp_KpiCard.MutedTextColor
+                  Height: =18
+                  Size: =9
+                  Text: =cmp_KpiCard.FooterText
+                  Visible: =cmp_KpiCard.ShowFooter && !IsBlank(cmp_KpiCard.FooterText)
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =104

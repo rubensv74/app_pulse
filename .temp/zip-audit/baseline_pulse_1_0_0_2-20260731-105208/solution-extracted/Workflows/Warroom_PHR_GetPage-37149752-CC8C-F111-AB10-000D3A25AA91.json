@@ -1,0 +1,163 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sqldw": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsqldw_ce25b"
+        },
+        "api": {
+          "name": "shared_sqldw"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "65e89792-76b1-4510-b7ea-28f57057587d"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "number": {
+                  "title": "ProjectId",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "text": {
+                  "title": "SearchSubsystem",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "number_1": {
+                  "title": "PageNumber",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                },
+                "number_2": {
+                  "title": "PageSize",
+                  "type": "number",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter a number",
+                  "x-ms-content-hint": "NUMBER"
+                }
+              },
+              "required": [
+                "number",
+                "text",
+                "number_1",
+                "number_2"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Execute_stored_procedure": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "44c7a4f1-cef4-486b-931d-3c7269536471"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sqldw",
+              "connectionName": "shared_sqldw",
+              "operationId": "ExecuteProcedureV2"
+            },
+            "parameters": {
+              "server": "default",
+              "database": "default",
+              "procedure": "[warroom].[usp_WarRoomReport_GetPage]",
+              "parameters/PageNumber": "@triggerBody()['number_1']",
+              "parameters/PageSize": "@triggerBody()['number_2']",
+              "parameters/ProjectId": "@triggerBody()['number']",
+              "parameters/SearchSubsystem": "@triggerBody()['text']"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "cmpRow": {
+          "runAfter": {
+            "Execute_stored_procedure": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "d3b293c3-770e-4c61-b6e3-c7bbbca7dab5"
+          },
+          "type": "Compose",
+          "inputs": "@if(\r\n  greater(length(coalesce(body('Execute_stored_procedure')?['ResultSets']?['Table1'], createArray())), 0),\r\n  first(body('Execute_stored_procedure')?['ResultSets']?['Table1']),\r\n  json('{}')\r\n)"
+        },
+        "cmpPayload": {
+          "runAfter": {
+            "cmpRow": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "06802cd4-326c-4181-a42e-10d6eb317726"
+          },
+          "type": "Compose",
+          "inputs": "@json(\r\n  concat(\r\n    '{',\r\n      '\"subsystems\":', string(json(coalesce(outputs('cmpRow')?['SubsystemsJson'], '[]'))), ',',\r\n      '\"headers\":',    string(json(coalesce(outputs('cmpRow')?['HeadersJson'], '[]'))), ',',\r\n      '\"metrics\":',    string(json(coalesce(outputs('cmpRow')?['MetricsJson'], '[]'))), ',',\r\n      '\"totalCount\":', string(int(coalesce(outputs('cmpRow')?['TotalCount'], 0))),\r\n    '}'\r\n  )\r\n)"
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "cmpPayload": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "9cf840cc-bcdf-427d-be91-8926384b48c3"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "result": "@{string(outputs('cmpPayload'))}"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "title": "result",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}
