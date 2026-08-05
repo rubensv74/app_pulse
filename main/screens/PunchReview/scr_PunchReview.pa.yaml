@@ -1,0 +1,724 @@
+Screens:
+  scr_PunchReview:
+    Properties:
+      Fill: =varTheme_PageBg
+      LoadingSpinnerColor: =varTheme_PulseBlueDark
+      OnVisible: |-
+        =
+        Set(varAppView, "PunchReview");
+
+        If(IsBlank(varTheme_PageBg), Set(varTheme_PageBg, ColorValue("#F6F8FB")));
+        If(IsBlank(varTheme_Surface), Set(varTheme_Surface, ColorValue("#FFFFFF")));
+        If(IsBlank(varTheme_SurfaceAlt), Set(varTheme_SurfaceAlt, ColorValue("#F8FAFC")));
+        If(IsBlank(varTheme_Border), Set(varTheme_Border, ColorValue("#E2E8F0")));
+        If(IsBlank(varTheme_Text), Set(varTheme_Text, ColorValue("#0F172A")));
+        If(IsBlank(varTheme_TextMuted), Set(varTheme_TextMuted, ColorValue("#64748B")));
+        If(IsBlank(varTheme_PulseBlueDark), Set(varTheme_PulseBlueDark, ColorValue("#1677FF")));
+
+        If(IsBlank(varPunchReviewSource), Set(varPunchReviewSource, "PUNCHES"));
+        If(IsBlank(varPunchReviewReturnScreen), Set(varPunchReviewReturnScreen, "PUNCHES"));
+        If(IsBlank(varPunchReviewSearchText), Set(varPunchReviewSearchText, ""));
+        If(IsBlank(varPunchReviewIsLoading), Set(varPunchReviewIsLoading, false));
+        If(IsBlank(varPunchReviewDirty), Set(varPunchReviewDirty, false));
+        If(IsBlank(varPunchReviewError), Set(varPunchReviewError, ""));
+        Set(varPunchReviewSessionOnly, true);
+
+        If(
+            CountRows(colPunchReviewQueue) = 0,
+            ClearCollect(
+                colPunchReviewQueue,
+                {
+                    ReviewOrder: 0,
+                    RowKey: "",
+                    PunchId: 0,
+                    PunchCode: "",
+                    PunchDescription: "",
+                    Title: "",
+                    Description: "",
+                    Category: "",
+                    Subsystem: "",
+                    Discipline: "",
+                    Priority: "",
+                    Status: "",
+                    ResponsibleParty: "",
+                    DueDateText: "",
+                    IsReviewedInSession: false
+                }
+            );
+            Clear(colPunchReviewQueue)
+        );
+
+        If(
+            CountRows(colPunchReviewQueue) > 0,
+            Set(
+                varPunchReviewCurrentIndex,
+                Min(
+                    Max(1, Coalesce(varPunchReviewCurrentIndex, 1)),
+                    CountRows(colPunchReviewQueue)
+                )
+            );
+            Select(btnPRW_LoadCurrent),
+            Set(varPunchReviewCurrentIndex, 0);
+            Set(varPunchReviewCurrentId, Blank());
+            Set(
+                varPunchReviewCurrent,
+                {
+                    PunchId: 0,
+                    PunchCode: "",
+                    Title: "",
+                    Description: "",
+                    Category: "",
+                    Subsystem: "",
+                    Discipline: "",
+                    Priority: "",
+                    Status: "",
+                    ResponsibleParty: "",
+                    DueDateText: "",
+                    IsReviewedInSession: false
+                }
+            )
+        )
+    Children:
+      - conPRW_Root:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =varTheme_PageBg
+            Height: =Parent.Height
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutGap: =0
+            Width: =Parent.Width
+          Children:
+            - cmp_NavApp_PunchReview:
+                Control: CanvasComponent
+                ComponentName: cmp_SidebarNav
+                Properties:
+                  ActiveKey: ="Punches"
+                  AppVersion: ="PULSE"
+                  EnvironmentLabel: ="ENV.PRE.TR.162"
+                  Fill: =ColorValue("#07111F")
+                  Height: =Parent.Height
+                  IsCollapsed: =false
+                  Items: =colSidebarNavItems
+                  NavItems: =colSidebarNavItems
+                  OnSelectItem: |-
+                    =
+                    Switch(
+                        Lower(Trim(Self.SelectedItemKey)),
+                        "home", Navigate(scr_Home, ScreenTransition.None),
+                        "punches", Navigate(scr_Punches, ScreenTransition.None),
+                        Notify("Leave Punch Review using Back before opening another module.", NotificationType.Information)
+                    )
+                  Width: =184
+            - conPRW_Main:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  Fill: =varTheme_PageBg
+                  FillPortions: =1
+                  Height: =Parent.Height
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =10
+                  LayoutMinWidth: =900
+                  PaddingBottom: =10
+                  PaddingLeft: =10
+                  PaddingRight: =10
+                  PaddingTop: =10
+                Children:
+                  - cmpPunchReviewHeader:
+                      Control: CanvasComponent
+                      ComponentName: cmp_PunchReviewHeaderPro
+                      Properties:
+                        AccentColor: =varTheme_PulseBlueDark
+                        BackgroundColor: =varTheme_Surface
+                        BorderColor: =varTheme_Border
+                        CurrentPosition: =varPunchReviewCurrentIndex
+                        Height: =112
+                        IsLoading: =varPunchReviewIsLoading
+                        IsSessionOnly: =varPunchReviewSessionOnly
+                        MutedTextColor: =varTheme_TextMuted
+                        OnBack: =Select(btnPRW_Back)
+                        ProjectLabel: =If(IsBlank(varProjectId), "No project selected", Coalesce(varProjectCode, Text(varProjectId)) & " · " & Coalesce(varProjectName, ""))
+                        QueueScopeLabel: =If(varPunchReviewSource = "HOME", "Home selection", "Current Punch page")
+                        SessionLabel: ="Reviewed items are saved locally for this session only."
+                        SourceLabel: =If(varPunchReviewReturnScreen = "HOME", "Home", "Punches")
+                        Subtitle: ="Sequential review, comments and custom fields"
+                        SurfaceAltColor: =varTheme_SurfaceAlt
+                        TemplateLabel: =If(IsBlank(varPunchDashboardTemplateId), "Current template", Text(varPunchDashboardTemplateId))
+                        TextColor: =varTheme_Text
+                        Title: ="Punch Review Workspace"
+                        TotalItems: =CountRows(colPunchReviewQueue)
+                        Width: =Parent.Width
+                  - conPRW_Body:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        Fill: =Color.Transparent
+                        FillPortions: =1
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =10
+                        LayoutMinHeight: =600
+                        LayoutMinWidth: =900
+                      Children:
+                        - cmpPunchReviewQueue:
+                            Control: CanvasComponent
+                            ComponentName: cmp_PunchReviewQueuePro
+                            Properties:
+                              AccentColor: =varTheme_PulseBlueDark
+                              BackgroundColor: =varTheme_Surface
+                              BorderColor: =varTheme_Border
+                              CurrentPosition: =varPunchReviewCurrentIndex
+                              FillPortions: =0
+                              FilterSummary: ="Status: All  •  Discipline: All  •  Priority: All"
+                              Height: =Parent.Height
+                              IsLoading: =varPunchReviewIsLoading
+                              Items: =colPunchReviewQueue
+                              LayoutMinWidth: =320
+                              MutedTextColor: =varTheme_TextMuted
+                              OnNext: =Select(btnPRW_Next)
+                              OnPrevious: =Select(btnPRW_Previous)
+                              OnRefresh: =Notify("Queue refresh will be connected to the source screen in Lot 2.", NotificationType.Information)
+                              OnRowSelect: |-
+                                =
+                                Set(
+                                    varPunchReviewCurrentId,
+                                    Value(Self.SelectedRowKey)
+                                );
+                                Set(
+                                    varPunchReviewCurrentIndex,
+                                    Coalesce(
+                                        LookUp(
+                                            colPunchReviewQueue,
+                                            Text(RowKey) = Self.SelectedRowKey,
+                                            ReviewOrder
+                                        ),
+                                        1
+                                    )
+                                );
+                                Select(btnPRW_LoadCurrent)
+                              OnSearchChanged: =Set(varPunchReviewSearchText, Self.SearchText)
+                              QueueTitle: ="Review Queue"
+                              SearchPlaceholder: ="Search Punch ID or title..."
+                              SearchTextIn: =varPunchReviewSearchText
+                              SelectedRowKeyIn: =Text(varPunchReviewCurrentId)
+                              SurfaceAltColor: =varTheme_SurfaceAlt
+                              TextColor: =varTheme_Text
+                              TotalItems: =CountRows(colPunchReviewQueue)
+                              Width: =330
+                        - conPRW_Content:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              Fill: =Color.Transparent
+                              FillPortions: =1
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =10
+                              LayoutMinWidth: =600
+                            Children:
+                              - conPRW_Top:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    Fill: =Color.Transparent
+                                    FillPortions: =1
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =10
+                                    LayoutMinHeight: =470
+                                  Children:
+                                    - conPRW_Center:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          Fill: =Color.Transparent
+                                          FillPortions: =2
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =10
+                                          LayoutMinWidth: =520
+                                        Children:
+                                          - cmpPunchReviewOverview:
+                                              Control: CanvasComponent
+                                              ComponentName: cmp_PunchReviewOverviewPro
+                                              Properties:
+                                                AccentColor: =varTheme_PulseBlueDark
+                                                BackgroundColor: =varTheme_Surface
+                                                BorderColor: =varTheme_Border
+                                                EmptyText: ="Select a Punch from the review queue."
+                                                Height: =300
+                                                IsLoading: =varPunchReviewIsLoading
+                                                MutedTextColor: =varTheme_TextMuted
+                                                PunchRecord: =varPunchReviewCurrent
+                                                SurfaceAltColor: =varTheme_SurfaceAlt
+                                                TextColor: =varTheme_Text
+                                                Title: ="Punch Overview"
+                                                Width: =Parent.Width
+                                          - cmpPunchReviewActions:
+                                              Control: CanvasComponent
+                                              ComponentName: cmp_PunchReviewActionsPro
+                                              Properties:
+                                                AccentColor: =varTheme_PulseBlueDark
+                                                BackgroundColor: =varTheme_Surface
+                                                BorderColor: =varTheme_Border
+                                                CanAddComment: =!IsBlank(varPunchReviewCurrentId)
+                                                CanMarkReviewed: =!IsBlank(varPunchReviewCurrentId)
+                                                CanOpenPunch: =!IsBlank(varPunchReviewCurrentId)
+                                                CanSave: =varPunchReviewDirty
+                                                Height: =92
+                                                IsDirty: =varPunchReviewDirty
+                                                IsLoading: =varPunchReviewIsLoading
+                                                IsReviewed: =Coalesce(varPunchReviewCurrent.IsReviewedInSession, false)
+                                                MutedTextColor: =varTheme_TextMuted
+                                                OnAddComment: =Select(btnPRW_AddComment)
+                                                OnMarkReviewed: =Select(btnPRW_MarkReviewed)
+                                                OnOpenPunch: =Select(btnPRW_OpenPunch)
+                                                OnSave: =Select(btnPRW_Save)
+                                                SurfaceAltColor: =varTheme_SurfaceAlt
+                                                TextColor: =varTheme_Text
+                                                Title: ="Review Actions"
+                                                Width: =Parent.Width
+                                          - conPRW_HistoryPlaceholder:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =varTheme_Border
+                                                BorderThickness: =1
+                                                DropShadow: =DropShadow.Semilight
+                                                Fill: =varTheme_Surface
+                                                FillPortions: =1
+                                                RadiusBottomLeft: =14
+                                                RadiusBottomRight: =14
+                                                RadiusTopLeft: =14
+                                                RadiusTopRight: =14
+                                                Width: =Parent.Width
+                                              Children:
+                                                - lblPRW_HistoryTitle:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      BorderColor: =RGBA(0,0,0,0)
+                                                      Color: =varTheme_Text
+                                                      Fill: =Color.Transparent
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =24
+                                                      Size: =10
+                                                      Text: ="Activity / History"
+                                                      Width: =Parent.Width - 32
+                                                      X: =16
+                                                      Y: =12
+                                                - lblPRW_HistoryMessage:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      BorderColor: =RGBA(0,0,0,0)
+                                                      Color: =varTheme_TextMuted
+                                                      Fill: =Color.Transparent
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =50
+                                                      Size: =9
+                                                      Text: ="History component and ActivityLog integration arrive in Lot 2."
+                                                      Width: =Parent.Width - 40
+                                                      X: =20
+                                                      Y: =(Parent.Height - Self.Height) / 2
+                                    - conPRW_Right:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          Fill: =Color.Transparent
+                                          FillPortions: =1
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =10
+                                          LayoutMinWidth: =360
+                                        Children:
+                                          - conPRW_CommentsPlaceholder:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =varTheme_Border
+                                                BorderThickness: =1
+                                                DropShadow: =DropShadow.Semilight
+                                                Fill: =varTheme_Surface
+                                                Height: =180
+                                                RadiusBottomLeft: =14
+                                                RadiusBottomRight: =14
+                                                RadiusTopLeft: =14
+                                                RadiusTopRight: =14
+                                                Width: =Parent.Width
+                                              Children:
+                                                - lblPRW_CommentsTitle:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      BorderColor: =RGBA(0,0,0,0)
+                                                      Color: =varTheme_Text
+                                                      Fill: =Color.Transparent
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =24
+                                                      Size: =10
+                                                      Text: ="Comments"
+                                                      Width: =Parent.Width - 32
+                                                      X: =16
+                                                      Y: =12
+                                                - lblPRW_CommentsMessage:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      BorderColor: =RGBA(0,0,0,0)
+                                                      Color: =varTheme_TextMuted
+                                                      Fill: =Color.Transparent
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =60
+                                                      Size: =9
+                                                      Text: ="The reusable comments component will replace this placeholder in Lot 2."
+                                                      Width: =Parent.Width - 40
+                                                      X: =20
+                                                      Y: =62
+                                          - conPRW_CustomPlaceholder:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =varTheme_Border
+                                                BorderThickness: =1
+                                                DropShadow: =DropShadow.Semilight
+                                                Fill: =varTheme_Surface
+                                                Height: =170
+                                                RadiusBottomLeft: =14
+                                                RadiusBottomRight: =14
+                                                RadiusTopLeft: =14
+                                                RadiusTopRight: =14
+                                                Width: =Parent.Width
+                                              Children:
+                                                - lblPRW_CustomTitle:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      BorderColor: =RGBA(0,0,0,0)
+                                                      Color: =varTheme_Text
+                                                      Fill: =Color.Transparent
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =24
+                                                      Size: =10
+                                                      Text: ="Custom Fields"
+                                                      Width: =Parent.Width - 32
+                                                      X: =16
+                                                      Y: =12
+                                                - lblPRW_CustomMessage:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      BorderColor: =RGBA(0,0,0,0)
+                                                      Color: =varTheme_TextMuted
+                                                      Fill: =Color.Transparent
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =60
+                                                      Size: =9
+                                                      Text: ="Typed custom-field editing will replace this placeholder in Lot 2."
+                                                      Width: =Parent.Width - 40
+                                                      X: =20
+                                                      Y: =58
+                                          - conPRW_ProgressPlaceholder:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =varTheme_Border
+                                                BorderThickness: =1
+                                                DropShadow: =DropShadow.Semilight
+                                                Fill: =varTheme_Surface
+                                                FillPortions: =1
+                                                RadiusBottomLeft: =14
+                                                RadiusBottomRight: =14
+                                                RadiusTopLeft: =14
+                                                RadiusTopRight: =14
+                                                Width: =Parent.Width
+                                              Children:
+                                                - lblPRW_ProgressTitle:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      BorderColor: =RGBA(0,0,0,0)
+                                                      Color: =varTheme_Text
+                                                      Fill: =Color.Transparent
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =24
+                                                      Size: =10
+                                                      Text: ="Review Progress"
+                                                      Width: =Parent.Width - 32
+                                                      X: =16
+                                                      Y: =12
+                                                - lblPRW_ProgressValue:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      BorderColor: =RGBA(0,0,0,0)
+                                                      Color: =varTheme_PulseBlueDark
+                                                      Fill: =Color.Transparent
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Bold
+                                                      Height: =40
+                                                      Size: =18
+                                                      Text: =Text(CountIf(colPunchReviewQueue, IsReviewedInSession)) & " / " & Text(CountRows(colPunchReviewQueue))
+                                                      Width: =Parent.Width - 40
+                                                      X: =20
+                                                      Y: =50
+                                                - lblPRW_ProgressCaption:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Align: =Align.Center
+                                                      BorderColor: =RGBA(0,0,0,0)
+                                                      Color: =varTheme_TextMuted
+                                                      Fill: =Color.Transparent
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =22
+                                                      Size: =8
+                                                      Text: ="Reviewed in this session"
+                                                      Width: =Parent.Width - 40
+                                                      X: =20
+                                                      Y: =92
+                              - conPRW_RelatedPlaceholder:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: =varTheme_Border
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.Semilight
+                                    Fill: =varTheme_Surface
+                                    Height: =180
+                                    RadiusBottomLeft: =14
+                                    RadiusBottomRight: =14
+                                    RadiusTopLeft: =14
+                                    RadiusTopRight: =14
+                                    Width: =Parent.Width
+                                  Children:
+                                    - lblPRW_RelatedTitle:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          Color: =varTheme_Text
+                                          Fill: =Color.Transparent
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =24
+                                          Size: =10
+                                          Text: ="Related Punches / Context"
+                                          Width: =Parent.Width - 32
+                                          X: =16
+                                          Y: =12
+                                    - lblPRW_RelatedMessage:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          Color: =varTheme_TextMuted
+                                          Fill: =Color.Transparent
+                                          Font: =Font.'Segoe UI'
+                                          Height: =60
+                                          Size: =9
+                                          Text: ="cmp_DataTableProV2 will be connected here after the Lot 1 layout is validated."
+                                          Width: =Parent.Width - 40
+                                          X: =20
+                                          Y: =64
+      - btnPRW_LoadCurrent:
+          Control: Classic/Button@2.2.0
+          Properties:
+            OnSelect: |-
+              =
+              If(
+                  CountRows(colPunchReviewQueue) = 0,
+                  Set(varPunchReviewCurrentId, Blank());
+                  Set(
+                      varPunchReviewCurrent,
+                      {
+                          PunchId: 0,
+                          PunchCode: "",
+                          Title: "",
+                          Description: "",
+                          Category: "",
+                          Subsystem: "",
+                          Discipline: "",
+                          Priority: "",
+                          Status: "",
+                          ResponsibleParty: "",
+                          DueDateText: "",
+                          IsReviewedInSession: false
+                      }
+                  ),
+                  Set(
+                      varPunchReviewCurrentIndex,
+                      Min(
+                          Max(1, varPunchReviewCurrentIndex),
+                          CountRows(colPunchReviewQueue)
+                      )
+                  );
+                  Set(
+                      varPunchReviewCurrent,
+                      Last(
+                          FirstN(
+                              SortByColumns(
+                                  colPunchReviewQueue,
+                                  "ReviewOrder",
+                                  SortOrder.Ascending
+                              ),
+                              varPunchReviewCurrentIndex
+                          )
+                      )
+                  );
+                  Set(
+                      varPunchReviewCurrentId,
+                      Value(varPunchReviewCurrent.RowKey)
+                  );
+                  Set(varPunchReviewDirty, false)
+              )
+            Text: ="Load current"
+            Visible: =false
+            X: =10
+            Y: =10
+      - btnPRW_Previous:
+          Control: Classic/Button@2.2.0
+          Properties:
+            OnSelect: |-
+              =
+              If(
+                  varPunchReviewDirty,
+                  Notify(
+                      "Save or discard pending changes before moving.",
+                      NotificationType.Warning
+                  ),
+                  Set(
+                      varPunchReviewCurrentIndex,
+                      Max(1, varPunchReviewCurrentIndex - 1)
+                  );
+                  Select(btnPRW_LoadCurrent)
+              )
+            Text: ="Previous"
+            Visible: =false
+            X: =20
+            Y: =20
+      - btnPRW_Next:
+          Control: Classic/Button@2.2.0
+          Properties:
+            OnSelect: |-
+              =
+              If(
+                  varPunchReviewDirty,
+                  Notify(
+                      "Save or discard pending changes before moving.",
+                      NotificationType.Warning
+                  ),
+                  Set(
+                      varPunchReviewCurrentIndex,
+                      Min(
+                          CountRows(colPunchReviewQueue),
+                          varPunchReviewCurrentIndex + 1
+                      )
+                  );
+                  Select(btnPRW_LoadCurrent)
+              )
+            Text: ="Next"
+            Visible: =false
+            X: =30
+            Y: =30
+      - btnPRW_MarkReviewed:
+          Control: Classic/Button@2.2.0
+          Properties:
+            OnSelect: |-
+              =
+              If(
+                  IsBlank(varPunchReviewCurrentId),
+                  Notify(
+                      "Select a Punch before marking it reviewed.",
+                      NotificationType.Warning
+                  ),
+                  Patch(
+                      colPunchReviewQueue,
+                      LookUp(
+                          colPunchReviewQueue,
+                          Value(RowKey) = Value(varPunchReviewCurrentId)
+                      ),
+                      {
+                          IsReviewedInSession: true
+                      }
+                  );
+                  Set(
+                      varPunchReviewCurrent,
+                      LookUp(
+                          colPunchReviewQueue,
+                          Value(RowKey) = Value(varPunchReviewCurrentId)
+                      )
+                  );
+                  Notify(
+                      "Marked as reviewed in this session.",
+                      NotificationType.Success
+                  )
+              )
+            Text: ="Mark reviewed"
+            Visible: =false
+            X: =40
+            Y: =40
+      - btnPRW_Back:
+          Control: Classic/Button@2.2.0
+          Properties:
+            OnSelect: |-
+              =
+              If(
+                  varPunchReviewDirty,
+                  Notify(
+                      "Save or discard pending changes before leaving.",
+                      NotificationType.Warning
+                  ),
+                  Switch(
+                      Upper(Coalesce(varPunchReviewReturnScreen, "PUNCHES")),
+                      "HOME", Navigate(scr_Home, ScreenTransition.Fade),
+                      "PUNCHES", Navigate(scr_Punches, ScreenTransition.Fade),
+                      Back()
+                  )
+              )
+            Text: ="Back"
+            Visible: =false
+            X: =50
+            Y: =50
+      - btnPRW_OpenPunch:
+          Control: Classic/Button@2.2.0
+          Properties:
+            OnSelect: |-
+              =
+              If(
+                  IsBlank(varPunchReviewCurrentId),
+                  Notify(
+                      "Select a Punch first.",
+                      NotificationType.Warning
+                  ),
+                  Set(varDrawerRecordId, Value(varPunchReviewCurrentId));
+                  Set(varPunches_FilterSource, "PunchReview");
+                  Set(varPunches_AutoLoad, true);
+                  Navigate(scr_Punches, ScreenTransition.Fade)
+              )
+            Text: ="Open Punch"
+            Visible: =false
+            X: =60
+            Y: =60
+      - btnPRW_AddComment:
+          Control: Classic/Button@2.2.0
+          Properties:
+            OnSelect: |-
+              =
+              Set(varPunchReviewActivePanel, "COMMENTS");
+              Notify(
+                  "Comments will be connected in Lot 2.",
+                  NotificationType.Information
+              )
+            Text: ="Add comment"
+            Visible: =false
+            X: =70
+            Y: =70
+      - btnPRW_Save:
+          Control: Classic/Button@2.2.0
+          Properties:
+            OnSelect: |-
+              =
+              Set(varPunchReviewDirty, false);
+              Notify(
+                  "No persistent editable fields are connected in Lot 1.",
+                  NotificationType.Information
+              )
+            Text: ="Save"
+            Visible: =false
+            X: =80
+            Y: =80
