@@ -1,1 +1,1812 @@
+ComponentDefinitions:
+  cmp_DataTableProV2:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      AccentColor:
+        PropertyKind: Input
+        DisplayName: AccentColor
+        DataType: Color
+        Default: =ColorValue("#2563EB")
+      AllMatchingSelectedIn:
+        PropertyKind: Input
+        DisplayName: AllMatchingSelectedIn
+        Description: True when every record matching the current filters is selected, not only the visible page.
+        DataType: Boolean
+        Default: =false
+      BackgroundColor:
+        PropertyKind: Input
+        DisplayName: BackgroundColor
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      BulkActionKeyOut:
+        PropertyKind: Output
+        DisplayName: BulkActionKeyOut
+        Description: REVIEW, EXPORT or another bulk action key.
+        DataType: Text
+      ColumnActionOut:
+        PropertyKind: Output
+        DisplayName: ColumnActionOut
+        Description: APPLY, RESET or CLOSE.
+        DataType: Text
+      ColumnToggleKeyOut:
+        PropertyKind: Output
+        DisplayName: ColumnToggleKeyOut
+        Description: Column key requested for visibility toggle.
+        DataType: Text
+      Columns:
+        PropertyKind: Input
+        DisplayName: Columns
+        Description: Column configuration table with Key, Label, IsVisible, IsLocked, Width, Sortable and Order.
+        DataType: Table
+        Default: |-
+          =Table(
+              {Key:"PunchId", Label:"Punch ID", IsVisible:true, IsLocked:true, Width:116, Sortable:true, Order:1},
+              {Key:"Title", Label:"Title", IsVisible:true, IsLocked:true, Width:300, Sortable:true, Order:2},
+              {Key:"Subsystem", Label:"Subsystem", IsVisible:true, IsLocked:false, Width:104, Sortable:true, Order:3},
+              {Key:"Discipline", Label:"Discipline", IsVisible:true, IsLocked:false, Width:104, Sortable:true, Order:4},
+              {Key:"Priority", Label:"Priority", IsVisible:true, IsLocked:false, Width:92, Sortable:true, Order:5},
+              {Key:"Status", Label:"Status", IsVisible:true, IsLocked:false, Width:92, Sortable:true, Order:6},
+              {Key:"DueDateText", Label:"Due Date", IsVisible:true, IsLocked:false, Width:108, Sortable:true, Order:7},
+              {Key:"OwnerName", Label:"Owner", IsVisible:true, IsLocked:false, Width:152, Sortable:true, Order:8},
+              {Key:"ProgressPct", Label:"Progress", IsVisible:true, IsLocked:false, Width:116, Sortable:true, Order:9}
+          )
+      ContextActionKeyOut:
+        PropertyKind: Output
+        DisplayName: ContextActionKeyOut
+        DataType: Text
+      ContextActions:
+        PropertyKind: Input
+        DisplayName: ContextActions
+        Description: Context menu definitions with Key, Label, Tone, IsVisible and Order.
+        DataType: Table
+        Default: |-
+          =Table(
+              {Key:"OPEN", Label:"Open details", Tone:"primary", IsVisible:true, Order:1},
+              {Key:"REVIEW", Label:"Mark as reviewed", Tone:"neutral", IsVisible:true, Order:2},
+              {Key:"COMMENT", Label:"Add comment", Tone:"neutral", IsVisible:true, Order:3},
+              {Key:"HISTORY", Label:"View history", Tone:"neutral", IsVisible:true, Order:4},
+              {Key:"EXPORT", Label:"Export row", Tone:"neutral", IsVisible:true, Order:5}
+          )
+      ContextRowKeyOut:
+        PropertyKind: Output
+        DisplayName: ContextRowKeyOut
+        DataType: Text
+      CurrentPage:
+        PropertyKind: Input
+        DisplayName: CurrentPage
+        Description: Current page, 1-based.
+        DataType: Number
+        Default: =1
+      DangerColor:
+        PropertyKind: Input
+        DisplayName: DangerColor
+        DataType: Color
+        Default: =ColorValue("#EF4444")
+      DensityIn:
+        PropertyKind: Input
+        DisplayName: DensityIn
+        Description: Compact, Comfortable or Spacious.
+        DataType: Text
+        Default: ="Compact"
+      EmptyText:
+        PropertyKind: Input
+        DisplayName: EmptyText
+        DataType: Text
+        Default: ="Adjust the filters or search criteria to see records here."
+      EmptyTitle:
+        PropertyKind: Input
+        DisplayName: EmptyTitle
+        DataType: Text
+        Default: ="No punches found"
+      IsLoading:
+        PropertyKind: Input
+        DisplayName: IsLoading
+        DataType: Boolean
+        Default: =false
+      LoadingText:
+        PropertyKind: Input
+        DisplayName: LoadingText
+        DataType: Text
+        Default: ="Loading rows..."
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      OnBulkAction:
+        PropertyKind: Event
+        DisplayName: OnBulkAction
+        ReturnType: None
+        Default: =
+      OnColumnAction:
+        PropertyKind: Event
+        DisplayName: OnColumnAction
+        ReturnType: None
+        Default: =
+      OnColumnToggle:
+        PropertyKind: Event
+        DisplayName: OnColumnToggle
+        ReturnType: None
+        Default: =
+      OnContextAction:
+        PropertyKind: Event
+        DisplayName: OnContextAction
+        ReturnType: None
+        Default: =
+      OnPageChange:
+        PropertyKind: Event
+        DisplayName: OnPageChange
+        ReturnType: None
+        Default: =
+      OnRowSelect:
+        PropertyKind: Event
+        DisplayName: OnRowSelect
+        ReturnType: None
+        Default: =
+      OnRowsPerPage:
+        PropertyKind: Event
+        DisplayName: OnRowsPerPage
+        Description: Opens or delegates the page-size selector.
+        ReturnType: None
+        Default: =
+      OnSelectionAction:
+        PropertyKind: Event
+        DisplayName: OnSelectionAction
+        Description: Handles visible-page, all-matching and clear selection commands.
+        ReturnType: None
+        Default: =
+      OnSort:
+        PropertyKind: Event
+        DisplayName: OnSort
+        ReturnType: None
+        Default: =
+      OnToggleRowSelect:
+        PropertyKind: Event
+        DisplayName: OnToggleRowSelect
+        ReturnType: None
+        Default: =
+      PageRequestedOut:
+        PropertyKind: Output
+        DisplayName: PageRequestedOut
+        Description: Requested page number.
+        DataType: Number
+      Rows:
+        PropertyKind: Input
+        DisplayName: Rows
+        Description: Normalized rows already filtered, sorted and paginated by the consuming screen.
+        DataType: Table
+        Default: |-
+          =Table(
+              {
+                  RowIndex:1,
+                  RowKey:"PULSE-02457",
+                  PunchId:"PULSE-02457",
+                  Title:"Install missing support for pump P-102A",
+                  Subsystem:"Mechanical",
+                  Discipline:"Mechanical",
+                  Priority:"Critical",
+                  Status:"Open",
+                  DueDateText:"May 10, 2024",
+                  IsOverdue:true,
+                  OwnerInitials:"RB",
+                  OwnerName:"Robert Brown",
+                  ProgressPct:20
+              },
+              {
+                  RowIndex:2,
+                  RowKey:"PULSE-02459",
+                  PunchId:"PULSE-02459",
+                  Title:"High temp alarm not functioning - AHU-07",
+                  Subsystem:"HVAC",
+                  Discipline:"Mechanical",
+                  Priority:"High",
+                  Status:"Open",
+                  DueDateText:"May 12, 2024",
+                  IsOverdue:true,
+                  OwnerInitials:"MJ",
+                  OwnerName:"Michael Johnson",
+                  ProgressPct:35
+              }
+          )
+      RowsPerPage:
+        PropertyKind: Input
+        DisplayName: RowsPerPage
+        Description: Current page size.
+        DataType: Number
+        Default: =25
+      SelectedKeys:
+        PropertyKind: Input
+        DisplayName: SelectedKeys
+        Description: Single-column or normalized table containing RowKey for every selected record, including selections on other pages.
+        DataType: Table
+        Default: =FirstN(Table({RowKey:""}), 0)
+      SelectedRowKeyIn:
+        PropertyKind: Input
+        DisplayName: SelectedRowKeyIn
+        Description: Active row used by the details drawer or keyboard navigation.
+        DataType: Text
+        Default: =""
+      SelectedRowKeyOut:
+        PropertyKind: Output
+        DisplayName: SelectedRowKeyOut
+        DataType: Text
+      SelectionActionOut:
+        PropertyKind: Output
+        DisplayName: SelectionActionOut
+        Description: SELECT_VISIBLE, CLEAR_VISIBLE, SELECT_MATCHING or CLEAR_ALL.
+        DataType: Text
+      ShowBulkActions:
+        PropertyKind: Input
+        DisplayName: ShowBulkActions
+        DataType: Boolean
+        Default: =true
+      ShowCheckboxes:
+        PropertyKind: Input
+        DisplayName: ShowCheckboxes
+        DataType: Boolean
+        Default: =true
+      ShowColumnSelector:
+        PropertyKind: Input
+        DisplayName: ShowColumnSelector
+        DataType: Boolean
+        Default: =true
+      ShowPagination:
+        PropertyKind: Input
+        DisplayName: ShowPagination
+        DataType: Boolean
+        Default: =true
+      ShowRowActions:
+        PropertyKind: Input
+        DisplayName: ShowRowActions
+        DataType: Boolean
+        Default: =true
+      ShowSelectAllMatching:
+        PropertyKind: Input
+        DisplayName: ShowSelectAllMatching
+        Description: Offers selection of all filtered results after the visible page has been selected.
+        DataType: Boolean
+        Default: =true
+      SortDirectionIn:
+        PropertyKind: Input
+        DisplayName: SortDirectionIn
+        Description: asc or desc.
+        DataType: Text
+        Default: ="asc"
+      SortDirectionOut:
+        PropertyKind: Output
+        DisplayName: SortDirectionOut
+        DataType: Text
+      SortKeyIn:
+        PropertyKind: Input
+        DisplayName: SortKeyIn
+        Description: Current sort key.
+        DataType: Text
+        Default: ="PunchId"
+      SortKeyOut:
+        PropertyKind: Output
+        DisplayName: SortKeyOut
+        DataType: Text
+      SuccessColor:
+        PropertyKind: Input
+        DisplayName: SuccessColor
+        DataType: Color
+        Default: =ColorValue("#10B981")
+      SurfaceAltColor:
+        PropertyKind: Input
+        DisplayName: SurfaceAltColor
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      ToggleRowKeyOut:
+        PropertyKind: Output
+        DisplayName: ToggleRowKeyOut
+        DataType: Text
+      TotalCount:
+        PropertyKind: Input
+        DisplayName: TotalCount
+        Description: Total records matching the current filters.
+        DataType: Number
+        Default: =248
+      TotalPages:
+        PropertyKind: Input
+        DisplayName: TotalPages
+        Description: Total number of pages.
+        DataType: Number
+        Default: =10
+      VisibleEnd:
+        PropertyKind: Input
+        DisplayName: VisibleEnd
+        Description: Last result ordinal shown.
+        DataType: Number
+        Default: =25
+      VisibleStart:
+        PropertyKind: Input
+        DisplayName: VisibleStart
+        Description: First result ordinal shown.
+        DataType: Number
+        Default: =1
+      WarningColor:
+        PropertyKind: Input
+        DisplayName: WarningColor
+        DataType: Color
+        Default: =ColorValue("#F59E0B")
+    Properties:
+      BulkActionKeyOut: =Coalesce(varDTP2_BulkActionKey, "")
+      ColumnActionOut: =Coalesce(varDTP2_ColumnAction, "")
+      ColumnToggleKeyOut: =Coalesce(varDTP2_ColumnToggleKey, "")
+      ContextActionKeyOut: =Coalesce(varDTP2_ContextActionKey, "")
+      ContextRowKeyOut: =Coalesce(varDTP2_ContextRowKey, "")
+      Height: =408
+      PageRequestedOut: =Coalesce(varDTP2_PageRequested, cmp_DataTableProV2.CurrentPage)
+      SelectedRowKeyOut: =Coalesce(varDTP2_SelectedRowKey, cmp_DataTableProV2.SelectedRowKeyIn, "")
+      SelectionActionOut: =Coalesce(varDTP2_SelectionAction, "")
+      SortDirectionOut: =Coalesce(varDTP2_SortDirection, cmp_DataTableProV2.SortDirectionIn, "asc")
+      SortKeyOut: =Coalesce(varDTP2_SortKey, cmp_DataTableProV2.SortKeyIn, "PunchId")
+      ToggleRowKeyOut: =Coalesce(varDTP2_ToggleRowKey, "")
+      Width: =1380
+    Children:
+      - conDTP2_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =cmp_DataTableProV2.BorderColor
+            BorderThickness: =1
+            DropShadow: =DropShadow.Semilight
+            Fill: =cmp_DataTableProV2.BackgroundColor
+            Height: =Parent.Height
+            RadiusBottomLeft: =12
+            RadiusBottomRight: =12
+            RadiusTopLeft: =12
+            RadiusTopRight: =12
+            Width: =Parent.Width
+          Children:
+            - rectDTP2_HeaderBg:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderStyle: =BorderStyle.None
+                  Fill: =cmp_DataTableProV2.SurfaceAltColor
+                  Height: =42
+                  Width: =Parent.Width - 2
+                  X: =1
+                  Y: =1
+            - btnDTP2_HeaderSelectAll:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =If(CountIf(cmp_DataTableProV2.Rows, RowKey in cmp_DataTableProV2.SelectedKeys.RowKey) > 0, cmp_DataTableProV2.AccentColor, cmp_DataTableProV2.BorderColor)
+                  BorderThickness: =1
+                  Color: =If(CountIf(cmp_DataTableProV2.Rows, RowKey in cmp_DataTableProV2.SelectedKeys.RowKey) > 0, Color.White, cmp_DataTableProV2.AccentColor)
+                  DisplayMode: =If(cmp_DataTableProV2.IsLoading || CountRows(cmp_DataTableProV2.Rows) = 0, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =If(CountIf(cmp_DataTableProV2.Rows, RowKey in cmp_DataTableProV2.SelectedKeys.RowKey) > 0, cmp_DataTableProV2.AccentColor, cmp_DataTableProV2.BackgroundColor)
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Bold
+                  Height: =18
+                  HoverBorderColor: =cmp_DataTableProV2.AccentColor
+                  HoverColor: =cmp_DataTableProV2.AccentColor
+                  HoverFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.92)
+                  OnSelect: |-
+                    =
+                    Set(
+                        varDTP2_SelectionAction,
+                        If(
+                            CountRows(cmp_DataTableProV2.Rows) > 0 &&
+                            CountIf(cmp_DataTableProV2.Rows, RowKey in cmp_DataTableProV2.SelectedKeys.RowKey) = CountRows(cmp_DataTableProV2.Rows),
+                            "CLEAR_VISIBLE",
+                            "SELECT_VISIBLE"
+                        )
+                    );
+                    cmp_DataTableProV2.OnSelectionAction()
+                  PressedBorderColor: =cmp_DataTableProV2.AccentColor
+                  PressedColor: =Color.White
+                  PressedFill: =cmp_DataTableProV2.AccentColor
+                  RadiusBottomLeft: =4
+                  RadiusBottomRight: =4
+                  RadiusTopLeft: =4
+                  RadiusTopRight: =4
+                  Size: =8
+                  Text: |-
+                    =If(
+                        CountRows(cmp_DataTableProV2.Rows) > 0 &&
+                        CountIf(cmp_DataTableProV2.Rows, RowKey in cmp_DataTableProV2.SelectedKeys.RowKey) = CountRows(cmp_DataTableProV2.Rows),
+                        "✓",
+                        If(CountIf(cmp_DataTableProV2.Rows, RowKey in cmp_DataTableProV2.SelectedKeys.RowKey) > 0, "−", "")
+                    )
+                  Visible: =cmp_DataTableProV2.ShowCheckboxes
+                  Width: =18
+                  X: =12
+                  Y: =12
+            - btnDTP2_SortPunchId:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Align: =Align.Left
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderThickness: =0
+                  Color: =cmp_DataTableProV2.TextColor
+                  DisplayMode: =If(cmp_DataTableProV2.IsLoading, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =26
+                  HoverBorderColor: =RGBA(0,0,0,0)
+                  HoverColor: =cmp_DataTableProV2.AccentColor
+                  HoverFill: =RGBA(0,0,0,0)
+                  OnSelect: |-
+                    =
+                    Set(varDTP2_SortKey, "PunchId");
+                    Set(varDTP2_SortDirection, If(cmp_DataTableProV2.SortKeyIn = "PunchId" && Lower(cmp_DataTableProV2.SortDirectionIn) = "asc", "desc", "asc"));
+                    cmp_DataTableProV2.OnSort()
+                  PaddingLeft: =0
+                  PressedBorderColor: =RGBA(0,0,0,0)
+                  PressedColor: =cmp_DataTableProV2.AccentColor
+                  PressedFill: =RGBA(0,0,0,0)
+                  Size: =9
+                  Text: |-
+                    =
+
+                    Coalesce(
+                        LookUp(
+                            cmp_DataTableProV2.Columns,
+                            Key = "PunchId"
+                        ).Label,
+                        "Punch ID"
+                    ) &
+                    If(
+                        cmp_DataTableProV2.SortKeyIn = "PunchId",
+                        "  " &
+                        If(
+                            Lower(cmp_DataTableProV2.SortDirectionIn) = "asc",
+                            UniChar(8593),
+                            UniChar(8595)
+                        ),
+                        ""
+                    )
+                  Visible: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "PunchId").IsVisible, true)
+                  Width: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "PunchId").Width, 116)
+                  X: =If(cmp_DataTableProV2.ShowCheckboxes, 42, 14)
+                  Y: =8
+            - btnDTP2_SortTitle:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Align: =Align.Left
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderThickness: =0
+                  Color: =cmp_DataTableProV2.TextColor
+                  DisplayMode: =If(cmp_DataTableProV2.IsLoading, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =26
+                  HoverBorderColor: =RGBA(0,0,0,0)
+                  HoverColor: =cmp_DataTableProV2.AccentColor
+                  HoverFill: =RGBA(0,0,0,0)
+                  OnSelect: |-
+                    =
+                    Set(varDTP2_SortKey, "Title");
+                    Set(varDTP2_SortDirection, If(cmp_DataTableProV2.SortKeyIn = "Title" && Lower(cmp_DataTableProV2.SortDirectionIn) = "asc", "desc", "asc"));
+                    cmp_DataTableProV2.OnSort()
+                  PaddingLeft: =0
+                  PressedBorderColor: =RGBA(0,0,0,0)
+                  PressedColor: =cmp_DataTableProV2.AccentColor
+                  PressedFill: =RGBA(0,0,0,0)
+                  Size: =9
+                  Text: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "Title").Label, "Title") & If(cmp_DataTableProV2.SortKeyIn = "Title", "  " & If(Lower(cmp_DataTableProV2.SortDirectionIn) = "asc", UniChar(8593), UniChar(8595)), "")
+                  Visible: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "Title").IsVisible, true)
+                  Width: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "Title").Width, 300)
+                  X: =btnDTP2_SortPunchId.X + If(btnDTP2_SortPunchId.Visible, btnDTP2_SortPunchId.Width + 12, 0)
+                  Y: =8
+            - btnDTP2_SortSubsystem:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Align: =Align.Left
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderThickness: =0
+                  Color: =cmp_DataTableProV2.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =26
+                  HoverColor: =cmp_DataTableProV2.AccentColor
+                  HoverFill: =RGBA(0,0,0,0)
+                  OnSelect: |-
+                    =
+                    Set(varDTP2_SortKey, "Subsystem");
+                    Set(varDTP2_SortDirection, If(cmp_DataTableProV2.SortKeyIn = "Subsystem" && Lower(cmp_DataTableProV2.SortDirectionIn) = "asc", "desc", "asc"));
+                    cmp_DataTableProV2.OnSort()
+                  PaddingLeft: =0
+                  PressedColor: =cmp_DataTableProV2.AccentColor
+                  PressedFill: =RGBA(0,0,0,0)
+                  Size: =9
+                  Text: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "Subsystem").Label, "Subsystem") & If(cmp_DataTableProV2.SortKeyIn = "Subsystem", "  " & If(Lower(cmp_DataTableProV2.SortDirectionIn) = "asc", UniChar(8593), UniChar(8595)), "")
+                  Visible: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "Subsystem").IsVisible, true)
+                  Width: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "Subsystem").Width, 104)
+                  X: =btnDTP2_SortTitle.X + If(btnDTP2_SortTitle.Visible, btnDTP2_SortTitle.Width + 12, 0)
+                  Y: =8
+            - btnDTP2_SortDiscipline:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Align: =Align.Left
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderThickness: =0
+                  Color: =cmp_DataTableProV2.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =26
+                  HoverColor: =cmp_DataTableProV2.AccentColor
+                  HoverFill: =RGBA(0,0,0,0)
+                  OnSelect: |-
+                    =
+                    Set(varDTP2_SortKey, "Discipline");
+                    Set(varDTP2_SortDirection, If(cmp_DataTableProV2.SortKeyIn = "Discipline" && Lower(cmp_DataTableProV2.SortDirectionIn) = "asc", "desc", "asc"));
+                    cmp_DataTableProV2.OnSort()
+                  PaddingLeft: =0
+                  PressedColor: =cmp_DataTableProV2.AccentColor
+                  PressedFill: =RGBA(0,0,0,0)
+                  Size: =9
+                  Text: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "Discipline").Label, "Discipline") & If(cmp_DataTableProV2.SortKeyIn = "Discipline", "  " & If(Lower(cmp_DataTableProV2.SortDirectionIn) = "asc", UniChar(8593), UniChar(8595)), "")
+                  Visible: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "Discipline").IsVisible, true)
+                  Width: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "Discipline").Width, 104)
+                  X: =btnDTP2_SortSubsystem.X + If(btnDTP2_SortSubsystem.Visible, btnDTP2_SortSubsystem.Width + 12, 0)
+                  Y: =8
+            - btnDTP2_SortPriority:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Align: =Align.Left
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderThickness: =0
+                  Color: =cmp_DataTableProV2.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =26
+                  HoverColor: =cmp_DataTableProV2.AccentColor
+                  HoverFill: =RGBA(0,0,0,0)
+                  OnSelect: |-
+                    =
+                    Set(varDTP2_SortKey, "Priority");
+                    Set(varDTP2_SortDirection, If(cmp_DataTableProV2.SortKeyIn = "Priority" && Lower(cmp_DataTableProV2.SortDirectionIn) = "asc", "desc", "asc"));
+                    cmp_DataTableProV2.OnSort()
+                  PaddingLeft: =0
+                  PressedColor: =cmp_DataTableProV2.AccentColor
+                  PressedFill: =RGBA(0,0,0,0)
+                  Size: =9
+                  Text: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "Priority").Label, "Priority") & If(cmp_DataTableProV2.SortKeyIn = "Priority", "  " & If(Lower(cmp_DataTableProV2.SortDirectionIn) = "asc", UniChar(8593), UniChar(8595)), "")
+                  Visible: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "Priority").IsVisible, true)
+                  Width: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "Priority").Width, 92)
+                  X: =btnDTP2_SortDiscipline.X + If(btnDTP2_SortDiscipline.Visible, btnDTP2_SortDiscipline.Width + 12, 0)
+                  Y: =8
+            - btnDTP2_SortStatus:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Align: =Align.Left
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderThickness: =0
+                  Color: =cmp_DataTableProV2.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =26
+                  HoverColor: =cmp_DataTableProV2.AccentColor
+                  HoverFill: =RGBA(0,0,0,0)
+                  OnSelect: |-
+                    =
+                    Set(varDTP2_SortKey, "Status");
+                    Set(varDTP2_SortDirection, If(cmp_DataTableProV2.SortKeyIn = "Status" && Lower(cmp_DataTableProV2.SortDirectionIn) = "asc", "desc", "asc"));
+                    cmp_DataTableProV2.OnSort()
+                  PaddingLeft: =0
+                  PressedColor: =cmp_DataTableProV2.AccentColor
+                  PressedFill: =RGBA(0,0,0,0)
+                  Size: =9
+                  Text: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "Status").Label, "Status") & If(cmp_DataTableProV2.SortKeyIn = "Status", "  " & If(Lower(cmp_DataTableProV2.SortDirectionIn) = "asc", UniChar(8593), UniChar(8595)), "")
+                  Visible: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "Status").IsVisible, true)
+                  Width: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "Status").Width, 92)
+                  X: =btnDTP2_SortPriority.X + If(btnDTP2_SortPriority.Visible, btnDTP2_SortPriority.Width + 12, 0)
+                  Y: =8
+            - btnDTP2_SortDueDate:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Align: =Align.Left
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderThickness: =0
+                  Color: =cmp_DataTableProV2.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =26
+                  HoverColor: =cmp_DataTableProV2.AccentColor
+                  HoverFill: =RGBA(0,0,0,0)
+                  OnSelect: |-
+                    =
+                    Set(varDTP2_SortKey, "DueDateText");
+                    Set(varDTP2_SortDirection, If(cmp_DataTableProV2.SortKeyIn = "DueDateText" && Lower(cmp_DataTableProV2.SortDirectionIn) = "asc", "desc", "asc"));
+                    cmp_DataTableProV2.OnSort()
+                  PaddingLeft: =0
+                  PressedColor: =cmp_DataTableProV2.AccentColor
+                  PressedFill: =RGBA(0,0,0,0)
+                  Size: =9
+                  Text: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "DueDateText").Label, "Due Date") & If(cmp_DataTableProV2.SortKeyIn = "DueDateText", "  " & If(Lower(cmp_DataTableProV2.SortDirectionIn) = "asc", UniChar(8593), UniChar(8595)), "")
+                  Visible: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "DueDateText").IsVisible, true)
+                  Width: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "DueDateText").Width, 108)
+                  X: =btnDTP2_SortStatus.X + If(btnDTP2_SortStatus.Visible, btnDTP2_SortStatus.Width + 12, 0)
+                  Y: =8
+            - btnDTP2_SortOwner:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Align: =Align.Left
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderThickness: =0
+                  Color: =cmp_DataTableProV2.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =26
+                  HoverColor: =cmp_DataTableProV2.AccentColor
+                  HoverFill: =RGBA(0,0,0,0)
+                  OnSelect: |-
+                    =
+                    Set(varDTP2_SortKey, "OwnerName");
+                    Set(varDTP2_SortDirection, If(cmp_DataTableProV2.SortKeyIn = "OwnerName" && Lower(cmp_DataTableProV2.SortDirectionIn) = "asc", "desc", "asc"));
+                    cmp_DataTableProV2.OnSort()
+                  PaddingLeft: =0
+                  PressedColor: =cmp_DataTableProV2.AccentColor
+                  PressedFill: =RGBA(0,0,0,0)
+                  Size: =9
+                  Text: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "OwnerName").Label, "Owner") & If(cmp_DataTableProV2.SortKeyIn = "OwnerName", "  " & If(Lower(cmp_DataTableProV2.SortDirectionIn) = "asc", UniChar(8593), UniChar(8595)), "")
+                  Visible: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "OwnerName").IsVisible, true)
+                  Width: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "OwnerName").Width, 152)
+                  X: =btnDTP2_SortDueDate.X + If(btnDTP2_SortDueDate.Visible, btnDTP2_SortDueDate.Width + 12, 0)
+                  Y: =8
+            - btnDTP2_SortProgress:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Align: =Align.Left
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderThickness: =0
+                  Color: =cmp_DataTableProV2.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =26
+                  HoverColor: =cmp_DataTableProV2.AccentColor
+                  HoverFill: =RGBA(0,0,0,0)
+                  OnSelect: |-
+                    =
+                    Set(varDTP2_SortKey, "ProgressPct");
+                    Set(varDTP2_SortDirection, If(cmp_DataTableProV2.SortKeyIn = "ProgressPct" && Lower(cmp_DataTableProV2.SortDirectionIn) = "asc", "desc", "asc"));
+                    cmp_DataTableProV2.OnSort()
+                  PaddingLeft: =0
+                  PressedColor: =cmp_DataTableProV2.AccentColor
+                  PressedFill: =RGBA(0,0,0,0)
+                  Size: =9
+                  Text: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "ProgressPct").Label, "Progress") & If(cmp_DataTableProV2.SortKeyIn = "ProgressPct", "  " & If(Lower(cmp_DataTableProV2.SortDirectionIn) = "asc", UniChar(8593), UniChar(8595)), "")
+                  Visible: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "ProgressPct").IsVisible, true)
+                  Width: =Coalesce(LookUp(cmp_DataTableProV2.Columns, Key = "ProgressPct").Width, 116)
+                  X: =btnDTP2_SortOwner.X + If(btnDTP2_SortOwner.Visible, btnDTP2_SortOwner.Width + 12, 0)
+                  Y: =8
+            - btnDTP2_Columns:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderThickness: =0
+                  Color: =If(varDTP2_ColumnsOpen, cmp_DataTableProV2.AccentColor, cmp_DataTableProV2.MutedTextColor)
+                  Fill: =If(varDTP2_ColumnsOpen, ColorFade(cmp_DataTableProV2.AccentColor, 0.92), Color.Transparent)
+                  Font: =Font.'Segoe UI'
+                  Height: =30
+                  HoverColor: =cmp_DataTableProV2.AccentColor
+                  HoverFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.94)
+                  OnSelect: |-
+                    =
+                    Set(varDTP2_ContextOpen, false);
+                    Set(varDTP2_ColumnsOpen, !Coalesce(varDTP2_ColumnsOpen, false))
+                  PressedColor: =cmp_DataTableProV2.AccentColor
+                  PressedFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.9)
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =13
+                  Text: ="⚙"
+                  Visible: =cmp_DataTableProV2.ShowColumnSelector
+                  Width: =32
+                  X: =Parent.Width - 40
+                  Y: =6
+            - conDTP2_SelectionBar:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_DataTableProV2.BorderColor
+                  DropShadow: =DropShadow.None
+                  Fill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.94)
+                  Height: =38
+                  Visible: =cmp_DataTableProV2.ShowBulkActions && CountRows(cmp_DataTableProV2.SelectedKeys) > 0
+                  Width: =Parent.Width - 2
+                  X: =1
+                  Y: =42
+                Children:
+                  - lblDTP2_SelectedCount:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_DataTableProV2.AccentColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =38
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =If(cmp_DataTableProV2.AllMatchingSelectedIn, "All " & Text(cmp_DataTableProV2.TotalCount) & " results selected", Text(CountRows(cmp_DataTableProV2.SelectedKeys)) & " selected")
+                        Width: =190
+                        X: =14
+                  - btnDTP2_SelectAllMatching:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        BorderThickness: =0
+                        Color: =cmp_DataTableProV2.AccentColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =30
+                        HoverColor: =cmp_DataTableProV2.AccentColor
+                        HoverFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.9)
+                        OnSelect: |-
+                          =
+                          Set(varDTP2_SelectionAction, "SELECT_MATCHING");
+                          cmp_DataTableProV2.OnSelectionAction()
+                        PressedColor: =cmp_DataTableProV2.AccentColor
+                        PressedFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.86)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =8
+                        Text: ="Select all " & Text(cmp_DataTableProV2.TotalCount) & " results"
+                        Visible: =cmp_DataTableProV2.ShowSelectAllMatching && !cmp_DataTableProV2.AllMatchingSelectedIn && CountRows(cmp_DataTableProV2.Rows) > 0 && CountIf(cmp_DataTableProV2.Rows, RowKey in cmp_DataTableProV2.SelectedKeys.RowKey) = CountRows(cmp_DataTableProV2.Rows) && cmp_DataTableProV2.TotalCount > CountRows(cmp_DataTableProV2.SelectedKeys)
+                        Width: =164
+                        X: =204
+                        Y: =4
+                  - btnDTP2_BulkReview:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =cmp_DataTableProV2.BorderColor
+                        BorderThickness: =1
+                        Color: =cmp_DataTableProV2.TextColor
+                        Fill: =cmp_DataTableProV2.BackgroundColor
+                        Font: =Font.'Segoe UI'
+                        Height: =30
+                        HoverBorderColor: =cmp_DataTableProV2.AccentColor
+                        HoverColor: =cmp_DataTableProV2.AccentColor
+                        HoverFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.94)
+                        OnSelect: |-
+                          =
+                          Set(varDTP2_BulkActionKey, "REVIEW");
+                          cmp_DataTableProV2.OnBulkAction()
+                        PressedBorderColor: =cmp_DataTableProV2.AccentColor
+                        PressedColor: =cmp_DataTableProV2.AccentColor
+                        PressedFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.9)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =8
+                        Text: ="Mark reviewed"
+                        Width: =112
+                        X: =Parent.Width - 330
+                        Y: =4
+                  - btnDTP2_BulkExport:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =cmp_DataTableProV2.BorderColor
+                        BorderThickness: =1
+                        Color: =cmp_DataTableProV2.TextColor
+                        Fill: =cmp_DataTableProV2.BackgroundColor
+                        Font: =Font.'Segoe UI'
+                        Height: =30
+                        HoverBorderColor: =cmp_DataTableProV2.AccentColor
+                        HoverColor: =cmp_DataTableProV2.AccentColor
+                        HoverFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.94)
+                        OnSelect: |-
+                          =
+                          Set(varDTP2_BulkActionKey, "EXPORT");
+                          cmp_DataTableProV2.OnBulkAction()
+                        PressedBorderColor: =cmp_DataTableProV2.AccentColor
+                        PressedColor: =cmp_DataTableProV2.AccentColor
+                        PressedFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.9)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =8
+                        Text: ="Export"
+                        Width: =82
+                        X: =Parent.Width - 210
+                        Y: =4
+                  - btnDTP2_ClearSelection:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        BorderThickness: =0
+                        Color: =cmp_DataTableProV2.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =30
+                        HoverColor: =cmp_DataTableProV2.DangerColor
+                        HoverFill: =ColorFade(cmp_DataTableProV2.DangerColor, 0.94)
+                        OnSelect: |-
+                          =
+                          Set(varDTP2_SelectionAction, "CLEAR_ALL");
+                          cmp_DataTableProV2.OnSelectionAction()
+                        PressedColor: =cmp_DataTableProV2.DangerColor
+                        PressedFill: =ColorFade(cmp_DataTableProV2.DangerColor, 0.9)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =8
+                        Text: ="Clear"
+                        Width: =68
+                        X: =Parent.Width - 116
+                        Y: =4
+            - galDTP2_Rows:
+                Control: Gallery@2.15.0
+                Variant: Vertical
+                Properties:
+                  BorderColor: =RGBA(245,245,245,1)
+                  Height: =Parent.Height - 42 - If(conDTP2_SelectionBar.Visible, conDTP2_SelectionBar.Height, 0) - 54 - 2
+                  Items: =cmp_DataTableProV2.Rows
+                  TemplatePadding: =0
+                  TemplateSize: =Switch(Lower(cmp_DataTableProV2.DensityIn), "spacious", 60, "comfortable", 52, 44)
+                  Width: =Parent.Width - 2
+                  X: =1
+                  Y: =42 + If(conDTP2_SelectionBar.Visible, conDTP2_SelectionBar.Height, 0)
+                Children:
+                  - rectDTP2_RowBg:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        BorderStyle: =BorderStyle.None
+                        Fill: =If(ThisItem.RowKey = cmp_DataTableProV2.SelectedRowKeyIn, ColorFade(cmp_DataTableProV2.AccentColor, 0.94), If(ThisItem.RowKey in cmp_DataTableProV2.SelectedKeys.RowKey, ColorFade(cmp_DataTableProV2.AccentColor, 0.97), Color.Transparent))
+                        Height: =Parent.TemplateHeight - 1
+                        Width: =Parent.TemplateWidth
+                  - rectDTP2_RowDivider:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        BorderStyle: =BorderStyle.None
+                        Fill: =cmp_DataTableProV2.BorderColor
+                        Height: =1
+                        Width: =Parent.TemplateWidth - 24
+                        X: =12
+                        Y: =Parent.TemplateHeight - 1
+                  - btnDTP2_RowSurface:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        BorderThickness: =0
+                        Color: =RGBA(0,0,0,0)
+                        Fill: =RGBA(0,0,0,0)
+                        Height: =Parent.TemplateHeight
+                        HoverColor: =RGBA(0,0,0,0)
+                        HoverFill: =RGBA(15,23,42,0.025)
+                        OnSelect: |-
+                          =
+                          Set(varDTP2_SelectedRowKey, ThisItem.RowKey);
+                          cmp_DataTableProV2.OnRowSelect()
+                        PressedColor: =RGBA(0,0,0,0)
+                        PressedFill: =RGBA(15,23,42,0.05)
+                        Text: =""
+                        Width: =Parent.TemplateWidth
+                  - btnDTP2_RowCheckbox:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =If(ThisItem.RowKey in cmp_DataTableProV2.SelectedKeys.RowKey, cmp_DataTableProV2.AccentColor, cmp_DataTableProV2.BorderColor)
+                        BorderThickness: =1
+                        Color: =If(ThisItem.RowKey in cmp_DataTableProV2.SelectedKeys.RowKey, Color.White, cmp_DataTableProV2.AccentColor)
+                        Fill: =If(ThisItem.RowKey in cmp_DataTableProV2.SelectedKeys.RowKey, cmp_DataTableProV2.AccentColor, cmp_DataTableProV2.BackgroundColor)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =18
+                        HoverBorderColor: =cmp_DataTableProV2.AccentColor
+                        HoverColor: =cmp_DataTableProV2.AccentColor
+                        HoverFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.92)
+                        OnSelect: |-
+                          =
+                          Set(varDTP2_ToggleRowKey, ThisItem.RowKey);
+                          cmp_DataTableProV2.OnToggleRowSelect()
+                        PressedBorderColor: =cmp_DataTableProV2.AccentColor
+                        PressedColor: =Color.White
+                        PressedFill: =cmp_DataTableProV2.AccentColor
+                        RadiusBottomLeft: =4
+                        RadiusBottomRight: =4
+                        RadiusTopLeft: =4
+                        RadiusTopRight: =4
+                        Size: =8
+                        Text: =If(ThisItem.RowKey in cmp_DataTableProV2.SelectedKeys.RowKey, "✓", "")
+                        Visible: =cmp_DataTableProV2.ShowCheckboxes
+                        Width: =18
+                        X: =12
+                        Y: =(Parent.TemplateHeight - Self.Height) / 2
+                  - lblDTP2_RowPunchId:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_DataTableProV2.AccentColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =Parent.TemplateHeight
+                        OnSelect: =Select(btnDTP2_RowSurface)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =ThisItem.PunchId
+                        Visible: =btnDTP2_SortPunchId.Visible
+                        Width: =btnDTP2_SortPunchId.Width
+                        X: =btnDTP2_SortPunchId.X
+                  - lblDTP2_RowTitle:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_DataTableProV2.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =Parent.TemplateHeight
+                        OnSelect: =Select(btnDTP2_RowSurface)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =10
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =ThisItem.Title
+                        Visible: =btnDTP2_SortTitle.Visible
+                        Width: =btnDTP2_SortTitle.Width
+                        X: =btnDTP2_SortTitle.X
+                  - lblDTP2_RowSubsystem:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_DataTableProV2.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =Parent.TemplateHeight
+                        OnSelect: =Select(btnDTP2_RowSurface)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =6
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =ThisItem.Subsystem
+                        Visible: =btnDTP2_SortSubsystem.Visible
+                        Width: =btnDTP2_SortSubsystem.Width
+                        X: =btnDTP2_SortSubsystem.X
+                  - lblDTP2_RowDiscipline:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_DataTableProV2.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =Parent.TemplateHeight
+                        OnSelect: =Select(btnDTP2_RowSurface)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =6
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =ThisItem.Discipline
+                        Visible: =btnDTP2_SortDiscipline.Visible
+                        Width: =btnDTP2_SortDiscipline.Width
+                        X: =btnDTP2_SortDiscipline.X
+                  - lblDTP2_RowPriority:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_DataTableProV2.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =Parent.TemplateHeight
+                        OnSelect: =Select(btnDTP2_RowSurface)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: ="●  " & ThisItem.Priority
+                        Visible: =btnDTP2_SortPriority.Visible
+                        Width: =btnDTP2_SortPriority.Width
+                        X: =btnDTP2_SortPriority.X
+                  - btnDTP2_RowStatus:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        BorderThickness: =0
+                        Color: =If(Lower(ThisItem.Status) = "in progress", ColorValue("#0F766E"), cmp_DataTableProV2.AccentColor)
+                        DisabledBorderColor: =RGBA(0,0,0,0)
+                        DisabledColor: =If(Lower(ThisItem.Status) = "in progress", ColorValue("#0F766E"), cmp_DataTableProV2.AccentColor)
+                        DisabledFill: =If(Lower(ThisItem.Status) = "in progress", ColorValue("#D1FAE5"), ColorFade(cmp_DataTableProV2.AccentColor, 0.9))
+                        DisplayMode: =DisplayMode.Disabled
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =24
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =8
+                        Text: =ThisItem.Status
+                        Visible: =btnDTP2_SortStatus.Visible
+                        Width: =Min(btnDTP2_SortStatus.Width, 84)
+                        X: =btnDTP2_SortStatus.X
+                        Y: =(Parent.TemplateHeight - Self.Height) / 2
+                  - lblDTP2_RowDueDate:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =If(Coalesce(ThisItem.IsOverdue, false), cmp_DataTableProV2.DangerColor, cmp_DataTableProV2.TextColor)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =If(Coalesce(ThisItem.IsOverdue, false), FontWeight.Semibold, FontWeight.Normal)
+                        Height: =Parent.TemplateHeight
+                        OnSelect: =Select(btnDTP2_RowSurface)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =ThisItem.DueDateText
+                        Visible: =btnDTP2_SortDueDate.Visible
+                        Width: =btnDTP2_SortDueDate.Width
+                        X: =btnDTP2_SortDueDate.X
+                  - conDTP2_RowOwner:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        DropShadow: =DropShadow.None
+                        Fill: =Color.Transparent
+                        Height: =Parent.TemplateHeight
+                        Visible: =btnDTP2_SortOwner.Visible
+                        Width: =btnDTP2_SortOwner.Width
+                        X: =btnDTP2_SortOwner.X
+                      Children:
+                        - conDTP2_Avatar:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              DropShadow: =DropShadow.None
+                              Fill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.82)
+                              Height: =24
+                              RadiusBottomLeft: =12
+                              RadiusBottomRight: =12
+                              RadiusTopLeft: =12
+                              RadiusTopRight: =12
+                              Width: =24
+                              Y: =(Parent.Height - Self.Height) / 2
+                            Children:
+                              - lblDTP2_AvatarText:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =cmp_DataTableProV2.TextColor
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =24
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =7
+                                    Text: =ThisItem.OwnerInitials
+                                    Width: =24
+                        - lblDTP2_OwnerName:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =cmp_DataTableProV2.TextColor
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              Height: =Parent.Height
+                              OnSelect: =Select(btnDTP2_RowSurface)
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =9
+                              Text: =ThisItem.OwnerName
+                              Width: =Parent.Width - 32
+                              X: =32
+                  - conDTP2_RowProgress:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        DropShadow: =DropShadow.None
+                        Fill: =Color.Transparent
+                        Height: =Parent.TemplateHeight
+                        Visible: =btnDTP2_SortProgress.Visible
+                        Width: =btnDTP2_SortProgress.Width
+                        X: =btnDTP2_SortProgress.X
+                      Children:
+                        - lblDTP2_ProgressText:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =cmp_DataTableProV2.TextColor
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              Height: =Parent.Height
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =8
+                              Text: =Text(Max(0, Min(100, Value(ThisItem.ProgressPct))), "0") & "%"
+                              Width: =34
+                        - rectDTP2_ProgressTrack:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              BorderStyle: =BorderStyle.None
+                              Fill: =cmp_DataTableProV2.BorderColor
+                              Height: =6
+                              Width: =Parent.Width - 46
+                              X: =42
+                              Y: =(Parent.Height - Self.Height) / 2
+                        - rectDTP2_ProgressFill:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              BorderStyle: =BorderStyle.None
+                              Fill: =cmp_DataTableProV2.AccentColor
+                              Height: =6
+                              Width: =rectDTP2_ProgressTrack.Width * Max(0, Min(100, Value(ThisItem.ProgressPct))) / 100
+                              X: =rectDTP2_ProgressTrack.X
+                              Y: =rectDTP2_ProgressTrack.Y
+                  - btnDTP2_RowMenu:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        BorderThickness: =0
+                        Color: =cmp_DataTableProV2.MutedTextColor
+                        Fill: =If(varDTP2_ContextOpen && varDTP2_ContextRowKey = ThisItem.RowKey, ColorFade(cmp_DataTableProV2.AccentColor, 0.92), Color.Transparent)
+                        Font: =Font.'Segoe UI'
+                        Height: =26
+                        HoverColor: =cmp_DataTableProV2.AccentColor
+                        HoverFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.94)
+                        OnSelect: |-
+                          =
+                          Set(varDTP2_ColumnsOpen, false);
+                          Set(varDTP2_ContextOpen, !(Coalesce(varDTP2_ContextOpen, false) && varDTP2_ContextRowKey = ThisItem.RowKey));
+                          Set(varDTP2_ContextRowKey, ThisItem.RowKey);
+                          Set(varDTP2_ContextRowIndex, ThisItem.RowIndex)
+                        PressedColor: =cmp_DataTableProV2.AccentColor
+                        PressedFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.9)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =13
+                        Text: ="⋯"
+                        Visible: =cmp_DataTableProV2.ShowRowActions
+                        Width: =28
+                        X: =Parent.TemplateWidth - 36
+                        Y: =(Parent.TemplateHeight - Self.Height) / 2
+            - rectDTP2_FooterDivider:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderStyle: =BorderStyle.None
+                  Fill: =cmp_DataTableProV2.BorderColor
+                  Height: =1
+                  Width: =Parent.Width - 24
+                  X: =12
+                  Y: =Parent.Height - 54
+            - btnDTP2_PageSize:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Align: =Align.Left
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderThickness: =0
+                  Color: =cmp_DataTableProV2.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =34
+                  HoverColor: =cmp_DataTableProV2.AccentColor
+                  HoverFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.96)
+                  OnSelect: =cmp_DataTableProV2.OnRowsPerPage()
+                  PaddingLeft: =0
+                  PressedColor: =cmp_DataTableProV2.AccentColor
+                  PressedFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.92)
+                  Size: =9
+                  Text: |-
+                    ="Rows per page:  " & Text(cmp_DataTableProV2.RowsPerPage) & "  " & UniChar(8964)
+                  Width: =164
+                  X: =16
+                  Y: =Parent.Height - 43
+            - lblDTP2_Range:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Right
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_DataTableProV2.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =34
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: =Text(cmp_DataTableProV2.VisibleStart) & "–" & Text(cmp_DataTableProV2.VisibleEnd) & " of " & Text(cmp_DataTableProV2.TotalCount)
+                  Width: =120
+                  X: =Parent.Width - 590
+                  Y: =Parent.Height - 43
+            - btnDTP2_FirstPage:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderThickness: =0
+                  Color: =cmp_DataTableProV2.TextColor
+                  DisplayMode: =If(cmp_DataTableProV2.CurrentPage > 1 && !cmp_DataTableProV2.IsLoading, DisplayMode.Edit, DisplayMode.Disabled)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =32
+                  HoverColor: =cmp_DataTableProV2.AccentColor
+                  HoverFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.94)
+                  OnSelect: |-
+                    =
+                    Set(varDTP2_PageRequested, 1);
+                    cmp_DataTableProV2.OnPageChange()
+                  PressedColor: =cmp_DataTableProV2.AccentColor
+                  PressedFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.9)
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =10
+                  Text: ="|‹"
+                  Visible: =cmp_DataTableProV2.ShowPagination
+                  Width: =34
+                  X: =Parent.Width - 458
+                  Y: =Parent.Height - 42
+            - btnDTP2_PrevPage:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderThickness: =0
+                  Color: =cmp_DataTableProV2.TextColor
+                  DisplayMode: =If(cmp_DataTableProV2.CurrentPage > 1 && !cmp_DataTableProV2.IsLoading, DisplayMode.Edit, DisplayMode.Disabled)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =32
+                  HoverColor: =cmp_DataTableProV2.AccentColor
+                  HoverFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.94)
+                  OnSelect: |-
+                    =
+                    Set(varDTP2_PageRequested, Max(1, cmp_DataTableProV2.CurrentPage - 1));
+                    cmp_DataTableProV2.OnPageChange()
+                  PressedColor: =cmp_DataTableProV2.AccentColor
+                  PressedFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.9)
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =11
+                  Text: =UniChar(8249)
+                  Visible: =cmp_DataTableProV2.ShowPagination
+                  Width: =34
+                  X: =btnDTP2_FirstPage.X + 36
+                  Y: =Parent.Height - 42
+            - galDTP2_PageWindow:
+                Control: Gallery@2.15.0
+                Variant: Horizontal
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Height: =36
+                  Items: |-
+                    =With(
+                        {
+                            _count: Min(5, Max(1, cmp_DataTableProV2.TotalPages)),
+                            _start: Max(1, Min(cmp_DataTableProV2.CurrentPage - 2, Max(1, cmp_DataTableProV2.TotalPages - 4)))
+                        },
+                        AddColumns(Sequence(_count), PageNumber, _start + Value - 1)
+                    )
+                  ShowScrollbar: =false
+                  TemplatePadding: =2
+                  TemplateSize: =36
+                  Visible: =cmp_DataTableProV2.ShowPagination
+                  Width: =Min(190, 38 * Min(5, Max(1, cmp_DataTableProV2.TotalPages)))
+                  X: =btnDTP2_PrevPage.X + btnDTP2_PrevPage.Width + 2
+                  Y: =Parent.Height - 44
+                Children:
+                  - btnDTP2_PageNumber:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =If(ThisItem.PageNumber = cmp_DataTableProV2.CurrentPage, cmp_DataTableProV2.AccentColor, RGBA(0,0,0,0))
+                        BorderThickness: =If(ThisItem.PageNumber = cmp_DataTableProV2.CurrentPage, 1, 0)
+                        Color: =If(ThisItem.PageNumber = cmp_DataTableProV2.CurrentPage, Color.White, cmp_DataTableProV2.TextColor)
+                        Fill: =If(ThisItem.PageNumber = cmp_DataTableProV2.CurrentPage, cmp_DataTableProV2.AccentColor, Color.Transparent)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =If(ThisItem.PageNumber = cmp_DataTableProV2.CurrentPage, FontWeight.Bold, FontWeight.Semibold)
+                        Height: =32
+                        HoverBorderColor: =cmp_DataTableProV2.AccentColor
+                        HoverColor: =cmp_DataTableProV2.AccentColor
+                        HoverFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.94)
+                        OnSelect: |-
+                          =
+                          Set(varDTP2_PageRequested, ThisItem.PageNumber);
+                          cmp_DataTableProV2.OnPageChange()
+                        PressedBorderColor: =cmp_DataTableProV2.AccentColor
+                        PressedColor: =cmp_DataTableProV2.AccentColor
+                        PressedFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.9)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =9
+                        Text: =Text(ThisItem.PageNumber)
+                        Width: =32
+                        Y: =2
+            - lblDTP2_Ellipsis:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_DataTableProV2.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =32
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =10
+                  Text: ="…"
+                  Visible: =cmp_DataTableProV2.ShowPagination && cmp_DataTableProV2.TotalPages > 5 && cmp_DataTableProV2.CurrentPage < cmp_DataTableProV2.TotalPages - 2
+                  Width: =26
+                  X: =galDTP2_PageWindow.X + galDTP2_PageWindow.Width + 2
+                  Y: =Parent.Height - 42
+            - btnDTP2_LastNumber:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderThickness: =0
+                  Color: =cmp_DataTableProV2.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =32
+                  HoverColor: =cmp_DataTableProV2.AccentColor
+                  HoverFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.94)
+                  OnSelect: |-
+                    =
+                    Set(varDTP2_PageRequested, cmp_DataTableProV2.TotalPages);
+                    cmp_DataTableProV2.OnPageChange()
+                  PressedColor: =cmp_DataTableProV2.AccentColor
+                  PressedFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.9)
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =9
+                  Text: =Text(cmp_DataTableProV2.TotalPages)
+                  Visible: =cmp_DataTableProV2.ShowPagination && cmp_DataTableProV2.TotalPages > 5 && cmp_DataTableProV2.CurrentPage < cmp_DataTableProV2.TotalPages - 2
+                  Width: =34
+                  X: =lblDTP2_Ellipsis.X + lblDTP2_Ellipsis.Width
+                  Y: =Parent.Height - 42
+            - btnDTP2_NextPage:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderThickness: =0
+                  Color: =cmp_DataTableProV2.TextColor
+                  DisplayMode: =If(cmp_DataTableProV2.CurrentPage < cmp_DataTableProV2.TotalPages && !cmp_DataTableProV2.IsLoading, DisplayMode.Edit, DisplayMode.Disabled)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =32
+                  HoverColor: =cmp_DataTableProV2.AccentColor
+                  HoverFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.94)
+                  OnSelect: |-
+                    =
+                    Set(varDTP2_PageRequested, Min(cmp_DataTableProV2.TotalPages, cmp_DataTableProV2.CurrentPage + 1));
+                    cmp_DataTableProV2.OnPageChange()
+                  PressedColor: =cmp_DataTableProV2.AccentColor
+                  PressedFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.9)
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =11
+                  Text: =UniChar(8250)
+                  Visible: =cmp_DataTableProV2.ShowPagination
+                  Width: =34
+                  X: =Parent.Width - 78
+                  Y: =Parent.Height - 42
+            - btnDTP2_LastPage:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderThickness: =0
+                  Color: =cmp_DataTableProV2.TextColor
+                  DisplayMode: =If(cmp_DataTableProV2.CurrentPage < cmp_DataTableProV2.TotalPages && !cmp_DataTableProV2.IsLoading, DisplayMode.Edit, DisplayMode.Disabled)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =32
+                  HoverColor: =cmp_DataTableProV2.AccentColor
+                  HoverFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.94)
+                  OnSelect: |-
+                    =
+                    Set(varDTP2_PageRequested, cmp_DataTableProV2.TotalPages);
+                    cmp_DataTableProV2.OnPageChange()
+                  PressedColor: =cmp_DataTableProV2.AccentColor
+                  PressedFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.9)
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =10
+                  Text: ="›|"
+                  Visible: =cmp_DataTableProV2.ShowPagination
+                  Width: =34
+                  X: =Parent.Width - 42
+                  Y: =Parent.Height - 42
+            - conDTP2_ColumnPanel:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_DataTableProV2.BorderColor
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.Regular
+                  Fill: =cmp_DataTableProV2.BackgroundColor
+                  Height: =332
+                  RadiusBottomLeft: =12
+                  RadiusBottomRight: =12
+                  RadiusTopLeft: =12
+                  RadiusTopRight: =12
+                  Visible: =cmp_DataTableProV2.ShowColumnSelector && Coalesce(varDTP2_ColumnsOpen, false)
+                  Width: =286
+                  X: =Parent.Width - Self.Width - 12
+                  Y: =40
+                Children:
+                  - lblDTP2_ColumnPanelTitle:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_DataTableProV2.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =11
+                        Text: ="Choose columns"
+                        Width: =200
+                        X: =14
+                  - btnDTP2_ColumnPanelClose:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        BorderThickness: =0
+                        Color: =cmp_DataTableProV2.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =28
+                        HoverColor: =cmp_DataTableProV2.DangerColor
+                        HoverFill: =ColorFade(cmp_DataTableProV2.DangerColor, 0.95)
+                        OnSelect: |-
+                          =
+                          Set(varDTP2_ColumnAction, "CLOSE");
+                          Set(varDTP2_ColumnsOpen, false);
+                          cmp_DataTableProV2.OnColumnAction()
+                        PressedColor: =cmp_DataTableProV2.DangerColor
+                        PressedFill: =ColorFade(cmp_DataTableProV2.DangerColor, 0.9)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =11
+                        Text: ="×"
+                        Width: =28
+                        X: =Parent.Width - 38
+                        Y: =6
+                  - rectDTP2_ColumnPanelDivider:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        BorderStyle: =BorderStyle.None
+                        Fill: =cmp_DataTableProV2.BorderColor
+                        Height: =1
+                        Width: =Parent.Width - 24
+                        X: =12
+                        Y: =40
+                  - galDTP2_Columns:
+                      Control: Gallery@2.15.0
+                      Variant: Vertical
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Height: =232
+                        Items: =SortByColumns(cmp_DataTableProV2.Columns, "Order", SortOrder.Ascending)
+                        TemplatePadding: =0
+                        TemplateSize: =32
+                        Width: =Parent.Width - 20
+                        X: =10
+                        Y: =48
+                      Children:
+                        - btnDTP2_ColumnCheck:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =If(ThisItem.IsVisible, cmp_DataTableProV2.AccentColor, cmp_DataTableProV2.BorderColor)
+                              BorderThickness: =1
+                              Color: =If(ThisItem.IsVisible, Color.White, cmp_DataTableProV2.AccentColor)
+                              DisplayMode: =If(ThisItem.IsLocked, DisplayMode.Disabled, DisplayMode.Edit)
+                              Fill: =If(ThisItem.IsVisible, cmp_DataTableProV2.AccentColor, cmp_DataTableProV2.BackgroundColor)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =18
+                              HoverBorderColor: =cmp_DataTableProV2.AccentColor
+                              HoverColor: =cmp_DataTableProV2.AccentColor
+                              HoverFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.92)
+                              OnSelect: |-
+                                =
+                                Set(varDTP2_ColumnToggleKey, ThisItem.Key);
+                                cmp_DataTableProV2.OnColumnToggle()
+                              PressedBorderColor: =cmp_DataTableProV2.AccentColor
+                              PressedColor: =Color.White
+                              PressedFill: =cmp_DataTableProV2.AccentColor
+                              RadiusBottomLeft: =4
+                              RadiusBottomRight: =4
+                              RadiusTopLeft: =4
+                              RadiusTopRight: =4
+                              Size: =8
+                              Text: =If(ThisItem.IsVisible, "✓", "")
+                              Width: =18
+                              X: =4
+                              Y: =7
+                        - lblDTP2_ColumnLabel:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =If(ThisItem.IsLocked, cmp_DataTableProV2.MutedTextColor, cmp_DataTableProV2.TextColor)
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              Height: =32
+                              OnSelect: =If(!ThisItem.IsLocked, Select(btnDTP2_ColumnCheck))
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =9
+                              Text: =ThisItem.Label
+                              Width: =186
+                              X: =32
+                        - lblDTP2_ColumnLocked:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =cmp_DataTableProV2.MutedTextColor
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              Height: =32
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =9
+                              Text: ="Locked"
+                              Visible: =ThisItem.IsLocked
+                              Width: =50
+                              X: =Parent.TemplateWidth - 56
+                  - btnDTP2_ColumnReset:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =cmp_DataTableProV2.BorderColor
+                        BorderThickness: =1
+                        Color: =cmp_DataTableProV2.TextColor
+                        Fill: =cmp_DataTableProV2.BackgroundColor
+                        Font: =Font.'Segoe UI'
+                        Height: =34
+                        HoverBorderColor: =cmp_DataTableProV2.AccentColor
+                        HoverColor: =cmp_DataTableProV2.AccentColor
+                        HoverFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.94)
+                        OnSelect: |-
+                          =
+                          Set(varDTP2_ColumnAction, "RESET");
+                          cmp_DataTableProV2.OnColumnAction()
+                        PressedBorderColor: =cmp_DataTableProV2.AccentColor
+                        PressedColor: =cmp_DataTableProV2.AccentColor
+                        PressedFill: =ColorFade(cmp_DataTableProV2.AccentColor, 0.9)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =9
+                        Text: ="Reset"
+                        Width: =92
+                        X: =14
+                        Y: =288
+                  - btnDTP2_ColumnApply:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =cmp_DataTableProV2.AccentColor
+                        BorderThickness: =1
+                        Color: =Color.White
+                        Fill: =cmp_DataTableProV2.AccentColor
+                        Font: =Font.'Segoe UI'
+                        Height: =34
+                        HoverBorderColor: =cmp_DataTableProV2.AccentColor
+                        HoverColor: =Color.White
+                        HoverFill: =ColorFade(cmp_DataTableProV2.AccentColor, -0.08)
+                        OnSelect: |-
+                          =
+                          Set(varDTP2_ColumnAction, "APPLY");
+                          Set(varDTP2_ColumnsOpen, false);
+                          cmp_DataTableProV2.OnColumnAction()
+                        PressedBorderColor: =cmp_DataTableProV2.AccentColor
+                        PressedColor: =Color.White
+                        PressedFill: =ColorFade(cmp_DataTableProV2.AccentColor, -0.14)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =9
+                        Text: ="Apply"
+                        Width: =150
+                        X: =Parent.Width - Self.Width - 14
+                        Y: =288
+            - conDTP2_ContextMenu:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_DataTableProV2.BorderColor
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.Regular
+                  Fill: =cmp_DataTableProV2.BackgroundColor
+                  Height: =Min(224, 16 + CountRows(Filter(cmp_DataTableProV2.ContextActions, IsVisible)) * 38)
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Visible: =cmp_DataTableProV2.ShowRowActions && Coalesce(varDTP2_ContextOpen, false)
+                  Width: =206
+                  X: =Parent.Width - Self.Width - 42
+                  Y: =Min(Parent.Height - 58 - Self.Height, galDTP2_Rows.Y + Max(0, (Coalesce(varDTP2_ContextRowIndex, 1) - 1) * galDTP2_Rows.TemplateHeight))
+                Children:
+                  - galDTP2_ContextActions:
+                      Control: Gallery@2.15.0
+                      Variant: Vertical
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Height: =Parent.Height - 12
+                        Items: =SortByColumns(Filter(cmp_DataTableProV2.ContextActions, IsVisible), "Order", SortOrder.Ascending)
+                        ShowScrollbar: =false
+                        TemplatePadding: =2
+                        TemplateSize: =36
+                        Width: =Parent.Width - 12
+                        X: =6
+                        Y: =6
+                      Children:
+                        - btnDTP2_ContextAction:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              Align: =Align.Left
+                              BorderColor: =RGBA(0,0,0,0)
+                              BorderThickness: =0
+                              Color: =If(Lower(ThisItem.Tone) = "danger", cmp_DataTableProV2.DangerColor, If(Lower(ThisItem.Tone) = "primary", cmp_DataTableProV2.AccentColor, cmp_DataTableProV2.TextColor))
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =If(Lower(ThisItem.Tone) = "primary", FontWeight.Semibold, FontWeight.Normal)
+                              Height: =32
+                              HoverColor: =If(Lower(ThisItem.Tone) = "danger", cmp_DataTableProV2.DangerColor, cmp_DataTableProV2.AccentColor)
+                              HoverFill: =If(Lower(ThisItem.Tone) = "danger", ColorFade(cmp_DataTableProV2.DangerColor, 0.94), ColorFade(cmp_DataTableProV2.AccentColor, 0.94))
+                              OnSelect: |-
+                                =
+                                Set(varDTP2_ContextActionKey, ThisItem.Key);
+                                Set(varDTP2_ContextOpen, false);
+                                cmp_DataTableProV2.OnContextAction()
+                              PaddingLeft: =10
+                              PressedColor: =If(Lower(ThisItem.Tone) = "danger", cmp_DataTableProV2.DangerColor, cmp_DataTableProV2.AccentColor)
+                              PressedFill: =If(Lower(ThisItem.Tone) = "danger", ColorFade(cmp_DataTableProV2.DangerColor, 0.9), ColorFade(cmp_DataTableProV2.AccentColor, 0.9))
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Size: =9
+                              Text: =ThisItem.Label
+                              Width: =Parent.TemplateWidth
+            - conDTP2_EmptyState:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_DataTableProV2.BackgroundColor
+                  Height: =galDTP2_Rows.Height
+                  Visible: =!cmp_DataTableProV2.IsLoading && CountRows(cmp_DataTableProV2.Rows) = 0
+                  Width: =galDTP2_Rows.Width
+                  X: =galDTP2_Rows.X
+                  Y: =galDTP2_Rows.Y
+                Children:
+                  - lblDTP2_EmptyTitle:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_DataTableProV2.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =28
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =12
+                        Text: =cmp_DataTableProV2.EmptyTitle
+                        Width: =300
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Parent.Height / 2 - 30
+                  - lblDTP2_EmptyText:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_DataTableProV2.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =44
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =cmp_DataTableProV2.EmptyText
+                        Width: =420
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Parent.Height / 2 + 2
+            - conDTP2_LoadingState:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255,255,255,0.84)
+                  Height: =Parent.Height
+                  Visible: =cmp_DataTableProV2.IsLoading
+                  Width: =Parent.Width
+                Children:
+                  - spnDTP2_Loading:
+                      Control: Spinner@1.4.6
+                      Properties:
+                        Height: =28
+                        SpinnerColor: =cmp_DataTableProV2.AccentColor
+                        Width: =28
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =(Parent.Height - Self.Height) / 2 - 14
+                  - lblDTP2_LoadingText:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_DataTableProV2.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =24
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =cmp_DataTableProV2.LoadingText
+                        Width: =240
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Parent.Height / 2 + 18
 
