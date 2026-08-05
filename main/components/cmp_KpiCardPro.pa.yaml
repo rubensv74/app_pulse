@@ -1,1 +1,554 @@
+ComponentDefinitions:
+  cmp_KpiCardPro:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      AccentColor:
+        PropertyKind: Input
+        DisplayName: AccentColor
+        Description: Native Power Apps accent color.
+        DataType: Color
+        Default: =ColorValue("#2563EB")
+      AccentHex:
+        PropertyKind: Input
+        DisplayName: AccentHex
+        Description: Hex equivalent of AccentColor, used by the SVG sparkline and donut.
+        DataType: Text
+        Default: ="#2563EB"
+      AccentSoftColor:
+        PropertyKind: Input
+        DisplayName: AccentSoftColor
+        Description: Soft icon background.
+        DataType: Color
+        Default: =ColorValue("#EFF6FF")
+      AccessibleLabel:
+        PropertyKind: Input
+        DisplayName: AccessibleLabel
+        Description: Optional explicit accessible label.
+        DataType: Text
+        Default: =""
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        Description: Default border color.
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      CardFill:
+        PropertyKind: Input
+        DisplayName: CardFill
+        Description: Main card surface.
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      CardKey:
+        PropertyKind: Input
+        DisplayName: CardKey
+        Description: Stable semantic key used by the consuming screen.
+        DataType: Text
+        Default: ="KPI"
+      DangerColor:
+        PropertyKind: Input
+        DisplayName: DangerColor
+        Description: Negative trend and error color.
+        DataType: Color
+        Default: =ColorValue("#EF4444")
+      EnableClick:
+        PropertyKind: Input
+        DisplayName: EnableClick
+        Description: Enables card interaction.
+        DataType: Boolean
+        Default: =true
+      ErrorText:
+        PropertyKind: Input
+        DisplayName: ErrorText
+        Description: Compact error message.
+        DataType: Text
+        Default: ="Data unavailable"
+      IconType:
+        PropertyKind: Input
+        DisplayName: IconType
+        Description: check, alert, calendar or progress.
+        DataType: Text
+        Default: ="check"
+      InfoTooltip:
+        PropertyKind: Input
+        DisplayName: InfoTooltip
+        Description: Tooltip and accessible context.
+        DataType: Text
+        Default: ="Current metric and comparison with the previous seven days."
+      IsError:
+        PropertyKind: Input
+        DisplayName: IsError
+        Description: Shows the error state without breaking the card layout.
+        DataType: Boolean
+        Default: =false
+      IsLoading:
+        PropertyKind: Input
+        DisplayName: IsLoading
+        Description: Shows the compact loading state.
+        DataType: Boolean
+        Default: =false
+      IsSelected:
+        PropertyKind: Input
+        DisplayName: IsSelected
+        Description: Highlights the card as an active quick filter.
+        DataType: Boolean
+        Default: =false
+      LoadingText:
+        PropertyKind: Input
+        DisplayName: LoadingText
+        Description: Compact loading message.
+        DataType: Text
+        Default: ="Loading metric..."
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        Description: Secondary text color.
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      OnCardSelect:
+        PropertyKind: Event
+        DisplayName: OnCardSelect
+        Description: Raised when the card is selected.
+        ReturnType: None
+        Default: =
+      ProgressValue:
+        PropertyKind: Input
+        DisplayName: ProgressValue
+        Description: Donut value from 0 to 100.
+        DataType: Number
+        Default: =64
+      ShowInfo:
+        PropertyKind: Input
+        DisplayName: ShowInfo
+        Description: Shows the information icon.
+        DataType: Boolean
+        Default: =true
+      ShowSparkline:
+        PropertyKind: Input
+        DisplayName: ShowSparkline
+        Description: Shows the mini trend chart.
+        DataType: Boolean
+        Default: =true
+      ShowTrend:
+        PropertyKind: Input
+        DisplayName: ShowTrend
+        Description: Shows the comparison line.
+        DataType: Boolean
+        Default: =true
+      SuccessColor:
+        PropertyKind: Input
+        DisplayName: SuccessColor
+        Description: Positive trend color.
+        DataType: Color
+        Default: =ColorValue("#10B981")
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        Description: Main text color.
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      Title:
+        PropertyKind: Input
+        DisplayName: Title
+        Description: KPI title.
+        DataType: Text
+        Default: ="Open Punches"
+      TrendDirection:
+        PropertyKind: Input
+        DisplayName: TrendDirection
+        Description: up, down or neutral.
+        DataType: Text
+        Default: ="down"
+      TrendSeries:
+        PropertyKind: Input
+        DisplayName: TrendSeries
+        Description: Normalized table with PointIndex and PointValue.
+        DataType: Table
+        Default: |-
+          =Table(
+              {PointIndex:1, PointValue:18},
+              {PointIndex:2, PointValue:22},
+              {PointIndex:3, PointValue:20},
+              {PointIndex:4, PointValue:29},
+              {PointIndex:5, PointValue:25},
+              {PointIndex:6, PointValue:31},
+              {PointIndex:7, PointValue:24},
+              {PointIndex:8, PointValue:27}
+          )
+      TrendText:
+        PropertyKind: Input
+        DisplayName: TrendText
+        Description: Supporting comparison text.
+        DataType: Text
+        Default: ="8 vs last 7 days"
+      TrendTone:
+        PropertyKind: Input
+        DisplayName: TrendTone
+        Description: success, danger, warning or neutral. This is independent from direction.
+        DataType: Text
+        Default: ="success"
+      ValueText:
+        PropertyKind: Input
+        DisplayName: ValueText
+        Description: Formatted KPI value.
+        DataType: Text
+        Default: ="126"
+      VisualMode:
+        PropertyKind: Input
+        DisplayName: VisualMode
+        Description: icon or donut.
+        DataType: Text
+        Default: ="icon"
+      WarningColor:
+        PropertyKind: Input
+        DisplayName: WarningColor
+        Description: Warning trend color.
+        DataType: Color
+        Default: =ColorValue("#F59E0B")
+    Properties:
+      Height: =96
+      Width: =300
+    Children:
+      - conKPI_Root_1:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =If(cmp_KpiCardPro.IsSelected, cmp_KpiCardPro.AccentColor, cmp_KpiCardPro.BorderColor)
+            BorderThickness: =If(cmp_KpiCardPro.IsSelected, 2, 1)
+            DropShadow: =DropShadow.Semilight
+            Fill: =cmp_KpiCardPro.CardFill
+            Height: =Parent.Height
+            RadiusBottomLeft: =12
+            RadiusBottomRight: =12
+            RadiusTopLeft: =12
+            RadiusTopRight: =12
+            Width: =Parent.Width
+          Children:
+            - btnKPI_ClickSurface:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  BorderStyle: =BorderStyle.None
+                  BorderThickness: =0
+                  Color: =RGBA(0, 0, 0, 0)
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledColor: =RGBA(0, 0, 0, 0)
+                  DisabledFill: =RGBA(0, 0, 0, 0)
+                  DisplayMode: =If(cmp_KpiCardPro.EnableClick && !cmp_KpiCardPro.IsLoading, DisplayMode.Edit, DisplayMode.Disabled)
+                  Fill: =RGBA(0, 0, 0, 0)
+                  Font: =Font.'Segoe UI'
+                  Height: =Parent.Height
+                  HoverBorderColor: =RGBA(0, 0, 0, 0)
+                  HoverColor: =RGBA(0, 0, 0, 0)
+                  HoverFill: =RGBA(15, 23, 42, 0.025)
+                  OnSelect: =cmp_KpiCardPro.OnCardSelect()
+                  PressedBorderColor: =RGBA(0, 0, 0, 0)
+                  PressedColor: =RGBA(0, 0, 0, 0)
+                  PressedFill: =RGBA(15, 23, 42, 0.055)
+                  RadiusBottomLeft: =12
+                  RadiusBottomRight: =12
+                  RadiusTopLeft: =12
+                  RadiusTopRight: =12
+                  Text: =""
+                  Tooltip: =If(!IsBlank(cmp_KpiCardPro.AccessibleLabel), cmp_KpiCardPro.AccessibleLabel, Coalesce(cmp_KpiCardPro.InfoTooltip, cmp_KpiCardPro.Title & " · " & cmp_KpiCardPro.ValueText & " · " & cmp_KpiCardPro.TrendText))
+                  Width: =Parent.Width
+            - rectKPI_SelectedAccent:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  BorderStyle: =BorderStyle.None
+                  DisabledFill: =cmp_KpiCardPro.AccentColor
+                  Fill: =cmp_KpiCardPro.AccentColor
+                  Height: =3
+                  HoverFill: =cmp_KpiCardPro.AccentColor
+                  PressedFill: =cmp_KpiCardPro.AccentColor
+                  Visible: =cmp_KpiCardPro.IsSelected
+                  Width: =Parent.Width - 24
+                  X: =12
+            - lblKPI_Title_1:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Color: =cmp_KpiCardPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =18
+                  OnSelect: =Select(btnKPI_ClickSurface)
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: =cmp_KpiCardPro.Title
+                  Width: =Min(130, htmlKPI_Sparkline.X - Self.X - 24)
+                  X: =14
+                  Y: =8
+            - icoKPI_Info:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Color: =cmp_KpiCardPro.MutedTextColor
+                  DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                  DisabledColor: =RGBA(225, 223, 221, 1)
+                  DisabledFill: =RGBA(0, 0, 0, 0)
+                  Height: =12
+                  HoverBorderColor: =RGBA(0, 0, 0, 0)
+                  HoverColor: =cmp_KpiCardPro.AccentColor
+                  HoverFill: =RGBA(0, 0, 0, 0)
+                  Icon: =Icon.Information
+                  PressedBorderColor: =RGBA(0, 0, 0, 0)
+                  PressedColor: =cmp_KpiCardPro.AccentColor
+                  PressedFill: =RGBA(0, 0, 0, 0)
+                  Tooltip: =cmp_KpiCardPro.InfoTooltip
+                  Visible: =cmp_KpiCardPro.ShowInfo && !cmp_KpiCardPro.IsLoading
+                  Width: =12
+                  X: =Min(htmlKPI_Sparkline.X - 16, 124)
+                  Y: =11
+            - lblKPI_Value_1:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Color: =If(cmp_KpiCardPro.IsError, cmp_KpiCardPro.DangerColor, cmp_KpiCardPro.TextColor)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Bold
+                  Height: =31
+                  OnSelect: =Select(btnKPI_ClickSurface)
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =20
+                  Text: =If(cmp_KpiCardPro.IsError, "--", cmp_KpiCardPro.ValueText)
+                  Visible: =!cmp_KpiCardPro.IsLoading
+                  Width: =htmlKPI_Sparkline.X - Self.X - 8
+                  X: =14
+                  Y: =27
+            - lblKPI_Trend:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Color: |-
+                    =
+                    If(
+                        cmp_KpiCardPro.IsError,
+                        cmp_KpiCardPro.DangerColor,
+                        Switch(
+                            Lower(cmp_KpiCardPro.TrendTone),
+                            "success", cmp_KpiCardPro.SuccessColor,
+                            "danger", cmp_KpiCardPro.DangerColor,
+                            "warning", cmp_KpiCardPro.WarningColor,
+                            cmp_KpiCardPro.MutedTextColor
+                        )
+                    )
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =20
+                  OnSelect: =Select(btnKPI_ClickSurface)
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: |-
+                    =
+                    If(
+                        cmp_KpiCardPro.IsError,
+                        cmp_KpiCardPro.ErrorText,
+                        Switch(
+                            Lower(cmp_KpiCardPro.TrendDirection),
+                            "up", UniChar(8593),
+                            "down", UniChar(8595),
+                            UniChar(8212)
+                        ) & " " & cmp_KpiCardPro.TrendText
+                    )
+                  Visible: =cmp_KpiCardPro.ShowTrend && !cmp_KpiCardPro.IsLoading
+                  Width: =htmlKPI_Sparkline.X - Self.X - 4
+                  X: =14
+                  Y: =62
+            - htmlKPI_Sparkline:
+                Control: HtmlViewer@2.1.0
+                Properties:
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledFill: =RGBA(0, 0, 0, 0)
+                  Font: =Font.'Segoe UI'
+                  Height: =34
+                  HtmlText: |-
+                    =
+                    With(
+                        {
+                            _series: SortByColumns(cmp_KpiCardPro.TrendSeries, "PointIndex", SortOrder.Ascending),
+                            _count: CountRows(cmp_KpiCardPro.TrendSeries),
+                            _minValue: Min(cmp_KpiCardPro.TrendSeries, PointValue),
+                            _maxValue: Max(cmp_KpiCardPro.TrendSeries, PointValue)
+                        },
+                        With(
+                            {
+                                _points:
+                                    Concat(
+                                        AddColumns(
+                                            _series,
+                                            KpiX,
+                                                If(
+                                                    _count <= 1,
+                                                    50,
+                                                    (PointIndex - 1) * 100 / (_count - 1)
+                                                ),
+                                            KpiY,
+                                                If(
+                                                    _maxValue = _minValue,
+                                                    15,
+                                                    27 - ((PointValue - _minValue) * 23 / (_maxValue - _minValue))
+                                                )
+                                        ),
+                                        Text(KpiX, "[$-en-US]0.0") & "," &
+                                        Text(KpiY, "[$-en-US]0.0") & " "
+                                    )
+                            },
+                            "<div style='width:100%;height:100%;display:flex;align-items:center;justify-content:center;'>" &
+                            "<svg viewBox='0 0 100 30' width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'>" &
+                            "<defs><linearGradient id='kpiArea' x1='0' y1='0' x2='0' y2='1'>" &
+                            "<stop offset='0%' stop-color='" & cmp_KpiCardPro.AccentHex & "' stop-opacity='0.18'/>" &
+                            "<stop offset='100%' stop-color='" & cmp_KpiCardPro.AccentHex & "' stop-opacity='0'/>" &
+                            "</linearGradient></defs>" &
+                            "<polygon points='0,29 " & _points & " 100,29' fill='url(#kpiArea)'/>" &
+                            "<polyline points='" & _points & "' fill='none' stroke='" & cmp_KpiCardPro.AccentHex & "' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>" &
+                            "</svg></div>"
+                        )
+                    )
+                  OnSelect: =Select(btnKPI_ClickSurface)
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Visible: =cmp_KpiCardPro.ShowSparkline && !cmp_KpiCardPro.IsLoading && !cmp_KpiCardPro.IsError && CountRows(cmp_KpiCardPro.TrendSeries) > 1
+                  Width: =76
+                  X: =Max(126, conKPI_IconBadge.X - Self.Width - 8)
+                  Y: =33
+            - conKPI_IconBadge:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_KpiCardPro.AccentSoftColor
+                  Height: =42
+                  RadiusBottomLeft: =21
+                  RadiusBottomRight: =21
+                  RadiusTopLeft: =21
+                  RadiusTopRight: =21
+                  Visible: =Lower(cmp_KpiCardPro.VisualMode) = "icon" && !cmp_KpiCardPro.IsLoading
+                  Width: =42
+                  X: =Parent.Width - Self.Width - 12
+                  Y: =20
+                Children:
+                  - icoKPI_Main_1:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =If(cmp_KpiCardPro.IsError, cmp_KpiCardPro.DangerColor, cmp_KpiCardPro.AccentColor)
+                        DisabledBorderColor: =RGBA(245, 245, 245, 1)
+                        DisabledColor: =RGBA(225, 223, 221, 1)
+                        DisabledFill: =RGBA(0, 0, 0, 0)
+                        Height: =20
+                        HoverBorderColor: =RGBA(0, 0, 0, 0)
+                        HoverColor: =cmp_KpiCardPro.AccentColor
+                        HoverFill: =RGBA(0, 0, 0, 0)
+                        Icon: |-
+                          =
+                          If(
+                              cmp_KpiCardPro.IsError,
+                              Icon.Warning,
+                              Switch(
+                                  Lower(cmp_KpiCardPro.IconType),
+                                  "alert", Icon.Warning,
+                                  "calendar", Icon.CalendarBlank,
+                                  "progress", Icon.Trending,
+                                  Icon.Check
+                              )
+                          )
+                        OnSelect: =Select(btnKPI_ClickSurface)
+                        PressedBorderColor: =RGBA(0, 0, 0, 0)
+                        PressedColor: =cmp_KpiCardPro.AccentColor
+                        PressedFill: =RGBA(0, 0, 0, 0)
+                        Tooltip: =cmp_KpiCardPro.InfoTooltip
+                        Width: =20
+                        X: =11
+                        Y: =11
+            - htmlKPI_Donut:
+                Control: HtmlViewer@2.1.0
+                Properties:
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledFill: =RGBA(0, 0, 0, 0)
+                  Font: =Font.'Segoe UI'
+                  Height: =48
+                  HtmlText: |-
+                    =
+                    "<div style='width:100%;height:100%;display:flex;align-items:center;justify-content:center;'>" &
+                    "<svg viewBox='0 0 48 48' width='48' height='48' xmlns='http://www.w3.org/2000/svg'>" &
+                    "<circle cx='24' cy='24' r='18' fill='none' stroke='#E2E8F0' stroke-width='5'/>" &
+                    "<circle cx='24' cy='24' r='18' fill='none' stroke='" & cmp_KpiCardPro.AccentHex & "' stroke-width='5' stroke-linecap='round' " &
+                    "stroke-dasharray='" &
+                    Text(Max(0, Min(100, cmp_KpiCardPro.ProgressValue)) * 1.131, "[$-en-US]0.0") &
+                    " 113.1' transform='rotate(-90 24 24)'/>" &
+                    "</svg></div>"
+                  OnSelect: =Select(btnKPI_ClickSurface)
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Visible: =Lower(cmp_KpiCardPro.VisualMode) = "donut" && !cmp_KpiCardPro.IsLoading && !cmp_KpiCardPro.IsError
+                  Width: =48
+                  X: =Parent.Width - Self.Width - 9
+                  Y: =17
+            - lblKPI_DonutValue:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Color: =cmp_KpiCardPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Bold
+                  Height: =20
+                  OnSelect: =Select(btnKPI_ClickSurface)
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: =Text(Max(0, Min(100, cmp_KpiCardPro.ProgressValue)), "0") & "%"
+                  Visible: =Lower(cmp_KpiCardPro.VisualMode) = "donut" && !cmp_KpiCardPro.IsLoading && !cmp_KpiCardPro.IsError
+                  Width: =42
+                  X: =Parent.Width - Self.Width - 12
+                  Y: =31
+            - spnKPI_Loading:
+                Control: Spinner@1.4.6
+                Properties:
+                  Height: =24
+                  SpinnerColor: =cmp_KpiCardPro.AccentColor
+                  Visible: =cmp_KpiCardPro.IsLoading
+                  Width: =24
+                  X: =14
+                  Y: =36
+            - lblKPI_Loading:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Color: =cmp_KpiCardPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: =cmp_KpiCardPro.LoadingText
+                  Visible: =cmp_KpiCardPro.IsLoading
+                  Width: =Parent.Width - 62
+                  X: =46
+                  Y: =36
 
