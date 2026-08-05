@@ -1,1 +1,1254 @@
+ComponentDefinitions:
+  cmp_HeatMapPro:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      AccentColor:
+        PropertyKind: Input
+        DisplayName: AccentColor
+        Description: Selection and interaction accent color
+        DataType: Color
+        Default: =ColorValue("#1677FF")
+      AverageValue:
+        PropertyKind: Output
+        DataType: Number
+      BackgroundColor:
+        PropertyKind: Input
+        DisplayName: BackgroundColor
+        Description: Main component background
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        Description: Component and grid border color
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      Cells:
+        PropertyKind: Input
+        DisplayName: Cells
+        Description: Table with RowKey, ColumnKey, Value, DisplayValue, TooltipText and IsEnabled
+        DataType: Table
+        Default: |-
+          =Table(
+              {RowKey: "R1", ColumnKey: "C1", Value: 92, DisplayValue: "92", TooltipText: "Engineering · Area 01 · 92", IsEnabled: true},
+              {RowKey: "R1", ColumnKey: "C2", Value: 81, DisplayValue: "81", TooltipText: "Engineering · Area 02 · 81", IsEnabled: true},
+              {RowKey: "R1", ColumnKey: "C3", Value: 73, DisplayValue: "73", TooltipText: "Engineering · Area 03 · 73", IsEnabled: true},
+              {RowKey: "R1", ColumnKey: "C4", Value: 55, DisplayValue: "55", TooltipText: "Engineering · Area 04 · 55", IsEnabled: true},
+              {RowKey: "R1", ColumnKey: "C5", Value: 38, DisplayValue: "38", TooltipText: "Engineering · Area 05 · 38", IsEnabled: true},
+              {RowKey: "R2", ColumnKey: "C1", Value: 84, DisplayValue: "84", TooltipText: "Procurement · Area 01 · 84", IsEnabled: true},
+              {RowKey: "R2", ColumnKey: "C2", Value: 68, DisplayValue: "68", TooltipText: "Procurement · Area 02 · 68", IsEnabled: true},
+              {RowKey: "R2", ColumnKey: "C3", Value: 59, DisplayValue: "59", TooltipText: "Procurement · Area 03 · 59", IsEnabled: true},
+              {RowKey: "R2", ColumnKey: "C4", Value: 47, DisplayValue: "47", TooltipText: "Procurement · Area 04 · 47", IsEnabled: true},
+              {RowKey: "R2", ColumnKey: "C5", Value: 31, DisplayValue: "31", TooltipText: "Procurement · Area 05 · 31", IsEnabled: true},
+              {RowKey: "R3", ColumnKey: "C1", Value: 72, DisplayValue: "72", TooltipText: "Construction · Area 01 · 72", IsEnabled: true},
+              {RowKey: "R3", ColumnKey: "C2", Value: 61, DisplayValue: "61", TooltipText: "Construction · Area 02 · 61", IsEnabled: true},
+              {RowKey: "R3", ColumnKey: "C3", Value: 48, DisplayValue: "48", TooltipText: "Construction · Area 03 · 48", IsEnabled: true},
+              {RowKey: "R3", ColumnKey: "C4", Value: 36, DisplayValue: "36", TooltipText: "Construction · Area 04 · 36", IsEnabled: true},
+              {RowKey: "R3", ColumnKey: "C5", Value: 22, DisplayValue: "22", TooltipText: "Construction · Area 05 · 22", IsEnabled: true},
+              {RowKey: "R4", ColumnKey: "C1", Value: 63, DisplayValue: "63", TooltipText: "Commissioning · Area 01 · 63", IsEnabled: true},
+              {RowKey: "R4", ColumnKey: "C2", Value: 51, DisplayValue: "51", TooltipText: "Commissioning · Area 02 · 51", IsEnabled: true},
+              {RowKey: "R4", ColumnKey: "C3", Value: 39, DisplayValue: "39", TooltipText: "Commissioning · Area 03 · 39", IsEnabled: true},
+              {RowKey: "R4", ColumnKey: "C4", Value: 27, DisplayValue: "27", TooltipText: "Commissioning · Area 04 · 27", IsEnabled: true},
+              {RowKey: "R4", ColumnKey: "C5", Value: 12, DisplayValue: "12", TooltipText: "Commissioning · Area 05 · 12", IsEnabled: true}
+          )
+      Columns:
+        PropertyKind: Input
+        DisplayName: Columns
+        Description: Table with ColumnKey and ColumnLabel
+        DataType: Table
+        Default: |-
+          =Table(
+              {ColumnKey: "C1", ColumnLabel: "Area 01"},
+              {ColumnKey: "C2", ColumnLabel: "Area 02"},
+              {ColumnKey: "C3", ColumnLabel: "Area 03"},
+              {ColumnKey: "C4", ColumnLabel: "Area 04"},
+              {ColumnKey: "C5", ColumnLabel: "Area 05"}
+          )
+      CompactMode:
+        PropertyKind: Input
+        DisplayName: CompactMode
+        Description: Use compact row and cell dimensions
+        DataType: Boolean
+        Default: =true
+      CriticalCount:
+        PropertyKind: Output
+        DataType: Number
+      CriticalThreshold:
+        PropertyKind: Input
+        DisplayName: CriticalThreshold
+        Description: Value used by CriticalCount
+        DataType: Number
+        Default: =25
+      CriticalWhenHigh:
+        PropertyKind: Input
+        DisplayName: CriticalWhenHigh
+        Description: High values are critical when true; low values are critical when false
+        DataType: Boolean
+        Default: =false
+      DangerColor:
+        PropertyKind: Input
+        DisplayName: DangerColor
+        Description: Error and critical status color
+        DataType: Color
+        Default: =ColorValue("#DC2626")
+      EmptyColor:
+        PropertyKind: Input
+        DisplayName: EmptyColor
+        Description: Fill used for zero or empty cells
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      EmptyText:
+        PropertyKind: Input
+        DisplayName: EmptyText
+        Description: Empty-state message
+        DataType: Text
+        Default: ="No matrix data available."
+      EnableSelection:
+        PropertyKind: Input
+        DisplayName: EnableSelection
+        Description: Allow users to select cells
+        DataType: Boolean
+        Default: =true
+      ErrorText:
+        PropertyKind: Input
+        DisplayName: ErrorText
+        Description: Error-state message
+        DataType: Text
+        Default: ="Heat map unavailable."
+      HasSelection:
+        PropertyKind: Output
+        DataType: Boolean
+      InvertScale:
+        PropertyKind: Input
+        DisplayName: InvertScale
+        Description: When true, high metric values receive the low-score color
+        DataType: Boolean
+        Default: =false
+      IsEmpty:
+        PropertyKind: Output
+        DataType: Boolean
+      IsError:
+        PropertyKind: Output
+        DataType: Boolean
+      IsLoading:
+        PropertyKind: Output
+        DataType: Boolean
+      LegendHighText:
+        PropertyKind: Input
+        DisplayName: LegendHighText
+        Description: High-end legend caption
+        DataType: Text
+        Default: ="High"
+      LegendLowText:
+        PropertyKind: Input
+        DisplayName: LegendLowText
+        Description: Low-end legend caption
+        DataType: Text
+        Default: ="Low"
+      LegendMidText:
+        PropertyKind: Input
+        DisplayName: LegendMidText
+        Description: Midpoint legend caption
+        DataType: Text
+        Default: ="Medium"
+      LoadingText:
+        PropertyKind: Input
+        DisplayName: LoadingText
+        Description: Loading-state message
+        DataType: Text
+        Default: ="Loading heat map..."
+      MaximumValue:
+        PropertyKind: Input
+        DisplayName: MaximumValue
+        Description: Upper bound used by the color scale
+        DataType: Number
+        Default: =100
+      MetricName:
+        PropertyKind: Input
+        DisplayName: MetricName
+        Description: Metric represented by each cell
+        DataType: Text
+        Default: ="Value"
+      MidpointValue:
+        PropertyKind: Input
+        DisplayName: MidpointValue
+        Description: Midpoint used by the three-stage gradient
+        DataType: Number
+        Default: =50
+      MinimumValue:
+        PropertyKind: Input
+        DisplayName: MinimumValue
+        Description: Lower bound used by the color scale
+        DataType: Number
+        Default: =0
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        Description: Secondary text color
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      OnCellSelect:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      OnClearSelection:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      Palette:
+        PropertyKind: Input
+        DisplayName: Palette
+        Description: TRAFFIC, BLUE or PURPLE
+        DataType: Text
+        Default: ="TRAFFIC"
+      RowAxisLabel:
+        PropertyKind: Input
+        DisplayName: RowAxisLabel
+        Description: Label shown above the row headers
+        DataType: Text
+        Default: ="ROW"
+      RowHeaderWidth:
+        PropertyKind: Input
+        DisplayName: RowHeaderWidth
+        Description: Width reserved for row labels
+        DataType: Number
+        Default: =170
+      Rows:
+        PropertyKind: Input
+        DisplayName: Rows
+        Description: Table with RowKey and RowLabel
+        DataType: Table
+        Default: |-
+          =Table(
+              {RowKey: "R1", RowLabel: "Engineering"},
+              {RowKey: "R2", RowLabel: "Procurement"},
+              {RowKey: "R3", RowLabel: "Construction"},
+              {RowKey: "R4", RowLabel: "Commissioning"}
+          )
+      SelectedCell:
+        PropertyKind: Output
+        DataType: Record
+      SelectedColumnKey:
+        PropertyKind: Output
+        DataType: Text
+      SelectedColumnLabel:
+        PropertyKind: Output
+        DataType: Text
+      SelectedDisplayValue:
+        PropertyKind: Output
+        DataType: Text
+      SelectedRowKey:
+        PropertyKind: Output
+        DataType: Text
+      SelectedRowLabel:
+        PropertyKind: Output
+        DataType: Text
+      SelectedValue:
+        PropertyKind: Output
+        DataType: Number
+      ShowLegend:
+        PropertyKind: Input
+        DisplayName: ShowLegend
+        Description: Show the gradient legend
+        DataType: Boolean
+        Default: =true
+      ShowSummary:
+        PropertyKind: Input
+        DisplayName: ShowSummary
+        Description: Show average, critical and selected summaries
+        DataType: Boolean
+        Default: =true
+      ShowTotals:
+        PropertyKind: Input
+        DisplayName: ShowTotals
+        Description: Show row, column and grand totals
+        DataType: Boolean
+        Default: =true
+      ShowValues:
+        PropertyKind: Input
+        DisplayName: ShowValues
+        Description: Show the value inside each cell
+        DataType: Boolean
+        Default: =true
+      State:
+        PropertyKind: Input
+        DisplayName: State
+        Description: ready, loading, empty or error
+        DataType: Text
+        Default: ="ready"
+      Subtitle:
+        PropertyKind: Input
+        DisplayName: Subtitle
+        Description: Component subtitle
+        DataType: Text
+        Default: ="Interactive matrix"
+      SuccessColor:
+        PropertyKind: Input
+        DisplayName: SuccessColor
+        Description: Success status color
+        DataType: Color
+        Default: =ColorValue("#16A34A")
+      SurfaceAltColor:
+        PropertyKind: Input
+        DisplayName: SurfaceAltColor
+        Description: Alternate surface and header background
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        Description: Primary text color
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      Title:
+        PropertyKind: Input
+        DisplayName: Title
+        Description: Component title
+        DataType: Text
+        Default: ="Heat Map"
+      TotalColumnWidth:
+        PropertyKind: Input
+        DisplayName: TotalColumnWidth
+        Description: Width reserved for row totals
+        DataType: Number
+        Default: =68
+      TotalLabel:
+        PropertyKind: Input
+        DisplayName: TotalLabel
+        Description: Label used for totals
+        DataType: Text
+        Default: ="TOTAL"
+      TreatZeroAsEmpty:
+        PropertyKind: Input
+        DisplayName: TreatZeroAsEmpty
+        Description: Render zero-value cells with EmptyColor
+        DataType: Boolean
+        Default: =true
+      ValueSuffix:
+        PropertyKind: Input
+        DisplayName: ValueSuffix
+        Description: Optional suffix appended to generated values
+        DataType: Text
+        Default: =""
+      WarningColor:
+        PropertyKind: Input
+        DisplayName: WarningColor
+        Description: Warning status color
+        DataType: Color
+        Default: =ColorValue("#F59E0B")
+    Properties:
+      AverageValue: =If(CountRows(cmp_HeatMapPro.Cells) = 0, 0, Average(cmp_HeatMapPro.Cells, Value))
+      CriticalCount: |-
+        =CountRows(
+            Filter(
+                cmp_HeatMapPro.Cells,
+                (!cmp_HeatMapPro.TreatZeroAsEmpty || Value <> 0) &&
+                If(
+                    cmp_HeatMapPro.CriticalWhenHigh,
+                    Value >= cmp_HeatMapPro.CriticalThreshold,
+                    Value <= cmp_HeatMapPro.CriticalThreshold
+                )
+            )
+        )
+      HasSelection: =!IsBlank(cmp_HeatMapPro.SelectedRowKey) && !IsBlank(cmp_HeatMapPro.SelectedColumnKey)
+      Height: =320
+      IsEmpty: =Lower(cmp_HeatMapPro.State) = "empty" || CountRows(cmp_HeatMapPro.Rows) = 0 || CountRows(cmp_HeatMapPro.Columns) = 0
+      IsError: =Lower(cmp_HeatMapPro.State) = "error"
+      IsLoading: =Lower(cmp_HeatMapPro.State) = "loading"
+      OnReset: |-
+        =
+        Set(varHMP_SelectedRowKey, "");
+        Set(varHMP_SelectedColumnKey, "");
+        Set(varHMP_SelectedValue, 0);
+        Set(varHMP_SelectedDisplayValue, "")
+      SelectedCell: =LookUp(cmp_HeatMapPro.Cells, Text(RowKey) = cmp_HeatMapPro.SelectedRowKey && Text(ColumnKey) = cmp_HeatMapPro.SelectedColumnKey)
+      SelectedColumnKey: =Coalesce(varHMP_SelectedColumnKey, "")
+      SelectedColumnLabel: =Coalesce(LookUp(cmp_HeatMapPro.Columns, Text(ColumnKey) = cmp_HeatMapPro.SelectedColumnKey, Text(ColumnLabel)), "")
+      SelectedDisplayValue: =Coalesce(varHMP_SelectedDisplayValue, "")
+      SelectedRowKey: =Coalesce(varHMP_SelectedRowKey, "")
+      SelectedRowLabel: =Coalesce(LookUp(cmp_HeatMapPro.Rows, Text(RowKey) = cmp_HeatMapPro.SelectedRowKey, Text(RowLabel)), "")
+      SelectedValue: =Coalesce(varHMP_SelectedValue, 0)
+      Width: =1100
+    Children:
+      - conHMP_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =cmp_HeatMapPro.BorderColor
+            BorderThickness: =1
+            DropShadow: =DropShadow.None
+            Fill: =cmp_HeatMapPro.BackgroundColor
+            Height: =Parent.Height
+            RadiusBottomLeft: =14
+            RadiusBottomRight: =14
+            RadiusTopLeft: =14
+            RadiusTopRight: =14
+            Width: =Parent.Width
+          Children:
+            - lblHMP_Title:
+                Control: Label@2.5.1
+                Properties:
+                  Color: =cmp_HeatMapPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =22
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =14
+                  Text: =cmp_HeatMapPro.Title
+                  Width: =If(cmp_HeatMapPro.ShowSummary && Parent.Width >= 760, Parent.Width - 390, Parent.Width - 32)
+                  X: =16
+                  Y: =10
+            - lblHMP_Subtitle:
+                Control: Label@2.5.1
+                Properties:
+                  Color: =cmp_HeatMapPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =16
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: =cmp_HeatMapPro.Subtitle
+                  Width: =If(cmp_HeatMapPro.ShowSummary && Parent.Width >= 760, Parent.Width - 390, Parent.Width - 32)
+                  X: =16
+                  Y: =33
+            - conHMP_AverageChip:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_HeatMapPro.BorderColor
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_HeatMapPro.SurfaceAltColor
+                  Height: =38
+                  RadiusBottomLeft: =9
+                  RadiusBottomRight: =9
+                  RadiusTopLeft: =9
+                  RadiusTopRight: =9
+                  Visible: =cmp_HeatMapPro.ShowSummary && Parent.Width >= 760
+                  Width: =104
+                  X: =Parent.Width - 358
+                  Y: =10
+                Children:
+                  - lblHMP_AverageCaption:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =cmp_HeatMapPro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =14
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: ="AVERAGE"
+                        Width: =Parent.Width - 16
+                        X: =8
+                        Y: =4
+                  - lblHMP_AverageValue:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =cmp_HeatMapPro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =18
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =11
+                        Text: =Text(cmp_HeatMapPro.AverageValue, "[$-en-US]#,##0.0") & cmp_HeatMapPro.ValueSuffix
+                        Width: =Parent.Width - 16
+                        X: =8
+                        Y: =17
+            - conHMP_CriticalChip:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =If(cmp_HeatMapPro.CriticalCount > 0, ColorFade(cmp_HeatMapPro.DangerColor, 0.55), cmp_HeatMapPro.BorderColor)
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =If(cmp_HeatMapPro.CriticalCount > 0, ColorFade(cmp_HeatMapPro.DangerColor, 0.9), cmp_HeatMapPro.SurfaceAltColor)
+                  Height: =38
+                  RadiusBottomLeft: =9
+                  RadiusBottomRight: =9
+                  RadiusTopLeft: =9
+                  RadiusTopRight: =9
+                  Visible: =cmp_HeatMapPro.ShowSummary && Parent.Width >= 760
+                  Width: =104
+                  X: =Parent.Width - 246
+                  Y: =10
+                Children:
+                  - lblHMP_CriticalCaption:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =cmp_HeatMapPro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =14
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: ="CRITICAL"
+                        Width: =Parent.Width - 16
+                        X: =8
+                        Y: =4
+                  - lblHMP_CriticalValue:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =If(cmp_HeatMapPro.CriticalCount > 0, cmp_HeatMapPro.DangerColor, cmp_HeatMapPro.TextColor)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =18
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =11
+                        Text: =Text(cmp_HeatMapPro.CriticalCount, "[$-en-US]#,##0")
+                        Width: =Parent.Width - 16
+                        X: =8
+                        Y: =17
+            - conHMP_SelectedChip:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =If(cmp_HeatMapPro.HasSelection, cmp_HeatMapPro.AccentColor, cmp_HeatMapPro.BorderColor)
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =If(cmp_HeatMapPro.HasSelection, ColorFade(cmp_HeatMapPro.AccentColor, 0.9), cmp_HeatMapPro.SurfaceAltColor)
+                  Height: =38
+                  RadiusBottomLeft: =9
+                  RadiusBottomRight: =9
+                  RadiusTopLeft: =9
+                  RadiusTopRight: =9
+                  Visible: =cmp_HeatMapPro.ShowSummary && Parent.Width >= 760
+                  Width: =120
+                  X: =Parent.Width - 134
+                  Y: =10
+                Children:
+                  - lblHMP_SelectedCaption:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =cmp_HeatMapPro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =14
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: ="SELECTED"
+                        Width: =80
+                        X: =8
+                        Y: =4
+                  - lblHMP_SelectedValue:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =If(cmp_HeatMapPro.HasSelection, cmp_HeatMapPro.AccentColor, cmp_HeatMapPro.TextColor)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =18
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =11
+                        Text: =If(cmp_HeatMapPro.HasSelection, cmp_HeatMapPro.SelectedDisplayValue, "—")
+                        Width: =80
+                        X: =8
+                        Y: =17
+                  - icoHMP_ClearSelection:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_HeatMapPro.MutedTextColor
+                        Height: =15
+                        HoverColor: =cmp_HeatMapPro.AccentColor
+                        Icon: =Icon.Cancel
+                        OnSelect: |-
+                          =
+                          Set(varHMP_SelectedRowKey, "");
+                          Set(varHMP_SelectedColumnKey, "");
+                          Set(varHMP_SelectedValue, 0);
+                          Set(varHMP_SelectedDisplayValue, "");
+                          cmp_HeatMapPro.OnClearSelection()
+                        PressedColor: =cmp_HeatMapPro.AccentColor
+                        Visible: =cmp_HeatMapPro.HasSelection
+                        Width: =15
+                        X: =Parent.Width - 24
+                        Y: =12
+            - htmlHMP_Legend:
+                Control: HtmlViewer@2.1.0
+                Properties:
+                  HtmlText: |-
+                    =With(
+                        {
+                            _gradient:
+                                Switch(
+                                    Upper(cmp_HeatMapPro.Palette),
+                                    "BLUE",
+                                        If(
+                                            cmp_HeatMapPro.InvertScale,
+                                            "#1D4ED8 0%,#60A5FA 50%,#EFF6FF 100%",
+                                            "#EFF6FF 0%,#60A5FA 50%,#1D4ED8 100%"
+                                        ),
+                                    "PURPLE",
+                                        If(
+                                            cmp_HeatMapPro.InvertScale,
+                                            "#6D28D9 0%,#A78BFA 50%,#F5F3FF 100%",
+                                            "#F5F3FF 0%,#A78BFA 50%,#6D28D9 100%"
+                                        ),
+                                    If(
+                                        cmp_HeatMapPro.InvertScale,
+                                        "#16A34A 0%,#F59E0B 50%,#DC2626 100%",
+                                        "#DC2626 0%,#F59E0B 50%,#16A34A 100%"
+                                    )
+                                )
+                        },
+                        "<div style='height:20px;display:flex;align-items:center;gap:7px;font-family:Segoe UI,Arial;font-size:10px;color:#64748B;'>" &
+                        "<span>" & cmp_HeatMapPro.LegendLowText & "</span>" &
+                        "<span style='display:inline-block;width:150px;height:8px;border-radius:999px;border:1px solid #E2E8F0;background:linear-gradient(90deg," & _gradient & ");'></span>" &
+                        "<span>" & cmp_HeatMapPro.LegendHighText & "</span>" &
+                        "</div>"
+                    )
+                  Visible: =cmp_HeatMapPro.ShowLegend
+                  Width: =250
+                  X: =16
+                  Y: =48
+            - lblHMP_SelectedContext:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Right
+                  Color: =cmp_HeatMapPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =8
+                  Text: |-
+                    =If(
+                        cmp_HeatMapPro.HasSelection,
+                        With(
+                            {
+                                _context:
+                                    cmp_HeatMapPro.SelectedRowLabel &
+                                    "  ×  " &
+                                    cmp_HeatMapPro.SelectedColumnLabel
+                            },
+                            If(
+                                Len(_context) > 46,
+                                Left(_context, 43) & "…",
+                                _context
+                            )
+                        ),
+                        cmp_HeatMapPro.MetricName
+                    )
+                  Tooltip: |-
+                    =If(
+                        cmp_HeatMapPro.HasSelection,
+                        cmp_HeatMapPro.SelectedRowLabel &
+                        " × " &
+                        cmp_HeatMapPro.SelectedColumnLabel,
+                        cmp_HeatMapPro.MetricName
+                    )
+                  Visible: =Parent.Width >= 560
+                  Width: =Parent.Width - 300
+                  X: =284
+                  Y: =53
+            - conHMP_Header:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_HeatMapPro.BorderColor
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_HeatMapPro.SurfaceAltColor
+                  Height: =28
+                  RadiusBottomLeft: =7
+                  RadiusBottomRight: =7
+                  RadiusTopLeft: =7
+                  RadiusTopRight: =7
+                  Width: =Parent.Width - 24
+                  X: =12
+                  Y: =76
+                Children:
+                  - lblHMP_RowAxis:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =cmp_HeatMapPro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =26
+                        PaddingBottom: =0
+                        PaddingLeft: =4
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: =Upper(cmp_HeatMapPro.RowAxisLabel)
+                        Width: =cmp_HeatMapPro.RowHeaderWidth
+                        X: =4
+                        Y: =1
+                  - galHMP_ColumnHeaders:
+                      Control: Gallery@2.15.0
+                      Variant: Horizontal
+                      Properties:
+                        Height: =26
+                        Items: =cmp_HeatMapPro.Columns
+                        ShowScrollbar: =false
+                        TemplatePadding: =2
+                        TemplateSize: |-
+                          =With(
+                              {
+                                  _count: Max(
+                                      1,
+                                      CountRows(cmp_HeatMapPro.Columns)
+                                  )
+                              },
+                              (
+                                  Self.Width -
+                                  4 -
+                                  ((_count - 1) * Self.TemplatePadding)
+                              ) / _count
+                          )
+                        Width: =Parent.Width - cmp_HeatMapPro.RowHeaderWidth - If(cmp_HeatMapPro.ShowTotals, cmp_HeatMapPro.TotalColumnWidth, 0) - 20
+                        X: =cmp_HeatMapPro.RowHeaderWidth + 8
+                        Y: =1
+                      Children:
+                        - lblHMP_ColumnHeader:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              Color: =cmp_HeatMapPro.TextColor
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =24
+                              PaddingBottom: =0
+                              PaddingLeft: =2
+                              PaddingRight: =2
+                              PaddingTop: =0
+                              Size: =8
+                              Text: =Text(ThisItem.ColumnLabel)
+                              Tooltip: =Text(ThisItem.ColumnLabel)
+                              Width: =Parent.TemplateWidth - 4
+                              Y: =1
+                  - lblHMP_TotalHeader:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =cmp_HeatMapPro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =26
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: =Upper(cmp_HeatMapPro.TotalLabel)
+                        Visible: =cmp_HeatMapPro.ShowTotals
+                        Width: =cmp_HeatMapPro.TotalColumnWidth
+                        X: =Parent.Width - cmp_HeatMapPro.TotalColumnWidth - 4
+                        Y: =1
+            - galHMP_Rows:
+                Control: Gallery@2.15.0
+                Variant: Vertical
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Height: =Parent.Height - If(cmp_HeatMapPro.ShowTotals, 142, 108)
+                  Items: =cmp_HeatMapPro.Rows
+                  TemplatePadding: =2
+                  TemplateSize: =If(cmp_HeatMapPro.CompactMode, 30, 38)
+                  Visible: =!cmp_HeatMapPro.IsLoading && !cmp_HeatMapPro.IsEmpty && !cmp_HeatMapPro.IsError
+                  Width: =Parent.Width - 24
+                  X: =12
+                  Y: =108
+                Children:
+                  - lblHMP_RowLabel:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =cmp_HeatMapPro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =Parent.TemplateHeight - 2
+                        PaddingBottom: =0
+                        PaddingLeft: =4
+                        PaddingRight: =8
+                        PaddingTop: =0
+                        Size: =9
+                        Text: |-
+                          =With(
+                              {
+                                  _name: Trim(Text(ThisItem.RowLabel))
+                              },
+                              If(
+                                  Len(_name) > 27,
+                                  Left(_name, 24) & "…",
+                                  _name
+                              )
+                          )
+                        Tooltip: =Text(ThisItem.RowLabel)
+                        Width: =cmp_HeatMapPro.RowHeaderWidth
+                        Wrap: =false
+                        X: =4
+                  - galHMP_Cells:
+                      Control: Gallery@2.15.0
+                      Variant: Horizontal
+                      Properties:
+                        Height: =Parent.TemplateHeight - 2
+                        Items: |-
+                          =With(
+                              {
+                                  _rowKey: Text(ThisItem.RowKey)
+                              },
+                              AddColumns(
+                                  cmp_HeatMapPro.Columns As HMPColumn,
+                                  HeatRowKey, _rowKey,
+                                  CellValue,
+                                      Coalesce(
+                                          LookUp(
+                                              cmp_HeatMapPro.Cells As HMPCell,
+                                              Text(HMPCell.RowKey) = _rowKey &&
+                                              Text(HMPCell.ColumnKey) = Text(HMPColumn.ColumnKey),
+                                              Value(HMPCell.Value)
+                                          ),
+                                          0
+                                      ),
+                                  CellDisplayValue,
+                                      Coalesce(
+                                          LookUp(
+                                              cmp_HeatMapPro.Cells As HMPCell,
+                                              Text(HMPCell.RowKey) = _rowKey &&
+                                              Text(HMPCell.ColumnKey) = Text(HMPColumn.ColumnKey),
+                                              Text(HMPCell.DisplayValue)
+                                          ),
+                                          Text(
+                                              Coalesce(
+                                                  LookUp(
+                                                      cmp_HeatMapPro.Cells As HMPCell,
+                                                      Text(HMPCell.RowKey) = _rowKey &&
+                                                      Text(HMPCell.ColumnKey) = Text(HMPColumn.ColumnKey),
+                                                      Value(HMPCell.Value)
+                                                  ),
+                                                  0
+                                              ),
+                                              "[$-en-US]#,##0.##"
+                                          ) & cmp_HeatMapPro.ValueSuffix
+                                      ),
+                                  CellTooltip,
+                                      Coalesce(
+                                          LookUp(
+                                              cmp_HeatMapPro.Cells As HMPCell,
+                                              Text(HMPCell.RowKey) = _rowKey &&
+                                              Text(HMPCell.ColumnKey) = Text(HMPColumn.ColumnKey),
+                                              Text(HMPCell.TooltipText)
+                                          ),
+                                          Text(
+                                              LookUp(
+                                                  cmp_HeatMapPro.Rows,
+                                                  Text(RowKey) = _rowKey,
+                                                  RowLabel
+                                              )
+                                          ) & " · " & Text(HMPColumn.ColumnLabel)
+                                      ),
+                                  CellEnabled,
+                                      Coalesce(
+                                          LookUp(
+                                              cmp_HeatMapPro.Cells As HMPCell,
+                                              Text(HMPCell.RowKey) = _rowKey &&
+                                              Text(HMPCell.ColumnKey) = Text(HMPColumn.ColumnKey),
+                                              Boolean(HMPCell.IsEnabled)
+                                          ),
+                                          true
+                                      )
+                              )
+                          )
+                        ShowScrollbar: =false
+                        TemplatePadding: =2
+                        TemplateSize: |-
+                          =With(
+                              {
+                                  _count: Max(
+                                      1,
+                                      CountRows(cmp_HeatMapPro.Columns)
+                                  )
+                              },
+                              (
+                                  Self.Width -
+                                  4 -
+                                  ((_count - 1) * Self.TemplatePadding)
+                              ) / _count
+                          )
+                        Width: =Parent.TemplateWidth - cmp_HeatMapPro.RowHeaderWidth - If(cmp_HeatMapPro.ShowTotals, cmp_HeatMapPro.TotalColumnWidth, 0) - 20
+                        X: =cmp_HeatMapPro.RowHeaderWidth + 8
+                      Children:
+                        - btnHMP_Cell:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: |-
+                                =If(
+                                    cmp_HeatMapPro.SelectedRowKey = Text(ThisItem.HeatRowKey) &&
+                                    cmp_HeatMapPro.SelectedColumnKey = Text(ThisItem.ColumnKey),
+
+                                    ColorValue("#2563EB"),
+
+                                    RGBA(255, 255, 255, 0.42)
+                                )
+                              BorderThickness: =1
+                              Color: |-
+                                =With(
+                                    {
+                                        _value: Value(ThisItem.CellValue),
+                                        _min: Value(cmp_HeatMapPro.MinimumValue),
+                                        _mid: Value(cmp_HeatMapPro.MidpointValue),
+                                        _max: Value(cmp_HeatMapPro.MaximumValue)
+                                    },
+                                    With(
+                                        {
+                                            _raw:
+                                                If(
+                                                    _value <= _mid,
+                                                    0.5 * (_value - _min) / Max(0.0001, _mid - _min),
+                                                    0.5 + 0.5 * (_value - _mid) / Max(0.0001, _max - _mid)
+                                                )
+                                        },
+                                        With(
+                                            {
+                                                _score:
+                                                    If(
+                                                        cmp_HeatMapPro.InvertScale,
+                                                        1 - Min(1, Max(0, _raw)),
+                                                        Min(1, Max(0, _raw))
+                                                    )
+                                            },
+                                            If(
+                                                cmp_HeatMapPro.TreatZeroAsEmpty && _value = 0,
+                                                cmp_HeatMapPro.MutedTextColor,
+                                                Switch(
+                                                    Upper(cmp_HeatMapPro.Palette),
+                                                    "BLUE", If(_score >= 0.52, Color.White, cmp_HeatMapPro.TextColor),
+                                                    "PURPLE", If(_score >= 0.5, Color.White, cmp_HeatMapPro.TextColor),
+                                                    If(_score <= 0.24 || _score >= 0.76, Color.White, cmp_HeatMapPro.TextColor)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                              DisabledBorderColor: =cmp_HeatMapPro.BorderColor
+                              DisabledColor: =cmp_HeatMapPro.MutedTextColor
+                              DisabledFill: =cmp_HeatMapPro.EmptyColor
+                              DisplayMode: =If(cmp_HeatMapPro.EnableSelection && ThisItem.CellEnabled, DisplayMode.Edit, DisplayMode.Disabled)
+                              Fill: |-
+                                =With(
+                                    {
+                                        _value: Value(ThisItem.CellValue),
+                                        _min: Value(cmp_HeatMapPro.MinimumValue),
+                                        _mid: Value(cmp_HeatMapPro.MidpointValue),
+                                        _max: Value(cmp_HeatMapPro.MaximumValue)
+                                    },
+                                    If(
+                                        cmp_HeatMapPro.TreatZeroAsEmpty && _value = 0,
+                                        cmp_HeatMapPro.EmptyColor,
+                                        With(
+                                            {
+                                                _raw:
+                                                    If(
+                                                        _value <= _mid,
+                                                        0.5 * (_value - _min) / Max(0.0001, _mid - _min),
+                                                        0.5 + 0.5 * (_value - _mid) / Max(0.0001, _max - _mid)
+                                                    )
+                                            },
+                                            With(
+                                                {
+                                                    _score:
+                                                        If(
+                                                            cmp_HeatMapPro.InvertScale,
+                                                            1 - Min(1, Max(0, _raw)),
+                                                            Min(1, Max(0, _raw))
+                                                        )
+                                                },
+                                                Switch(
+                                                    Upper(cmp_HeatMapPro.Palette),
+                                                    "BLUE",
+                                                        If(
+                                                            _score <= 0.5,
+                                                            RGBA(
+                                                                Round(239 + (96 - 239) * (_score * 2), 0),
+                                                                Round(246 + (165 - 246) * (_score * 2), 0),
+                                                                Round(255 + (250 - 255) * (_score * 2), 0),
+                                                                1
+                                                            ),
+                                                            RGBA(
+                                                                Round(96 + (29 - 96) * ((_score - 0.5) * 2), 0),
+                                                                Round(165 + (78 - 165) * ((_score - 0.5) * 2), 0),
+                                                                Round(250 + (216 - 250) * ((_score - 0.5) * 2), 0),
+                                                                1
+                                                            )
+                                                        ),
+                                                    "PURPLE",
+                                                        If(
+                                                            _score <= 0.5,
+                                                            RGBA(
+                                                                Round(245 + (167 - 245) * (_score * 2), 0),
+                                                                Round(243 + (139 - 243) * (_score * 2), 0),
+                                                                Round(255 + (250 - 255) * (_score * 2), 0),
+                                                                1
+                                                            ),
+                                                            RGBA(
+                                                                Round(167 + (109 - 167) * ((_score - 0.5) * 2), 0),
+                                                                Round(139 + (40 - 139) * ((_score - 0.5) * 2), 0),
+                                                                Round(250 + (217 - 250) * ((_score - 0.5) * 2), 0),
+                                                                1
+                                                            )
+                                                        ),
+                                                    If(
+                                                        _score <= 0.5,
+                                                        RGBA(
+                                                            Round(220 + (245 - 220) * (_score * 2), 0),
+                                                            Round(38 + (158 - 38) * (_score * 2), 0),
+                                                            Round(38 + (11 - 38) * (_score * 2), 0),
+                                                            1
+                                                        ),
+                                                        RGBA(
+                                                            Round(245 + (22 - 245) * ((_score - 0.5) * 2), 0),
+                                                            Round(158 + (163 - 158) * ((_score - 0.5) * 2), 0),
+                                                            Round(11 + (74 - 11) * ((_score - 0.5) * 2), 0),
+                                                            1
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                              FocusedBorderColor: =ColorValue("#2563EB")
+                              FocusedBorderThickness: =1
+                              Font: =Font.'Segoe UI'
+                              Height: =Parent.Height - 2
+                              HoverBorderColor: =cmp_HeatMapPro.AccentColor
+                              HoverColor: =Self.Color
+                              HoverFill: =ColorFade(Self.Fill, -0.08)
+                              OnSelect: |-
+                                =
+                                If(
+                                    cmp_HeatMapPro.EnableSelection && ThisItem.CellEnabled,
+                                    Set(varHMP_SelectedRowKey, Text(ThisItem.HeatRowKey));
+                                    Set(varHMP_SelectedColumnKey, Text(ThisItem.ColumnKey));
+                                    Set(varHMP_SelectedValue, Value(ThisItem.CellValue));
+                                    Set(varHMP_SelectedDisplayValue, Text(ThisItem.CellDisplayValue));
+                                    cmp_HeatMapPro.OnCellSelect()
+                                )
+                              PressedBorderColor: =cmp_HeatMapPro.AccentColor
+                              PressedFill: =ColorFade(Self.Fill, -0.14)
+                              RadiusBottomLeft: =6
+                              RadiusBottomRight: =6
+                              RadiusTopLeft: =6
+                              RadiusTopRight: =6
+                              Size: =9
+                              Text: =If(cmp_HeatMapPro.ShowValues, Text(ThisItem.CellDisplayValue), "")
+                              Tooltip: =Text(ThisItem.CellTooltip)
+                              Width: =Parent.TemplateWidth - 4
+                              Y: =1
+                  - lblHMP_RowTotal:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =cmp_HeatMapPro.TextColor
+                        Fill: =cmp_HeatMapPro.SurfaceAltColor
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =Parent.TemplateHeight - 4
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: |-
+                          =Text(
+                              Sum(
+                                  Filter(
+                                      cmp_HeatMapPro.Cells,
+                                      Text(RowKey) = Text(ThisItem.RowKey)
+                                  ),
+                                  Value
+                              ),
+                              "[$-en-US]#,##0"
+                          ) & cmp_HeatMapPro.ValueSuffix
+                        Visible: =cmp_HeatMapPro.ShowTotals
+                        Width: =cmp_HeatMapPro.TotalColumnWidth
+                        X: =Parent.TemplateWidth - cmp_HeatMapPro.TotalColumnWidth - 4
+                        Y: =1
+            - conHMP_Footer:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_HeatMapPro.BorderColor
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_HeatMapPro.SurfaceAltColor
+                  Height: =28
+                  RadiusBottomLeft: =7
+                  RadiusBottomRight: =7
+                  RadiusTopLeft: =7
+                  RadiusTopRight: =7
+                  Visible: =cmp_HeatMapPro.ShowTotals && !cmp_HeatMapPro.IsLoading && !cmp_HeatMapPro.IsEmpty && !cmp_HeatMapPro.IsError
+                  Width: =Parent.Width - 24
+                  X: =12
+                  Y: =Parent.Height - 34
+                Children:
+                  - lblHMP_TotalLabel:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =cmp_HeatMapPro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =26
+                        PaddingBottom: =0
+                        PaddingLeft: =4
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: =Upper(cmp_HeatMapPro.TotalLabel)
+                        Width: =cmp_HeatMapPro.RowHeaderWidth
+                        X: =4
+                        Y: =1
+                  - galHMP_ColumnTotals:
+                      Control: Gallery@2.15.0
+                      Variant: Horizontal
+                      Properties:
+                        Height: =26
+                        Items: =cmp_HeatMapPro.Columns
+                        ShowScrollbar: =false
+                        TemplatePadding: =2
+                        TemplateSize: |-
+                          =With(
+                              {
+                                  _count: Max(
+                                      1,
+                                      CountRows(cmp_HeatMapPro.Columns)
+                                  )
+                              },
+                              (
+                                  Self.Width -
+                                  4 -
+                                  ((_count - 1) * Self.TemplatePadding)
+                              ) / _count
+                          )
+                        Width: =Parent.Width - cmp_HeatMapPro.RowHeaderWidth - cmp_HeatMapPro.TotalColumnWidth - 20
+                        X: =cmp_HeatMapPro.RowHeaderWidth + 8
+                        Y: =1
+                      Children:
+                        - lblHMP_ColumnTotal:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              Color: =cmp_HeatMapPro.TextColor
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =24
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =8
+                              Text: |-
+                                =Text(
+                                    Sum(
+                                        Filter(
+                                            cmp_HeatMapPro.Cells,
+                                            Text(ColumnKey) = Text(ThisItem.ColumnKey)
+                                        ),
+                                        Value
+                                    ),
+                                    "[$-en-US]#,##0"
+                                ) & cmp_HeatMapPro.ValueSuffix
+                              Width: =Parent.TemplateWidth - 4
+                  - lblHMP_GrandTotal:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =cmp_HeatMapPro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =26
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =Text(Sum(cmp_HeatMapPro.Cells, Value), "[$-en-US]#,##0") & cmp_HeatMapPro.ValueSuffix
+                        Width: =cmp_HeatMapPro.TotalColumnWidth
+                        X: =Parent.Width - cmp_HeatMapPro.TotalColumnWidth - 4
+                        Y: =1
+            - conHMP_StateOverlay:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255,255,255,0.92)
+                  Height: =Parent.Height - 76
+                  Visible: =cmp_HeatMapPro.IsLoading || cmp_HeatMapPro.IsEmpty || cmp_HeatMapPro.IsError
+                  Width: =Parent.Width
+                  Y: =76
+                Children:
+                  - spnHMP_Loading:
+                      Control: Spinner@1.4.6
+                      Properties:
+                        Height: =30
+                        SpinnerColor: =cmp_HeatMapPro.AccentColor
+                        Visible: =cmp_HeatMapPro.IsLoading
+                        Width: =30
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =(Parent.Height - 68) / 2
+                  - lblHMP_State:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =If(cmp_HeatMapPro.IsError, cmp_HeatMapPro.DangerColor, cmp_HeatMapPro.MutedTextColor)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =52
+                        PaddingBottom: =8
+                        PaddingLeft: =16
+                        PaddingRight: =16
+                        PaddingTop: =8
+                        Size: =11
+                        Text: |-
+                          =If(
+                              cmp_HeatMapPro.IsLoading,
+                              cmp_HeatMapPro.LoadingText,
+                              If(
+                                  cmp_HeatMapPro.IsError,
+                                  cmp_HeatMapPro.ErrorText,
+                                  cmp_HeatMapPro.EmptyText
+                              )
+                          )
+                        Width: =Parent.Width - 80
+                        X: =40
+                        Y: =(Parent.Height - Self.Height) / 2 + If(cmp_HeatMapPro.IsLoading, 26, 0)
 
