@@ -1,11 +1,11 @@
 Screens:
-  scr_Punches_1:
+  scr_Punches:
     Properties:
       Fill: =RGBA(255, 255, 255, 1)
       LoadingSpinnerColor: =RGBA(0, 120, 212, 1)
-      OnVisible: "=\r\n// =====================================================\r\n// Punch export collection schema initialization\r\n// =====================================================\r\n\r\nClearCollect(\r\n    colPunchExportColumns,\r\n    {\r\n        ColumnKey: \"\",\r\n        ColumnLabel: \"\",\r\n        ColumnGroup: \"\",\r\n        SortOrder: 0,\r\n        IsRequired: false,\r\n        IsSensitive: false,\r\n        IsSelected: false\r\n    }\r\n);\r\n\r\nClear(colPunchExportColumns);\r\n\r\nSet(varShowPunchExportColumns, false);\r\nSet(varPunchExportMode, \"CLIENT\");\r\nSet(varPunchExportColumnsJson, \"[]\");\r\nSet(varPunchExportConfigError, \"\");\r\nSet(varPunchExportLoading, false);\r\n\r\n\r\n// =====================================================\r\n// scr_Punches.OnVisible\r\n// Punch List initialization\r\n// Source of truth for filter catalogs:\r\n// Warroom_Punches_GetFilterCatalogs\r\n// =====================================================\r\n\r\nIf(\r\n    Coalesce(varPunches_FilterSource, \"Manual\") <> \"Dashboard\",\r\n    Set(varFilter_SubsystemsCsv, \"\");\r\n    Set(varFilter_Subsystem, Blank());\r\n    Reset(cmp_MultiValueFilter_2)\r\n);\r\n\r\nSet(varPunchSubsystemPopup, false);\r\n\r\nSet(varAppView, \"Punches\");\r\n\r\nSet(varPageKey, \"PUNCHES\");\r\nSet(varPageTitle, \"Punch List\");\r\nSet(varPageSubtitle, \"Punch item management\");\r\n\r\nSet(varPunches_ViewReady, false);\r\n\r\nSet(varShowPunchDynamicFilters, false);\r\n\r\nSet(\r\n    varPunchCustomFiltersJson,\r\n    Coalesce(varPunchCustomFiltersJson, \"[]\")\r\n);\r\n\r\nSet(varPunches_FilterSource, Coalesce(varPunches_FilterSource, \"Manual\"));\r\nSet(varPunches_ReturnView, Coalesce(varPunches_ReturnView, \"Overview\"));\r\n\r\nIf(\r\n    varPunches_FilterSource = \"Dashboard\",\r\n    Set(varPunches_HasSearched, true);\r\n    Set(varPunches_Page, 1);\r\n    Set(varPunches_AutoLoad, true)\r\n);\r\n\r\nSet(varPunches_Page, Coalesce(varPunches_Page, 1));\r\nSet(varPunches_PageSize, Coalesce(varPunches_PageSize, 50));\r\n\r\nSet(varPunches_IsLoading, false);\r\nSet(varPunches_Error, Coalesce(varPunches_Error, \"\"));\r\n\r\nSet(varPunchCatalogs_IsLoading, false);\r\nSet(varPunchCatalogs_Error, \"\");\r\n\r\nSet(varFilter_Subsystem, Coalesce(varFilter_Subsystem, Blank()));\r\nSet(varFilter_PunchDiscipline, Coalesce(varFilter_PunchDiscipline, Blank()));\r\nSet(varFilter_Subcontractor, Coalesce(varFilter_Subcontractor, Blank()));\r\nSet(varFilter_PunchTemplateId, Coalesce(varFilter_PunchTemplateId, Blank()));\r\nSet(varFilter_PunchCategoryCode, Coalesce(varFilter_PunchCategoryCode, Blank()));\r\nSet(varFilter_PunchStatusCode, Coalesce(varFilter_PunchStatusCode, Blank()));\r\n\r\nSet(varGlobalLoading, false);\r\nSet(varGlobalLoadingMsg, \"\");\r\nSet(varGlobalLoadingSubMsg, \"\");\r\nSet(varGlobalLoadingScope, \"\");\r\n\r\nIf(\r\n    !IsBlank(varProjectId) &&\r\n    (\r\n        IsBlank(varPunchCatalogs_ProjectId) ||\r\n        Text(varPunchCatalogs_ProjectId) <> Text(varProjectId) ||\r\n        CountRows(colPunchSubsystems_Filter) = 0 ||\r\n        CountRows(colPunchTemplates_Filter) = 0\r\n    ),\r\n\r\n    Set(varPunchCatalogs_IsLoading, true);\r\n    Set(varPunchCatalogs_Error, \"\");\r\n\r\n    Set(varGlobalLoading, true);\r\n    Set(varGlobalLoadingMsg, \"Loading Punch List filters...\");\r\n    Set(varGlobalLoadingSubMsg, \"Preparing filter catalogs\");\r\n    Set(varGlobalLoadingScope, \"PUNCHES\");\r\n\r\n    IfError(\r\n        With(\r\n            {\r\n                respCatalogs:\r\n                    Warroom_Punches_GetFilterCatalogs.Run(\r\n                        Value(varProjectId)\r\n                    )\r\n            },\r\n            With(\r\n                {\r\n                    objCatalogs:\r\n                        ParseJSON(\r\n                            Coalesce(\r\n                                respCatalogs.result,\r\n                                \"{}\"\r\n                            )\r\n                        )\r\n                },\r\n\r\n                ClearCollect(\r\n                    colPunchSubsystems_Filter,\r\n                    SortByColumns(\r\n                        ForAll(\r\n                            Table(objCatalogs.Table1),\r\n                            With(\r\n                                { r: ThisRecord.Value },\r\n                                {\r\n                                    Code: Text(r.Code),\r\n                                    Label: Text(r.Label),\r\n                                    SortOrder:\r\n                                        If(\r\n                                            IsBlank(Text(r.SortOrder)) || Text(r.SortOrder) = \"null\",\r\n                                            1,\r\n                                            Value(Text(r.SortOrder))\r\n                                        )\r\n                                }\r\n                            )\r\n                        ),\r\n                        \"SortOrder\",\r\n                        SortOrder.Ascending,\r\n                        \"Code\",\r\n                        SortOrder.Ascending\r\n                    )\r\n                );\r\n\r\n                ClearCollect(\r\n                colPunchSubsystems_MVF,\r\n                AddColumns(\r\n                    colPunchSubsystems_Filter,\r\n                    Display,\r\n                    Label,\r\n                    Id,\r\n                    Code\r\n                )\r\n            );\r\n\r\n                ClearCollect(\r\n                    colPunchTemplates_Filter,\r\n                    SortByColumns(\r\n                        ForAll(\r\n                            Table(objCatalogs.Table2),\r\n                            With(\r\n                                { r: ThisRecord.Value },\r\n                                {\r\n                                    TemplateId:\r\n                                        If(\r\n                                            IsBlank(Text(r.TemplateId)) || Text(r.TemplateId) = \"null\",\r\n                                            Blank(),\r\n                                            Value(Text(r.TemplateId))\r\n                                        ),\r\n                                    TemplateCode: Text(r.TemplateCode),\r\n                                    TemplateLabel: Text(r.TemplateLabel),\r\n                                    TemplateDescription: Text(r.TemplateDescription)\r\n                                }\r\n                            )\r\n                        ),\r\n                        \"TemplateLabel\",\r\n                        SortOrder.Ascending\r\n                    )\r\n                );\r\n\r\n                ClearCollect(\r\n                    colPunchCategories_Filter,\r\n                    SortByColumns(\r\n                        ForAll(\r\n                            Table(objCatalogs.Table3),\r\n                            With(\r\n                                { r: ThisRecord.Value },\r\n                                {\r\n                                    TemplateId:\r\n                                        If(\r\n                                            IsBlank(Text(r.TemplateId)) || Text(r.TemplateId) = \"null\",\r\n                                            Blank(),\r\n                                            Value(Text(r.TemplateId))\r\n                                        ),\r\n                                    CategoryCode: Text(r.CategoryCode),\r\n                                    CategoryLabel: Text(r.CategoryLabel),\r\n                                    DisplayLabel: Text(r.DisplayLabel),\r\n                                    SortOrder:\r\n                                        If(\r\n                                            IsBlank(Text(r.SortOrder)) || Text(r.SortOrder) = \"null\",\r\n                                            999,\r\n                                            Value(Text(r.SortOrder))\r\n                                        )\r\n                                }\r\n                            )\r\n                        ),\r\n                        \"TemplateId\",\r\n                        SortOrder.Ascending,\r\n                        \"SortOrder\",\r\n                        SortOrder.Ascending,\r\n                        \"CategoryCode\",\r\n                        SortOrder.Ascending\r\n                    )\r\n                );\r\n\r\n                ClearCollect(\r\n                    colPunchStatuses_Filter,\r\n                    SortByColumns(\r\n                        ForAll(\r\n                            Table(objCatalogs.Table4),\r\n                            With(\r\n                                { r: ThisRecord.Value },\r\n                                {\r\n                                    StatusCode: Text(r.StatusCode),\r\n                                    StatusLabel: Text(r.StatusLabel),\r\n                                    SortOrder:\r\n                                        If(\r\n                                            IsBlank(Text(r.SortOrder)) || Text(r.SortOrder) = \"null\",\r\n                                            999,\r\n                                            Value(Text(r.SortOrder))\r\n                                        )\r\n                                }\r\n                            )\r\n                        ),\r\n                        \"SortOrder\",\r\n                        SortOrder.Ascending,\r\n                        \"StatusCode\",\r\n                        SortOrder.Ascending\r\n                    )\r\n                );\r\n\r\n                ClearCollect(\r\n                    colPunchDisciplines_Filter,\r\n                    SortByColumns(\r\n                        ForAll(\r\n                            Table(objCatalogs.Table5),\r\n                            With(\r\n                                { r: ThisRecord.Value },\r\n                                {\r\n                                    Discipline: Text(r.Discipline),\r\n                                    DisciplineLabel: Text(r.DisciplineLabel)\r\n                                }\r\n                            )\r\n                        ),\r\n                        \"DisciplineLabel\",\r\n                        SortOrder.Ascending\r\n                    )\r\n                );\r\n\r\n                ClearCollect(\r\n                    colPunchSubcontractors_Filter,\r\n                    SortByColumns(\r\n                        ForAll(\r\n                            Table(objCatalogs.Table6),\r\n                            With(\r\n                                { r: ThisRecord.Value },\r\n                                {\r\n                                    SubcontractorId:\r\n                                        If(\r\n                                            IsBlank(Text(r.SubcontractorId)) || Text(r.SubcontractorId) = \"null\",\r\n                                            Blank(),\r\n                                            Value(Text(r.SubcontractorId))\r\n                                        ),\r\n                                    SubcontractorCode: Text(r.SubcontractorCode),\r\n                                    SubcontractorName: Text(r.SubcontractorName),\r\n                                    SubcontractorFullName: Text(r.SubcontractorFullName)\r\n                                }\r\n                            )\r\n                        ),\r\n                        \"SubcontractorName\",\r\n                        SortOrder.Ascending\r\n                    )\r\n                );\r\n\r\n                Set(varPunchCatalogs_ProjectId, varProjectId)\r\n\r\n                ;\r\n\r\n                Select(btnPunches_LoadDynamicFilters_1)\r\n\r\n                \r\n            )\r\n        ),\r\n\r\n        Set(varPunchCatalogs_Error, FirstError.Message);\r\n\r\n        Notify(\r\n            \"Punch filter catalogs could not be loaded.\",\r\n            NotificationType.Warning\r\n        );\r\n\r\n        Clear(colPunchSubsystems_Filter);\r\n        Clear(colPunchTemplates_Filter);\r\n        Clear(colPunchCategories_Filter);\r\n        Clear(colPunchStatuses_Filter);\r\n        Clear(colPunchDisciplines_Filter);\r\n        Clear(colPunchSubcontractors_Filter);\r\n\r\n        Set(varPunchCatalogs_ProjectId, Blank())\r\n    );\r\n\r\n    Set(varPunchCatalogs_IsLoading, false);\r\n\r\n    Set(varGlobalLoading, false);\r\n    Set(varGlobalLoadingMsg, \"\");\r\n    Set(varGlobalLoadingSubMsg, \"\");\r\n    Set(varGlobalLoadingScope, \"\")\r\n);\r\n\r\nSet(varPunches_ViewReady, true);\r\n\r\nIf(\r\n    varPunches_AutoLoad,\r\n\r\n    Set(varPunches_AutoLoad, false);\r\n\r\n    Set(varGlobalLoading, true);\r\n    Set(varGlobalLoadingMsg, \"Loading Punches...\");\r\n    Set(\r\n        varGlobalLoadingSubMsg,\r\n        If(\r\n            varPunches_FilterSource = \"Dashboard\",\r\n            \"Applying Home Dashboard context\",\r\n            \"Applying Overview context\"\r\n        )\r\n    );\r\n    Set(varGlobalLoadingScope, \"PUNCHES\");\r\n\r\n    Select(btnPunches_LoadPage_Punches_1)\r\n);\r\n\r\nSet(varPunchSubsystemPopup, false);\r\n\r\n"
+      OnVisible: "=\r\n// =====================================================\r\n// Punch export collection schema initialization\r\n// =====================================================\r\n\r\nClearCollect(\r\n    colPunchExportColumns,\r\n    {\r\n        ColumnKey: \"\",\r\n        ColumnLabel: \"\",\r\n        ColumnGroup: \"\",\r\n        SortOrder: 0,\r\n        IsRequired: false,\r\n        IsSensitive: false,\r\n        IsSelected: false\r\n    }\r\n);\r\n\r\nClear(colPunchExportColumns);\r\n\r\nSet(varShowPunchExportColumns, false);\r\nSet(varPunchExportMode, \"CLIENT\");\r\nSet(varPunchExportColumnsJson, \"[]\");\r\nSet(varPunchExportConfigError, \"\");\r\nSet(varPunchExportLoading, false);\r\n\r\n\r\n// =====================================================\r\n// scr_Punches.OnVisible\r\n// Punch List initialization\r\n// Source of truth for filter catalogs:\r\n// Warroom_Punches_GetFilterCatalogs\r\n// =====================================================\r\n\r\nIf(\r\n    Coalesce(varPunches_FilterSource, \"Manual\") <> \"Dashboard\",\r\n    Set(varFilter_SubsystemsCsv, \"\");\r\n    Set(varFilter_Subsystem, Blank());\r\n    Reset(cmp_MultiValueFilter_3)\r\n);\r\n\r\nSet(varPunchSubsystemPopup, false);\r\n\r\nSet(varAppView, \"Punches\");\r\n\r\nSet(varPageKey, \"PUNCHES\");\r\nSet(varPageTitle, \"Punch List\");\r\nSet(varPageSubtitle, \"Punch item management\");\r\n\r\nSet(varPunches_ViewReady, false);\r\n\r\nSet(varShowPunchDynamicFilters, false);\r\n\r\nSet(\r\n    varPunchCustomFiltersJson,\r\n    Coalesce(varPunchCustomFiltersJson, \"[]\")\r\n);\r\n\r\nSet(varPunches_FilterSource, Coalesce(varPunches_FilterSource, \"Manual\"));\r\nSet(varPunches_ReturnView, Coalesce(varPunches_ReturnView, \"Overview\"));\r\n\r\nIf(\r\n    varPunches_FilterSource = \"Dashboard\",\r\n    Set(varPunches_HasSearched, true);\r\n    Set(varPunches_Page, 1);\r\n    Set(varPunches_AutoLoad, true)\r\n);\r\n\r\nSet(varPunches_Page, Coalesce(varPunches_Page, 1));\r\nSet(varPunches_PageSize, Coalesce(varPunches_PageSize, 50));\r\n\r\nSet(varPunches_IsLoading, false);\r\nSet(varPunches_Error, Coalesce(varPunches_Error, \"\"));\r\n\r\nSet(varPunchCatalogs_IsLoading, false);\r\nSet(varPunchCatalogs_Error, \"\");\r\n\r\nSet(varFilter_Subsystem, Coalesce(varFilter_Subsystem, Blank()));\r\nSet(varFilter_PunchDiscipline, Coalesce(varFilter_PunchDiscipline, Blank()));\r\nSet(varFilter_Subcontractor, Coalesce(varFilter_Subcontractor, Blank()));\r\nSet(varFilter_PunchTemplateId, Coalesce(varFilter_PunchTemplateId, Blank()));\r\nSet(varFilter_PunchCategoryCode, Coalesce(varFilter_PunchCategoryCode, Blank()));\r\nSet(varFilter_PunchStatusCode, Coalesce(varFilter_PunchStatusCode, Blank()));\r\n\r\nSet(varGlobalLoading, false);\r\nSet(varGlobalLoadingMsg, \"\");\r\nSet(varGlobalLoadingSubMsg, \"\");\r\nSet(varGlobalLoadingScope, \"\");\r\n\r\nIf(\r\n    !IsBlank(varProjectId) &&\r\n    (\r\n        IsBlank(varPunchCatalogs_ProjectId) ||\r\n        Text(varPunchCatalogs_ProjectId) <> Text(varProjectId) ||\r\n        CountRows(colPunchSubsystems_Filter) = 0 ||\r\n        CountRows(colPunchTemplates_Filter) = 0\r\n    ),\r\n\r\n    Set(varPunchCatalogs_IsLoading, true);\r\n    Set(varPunchCatalogs_Error, \"\");\r\n\r\n    Set(varGlobalLoading, true);\r\n    Set(varGlobalLoadingMsg, \"Loading Punch List filters...\");\r\n    Set(varGlobalLoadingSubMsg, \"Preparing filter catalogs\");\r\n    Set(varGlobalLoadingScope, \"PUNCHES\");\r\n\r\n    IfError(\r\n        With(\r\n            {\r\n                respCatalogs:\r\n                    Warroom_Punches_GetFilterCatalogs.Run(\r\n                        Value(varProjectId)\r\n                    )\r\n            },\r\n            With(\r\n                {\r\n                    objCatalogs:\r\n                        ParseJSON(\r\n                            Coalesce(\r\n                                respCatalogs.result,\r\n                                \"{}\"\r\n                            )\r\n                        )\r\n                },\r\n\r\n                ClearCollect(\r\n                    colPunchSubsystems_Filter,\r\n                    SortByColumns(\r\n                        ForAll(\r\n                            Table(objCatalogs.Table1),\r\n                            With(\r\n                                { r: ThisRecord.Value },\r\n                                {\r\n                                    Code: Text(r.Code),\r\n                                    Label: Text(r.Label),\r\n                                    SortOrder:\r\n                                        If(\r\n                                            IsBlank(Text(r.SortOrder)) || Text(r.SortOrder) = \"null\",\r\n                                            1,\r\n                                            Value(Text(r.SortOrder))\r\n                                        )\r\n                                }\r\n                            )\r\n                        ),\r\n                        \"SortOrder\",\r\n                        SortOrder.Ascending,\r\n                        \"Code\",\r\n                        SortOrder.Ascending\r\n                    )\r\n                );\r\n\r\n                ClearCollect(\r\n                colPunchSubsystems_MVF,\r\n                AddColumns(\r\n                    colPunchSubsystems_Filter,\r\n                    Display,\r\n                    Label,\r\n                    Id,\r\n                    Code\r\n                )\r\n            );\r\n\r\n                ClearCollect(\r\n                    colPunchTemplates_Filter,\r\n                    SortByColumns(\r\n                        ForAll(\r\n                            Table(objCatalogs.Table2),\r\n                            With(\r\n                                { r: ThisRecord.Value },\r\n                                {\r\n                                    TemplateId:\r\n                                        If(\r\n                                            IsBlank(Text(r.TemplateId)) || Text(r.TemplateId) = \"null\",\r\n                                            Blank(),\r\n                                            Value(Text(r.TemplateId))\r\n                                        ),\r\n                                    TemplateCode: Text(r.TemplateCode),\r\n                                    TemplateLabel: Text(r.TemplateLabel),\r\n                                    TemplateDescription: Text(r.TemplateDescription)\r\n                                }\r\n                            )\r\n                        ),\r\n                        \"TemplateLabel\",\r\n                        SortOrder.Ascending\r\n                    )\r\n                );\r\n\r\n                ClearCollect(\r\n                    colPunchCategories_Filter,\r\n                    SortByColumns(\r\n                        ForAll(\r\n                            Table(objCatalogs.Table3),\r\n                            With(\r\n                                { r: ThisRecord.Value },\r\n                                {\r\n                                    TemplateId:\r\n                                        If(\r\n                                            IsBlank(Text(r.TemplateId)) || Text(r.TemplateId) = \"null\",\r\n                                            Blank(),\r\n                                            Value(Text(r.TemplateId))\r\n                                        ),\r\n                                    CategoryCode: Text(r.CategoryCode),\r\n                                    CategoryLabel: Text(r.CategoryLabel),\r\n                                    DisplayLabel: Text(r.DisplayLabel),\r\n                                    SortOrder:\r\n                                        If(\r\n                                            IsBlank(Text(r.SortOrder)) || Text(r.SortOrder) = \"null\",\r\n                                            999,\r\n                                            Value(Text(r.SortOrder))\r\n                                        )\r\n                                }\r\n                            )\r\n                        ),\r\n                        \"TemplateId\",\r\n                        SortOrder.Ascending,\r\n                        \"SortOrder\",\r\n                        SortOrder.Ascending,\r\n                        \"CategoryCode\",\r\n                        SortOrder.Ascending\r\n                    )\r\n                );\r\n\r\n                ClearCollect(\r\n                    colPunchStatuses_Filter,\r\n                    SortByColumns(\r\n                        ForAll(\r\n                            Table(objCatalogs.Table4),\r\n                            With(\r\n                                { r: ThisRecord.Value },\r\n                                {\r\n                                    StatusCode: Text(r.StatusCode),\r\n                                    StatusLabel: Text(r.StatusLabel),\r\n                                    SortOrder:\r\n                                        If(\r\n                                            IsBlank(Text(r.SortOrder)) || Text(r.SortOrder) = \"null\",\r\n                                            999,\r\n                                            Value(Text(r.SortOrder))\r\n                                        )\r\n                                }\r\n                            )\r\n                        ),\r\n                        \"SortOrder\",\r\n                        SortOrder.Ascending,\r\n                        \"StatusCode\",\r\n                        SortOrder.Ascending\r\n                    )\r\n                );\r\n\r\n                ClearCollect(\r\n                    colPunchDisciplines_Filter,\r\n                    SortByColumns(\r\n                        ForAll(\r\n                            Table(objCatalogs.Table5),\r\n                            With(\r\n                                { r: ThisRecord.Value },\r\n                                {\r\n                                    Discipline: Text(r.Discipline),\r\n                                    DisciplineLabel: Text(r.DisciplineLabel)\r\n                                }\r\n                            )\r\n                        ),\r\n                        \"DisciplineLabel\",\r\n                        SortOrder.Ascending\r\n                    )\r\n                );\r\n\r\n                ClearCollect(\r\n                    colPunchSubcontractors_Filter,\r\n                    SortByColumns(\r\n                        ForAll(\r\n                            Table(objCatalogs.Table6),\r\n                            With(\r\n                                { r: ThisRecord.Value },\r\n                                {\r\n                                    SubcontractorId:\r\n                                        If(\r\n                                            IsBlank(Text(r.SubcontractorId)) || Text(r.SubcontractorId) = \"null\",\r\n                                            Blank(),\r\n                                            Value(Text(r.SubcontractorId))\r\n                                        ),\r\n                                    SubcontractorCode: Text(r.SubcontractorCode),\r\n                                    SubcontractorName: Text(r.SubcontractorName),\r\n                                    SubcontractorFullName: Text(r.SubcontractorFullName)\r\n                                }\r\n                            )\r\n                        ),\r\n                        \"SubcontractorName\",\r\n                        SortOrder.Ascending\r\n                    )\r\n                );\r\n\r\n                Set(varPunchCatalogs_ProjectId, varProjectId)\r\n\r\n                ;\r\n\r\n                Select(btnPunches_LoadDynamicFilters_2)\r\n\r\n                \r\n            )\r\n        ),\r\n\r\n        Set(varPunchCatalogs_Error, FirstError.Message);\r\n\r\n        Notify(\r\n            \"Punch filter catalogs could not be loaded.\",\r\n            NotificationType.Warning\r\n        );\r\n\r\n        Clear(colPunchSubsystems_Filter);\r\n        Clear(colPunchTemplates_Filter);\r\n        Clear(colPunchCategories_Filter);\r\n        Clear(colPunchStatuses_Filter);\r\n        Clear(colPunchDisciplines_Filter);\r\n        Clear(colPunchSubcontractors_Filter);\r\n\r\n        Set(varPunchCatalogs_ProjectId, Blank())\r\n    );\r\n\r\n    Set(varPunchCatalogs_IsLoading, false);\r\n\r\n    Set(varGlobalLoading, false);\r\n    Set(varGlobalLoadingMsg, \"\");\r\n    Set(varGlobalLoadingSubMsg, \"\");\r\n    Set(varGlobalLoadingScope, \"\")\r\n);\r\n\r\nSet(varPunches_ViewReady, true);\r\n\r\nIf(\r\n    varPunches_AutoLoad,\r\n\r\n    Set(varPunches_AutoLoad, false);\r\n\r\n    Set(varGlobalLoading, true);\r\n    Set(varGlobalLoadingMsg, \"Loading Punches...\");\r\n    Set(\r\n        varGlobalLoadingSubMsg,\r\n        If(\r\n            varPunches_FilterSource = \"Dashboard\",\r\n            \"Applying Home Dashboard context\",\r\n            \"Applying Overview context\"\r\n        )\r\n    );\r\n    Set(varGlobalLoadingScope, \"PUNCHES\");\r\n\r\n    Select(btnPunches_LoadPage_Punches_2)\r\n);\r\n\r\nSet(varPunchSubsystemPopup, false);\r\n\r\n"
     Children:
-      - conPunchesScreenRoot_1:
+      - conPunchesScreenRoot_2:
           Control: GroupContainer@1.5.0
           Variant: AutoLayout
           Properties:
@@ -15,7 +15,7 @@ Screens:
             LayoutDirection: =LayoutDirection.Horizontal
             Width: =Parent.Width
           Children:
-            - cmp_NavApp_Punches_1:
+            - cmp_NavApp_Punches_2:
                 Control: CanvasComponent
                 ComponentName: cmp_SidebarNav
                 Properties:
@@ -27,13 +27,13 @@ Screens:
                   IsCollapsed: =true
                   Items: =colSidebarNavItems
                   NavItems: =colSidebarNavItems
-                  OnSelectItem: "=\n\n\n\nWith(\n    {\n        _key: Lower(Trim(Self.SelectedItemKey)),\n        _hasProject: !IsBlank(varProjectId),\n        _hasConfig: varProjectHasReportConfig || varHomeHiveLoaded || varProjectHasPHRData\n    },\n\n    If(\n        _key = \"superadmin\",\n\n        Set(varGlobalLoading, false);\n        Set(varGlobalLoadingMsg, \"\");\n        Set(varGlobalLoadingSubMsg, \"\");\n        Set(varGlobalLoadingScope, \"\");\n        Set(varGlobalLoadAction, \"\");\n        Set(varGlobalLoadPending, false);\n\n        Set(varPHR_IsLoading, false);\n        Set(varOps_IsLoading, false);\n        Set(varTasks_IsLoading, false);\n        Set(varPunches_IsLoading, false);\n        Set(varCfg_IsLoading, false);\n\n        Set(varAppView, \"SuperAdmin\");\n        Set(varPageKey, \"SUPERADMIN\");\n        Set(varPageTitle, \"Administration\");\n        Set(varPageSubtitle, \"Platform configuration and governance\");\n\n        Navigate(scr_SuperAdmin, ScreenTransition.None),\n\n        If(\n            _key <> \"home\" && !_hasProject,\n\n            Notify(\"Please select a project first.\", NotificationType.Warning);\n\n            Set(varAppView, \"Home\");\n            Set(varPageKey, \"HOME\");\n            Set(varPageTitle, \"Home\");\n            Set(varPageSubtitle, \"Project command center\");\n\n            Navigate(scr_Home, ScreenTransition.None),\n\n            If(\n                _key in [\"overview\", \"tasks\", \"punches\", \"briefing\", \"config\", \"skyline\"] && !_hasConfig,\n\n                Notify(\n                    \"This project has no published report configuration yet.\",\n                    NotificationType.Warning\n                );\n\n                Set(varAppView, \"Home\");\n                Set(varPageKey, \"HOME\");\n                Set(varPageTitle, \"Home\");\n                Set(varPageSubtitle, \"Project command center\");\n\n                Navigate(scr_Home, ScreenTransition.None),\n\n                Switch(\n                    _key,\n\n                    \"skyline\",\n                    Set(varAppView, \"Skyline\");\n                    Set(varPageKey, \"SKYLINE\");\n                    Set(varPageTitle, \"Delivery Skyline\");\n                    Set(varPageSubtitle, \"Weekly subsystem delivery risk and workload forecast\");\n                    Set(varSkylineLoaded, false);\n                    Set(varSkylineError, \"\");\n                    Clear(colSkylineRaw);\n                    Clear(colSkylineWeeks);\n                    Clear(colSkylineSelectedWeek);\n\n                    Navigate(scr_Skyline, ScreenTransition.None),\n\n                    \n                    \"home\",\n                        Set(varGlobalLoading, false);\n                        Set(varGlobalLoadingMsg, \"\");\n                        Set(varGlobalLoadingSubMsg, \"\");\n                        Set(varGlobalLoadingScope, \"\");\n                        Set(varGlobalLoadAction, \"\");\n                        Set(varGlobalLoadPending, false);\n\n                        Set(varPHR_IsLoading, false);\n                        Set(varOps_IsLoading, false);\n                        Set(varTasks_IsLoading, false);\n                        Set(varPunches_IsLoading, false);\n                        Set(varCfg_IsLoading, false);\n\n                        Set(varAppView, \"Home\");\n                        Set(varPageKey, \"HOME\");\n                        Set(varPageTitle, \"Home\");\n                        Set(varPageSubtitle, \"Project command center\");\n                        Set(varHomeViewMode, \"DASHBOARD\");\n\n                        Navigate(scr_Home, ScreenTransition.None),\n\n                    \"overview\",\n                        Set(varAppView, \"Overview\");\n                        Set(varPageKey, \"OVERVIEW\");\n                        Set(varPageTitle, \"Overview\");\n                        Set(varPageSubtitle, \"Project Handover Report by subsystem, discipline and form family\");\n                        Set(varOps_ViewMode, \"OVERVIEW\");\n\n                        Navigate(scr_Overview, ScreenTransition.None),\n\n\n\n                    \"tasks\",\n                        Set(varAppView, \"Tasks\");\n                        Set(varPageKey, \"TASKS\");\n                        Set(varPageTitle, \"Tasks\");\n                        Set(varPageSubtitle, \"Inspection task management\");\n\n                        Navigate(scr_Tasks, ScreenTransition.None),\n\n                    \"punches\",\n                        Set(varAppView, \"Punches\");\n                        Set(varPageKey, \"PUNCHES\");\n                        Set(varPageTitle, \"Punch List\");\n                        Set(varPageSubtitle, \"Punch item management\");\n\n                        Navigate(scr_Punches_1, ScreenTransition.None),\n\n                    \"briefing\",\n                        Set(varAppView, \"Briefing\");\n                        Set(varPageKey, \"BRIEFING\");\n                        Set(varPageTitle, \"Briefing\");\n                        Set(varPageSubtitle, \"Project reporting and communication\");\n\n                        Navigate(scr_Briefing, ScreenTransition.None),\n\n                    \"config\",\n                        Set(varAppView, \"Config\");\n                        Set(varPageKey, \"CONFIG\");\n                        Set(varPageTitle, \"Configuration\");\n                        Set(varPageSubtitle, \"Report structure and scope management\");\n\n                        Navigate(scr_Config_NEW, ScreenTransition.None),\n\n                    Notify(\"Key not mapped: [\" & _key & \"]\", NotificationType.Error)\n                )\n            )\n        )\n    )\n)"
+                  OnSelectItem: "=\n\n\n\nWith(\n    {\n        _key: Lower(Trim(Self.SelectedItemKey)),\n        _hasProject: !IsBlank(varProjectId),\n        _hasConfig: varProjectHasReportConfig || varHomeHiveLoaded || varProjectHasPHRData\n    },\n\n    If(\n        _key = \"superadmin\",\n\n        Set(varGlobalLoading, false);\n        Set(varGlobalLoadingMsg, \"\");\n        Set(varGlobalLoadingSubMsg, \"\");\n        Set(varGlobalLoadingScope, \"\");\n        Set(varGlobalLoadAction, \"\");\n        Set(varGlobalLoadPending, false);\n\n        Set(varPHR_IsLoading, false);\n        Set(varOps_IsLoading, false);\n        Set(varTasks_IsLoading, false);\n        Set(varPunches_IsLoading, false);\n        Set(varCfg_IsLoading, false);\n\n        Set(varAppView, \"SuperAdmin\");\n        Set(varPageKey, \"SUPERADMIN\");\n        Set(varPageTitle, \"Administration\");\n        Set(varPageSubtitle, \"Platform configuration and governance\");\n\n        Navigate(scr_SuperAdmin, ScreenTransition.None),\n\n        If(\n            _key <> \"home\" && !_hasProject,\n\n            Notify(\"Please select a project first.\", NotificationType.Warning);\n\n            Set(varAppView, \"Home\");\n            Set(varPageKey, \"HOME\");\n            Set(varPageTitle, \"Home\");\n            Set(varPageSubtitle, \"Project command center\");\n\n            Navigate(scr_Home, ScreenTransition.None),\n\n            If(\n                _key in [\"overview\", \"tasks\", \"punches\", \"briefing\", \"config\", \"skyline\"] && !_hasConfig,\n\n                Notify(\n                    \"This project has no published report configuration yet.\",\n                    NotificationType.Warning\n                );\n\n                Set(varAppView, \"Home\");\n                Set(varPageKey, \"HOME\");\n                Set(varPageTitle, \"Home\");\n                Set(varPageSubtitle, \"Project command center\");\n\n                Navigate(scr_Home, ScreenTransition.None),\n\n                Switch(\n                    _key,\n\n                    \"skyline\",\n                    Set(varAppView, \"Skyline\");\n                    Set(varPageKey, \"SKYLINE\");\n                    Set(varPageTitle, \"Delivery Skyline\");\n                    Set(varPageSubtitle, \"Weekly subsystem delivery risk and workload forecast\");\n                    Set(varSkylineLoaded, false);\n                    Set(varSkylineError, \"\");\n                    Clear(colSkylineRaw);\n                    Clear(colSkylineWeeks);\n                    Clear(colSkylineSelectedWeek);\n\n                    Navigate(scr_Skyline, ScreenTransition.None),\n\n                    \n                    \"home\",\n                        Set(varGlobalLoading, false);\n                        Set(varGlobalLoadingMsg, \"\");\n                        Set(varGlobalLoadingSubMsg, \"\");\n                        Set(varGlobalLoadingScope, \"\");\n                        Set(varGlobalLoadAction, \"\");\n                        Set(varGlobalLoadPending, false);\n\n                        Set(varPHR_IsLoading, false);\n                        Set(varOps_IsLoading, false);\n                        Set(varTasks_IsLoading, false);\n                        Set(varPunches_IsLoading, false);\n                        Set(varCfg_IsLoading, false);\n\n                        Set(varAppView, \"Home\");\n                        Set(varPageKey, \"HOME\");\n                        Set(varPageTitle, \"Home\");\n                        Set(varPageSubtitle, \"Project command center\");\n                        Set(varHomeViewMode, \"DASHBOARD\");\n\n                        Navigate(scr_Home, ScreenTransition.None),\n\n                    \"overview\",\n                        Set(varAppView, \"Overview\");\n                        Set(varPageKey, \"OVERVIEW\");\n                        Set(varPageTitle, \"Overview\");\n                        Set(varPageSubtitle, \"Project Handover Report by subsystem, discipline and form family\");\n                        Set(varOps_ViewMode, \"OVERVIEW\");\n\n                        Navigate(scr_Overview, ScreenTransition.None),\n\n\n\n                    \"tasks\",\n                        Set(varAppView, \"Tasks\");\n                        Set(varPageKey, \"TASKS\");\n                        Set(varPageTitle, \"Tasks\");\n                        Set(varPageSubtitle, \"Inspection task management\");\n\n                        Navigate(scr_Tasks, ScreenTransition.None),\n\n                    \"punches\",\n                        Set(varAppView, \"Punches\");\n                        Set(varPageKey, \"PUNCHES\");\n                        Set(varPageTitle, \"Punch List\");\n                        Set(varPageSubtitle, \"Punch item management\");\n\n                        Navigate(scr_Punches, ScreenTransition.None),\n\n                    \"briefing\",\n                        Set(varAppView, \"Briefing\");\n                        Set(varPageKey, \"BRIEFING\");\n                        Set(varPageTitle, \"Briefing\");\n                        Set(varPageSubtitle, \"Project reporting and communication\");\n\n                        Navigate(scr_Briefing, ScreenTransition.None),\n\n                    \"config\",\n                        Set(varAppView, \"Config\");\n                        Set(varPageKey, \"CONFIG\");\n                        Set(varPageTitle, \"Configuration\");\n                        Set(varPageSubtitle, \"Report structure and scope management\");\n\n                        Navigate(scr_Config_NEW, ScreenTransition.None),\n\n                    Notify(\"Key not mapped: [\" & _key & \"]\", NotificationType.Error)\n                )\n            )\n        )\n    )\n)"
                   OnToggleCollapse: =
                   ProjectCode: =Coalesce(Text(varSelectedProject.ProjectCode), "")
                   ProjectName: =Coalesce(varSelectedProject.ProjectName, "")
                   UserRole: ="Text"
                   Width: =154
-            - btnPunches_LoadPage_Punches_1:
+            - btnPunches_LoadPage_Punches_2:
                 Control: ModernButton@1.0.0
                 Properties:
                   Align: =Align.Center
@@ -346,7 +346,7 @@ Screens:
                   Visible: =false
                   X: =40
                   Y: =40
-            - btnPunches_LoadDynamicFilters_1:
+            - btnPunches_LoadDynamicFilters_2:
                 Control: ModernButton@1.0.0
                 Properties:
                   LayoutMinHeight: =16
@@ -481,9 +481,9 @@ Screens:
 
                     Set(varCT_DefsIsLoading, false);
 
-                    Reset(cmp_DynamicFilters_Punches_1);
+                    Reset(cmp_DynamicFilters_Punches_2);
                   Visible: =false
-            - conPunchesContent_1:
+            - conPunchesContent_2:
                 Control: GroupContainer@1.5.0
                 Variant: AutoLayout
                 Properties:
@@ -492,9 +492,9 @@ Screens:
                   LayoutDirection: =LayoutDirection.Horizontal
                   LayoutMinHeight: =16
                   LayoutMinWidth: =16
-                  Width: =Parent.Width  - cmp_NavApp_Punches_1.Width
+                  Width: =Parent.Width  - cmp_NavApp_Punches_2.Width
                 Children:
-                  - con_PunchesRoot_1:
+                  - con_PunchesRoot_2:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
                       Properties:
@@ -516,7 +516,7 @@ Screens:
                         RadiusTopRight: =0
                         Width: =Parent.Width
                       Children:
-                        - conPageHeader_Punches_1:
+                        - conPageHeader_Punches_2:
                             Control: GroupContainer@1.5.0
                             Variant: AutoLayout
                             Properties:
@@ -534,7 +534,7 @@ Screens:
                               X: =40
                               Y: =40
                             Children:
-                              - lblHomeTitle_9:
+                              - lblHomeTitle_10:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     Color: =varTheme_Text
@@ -556,7 +556,7 @@ Screens:
                                     VerticalAlign: =VerticalAlign.Top
                                     X: =40
                                     Y: =40
-                              - Text6_2:
+                              - Text6_3:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     AlignInContainer: =AlignInContainer.Start
@@ -571,7 +571,7 @@ Screens:
                                     Text: =varPageSubtitle
                                     VerticalAlign: =VerticalAlign.Top
                                     Width: =Parent.Width
-                        - conPunches_HeaderContext_1:
+                        - conPunches_HeaderContext_2:
                             Control: GroupContainer@1.5.0
                             Variant: AutoLayout
                             Properties:
@@ -594,7 +594,7 @@ Screens:
                               RadiusTopLeft: =14
                               RadiusTopRight: =14
                             Children:
-                              - conPunches_ProjectContext_1:
+                              - conPunches_ProjectContext_2:
                                   Control: GroupContainer@1.5.0
                                   Variant: ManualLayout
                                   Properties:
@@ -612,7 +612,7 @@ Screens:
                                     RadiusTopRight: =12
                                     Width: =Parent.Width
                                   Children:
-                                    - icoPunches_Project_2:
+                                    - icoPunches_Project_3:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
                                           BorderColor: =RGBA(0, 0, 0, 0)
@@ -632,7 +632,7 @@ Screens:
                                           Width: =22
                                           X: =19
                                           Y: =26
-                                    - lblPunches_CurrentProject_2:
+                                    - lblPunches_CurrentProject_3:
                                         Control: ModernText@1.0.0
                                         Properties:
                                           Color: =varTheme_TextMuted
@@ -641,7 +641,7 @@ Screens:
                                           Width: =320
                                           X: =48
                                           Y: =8
-                                    - lblPunches_ProjectName_2:
+                                    - lblPunches_ProjectName_3:
                                         Control: ModernText@1.0.0
                                         Properties:
                                           Color: =varTheme_Text
@@ -656,7 +656,7 @@ Screens:
                                           Width: =340
                                           X: =48
                                           Y: =25
-                                    - lblPunches_ProjectDescription_2:
+                                    - lblPunches_ProjectDescription_3:
                                         Control: ModernText@1.0.0
                                         Properties:
                                           Color: =varTheme_TextMuted
@@ -674,7 +674,7 @@ Screens:
                                           Wrap: =false
                                           X: =48
                                           Y: =42
-                        - conPunches_FilterBar_1:
+                        - conPunches_FilterBar_2:
                             Control: GroupContainer@1.5.0
                             Variant: AutoLayout
                             Properties:
@@ -697,7 +697,7 @@ Screens:
                               RadiusTopLeft: =14
                               RadiusTopRight: =14
                             Children:
-                              - btnOpenDynamicFilters_1:
+                              - btnOpenDynamicFilters_2:
                                   Control: ModernButton@1.0.0
                                   Properties:
                                     BasePaletteColor: =varTheme_PulseBlueDark
@@ -709,16 +709,16 @@ Screens:
                                     OnSelect: |-
                                       =If(
                                           varPunchDynamicFilters_NeedRefresh,
-                                          Select(btnPunches_LoadDynamicFilters_1);
+                                          Select(btnPunches_LoadDynamicFilters_2);
                                           Set(varPunchDynamicFilters_NeedRefresh, false)
                                       );
 
                                       Set(varShowPunchDynamicFilters, true);
-                                      Reset(cmp_DynamicFilters_Punches_1)
+                                      Reset(cmp_DynamicFilters_Punches_2)
                                     Text: ="Project filters"
                                     Visible: =CountRows(colPunchDynamicFilters) > 0
                                     Width: =140
-                              - backPunchesBackToOperations_1:
+                              - backPunchesBackToOperations_2:
                                   Control: ModernButton@1.0.0
                                   Properties:
                                     Appearance: =ButtonAppearance.Secondary
@@ -751,7 +751,7 @@ Screens:
                                           Navigate(scr_Overview, ScreenTransition.None)
                                       )
                                     Width: =32
-                              - btnPunchApplyFilters_1:
+                              - btnPunchApplyFilters_2:
                                   Control: ModernButton@1.0.0
                                   Properties:
                                     Align: =Align.Center
@@ -763,7 +763,7 @@ Screens:
                                           varPunchCatalogs_IsLoading ||
                                           varPunches_IsLoading ||
                                           (
-                                              IsBlank(cmp_MultiValueFilter_2.SelectedCodesCSV) &&
+                                              IsBlank(cmp_MultiValueFilter_3.SelectedCodesCSV) &&
                                               IsBlank(varFilter_PunchDiscipline) &&
                                               IsBlank(varFilter_Subcontractor) &&
                                               IsBlank(varFilter_PunchTemplateId) &&
@@ -803,10 +803,10 @@ Screens:
 
                                       Set(
                                           varFilter_SubsystemsCsv,
-                                          Coalesce(cmp_MultiValueFilter_2.SelectedCodesCSV, "")
+                                          Coalesce(cmp_MultiValueFilter_3.SelectedCodesCSV, "")
                                       );
 
-                                      Select(btnPunches_LoadPage_Punches_1)
+                                      Select(btnPunches_LoadPage_Punches_2)
 
                                       )
                                     PaddingBottom: =5
@@ -822,7 +822,7 @@ Screens:
                                     Width: =140
                                     X: =40
                                     Y: =40
-                              - btnPunchClearFilters_1:
+                              - btnPunchClearFilters_2:
                                   Control: ModernButton@1.0.0
                                   Properties:
                                     Align: =Align.Center
@@ -862,7 +862,7 @@ Screens:
 
                                       Set(varFilter_SubsystemsCsv, "");
                                       Set(varFilter_Subsystem, Blank());
-                                      Reset(cmp_MultiValueFilter_2);
+                                      Reset(cmp_MultiValueFilter_3);
                                       Set(varPunchSubsystemPopup, false);
 
                                       // -----------------------------------------------------
@@ -909,17 +909,17 @@ Screens:
                                           )
                                       );
 
-                                      Reset(cmp_DynamicFilters_Punches_1);
+                                      Reset(cmp_DynamicFilters_Punches_2);
 
                                       // -----------------------------------------------------
                                       // 4) Reset standard filter controls
                                       // Reset dependent controls first.
                                       // -----------------------------------------------------
-                                      Reset(ddPunchCategory_1);
-                                      Reset(ddPunchStatus_1);
-                                      Reset(ddPunchSubcontractor_1);
-                                      Reset(ddPunchDiscipline_1);
-                                      Reset(ddPunchTemplate_1);
+                                      Reset(ddPunchCategory_2);
+                                      Reset(ddPunchStatus_2);
+                                      Reset(ddPunchSubcontractor_2);
+                                      Reset(ddPunchDiscipline_2);
+                                      Reset(ddPunchTemplate_2);
 
 
                                       // -----------------------------------------------------
@@ -958,19 +958,19 @@ Screens:
                                     Width: =130
                                     X: =40
                                     Y: =40
-                              - btnOpenSubsystemMVF_1:
+                              - btnOpenSubsystemMVF_2:
                                   Control: Classic/Button@2.2.0
                                   Properties:
                                     BorderColor: |-
                                       =If(
-                                          cmp_MultiValueFilter_2.SelectedCount = 0,
+                                          cmp_MultiValueFilter_3.SelectedCount = 0,
                                           ColorValue("#CBD5E1"),
                                           ColorValue("#1677FF")
                                       )
                                     BorderThickness: =1
                                     Color: |-
                                       =If(
-                                          cmp_MultiValueFilter_2.SelectedCount = 0,
+                                          cmp_MultiValueFilter_3.SelectedCount = 0,
                                           ColorValue("#334155"),
                                           ColorValue("#1677FF")
                                       )
@@ -979,26 +979,26 @@ Screens:
                                     DisabledFill: =RGBA(242, 242, 241, 0)
                                     Fill: |-
                                       =If(
-                                          cmp_MultiValueFilter_2.SelectedCount = 0,
+                                          cmp_MultiValueFilter_3.SelectedCount = 0,
                                           ColorValue("#FFFFFF"),
                                           ColorValue("#EFF6FF")
                                       )
                                     Font: =Font.'Segoe UI'
                                     HoverBorderColor: |-
                                       =If(
-                                          cmp_MultiValueFilter_2.SelectedCount = 0,
+                                          cmp_MultiValueFilter_3.SelectedCount = 0,
                                           ColorValue("#CBD5E1"),
                                           ColorValue("#1677FF")
                                       )
                                     HoverColor: |-
                                       =If(
-                                          cmp_MultiValueFilter_2.SelectedCount = 0,
+                                          cmp_MultiValueFilter_3.SelectedCount = 0,
                                           ColorValue("#334155"),
                                           ColorValue("#1677FF")
                                       )
                                     HoverFill: |-
                                       =If(
-                                          cmp_MultiValueFilter_2.SelectedCount = 0,
+                                          cmp_MultiValueFilter_3.SelectedCount = 0,
                                           ColorValue("#F8FAFC"),
                                           ColorValue("#EFF6FF")
                                       )
@@ -1015,14 +1015,14 @@ Screens:
                                     Size: =10
                                     Text: |-
                                       =If(
-                                          cmp_MultiValueFilter_2.SelectedCount = 0,
+                                          cmp_MultiValueFilter_3.SelectedCount = 0,
                                           "Subsystems",
-                                          "Subsystems · " & cmp_MultiValueFilter_2.SelectedCount & " selected"
+                                          "Subsystems · " & cmp_MultiValueFilter_3.SelectedCount & " selected"
                                       )
                                     Width: =200
-                                    X: =ddPunchSubsystem_1.X
-                                    Y: =ddPunchSubsystem_1.Y
-                              - ddPunchSubsystem_1:
+                                    X: =ddPunchSubsystem_2.X
+                                    Y: =ddPunchSubsystem_2.Y
+                              - ddPunchSubsystem_2:
                                   Control: ModernCombobox@1.1.1
                                   Properties:
                                     AllowExternalSelectedItems: =false
@@ -1051,9 +1051,9 @@ Screens:
                                       Set(
                                           varFilter_Subsystem,
                                           If(
-                                              IsBlank(ddPunchSubsystem_1.Selected.Code),
+                                              IsBlank(ddPunchSubsystem_2.Selected.Code),
                                               Blank(),
-                                              Text(ddPunchSubsystem_1.Selected.Code)
+                                              Text(ddPunchSubsystem_2.Selected.Code)
                                           )
                                       )
                                     SelectMultiple: =false
@@ -1062,7 +1062,7 @@ Screens:
                                     Width: =200
                                     X: =40
                                     Y: =40
-                              - ddPunchTemplate_1:
+                              - ddPunchTemplate_2:
                                   Control: ModernCombobox@1.1.1
                                   Properties:
                                     Appearance: =Appearance.Outline
@@ -1088,20 +1088,20 @@ Screens:
                                       Set(
                                           varFilter_PunchTemplateId,
                                           If(
-                                              IsBlank(ddPunchTemplate_1.Selected) ||
-                                              IsBlank(Text(ddPunchTemplate_1.Selected.TemplateId)),
+                                              IsBlank(ddPunchTemplate_2.Selected) ||
+                                              IsBlank(Text(ddPunchTemplate_2.Selected.TemplateId)),
                                               Blank(),
-                                              Value(ddPunchTemplate_1.Selected.TemplateId)
+                                              Value(ddPunchTemplate_2.Selected.TemplateId)
                                           )
                                       );
 
                                       Set(varFilter_PunchCategoryCode, Blank());
-                                      Reset(ddPunchCategory_1);
+                                      Reset(ddPunchCategory_2);
                                     SelectMultiple: =false
                                     Width: =240
                                     X: =40
                                     Y: =40
-                              - ddPunchDiscipline_1:
+                              - ddPunchDiscipline_2:
                                   Control: ModernCombobox@1.1.1
                                   Properties:
                                     AllowExternalSelectedItems: =false
@@ -1120,9 +1120,9 @@ Screens:
                                       Set(
                                           varFilter_PunchDiscipline,
                                           If(
-                                              IsBlank(ddPunchDiscipline_1.Selected.Discipline),
+                                              IsBlank(ddPunchDiscipline_2.Selected.Discipline),
                                               Blank(),
-                                              Text(ddPunchDiscipline_1.Selected.Discipline)
+                                              Text(ddPunchDiscipline_2.Selected.Discipline)
                                           )
                                       )
                                     SelectMultiple: =false
@@ -1130,7 +1130,7 @@ Screens:
                                     Width: =200
                                     X: =40
                                     Y: =40
-                              - ddPunchSubcontractor_1:
+                              - ddPunchSubcontractor_2:
                                   Control: ModernCombobox@1.1.1
                                   Properties:
                                     AllowExternalSelectedItems: =false
@@ -1148,9 +1148,9 @@ Screens:
                                       Set(
                                           varFilter_Subcontractor,
                                           If(
-                                              IsBlank(ddPunchSubcontractor_1.Selected.SubcontractorCode),
+                                              IsBlank(ddPunchSubcontractor_2.Selected.SubcontractorCode),
                                               Blank(),
-                                              Text(ddPunchSubcontractor_1.Selected.SubcontractorCode)
+                                              Text(ddPunchSubcontractor_2.Selected.SubcontractorCode)
                                           )
                                       )
                                     SelectMultiple: =false
@@ -1158,7 +1158,7 @@ Screens:
                                     Width: =200
                                     X: =40
                                     Y: =40
-                              - ddPunchCategory_1:
+                              - ddPunchCategory_2:
                                   Control: ModernCombobox@1.1.1
                                   Properties:
                                     Appearance: =Appearance.Outline
@@ -1200,16 +1200,16 @@ Screens:
                                       Set(
                                           varFilter_PunchCategoryCode,
                                           If(
-                                              IsBlank(ddPunchCategory_1.Selected.CategoryCode),
+                                              IsBlank(ddPunchCategory_2.Selected.CategoryCode),
                                               Blank(),
-                                              Text(ddPunchCategory_1.Selected.CategoryCode)
+                                              Text(ddPunchCategory_2.Selected.CategoryCode)
                                           )
                                       )
                                     SelectMultiple: =false
                                     Width: =160
                                     X: =40
                                     Y: =40
-                              - ddPunchStatus_1:
+                              - ddPunchStatus_2:
                                   Control: ModernCombobox@1.1.1
                                   Properties:
                                     Appearance: =Appearance.Outline
@@ -1233,16 +1233,16 @@ Screens:
                                       Set(
                                           varFilter_PunchStatusCode,
                                           If(
-                                              IsBlank(ddPunchStatus_1.Selected.StatusCode),
+                                              IsBlank(ddPunchStatus_2.Selected.StatusCode),
                                               Blank(),
-                                              Text(ddPunchStatus_1.Selected.StatusCode)
+                                              Text(ddPunchStatus_2.Selected.StatusCode)
                                           )
                                       )
                                     SelectMultiple: =false
                                     Width: =150
                                     X: =40
                                     Y: =40
-                        - conPunch_NotLoaded_1:
+                        - conPunch_NotLoaded_2:
                             Control: GroupContainer@1.5.0
                             Variant: ManualLayout
                             Properties:
@@ -1269,7 +1269,7 @@ Screens:
                                     varGlobalLoadingScope = "PUNCHES"
                                 )
                             Children:
-                              - Text58_6:
+                              - Text58_7:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     Align: =Align.Center
@@ -1283,7 +1283,7 @@ Screens:
                                     Width: =289
                                     X: =(Parent.Width - Self.Width) / 2
                                     Y: =116
-                              - icoPunchEmptyState_1:
+                              - icoPunchEmptyState_2:
                                   Control: Classic/Icon@2.5.0
                                   Properties:
                                     BorderColor: =RGBA(0, 0, 0, 0)
@@ -1303,7 +1303,7 @@ Screens:
                                     Width: =48
                                     X: =(Parent.Width - Self.Width) / 2
                                     Y: =56
-                        - conMain_Punches_1:
+                        - conMain_Punches_2:
                             Control: GroupContainer@1.5.0
                             Variant: AutoLayout
                             Properties:
@@ -1317,7 +1317,7 @@ Screens:
                               RadiusTopLeft: =0
                               RadiusTopRight: =0
                             Children:
-                              - conPunches_ListPanel_2:
+                              - conPunches_ListPanel_3:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
@@ -1345,7 +1345,7 @@ Screens:
                                     X: =40
                                     Y: =40
                                   Children:
-                                    - contTasks_Headers_4:
+                                    - contTasks_Headers_5:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
@@ -1366,7 +1366,7 @@ Screens:
                                           RadiusTopRight: =12
                                           Width: =Parent.Width
                                         Children:
-                                          - lbl_subsystem_2:
+                                          - lbl_subsystem_3:
                                               Control: Text@0.0.51
                                               Properties:
                                                 Align: ='TextCanvas.Align'.Center
@@ -1384,7 +1384,7 @@ Screens:
                                                 Width: =130
                                                 X: =15
                                                 Y: =15
-                                          - line04_25:
+                                          - line04_31:
                                               Control: Rectangle@2.3.0
                                               Properties:
                                                 BorderColor: =RGBA(0, 0, 0, 0)
@@ -1402,7 +1402,7 @@ Screens:
                                                 Width: =1
                                                 Y: |
                                                   =4
-                                          - lbl_punchCode_2:
+                                          - lbl_punchCode_3:
                                               Control: Text@0.0.51
                                               Properties:
                                                 Align: ='TextCanvas.Align'.Center
@@ -1421,7 +1421,7 @@ Screens:
                                                 Width: =160
                                                 X: =15
                                                 Y: =15
-                                          - line04_26:
+                                          - line04_32:
                                               Control: Rectangle@2.3.0
                                               Properties:
                                                 BorderColor: =RGBA(0, 0, 0, 0)
@@ -1439,7 +1439,7 @@ Screens:
                                                 Width: =1
                                                 Y: |
                                                   =4
-                                          - lbl_punchCategoryCode_2:
+                                          - lbl_punchCategoryCode_3:
                                               Control: Text@0.0.51
                                               Properties:
                                                 Align: ='TextCanvas.Align'.Center
@@ -1458,7 +1458,7 @@ Screens:
                                                 Width: =90
                                                 X: =15
                                                 Y: =15
-                                          - line04_27:
+                                          - line04_33:
                                               Control: Rectangle@2.3.0
                                               Properties:
                                                 BorderColor: =RGBA(0, 0, 0, 0)
@@ -1476,7 +1476,7 @@ Screens:
                                                 Width: =1
                                                 Y: |
                                                   =4
-                                          - lbl_native_4:
+                                          - lbl_native_5:
                                               Control: Text@0.0.51
                                               Properties:
                                                 Align: ='TextCanvas.Align'.Center
@@ -1495,7 +1495,7 @@ Screens:
                                                 Width: =140
                                                 X: =15
                                                 Y: =15
-                                          - line04_28:
+                                          - line04_34:
                                               Control: Rectangle@2.3.0
                                               Properties:
                                                 BorderColor: =RGBA(0, 0, 0, 0)
@@ -1513,7 +1513,7 @@ Screens:
                                                 Width: =1
                                                 Y: |
                                                   =4
-                                          - lbl_path_13:
+                                          - lbl_path_15:
                                               Control: Text@0.0.51
                                               Properties:
                                                 Align: ='TextCanvas.Align'.Center
@@ -1533,7 +1533,7 @@ Screens:
                                                 Width: =400
                                                 X: =15
                                                 Y: =15
-                                          - line04_29:
+                                          - line04_35:
                                               Control: Rectangle@2.3.0
                                               Properties:
                                                 BorderColor: =RGBA(0, 0, 0, 0)
@@ -1551,7 +1551,7 @@ Screens:
                                                 Width: =1
                                                 Y: |
                                                   =4
-                                          - lbl_path_14:
+                                          - lbl_path_16:
                                               Control: Text@0.0.51
                                               Properties:
                                                 Align: ='TextCanvas.Align'.Center
@@ -1570,7 +1570,7 @@ Screens:
                                                 Width: =90
                                                 X: =15
                                                 Y: =15
-                                          - line04_30:
+                                          - line04_36:
                                               Control: Rectangle@2.3.0
                                               Properties:
                                                 BorderColor: =RGBA(0, 0, 0, 0)
@@ -1588,7 +1588,7 @@ Screens:
                                                 Width: =1
                                                 Y: |
                                                   =4
-                                    - conTasksGrid_4:
+                                    - conTasksGrid_5:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
@@ -1613,7 +1613,7 @@ Screens:
                                           X: =40
                                           Y: =40
                                         Children:
-                                          - galPunches_2:
+                                          - galPunches_3:
                                               Control: Gallery@2.15.0
                                               Variant: Vertical
                                               Properties:
@@ -1622,7 +1622,7 @@ Screens:
                                                 BorderStyle: =BorderStyle.None
                                                 BorderThickness: =1
                                                 Fill: =RGBA(255, 255, 255, 1)
-                                                Height: =conTasksGrid_4.Height
+                                                Height: =conTasksGrid_5.Height
                                                 Items: |+
                                                   =
                                                   colPunches
@@ -1700,7 +1700,7 @@ Screens:
                                                   Reset(comp_DetailDrawer);
 
                                                   // 5) Disparar carga del drawer (tu loader central)
-                                                  Select(btnDrawerLoad_Punches_1);
+                                                  Select(btnDrawerLoad_Punches_2);
                                                 ShowNavigation: =true
                                                 ShowScrollbar: =false
                                                 TemplateFill: |-
@@ -1712,9 +1712,9 @@ Screens:
                                                 TemplatePadding: =0
                                                 TemplateSize: =60
                                                 Transition: =Transition.Push
-                                                Width: =conTasksGrid_4.Width
+                                                Width: =conTasksGrid_5.Width
                                               Children:
-                                                - lbl_Status_2:
+                                                - lbl_Status_3:
                                                     Control: Text@0.0.51
                                                     Properties:
                                                       Align: ='TextCanvas.Align'.Center
@@ -1726,7 +1726,7 @@ Screens:
                                                       Width: =80
                                                       X: =927
                                                       Y: =2
-                                                - lbl_PunchDescription_2:
+                                                - lbl_PunchDescription_3:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       Color: =RGBA(31,41,55,1)
@@ -1747,7 +1747,7 @@ Screens:
                                                       Wrap: =false
                                                       X: =525
                                                       Y: =2
-                                                - lbl_Discipline_2:
+                                                - lbl_Discipline_3:
                                                     Control: Text@0.0.51
                                                     Properties:
                                                       Align: ='TextCanvas.Align'.Center
@@ -1759,7 +1759,7 @@ Screens:
                                                       Width: =130
                                                       X: =385
                                                       Y: =2
-                                                - lbl_CategoryCode_2:
+                                                - lbl_CategoryCode_3:
                                                     Control: Text@0.0.51
                                                     Properties:
                                                       Align: ='TextCanvas.Align'.Center
@@ -1771,7 +1771,7 @@ Screens:
                                                       Width: =80
                                                       X: =294
                                                       Y: =2
-                                                - lbl_PunchCode_2:
+                                                - lbl_PunchCode_3:
                                                     Control: Text@0.0.51
                                                     Properties:
                                                       Align: ='TextCanvas.Align'.Center
@@ -1784,7 +1784,7 @@ Screens:
                                                       Width: =140
                                                       X: =135
                                                       Y: =2
-                                                - lbl_SubsystemCode_2:
+                                                - lbl_SubsystemCode_3:
                                                     Control: Text@0.0.51
                                                     Properties:
                                                       Align: ='TextCanvas.Align'.Center
@@ -1795,7 +1795,7 @@ Screens:
                                                       VerticalAlign: =VerticalAlign.Middle
                                                       Width: =120
                                                       Y: =2
-                                                - line1_4:
+                                                - line1_5:
                                                     Control: Rectangle@2.3.0
                                                     Properties:
                                                       BorderColor: =RGBA(0, 0, 0, 0)
@@ -1808,9 +1808,9 @@ Screens:
                                                       HoverFill: =RGBA(0, 0, 0, 0)
                                                       OnSelect: =Select(Parent)
                                                       PressedFill: =RGBA(0, 0, 0, 0)
-                                                      Width: =galPunches_2.TemplateWidth
+                                                      Width: =galPunches_3.TemplateWidth
                                                       Y: =58
-                                                - Rectangle1_4:
+                                                - Rectangle1_5:
                                                     Control: Rectangle@2.3.0
                                                     Properties:
                                                       BorderColor: =RGBA(79, 90, 94, 1)
@@ -1828,7 +1828,7 @@ Screens:
                                                         Select(Parent);
                                                       PressedFill: =RGBA(0, 0, 0, 0)
                                                       Width: =Parent.TemplateWidth
-                                    - conPunchPager_2:
+                                    - conPunchPager_3:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
@@ -1854,7 +1854,7 @@ Screens:
                                           X: =40
                                           Y: =40
                                         Children:
-                                          - btnPunchPrev_2:
+                                          - btnPunchPrev_3:
                                               Control: Classic/Button@2.2.0
                                               Properties:
                                                 BorderColor: =
@@ -1894,7 +1894,7 @@ Screens:
                                                   If(
                                                       varPunches_Page > 1 && !varPunches_IsLoading,
                                                       Set(varPunches_Page, varPunches_Page - 1);
-                                                      Select(btnPunches_LoadPage_Punches_1)
+                                                      Select(btnPunches_LoadPage_Punches_2)
                                                   )
                                                 PressedBorderColor: =RGBA(0, 69, 120, 1)
                                                 PressedColor: =RGBA(255, 255, 255, 1)
@@ -1906,7 +1906,7 @@ Screens:
                                                 Size: =12
                                                 Text: ="<"
                                                 Width: =40
-                                          - TextCanvas4_5:
+                                          - TextCanvas4_6:
                                               Control: Text@0.0.51
                                               Properties:
                                                 Align: ='TextCanvas.Align'.Center
@@ -1921,7 +1921,7 @@ Screens:
                                                 VerticalAlign: =VerticalAlign.Middle
                                                 Width: =120
                                                 Y: =15
-                                          - btnPunchNext_2:
+                                          - btnPunchNext_3:
                                               Control: Classic/Button@2.2.0
                                               Properties:
                                                 BorderColor: |+
@@ -1960,7 +1960,7 @@ Screens:
                                                   If(
                                                       varPunches_Page < varPunches_TotalPages && !varPunches_IsLoading,
                                                       Set(varPunches_Page, varPunches_Page + 1);
-                                                      Select(btnPunches_LoadPage_Punches_1)
+                                                      Select(btnPunches_LoadPage_Punches_2)
                                                   )
                                                 PressedBorderColor: =RGBA(0, 69, 120, 1)
                                                 PressedColor: =RGBA(255, 255, 255, 1)
@@ -1972,7 +1972,7 @@ Screens:
                                                 Size: =12
                                                 Text: =">"
                                                 Width: =36
-                                          - exportPunchesExcel_1:
+                                          - exportPunchesExcel_2:
                                               Control: ModernButton@1.0.0
                                               Properties:
                                                 LayoutMinHeight: =16
@@ -2229,7 +2229,7 @@ Screens:
                                                   )
                                                 Text: ="Export Excel"
                                                 Width: =120
-      - rectSubsystemOverlay_1:
+      - rectSubsystemOverlay_2:
           Control: Rectangle@2.3.0
           Properties:
             BorderColor: =RGBA(0, 0, 0, 0)
@@ -2244,7 +2244,7 @@ Screens:
             PressedFill: =RGBA(15, 23, 42, 0.18)
             Visible: =varPunchSubsystemPopup
             Width: =App.Width
-      - conGlobalOverlay_Punches_1:
+      - conGlobalOverlay_Punches_2:
           Control: GroupContainer@1.5.0
           Variant: ManualLayout
           Properties:
@@ -2258,7 +2258,7 @@ Screens:
               varGlobalLoadingScope = "PUNCHES"
             Width: =App.Width
           Children:
-            - conGlobalLoadingCard_7:
+            - conGlobalLoadingCard_9:
                 Control: GroupContainer@1.5.0
                 Variant: ManualLayout
                 Properties:
@@ -2275,7 +2275,7 @@ Screens:
                   X: =(Parent.Width - Self.Width) / 2
                   Y: =(Parent.Height - Self.Height) / 2
                 Children:
-                  - Spinner3_7:
+                  - Spinner3_9:
                       Control: Spinner@1.4.6
                       Properties:
                         Height: =32
@@ -2283,7 +2283,7 @@ Screens:
                         Width: =32
                         X: =24
                         Y: =86
-                  - Text31_7:
+                  - Text31_9:
                       Control: ModernText@1.0.0
                       Properties:
                         AutoHeight: =true
@@ -2295,7 +2295,7 @@ Screens:
                         Width: =Parent.Width - 48
                         X: =24
                         Y: =52
-                  - Text36_7:
+                  - Text36_9:
                       Control: ModernText@1.0.0
                       Properties:
                         AutoHeight: =true
@@ -2309,7 +2309,7 @@ Screens:
                         Width: =Parent.Width - 48
                         X: =24
                         Y: =24
-                  - Rectangle2_7:
+                  - Rectangle2_9:
                       Control: Rectangle@2.3.0
                       Properties:
                         BorderColor: =RGBA(0, 0, 0, 0)
@@ -2324,7 +2324,7 @@ Screens:
                         Width: =Parent.Width - 88
                         X: =88
                         Y: =98
-                  - Rectangle6_7:
+                  - Rectangle6_9:
                       Control: Rectangle@2.3.0
                       Properties:
                         BorderColor: =RGBA(0, 0, 0, 0)
@@ -2339,7 +2339,7 @@ Screens:
                         Width: =90
                         X: =64
                         Y: =98
-      - cmp_MultiValueFilter_2:
+      - cmp_MultiValueFilter_3:
           Control: CanvasComponent
           ComponentName: cmp_MultiValueFilter
           Properties:
@@ -2362,16 +2362,16 @@ Screens:
             Width: =340
             X: =353
             Y: =251
-      - conLayer_Drawer_4:
+      - conLayer_Drawer_6:
           Control: GroupContainer@1.5.0
           Variant: ManualLayout
           Properties:
             Fill: =RGBA(0,0,0,0.25)
             Height: =App.Height
-            Visible: =comp_DetailDrawer_4.IsOpen
+            Visible: =comp_DetailDrawer_6.IsOpen
             Width: =App.Width
           Children:
-            - comp_DetailDrawer_4:
+            - comp_DetailDrawer_6:
                 Control: CanvasComponent
                 ComponentName: cmp_DetailDrawer_old
                 Properties:
@@ -2400,10 +2400,10 @@ Screens:
 
                     Set(varCT_DefsError, "");
 
-                    Select(btnCT_LoadDefs_4)
-                  OnSaveCustomField: =Select(btnCT_SaveFieldDef_4);
+                    Select(btnCT_LoadDefs_6)
+                  OnSaveCustomField: =Select(btnCT_SaveFieldDef_6);
                   OnSaved: =
-                  OnToggleFieldActiveRequested: =Select(btnCT_SetActive_4)
+                  OnToggleFieldActiveRequested: =Select(btnCT_SetActive_6)
                   ProjectId: =varProjectId
                   RecordId: =varDrawerRecordId
                   SelectedRecord: =varDrawerSelectedRecord
@@ -2417,7 +2417,7 @@ Screens:
                   UserRole: =varUserRole
                   Visible: =varShowDetailDrawer
                   Width: =App.Width
-            - btnDrawerLoad_Custom_4:
+            - btnDrawerLoad_Custom_6:
                 Control: Button@0.0.45
                 Properties:
                   OnSelect: |-
@@ -2546,7 +2546,7 @@ Screens:
                   Visible: =false
                   X: =60
                   Y: =60
-            - btnDrawerLoad_Comments_4:
+            - btnDrawerLoad_Comments_6:
                 Control: Button@0.0.45
                 Properties:
                   OnSelect: |-
@@ -2676,7 +2676,7 @@ Screens:
                   Visible: =false
                   X: =80
                   Y: =80
-            - btnDrawerLoad_Punches_1:
+            - btnDrawerLoad_Punches_2:
                 Control: Button@0.0.45
                 Properties:
                   OnSelect: |-
@@ -2716,26 +2716,26 @@ Screens:
 
                         "Comments",
                             Set(varDrawerIsLoading, true);
-                            Select(btnDrawerLoad_Comments_4),
+                            Select(btnDrawerLoad_Comments_6),
 
                         "Custom",
                             Set(varDrawerIsLoading, true);
-                            Select(btnDrawerLoad_Custom_4),
+                            Select(btnDrawerLoad_Custom_6),
 
                         Set(varDrawerIsLoading, false)
                     );
                   Visible: =false
                   X: =40
                   Y: =40
-            - btnDrawerRefreshFromTab_4:
+            - btnDrawerRefreshFromTab_6:
                 Control: Button@0.0.45
                 Properties:
                   OnSelect: |-
                     =
                     Set(varDrawerTab, "Custom");
-                    Select(btnDrawerLoad_Custom_4)
+                    Select(btnDrawerLoad_Custom_6)
                   Visible: =false
-            - btnCT_LoadDefs_4:
+            - btnCT_LoadDefs_6:
                 Control: Button@0.0.45
                 Properties:
                   OnSelect: |-
@@ -2748,8 +2748,8 @@ Screens:
                     Set(
                         varCT_DefsResp,
                         WarRoom_ListCustomFieldDefs.Run(
-                            comp_DetailDrawer_4.ProjectId,
-                            comp_DetailDrawer_4.EntityType,
+                            comp_DetailDrawer_6.ProjectId,
+                            comp_DetailDrawer_6.EntityType,
                             If(varCT_ShowInactiveDefs, 1, 0)
                         )
                     );
@@ -2812,7 +2812,7 @@ Screens:
                   Visible: =false
                   X: =100
                   Y: =100
-            - btnCT_SetActive_4:
+            - btnCT_SetActive_6:
                 Control: Button@0.0.45
                 Properties:
                   OnSelect: |-
@@ -2821,25 +2821,25 @@ Screens:
                     With(
                         {
                             resp: WarRoom_SetCustomFieldActive.Run(
-                                comp_DetailDrawer_4.ProjectId,
-                                comp_DetailDrawer_4.EntityType,
+                                comp_DetailDrawer_6.ProjectId,
+                                comp_DetailDrawer_6.EntityType,
                                 varCT_Toggle_FieldKey,
                                 varCT_Toggle_IsActive,
-                                comp_DetailDrawer_4.UserEmail
+                                comp_DetailDrawer_6.UserEmail
                             )
                         },
-                        Select(btnCT_LoadDefs_4);
-                        Select(btnDrawerLoad_Custom_4)
+                        Select(btnCT_LoadDefs_6);
+                        Select(btnDrawerLoad_Custom_6)
                     );
                   Visible: =false
                   X: =140
                   Y: =140
-            - btnCT_SaveFieldDef_4:
+            - btnCT_SaveFieldDef_6:
                 Control: ModernButton@1.0.0
                 Properties:
                   Align: =Align.Center
                   FontWeight: =""
-                  OnSelect: "=\r\nIf(\r\n    IsBlank(Trim(varCT_Edit_Label)),\r\n    Set(varCT_SaveField_Error, \"Label is required.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    IsBlank(Trim(varCT_Edit_FieldKey)),\r\n    Set(varCT_SaveField_Error, \"Field key is required.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    !IsBlank(\r\n        LookUp(\r\n            colCT_Defs_Admin,\r\n            Lower(Trim(FieldKey)) = Lower(Trim(varCT_Edit_FieldKey)) &&\r\n            FieldDefId <> Coalesce(varCT_Edit_FieldDefId, 0)\r\n        )\r\n    ),\r\n\r\n    Set(varCT_SaveField_Error, \"This Field Key already exists.\");\r\n    Set(varCT_SaveField_IsLoading, false);\r\n    Notify(\"This Field Key already exists. Use another key or edit the existing field.\", NotificationType.Error),\r\n\r\n    Value(varCT_Edit_SortOrder) <= 0,\r\n    Set(varCT_SaveField_Error, \"Sort order must be greater than zero.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    (varCT_Edit_FieldType = \"Choice\" || varCT_Edit_FieldType = \"MultiChoice\") && IsBlank(Trim(varCT_Edit_OptionsJson)),\r\n    Set(varCT_SaveField_Error, \"OptionsJson is required for Choice and MultiChoice fields.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    With(\r\n        {\r\n            resp: WarRoom_UpsertCustomFieldDef.Run(\r\n                Coalesce(varCT_Edit_FieldDefId, 0),\r\n                comp_DetailDrawer_4.ProjectId,\r\n                comp_DetailDrawer_4.EntityType,\r\n                Trim(varCT_Edit_Label),\r\n                varCT_Edit_FieldType,\r\n                Trim(varCT_Edit_HelpText),\r\n                Value(varCT_Edit_SortOrder),\r\n                If(\r\n                    varCT_Edit_FieldType = \"Choice\" || varCT_Edit_FieldType = \"MultiChoice\",\r\n                    If(\r\n                        IsBlank(Trim(varCT_Edit_OptionsJson)),\r\n                        \" \",\r\n                        varCT_Edit_OptionsJson\r\n                    ),\r\n                    \" \"\r\n                ),\r\n                comp_DetailDrawer_4.UserEmail,\r\n                Lower(Trim(varCT_Edit_FieldKey)),\r\n                varCT_Edit_IsRequired,\r\n                varCT_Edit_IsPinned,\r\n                varCT_Edit_IsActive,\r\n                varCT_Edit_IsFilterable,\r\n                varCT_Edit_ShowInQuickFilters,\r\n                Coalesce(varCT_Edit_FilterOrder, varCT_Edit_SortOrder, 1000),\r\n                Coalesce(varCT_Edit_FilterMode, \"Equals\")\r\n            )\r\n        },\r\n        \r\n        Set(varShowCustomAddFields, false);\r\n        Set(varCT_SaveField_Error, \"\");\r\n        Set(varCT_SaveField_IsLoading, false);\r\n\r\n        Select(btnCT_LoadDefs_4);\r\n\r\n        Set(varCT_LoadKey, \"\");\r\n        Select(btnDrawerLoad_Custom_4);\r\n\r\n        Notify(\"Field definition saved successfully.\", NotificationType.Success);\r\n\r\n        Set(varPunchDynamicFilters_NeedRefresh, true);\r\n    )\r\n)"
+                  OnSelect: "=\r\nIf(\r\n    IsBlank(Trim(varCT_Edit_Label)),\r\n    Set(varCT_SaveField_Error, \"Label is required.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    IsBlank(Trim(varCT_Edit_FieldKey)),\r\n    Set(varCT_SaveField_Error, \"Field key is required.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    !IsBlank(\r\n        LookUp(\r\n            colCT_Defs_Admin,\r\n            Lower(Trim(FieldKey)) = Lower(Trim(varCT_Edit_FieldKey)) &&\r\n            FieldDefId <> Coalesce(varCT_Edit_FieldDefId, 0)\r\n        )\r\n    ),\r\n\r\n    Set(varCT_SaveField_Error, \"This Field Key already exists.\");\r\n    Set(varCT_SaveField_IsLoading, false);\r\n    Notify(\"This Field Key already exists. Use another key or edit the existing field.\", NotificationType.Error),\r\n\r\n    Value(varCT_Edit_SortOrder) <= 0,\r\n    Set(varCT_SaveField_Error, \"Sort order must be greater than zero.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    (varCT_Edit_FieldType = \"Choice\" || varCT_Edit_FieldType = \"MultiChoice\") && IsBlank(Trim(varCT_Edit_OptionsJson)),\r\n    Set(varCT_SaveField_Error, \"OptionsJson is required for Choice and MultiChoice fields.\");\r\n    Set(varCT_SaveField_IsLoading, false),\r\n\r\n    With(\r\n        {\r\n            resp: WarRoom_UpsertCustomFieldDef.Run(\r\n                Coalesce(varCT_Edit_FieldDefId, 0),\r\n                comp_DetailDrawer_6.ProjectId,\r\n                comp_DetailDrawer_6.EntityType,\r\n                Trim(varCT_Edit_Label),\r\n                varCT_Edit_FieldType,\r\n                Trim(varCT_Edit_HelpText),\r\n                Value(varCT_Edit_SortOrder),\r\n                If(\r\n                    varCT_Edit_FieldType = \"Choice\" || varCT_Edit_FieldType = \"MultiChoice\",\r\n                    If(\r\n                        IsBlank(Trim(varCT_Edit_OptionsJson)),\r\n                        \" \",\r\n                        varCT_Edit_OptionsJson\r\n                    ),\r\n                    \" \"\r\n                ),\r\n                comp_DetailDrawer_6.UserEmail,\r\n                Lower(Trim(varCT_Edit_FieldKey)),\r\n                varCT_Edit_IsRequired,\r\n                varCT_Edit_IsPinned,\r\n                varCT_Edit_IsActive,\r\n                varCT_Edit_IsFilterable,\r\n                varCT_Edit_ShowInQuickFilters,\r\n                Coalesce(varCT_Edit_FilterOrder, varCT_Edit_SortOrder, 1000),\r\n                Coalesce(varCT_Edit_FilterMode, \"Equals\")\r\n            )\r\n        },\r\n        \r\n        Set(varShowCustomAddFields, false);\r\n        Set(varCT_SaveField_Error, \"\");\r\n        Set(varCT_SaveField_IsLoading, false);\r\n\r\n        Select(btnCT_LoadDefs_6);\r\n\r\n        Set(varCT_LoadKey, \"\");\r\n        Select(btnDrawerLoad_Custom_6);\r\n\r\n        Notify(\"Field definition saved successfully.\", NotificationType.Success);\r\n\r\n        Set(varPunchDynamicFilters_NeedRefresh, true);\r\n    )\r\n)"
                   PaddingBottom: =5
                   PaddingLeft: =12
                   PaddingRight: =12
@@ -2852,7 +2852,7 @@ Screens:
                   Visible: =false
                   X: =160
                   Y: =160
-      - conPunchDynamicFiltersLayer_1:
+      - conPunchDynamicFiltersLayer_2:
           Control: GroupContainer@1.5.0
           Variant: ManualLayout
           Properties:
@@ -2861,7 +2861,7 @@ Screens:
             Visible: =varShowPunchDynamicFilters
             Width: =App.Width
           Children:
-            - cmp_DynamicFilters_Punches_1:
+            - cmp_DynamicFilters_Punches_2:
                 Control: CanvasComponent
                 ComponentName: cmp_DynamicFilters
                 Properties:
@@ -2877,7 +2877,7 @@ Screens:
 
                     Set(varShowPunchDynamicFilters, false);
                     Set(varPunches_Page, 1);
-                    Select(btnPunches_LoadPage_Punches_1)
+                    Select(btnPunches_LoadPage_Punches_2)
                   OnClear: |-
                     =
 
@@ -2889,56 +2889,56 @@ Screens:
 
                     Set(varShowPunchDynamicFilters, false);
 
-                    Select(btnPunches_LoadPage_Punches_1)
+                    Select(btnPunches_LoadPage_Punches_2)
                   OnValueChanged: |-
                     =Switch(
-                        cmp_DynamicFilters_Punches_1.ChangedValueSlot,
+                        cmp_DynamicFilters_Punches_2.ChangedValueSlot,
 
                         "ValueText",
                         UpdateIf(
                             colPunchDynamicFilterValues,
-                            FieldKey = cmp_DynamicFilters_Punches_1.ChangedFieldKey,
-                            { ValueText: cmp_DynamicFilters_Punches_1.ChangedValueText }
+                            FieldKey = cmp_DynamicFilters_Punches_2.ChangedFieldKey,
+                            { ValueText: cmp_DynamicFilters_Punches_2.ChangedValueText }
                         ),
 
                         "ValueJson",
                         UpdateIf(
                             colPunchDynamicFilterValues,
-                            FieldKey = cmp_DynamicFilters_Punches_1.ChangedFieldKey,
-                            { ValueJson: cmp_DynamicFilters_Punches_1.ChangedValueJson }
+                            FieldKey = cmp_DynamicFilters_Punches_2.ChangedFieldKey,
+                            { ValueJson: cmp_DynamicFilters_Punches_2.ChangedValueJson }
                         ),
 
                         "ValueDateFrom",
                         UpdateIf(
                             colPunchDynamicFilterValues,
-                            FieldKey = cmp_DynamicFilters_Punches_1.ChangedFieldKey,
-                            { ValueDateFrom: DateValue(cmp_DynamicFilters_Punches_1.ChangedValueDate) }
+                            FieldKey = cmp_DynamicFilters_Punches_2.ChangedFieldKey,
+                            { ValueDateFrom: DateValue(cmp_DynamicFilters_Punches_2.ChangedValueDate) }
                         ),
 
                         "ValueDateTo",
                         UpdateIf(
                             colPunchDynamicFilterValues,
-                            FieldKey = cmp_DynamicFilters_Punches_1.ChangedFieldKey,
-                            { ValueDateTo: DateValue(cmp_DynamicFilters_Punches_1.ChangedValueDate) }
+                            FieldKey = cmp_DynamicFilters_Punches_2.ChangedFieldKey,
+                            { ValueDateTo: DateValue(cmp_DynamicFilters_Punches_2.ChangedValueDate) }
                         ),
                         "ValueNumberFrom",
                         UpdateIf(
                             colPunchDynamicFilterValues,
-                            FieldKey = cmp_DynamicFilters_Punches_1.ChangedFieldKey,
-                            { ValueNumberFrom: cmp_DynamicFilters_Punches_1.ChangedValueNumber }
+                            FieldKey = cmp_DynamicFilters_Punches_2.ChangedFieldKey,
+                            { ValueNumberFrom: cmp_DynamicFilters_Punches_2.ChangedValueNumber }
                     ),
 
                         "ValueNumberTo",
                         UpdateIf(
                             colPunchDynamicFilterValues,
-                            FieldKey = cmp_DynamicFilters_Punches_1.ChangedFieldKey,
-                            { ValueNumberTo: cmp_DynamicFilters_Punches_1.ChangedValueNumber }
+                            FieldKey = cmp_DynamicFilters_Punches_2.ChangedFieldKey,
+                            { ValueNumberTo: cmp_DynamicFilters_Punches_2.ChangedValueNumber }
                         ),
                         "ValueBool",
                         UpdateIf(
                             colPunchDynamicFilterValues,
-                            FieldKey = cmp_DynamicFilters_Punches_1.ChangedFieldKey,
-                            { ValueBool: cmp_DynamicFilters_Punches_1.ChangedValueBool }
+                            FieldKey = cmp_DynamicFilters_Punches_2.ChangedFieldKey,
+                            { ValueBool: cmp_DynamicFilters_Punches_2.ChangedValueBool }
                         ),
                         "ClearAll",
                             ClearCollect(
@@ -2985,7 +2985,7 @@ Screens:
                   Values: =colPunchDynamicFilterValues
                   Width: =420
                   X: =Parent.Width - Self.Width
-            - Icon3_2:
+            - Icon3_3:
                 Control: Classic/Icon@2.5.0
                 Properties:
                   BorderColor: =RGBA(0, 0, 0, 0)
@@ -3006,7 +3006,7 @@ Screens:
                   Width: =20
                   X: =App.Width - 40
                   Y: =20
-      - conPunchExportModalLayer_1:
+      - conPunchExportModalLayer_2:
           Control: GroupContainer@1.5.0
           Variant: ManualLayout
           Properties:
@@ -3014,7 +3014,7 @@ Screens:
             Visible: =varShowPunchExportColumns
             Width: =App.Width
           Children:
-            - rectPunchExportBackdrop_1:
+            - rectPunchExportBackdrop_2:
                 Control: Rectangle@2.3.0
                 Properties:
                   BorderColor: =RGBA(0, 0, 0, 0)
@@ -3029,7 +3029,7 @@ Screens:
                     )
                   PressedFill: =RGBA(15, 23, 42, 0.38)
                   Width: =Parent.Width
-            - conPunchExportModal_1:
+            - conPunchExportModal_2:
                 Control: GroupContainer@1.5.0
                 Variant: AutoLayout
                 Properties:
@@ -3048,7 +3048,7 @@ Screens:
                   X: =(Parent.Width - Self.Width) / 2
                   Y: =(Parent.Height - Self.Height) / 2
                 Children:
-                  - conPunchExportHeader_1:
+                  - conPunchExportHeader_2:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
                       Properties:
@@ -3063,7 +3063,7 @@ Screens:
                         PaddingRight: =20
                         PaddingTop: =12
                       Children:
-                        - icoPunchExport_1:
+                        - icoPunchExport_2:
                             Control: Classic/Icon@2.5.0
                             Properties:
                               BorderColor: =RGBA(0, 0, 0, 0)
@@ -3077,7 +3077,7 @@ Screens:
                               PressedColor: =varTheme_PulseBlueDark
                               PressedFill: =RGBA(0, 0, 0, 0)
                               Width: =28
-                        - conPunchExportHeaderTexts_1:
+                        - conPunchExportHeaderTexts_2:
                             Control: GroupContainer@1.5.0
                             Variant: AutoLayout
                             Properties:
@@ -3092,7 +3092,7 @@ Screens:
                               RadiusTopLeft: =0
                               RadiusTopRight: =0
                             Children:
-                              - lblPunchExportTitle_1:
+                              - lblPunchExportTitle_2:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     AutoHeight: =true
@@ -3106,7 +3106,7 @@ Screens:
                                     Text: ="Export Punches"
                                     Width: =Parent.Width
                                     Wrap: =false
-                              - lblPunchExportSubtitle_1:
+                              - lblPunchExportSubtitle_2:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     AutoHeight: =true
@@ -3119,7 +3119,7 @@ Screens:
                                     Text: ="Select the information that will be included in the exported workbook."
                                     Width: =Parent.Width
                                     Wrap: =false
-                        - icoPunchExportClose_1:
+                        - icoPunchExportClose_2:
                             Control: Classic/Icon@2.5.0
                             Properties:
                               BorderColor: =RGBA(0, 0, 0, 0)
@@ -3138,7 +3138,7 @@ Screens:
                               PressedColor: =ColorValue("#0F172A")
                               PressedFill: =RGBA(0, 0, 0, 0)
                               Width: =24
-                  - conPunchExportMode_1:
+                  - conPunchExportMode_2:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
                       Properties:
@@ -3153,7 +3153,7 @@ Screens:
                         PaddingRight: =24
                         PaddingTop: =14
                       Children:
-                        - lblPunchExportModeTitle_1:
+                        - lblPunchExportModeTitle_2:
                             Control: ModernText@1.0.0
                             Properties:
                               Color: =ColorValue("#334155")
@@ -3163,7 +3163,7 @@ Screens:
                               Size: =11
                               Text: ="Export profile"
                               Width: =110
-                        - btnPunchExportClient_1:
+                        - btnPunchExportClient_2:
                             Control: ModernButton@1.0.0
                             Properties:
                               Appearance: |-
@@ -3202,7 +3202,7 @@ Screens:
                                 Clear(colPunchExportColumns_Staging)
                               Text: ="External export"
                               Width: =150
-                        - btnPunchExportInternal_1:
+                        - btnPunchExportInternal_2:
                             Control: ModernButton@1.0.0
                             Properties:
                               Appearance: |-
@@ -3249,7 +3249,7 @@ Screens:
                                     "handover"
                                 ]
                               Width: =150
-                  - conPunchExportToolbar_1:
+                  - conPunchExportToolbar_2:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
                       Properties:
@@ -3262,7 +3262,7 @@ Screens:
                         PaddingLeft: =24
                         PaddingRight: =24
                       Children:
-                        - lblPunchExportSelectionCount_1:
+                        - lblPunchExportSelectionCount_2:
                             Control: ModernText@1.0.0
                             Properties:
                               Color: =ColorValue("#475569")
@@ -3281,7 +3281,7 @@ Screens:
                                 " of " &
                                 Text(CountRows(colPunchExportColumns)) &
                                 " columns selected"
-                        - btnPunchExportSelectAll_1:
+                        - btnPunchExportSelectAll_2:
                             Control: ModernButton@1.0.0
                             Properties:
                               Appearance: =ButtonAppearance.Secondary
@@ -3297,7 +3297,7 @@ Screens:
                                 )
                               Text: ="Select all"
                               Width: =110
-                        - btnPunchExportSelectPublic_1:
+                        - btnPunchExportSelectPublic_2:
                             Control: ModernButton@1.0.0
                             Properties:
                               Appearance: =ButtonAppearance.Secondary
@@ -3314,7 +3314,7 @@ Screens:
                               Text: ="Select public"
                               Visible: =varPunchExportMode = "CLIENT"
                               Width: =120
-                        - btnPunchExportClearOptional_1:
+                        - btnPunchExportClearOptional_2:
                             Control: ModernButton@1.0.0
                             Properties:
                               Appearance: =ButtonAppearance.Secondary
@@ -3330,7 +3330,7 @@ Screens:
                                 )
                               Text: ="Clear optional"
                               Width: =120
-                  - conPunchExportColumnHeader_1:
+                  - conPunchExportColumnHeader_2:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
                       Properties:
@@ -3342,13 +3342,13 @@ Screens:
                         PaddingLeft: =20
                         PaddingRight: =20
                       Children:
-                        - lblPunchExportHeaderSelect_1:
+                        - lblPunchExportHeaderSelect_2:
                             Control: ModernText@1.0.0
                             Properties:
                               Height: =30
                               Text: =""
                               Width: =60
-                        - lblPunchExportHeaderColumn_1:
+                        - lblPunchExportHeaderColumn_2:
                             Control: ModernText@1.0.0
                             Properties:
                               Color: =ColorValue("#475569")
@@ -3359,7 +3359,7 @@ Screens:
                               Size: =10
                               Text: ="Column"
                               Width: =100
-                        - lblPunchExportHeaderGroup_1:
+                        - lblPunchExportHeaderGroup_2:
                             Control: ModernText@1.0.0
                             Properties:
                               Color: =ColorValue("#475569")
@@ -3369,7 +3369,7 @@ Screens:
                               Size: =10
                               Text: ="Group"
                               Width: =190
-                        - lblPunchExportHeaderSecurity_1:
+                        - lblPunchExportHeaderSecurity_2:
                             Control: ModernText@1.0.0
                             Properties:
                               Align: =Align.Center
@@ -3380,7 +3380,7 @@ Screens:
                               Size: =10
                               Text: ="Classification"
                               Width: =110
-                  - galPunchExportColumns_1:
+                  - galPunchExportColumns_2:
                       Control: Gallery@2.15.0
                       Variant: Vertical
                       Properties:
@@ -3395,7 +3395,7 @@ Screens:
                         TemplatePadding: =0
                         TemplateSize: =48
                       Children:
-                        - lblPunchExportColumnLabel_1:
+                        - lblPunchExportColumnLabel_2:
                             Control: ModernText@1.0.0
                             Properties:
                               Color: =ColorValue("#0F172A")
@@ -3418,7 +3418,7 @@ Screens:
                               Width: =Parent.TemplateWidth - 500
                               X: =72
                               Y: =5
-                        - lblPunchExportColumnGroup_1:
+                        - lblPunchExportColumnGroup_2:
                             Control: ModernText@1.0.0
                             Properties:
                               Color: =ColorValue("#64748B")
@@ -3429,7 +3429,7 @@ Screens:
                               Width: =190
                               X: =Parent.TemplateWidth - 410
                               Y: =5
-                        - conPunchExportSecurityPill_1:
+                        - conPunchExportSecurityPill_2:
                             Control: GroupContainer@1.5.0
                             Variant: ManualLayout
                             Properties:
@@ -3449,7 +3449,7 @@ Screens:
                               X: =Parent.TemplateWidth - 200
                               Y: =11
                             Children:
-                              - lblPunchExportSecurity_1:
+                              - lblPunchExportSecurity_2:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     Align: =Align.Center
@@ -3470,7 +3470,7 @@ Screens:
                                           "Public"
                                       )
                                     Width: =Parent.Width
-                        - rectPunchExportRowDivider_1:
+                        - rectPunchExportRowDivider_2:
                             Control: Rectangle@2.3.0
                             Properties:
                               BorderColor: =RGBA(0, 0, 0, 0)
@@ -3480,7 +3480,7 @@ Screens:
                               Width: =Parent.TemplateWidth - 40
                               X: =20
                               Y: =Parent.TemplateHeight - 1
-                        - btnPunchExportColumnToggle_1:
+                        - btnPunchExportColumnToggle_2:
                             Control: Classic/Button@2.2.0
                             Properties:
                               BorderColor: |-
@@ -3537,7 +3537,7 @@ Screens:
                               Width: =28
                               X: =20
                               Y: =10
-                  - conPunchExportWarning_1:
+                  - conPunchExportWarning_2:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
                       Properties:
@@ -3555,7 +3555,7 @@ Screens:
                         PaddingLeft: =24
                         PaddingRight: =24
                       Children:
-                        - icoPunchExportWarning_1:
+                        - icoPunchExportWarning_2:
                             Control: Classic/Icon@2.5.0
                             Properties:
                               BorderColor: =RGBA(0, 0, 0, 0)
@@ -3577,7 +3577,7 @@ Screens:
                               PressedBorderColor: =RGBA(0, 0, 0, 0)
                               PressedFill: =RGBA(0, 0, 0, 0)
                               Width: =22
-                        - lblPunchExportWarning_1:
+                        - lblPunchExportWarning_2:
                             Control: ModernText@1.0.0
                             Properties:
                               Color: |-
@@ -3596,7 +3596,7 @@ Screens:
                                     "Columns not selected will be removed from the workbook. Hidden columns will not be used for client exports.",
                                     "Internal exports may contain operational and sensitive project information."
                                 )
-                  - conPunchExportFooter_1:
+                  - conPunchExportFooter_2:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
                       Properties:
@@ -3612,7 +3612,7 @@ Screens:
                         PaddingRight: =24
                         PaddingTop: =14
                       Children:
-                        - btnPunchExportCancel_1:
+                        - btnPunchExportCancel_2:
                             Control: ModernButton@1.0.0
                             Properties:
                               Appearance: =ButtonAppearance.Secondary
@@ -3624,7 +3624,7 @@ Screens:
                                 Clear(colPunchExportColumns)
                               Text: ="Cancel"
                               Width: =110
-                        - btnPunchExportContinue_1:
+                        - btnPunchExportContinue_2:
                             Control: ModernButton@1.0.0
                             Properties:
                               BasePaletteColor: =varTheme_PulseBlueDark
@@ -3642,38 +3642,129 @@ Screens:
                                 )
                               Height: =40
                               Icon: ="ArrowDownload"
-                              OnSelect: |
+                              OnSelect: |-
                                 =// =====================================================
                                 // btnPunchExportContinue.OnSelect
                                 // Generate Punch export using selected columns
                                 //
                                 // Flow parameter order:
-                                // 1. ProjectId
-                                // 2. SubsystemCode
-                                // 3. TemplateId
-                                // 4. CategoryCode
-                                // 5. StatusCode
-                                // 6. PunchDiscipline
-                                // 7. Subcontractor
-                                // 8. CustomFiltersJson
-                                // 9. RequestedByEmail
-                                // 10. RequestedByName
-                                // 11. ExportMode
-                                // 12. SelectedColumnsJson
+                                // 1.  ProjectId             Number
+                                // 2.  SubsystemCode         Text
+                                // 3.  TemplateId            Number
+                                // 4.  CategoryCode          Text
+                                // 5.  StatusCode            Text
+                                // 6.  PunchDiscipline       Text
+                                // 7.  Subcontractor         Text
+                                // 8.  CustomFiltersJson     Text
+                                // 9.  RequestedByEmail      Text
+                                // 10. RequestedByName       Text
+                                // 11. ExportMode            Text
+                                // 12. SelectedColumnsJson   Text
                                 // =====================================================
 
                                 If(
+                                    // -------------------------------------------------
+                                    // 1. Validate project
+                                    // -------------------------------------------------
+                                    IsBlank(varProjectId) ||
+                                    !IsNumeric(varProjectId) ||
+                                    Value(varProjectId) <= 0,
+
+                                    Notify(
+                                        "Please select a project first.",
+                                        NotificationType.Warning,
+                                        5000
+                                    ),
+
+                                    // -------------------------------------------------
+                                    // 2. Validate Punch template
+                                    // -------------------------------------------------
+                                    IsBlank(varFilter_PunchTemplateId) ||
+                                    !IsNumeric(varFilter_PunchTemplateId) ||
+                                    Value(varFilter_PunchTemplateId) <= 0,
+
+                                    Notify(
+                                        "Please select a Punch template.",
+                                        NotificationType.Warning,
+                                        5000
+                                    ),
+
+                                    // -------------------------------------------------
+                                    // 3. Validate selected columns
+                                    // -------------------------------------------------
                                     CountRows(
                                         Filter(
                                             colPunchExportColumns,
-                                            IsSelected
+                                            IsSelected = true
                                         )
                                     ) = 0,
 
                                     Notify(
                                         "Select at least one export column.",
-                                        NotificationType.Warning
+                                        NotificationType.Warning,
+                                        5000
                                     ),
+
+                                    // -------------------------------------------------
+                                    // 4. Initialize execution state
+                                    // -------------------------------------------------
+
+                                    Set(
+                                        varPunchExportLoading,
+                                        true
+                                    );
+
+                                    Set(
+                                        varPunchExportError,
+                                        Blank()
+                                    );
+
+                                    // Do not use varPunchExportResult.
+                                    // Store each Flow response field separately.
+
+                                    Set(
+                                        varPunchExportSuccess,
+                                        false
+                                    );
+
+                                    Set(
+                                        varPunchExportRowCount,
+                                        0
+                                    );
+
+                                    Set(
+                                        varPunchExportFileUrl,
+                                        Blank()
+                                    );
+
+                                    Set(
+                                        varPunchExportMessage,
+                                        Blank()
+                                    );
+
+                                    Set(
+                                        varGlobalLoading,
+                                        true
+                                    );
+
+                                    Set(
+                                        varGlobalLoadingMsg,
+                                        "Exporting Punches..."
+                                    );
+
+                                    Set(
+                                        varGlobalLoadingSubMsg,
+                                        "Applying filters and selected export columns"
+                                    );
+
+                                    Set(
+                                        varGlobalLoadingScope,
+                                        "PUNCHES"
+                                    );
+
+                                    // -------------------------------------------------
+                                    // 5. Build selected columns JSON
+                                    // -------------------------------------------------
 
                                     Set(
                                         varPunchExportColumnsJson,
@@ -3682,7 +3773,7 @@ Screens:
                                                 SortByColumns(
                                                     Filter(
                                                         colPunchExportColumns,
-                                                        IsSelected
+                                                        IsSelected = true
                                                     ),
                                                     "SortOrder",
                                                     SortOrder.Ascending
@@ -3695,102 +3786,175 @@ Screens:
                                         )
                                     );
 
-                                    Set(varPunchExportLoading, true);
-                                    Set(varPunchExportError, "");
-                                    Set(varPunchExportResult, Blank());
-
-                                    Set(varShowPunchExportColumns, false);
-
-                                    Set(varGlobalLoading, true);
-                                    Set(varGlobalLoadingMsg, "Exporting Punches...");
-                                    Set(
-                                        varGlobalLoadingSubMsg,
-                                        "Applying filters and selected export columns"
-                                    );
-                                    Set(varGlobalLoadingScope, "PUNCHES");
+                                    // -------------------------------------------------
+                                    // 6. Normalize custom filters JSON
+                                    // -------------------------------------------------
 
                                     Set(
                                         varPunchExportCustomFiltersJson,
                                         If(
                                             IsBlank(varPunchCustomFiltersJson) ||
-                                            Trim(varPunchCustomFiltersJson) = "" ||
-                                            Trim(varPunchCustomFiltersJson) = " ",
+                                            Len(Trim(Text(varPunchCustomFiltersJson))) = 0,
                                             "[]",
-                                            varPunchCustomFiltersJson
+                                            Trim(Text(varPunchCustomFiltersJson))
                                         )
                                     );
+
+                                    // -------------------------------------------------
+                                    // 7. Normalize subsystem filter
+                                    // -------------------------------------------------
 
                                     Set(
                                         varPunchExportSubsystems,
                                         If(
                                             IsBlank(varFilter_SubsystemsCsv) ||
-                                            Trim(varFilter_SubsystemsCsv) = "",
-                                            " ",
-                                            Text(varFilter_SubsystemsCsv)
+                                            Len(Trim(Text(varFilter_SubsystemsCsv))) = 0,
+                                            "",
+                                            Trim(Text(varFilter_SubsystemsCsv))
                                         )
                                     );
 
+                                    // -------------------------------------------------
+                                    // 8. Normalize template
+                                    // -------------------------------------------------
+
                                     Set(
                                         varPunchExportTemplateId,
-                                        If(
-                                            IsBlank(varFilter_PunchTemplateId),
-                                            0,
-                                            Value(varFilter_PunchTemplateId)
-                                        )
+                                        Value(varFilter_PunchTemplateId)
                                     );
+
+                                    // -------------------------------------------------
+                                    // 9. Normalize category
+                                    // -------------------------------------------------
 
                                     Set(
                                         varPunchExportCategoryCode,
                                         If(
                                             IsBlank(varFilter_PunchCategoryCode),
-                                            " ",
-                                            Text(varFilter_PunchCategoryCode)
+                                            "",
+                                            Trim(Text(varFilter_PunchCategoryCode))
                                         )
                                     );
+
+                                    // -------------------------------------------------
+                                    // 10. Normalize status
+                                    // -------------------------------------------------
 
                                     Set(
                                         varPunchExportStatusCode,
                                         If(
                                             IsBlank(varFilter_PunchStatusCode),
-                                            " ",
-                                            Text(varFilter_PunchStatusCode)
+                                            "",
+                                            Trim(Text(varFilter_PunchStatusCode))
                                         )
                                     );
+
+                                    // -------------------------------------------------
+                                    // 11. Normalize discipline
+                                    // -------------------------------------------------
 
                                     Set(
                                         varPunchExportDiscipline,
                                         If(
                                             IsBlank(varFilter_PunchDiscipline),
-                                            " ",
-                                            Text(varFilter_PunchDiscipline)
+                                            "",
+                                            Trim(Text(varFilter_PunchDiscipline))
                                         )
                                     );
+
+                                    // -------------------------------------------------
+                                    // 12. Normalize subcontractor
+                                    // -------------------------------------------------
 
                                     Set(
                                         varPunchExportSubcontractor,
                                         If(
                                             IsBlank(varFilter_Subcontractor),
-                                            " ",
-                                            Text(varFilter_Subcontractor)
+                                            "",
+                                            Trim(Text(varFilter_Subcontractor))
                                         )
                                     );
 
+                                    // -------------------------------------------------
+                                    // 13. Normalize export mode
+                                    // -------------------------------------------------
+
+                                    Set(
+                                        varPunchExportMode,
+                                        If(
+                                            IsBlank(varPunchExportMode) ||
+                                            Len(Trim(Text(varPunchExportMode))) = 0,
+                                            "FILTERED",
+                                            Upper(Trim(Text(varPunchExportMode)))
+                                        )
+                                    );
+
+                                    // -------------------------------------------------
+                                    // 14. Close export columns modal
+                                    // -------------------------------------------------
+
+                                    Set(
+                                        varShowPunchExportColumns,
+                                        false
+                                    );
+
+                                    // -------------------------------------------------
+                                    // 15. Execute Flow
+                                    //
+                                    // The Flow response remains local inside With().
+                                    // It is not assigned to varPunchExportResult.
+                                    // -------------------------------------------------
+
                                     IfError(
-                                        Set(
-                                            varPunchExportResult,
-                                            Warroom_ExportPunchesToExcel_Codex.Run(
-                                                Value(varProjectId),
-                                                varPunchExportSubsystems,
-                                                varPunchExportTemplateId,
-                                                varPunchExportCategoryCode,
-                                                varPunchExportStatusCode,
-                                                varPunchExportDiscipline,
-                                                varPunchExportSubcontractor,
-                                                varPunchExportCustomFiltersJson,
-                                                User().Email,
-                                                User().FullName,
-                                                varPunchExportMode,
-                                                varPunchExportColumnsJson
+                                        With(
+                                            {
+                                                flowResponse:
+                                                    Warroom_ExportPunchesToExcel_Codex.Run(
+                                                        Value(varProjectId),
+                                                        Text(varPunchExportSubsystems),
+                                                        Value(varPunchExportTemplateId),
+                                                        Text(varPunchExportCategoryCode),
+                                                        Text(varPunchExportStatusCode),
+                                                        Text(varPunchExportDiscipline),
+                                                        Text(varPunchExportSubcontractor),
+                                                        Text(varPunchExportCustomFiltersJson),
+                                                        Text(User().Email),
+                                                        Text(User().FullName),
+                                                        Text(varPunchExportMode),
+                                                        Text(varPunchExportColumnsJson)
+                                                    )
+                                            },
+
+                                            Set(
+                                                varPunchExportSuccess,
+                                                Coalesce(
+                                                    flowResponse.success,
+                                                    false
+                                                )
+                                            );
+
+                                            Set(
+                                                varPunchExportRowCount,
+                                                Coalesce(
+                                                    Value(flowResponse.rowcount),
+                                                    0
+                                                )
+                                            );
+
+                                            Set(
+                                                varPunchExportFileUrl,
+                                                Coalesce(
+                                                    Text(flowResponse.fileurl),
+                                                    ""
+                                                )
+                                            );
+
+                                            Set(
+                                                varPunchExportMessage,
+                                                Coalesce(
+                                                    Text(flowResponse.message),
+                                                    ""
+                                                )
                                             )
                                         ),
 
@@ -3803,53 +3967,84 @@ Screens:
                                         )
                                     );
 
-                                    Set(varPunchExportLoading, false);
+                                    // -------------------------------------------------
+                                    // 16. Clear loading state
+                                    // -------------------------------------------------
 
-                                    Set(varGlobalLoading, false);
-                                    Set(varGlobalLoadingMsg, "");
-                                    Set(varGlobalLoadingSubMsg, "");
-                                    Set(varGlobalLoadingScope, "");
+                                    Set(
+                                        varPunchExportLoading,
+                                        false
+                                    );
+
+                                    Set(
+                                        varGlobalLoading,
+                                        false
+                                    );
+
+                                    Set(
+                                        varGlobalLoadingMsg,
+                                        ""
+                                    );
+
+                                    Set(
+                                        varGlobalLoadingSubMsg,
+                                        ""
+                                    );
+
+                                    Set(
+                                        varGlobalLoadingScope,
+                                        ""
+                                    );
+
+                                    // -------------------------------------------------
+                                    // 17. Process result
+                                    // -------------------------------------------------
 
                                     If(
+                                        // Connector or Flow execution error
                                         !IsBlank(varPunchExportError),
 
                                         Notify(
-                                            "Error exporting punches: " & varPunchExportError,
+                                            "Error exporting punches: " &
+                                            varPunchExportError,
                                             NotificationType.Error,
                                             10000
                                         ),
 
-                                        IsBlank(varPunchExportResult),
-
-                                        Notify(
-                                            "The export Flow returned no response.",
-                                            NotificationType.Error
-                                        ),
-
-                                        Coalesce(varPunchExportResult.success, false),
+                                        // Flow business success
+                                        varPunchExportSuccess = true,
 
                                         Notify(
                                             "Excel export generated successfully. " &
-                                            Text(Coalesce(varPunchExportResult.rowcount, 0)) &
+                                            Text(
+                                                varPunchExportRowCount,
+                                                "[$-en-US]#,##0"
+                                            ) &
                                             " punches exported.",
-                                            NotificationType.Success
+                                            NotificationType.Success,
+                                            5000
                                         );
 
                                         If(
-                                            !IsBlank(varPunchExportResult.fileurl),
+                                            !IsBlank(varPunchExportFileUrl),
 
-                                            Launch(varPunchExportResult.fileurl),
+                                            Launch(
+                                                varPunchExportFileUrl
+                                            ),
 
                                             Notify(
-                                                "The Excel was generated, but the file link was not returned.",
-                                                NotificationType.Warning
+                                                "The Excel file was generated, but the Flow did not return its link.",
+                                                NotificationType.Warning,
+                                                7000
                                             )
                                         ),
 
+                                        // Flow business failure
                                         Notify(
-                                            Coalesce(
-                                                varPunchExportResult.message,
-                                                "The Excel export could not be generated."
+                                            If(
+                                                IsBlank(varPunchExportMessage),
+                                                "The Excel export could not be generated.",
+                                                varPunchExportMessage
                                             ),
                                             NotificationType.Error,
                                             10000
