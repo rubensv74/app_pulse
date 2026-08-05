@@ -1,1 +1,671 @@
+ComponentDefinitions:
+  cmp_SmartFilterBarPro:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      AccentColor:
+        PropertyKind: Input
+        DisplayName: AccentColor
+        Description: Primary interaction color.
+        DataType: Color
+        Default: =ColorValue("#1677FF")
+      ActiveFilterCount:
+        PropertyKind: Output
+        DisplayName: ActiveFilterCount
+        Description: Number of active filters.
+        DataType: Number
+      ActiveFilters:
+        PropertyKind: Input
+        DisplayName: ActiveFilters
+        Description: Normalized table with Key, Label, Value and DisplayText.
+        DataType: Table
+        Default: |-
+          =
+          FirstN(
+              Table(
+                  {
+                      Key: "",
+                      Label: "",
+                      Value: "",
+                      DisplayText: ""
+                  }
+              ),
+              0
+          )
+      BackgroundColor:
+        PropertyKind: Input
+        DisplayName: BackgroundColor
+        Description: Component surface color.
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        Description: Border and separator color.
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      DangerColor:
+        PropertyKind: Input
+        DisplayName: DangerColor
+        Description: Error or destructive action color.
+        DataType: Color
+        Default: =ColorValue("#DC2626")
+      Density:
+        PropertyKind: Output
+        DisplayName: Density
+        Description: Current density value.
+        DataType: Text
+      DensityIn:
+        PropertyKind: Input
+        DisplayName: DensityIn
+        Description: Compact, Comfortable or Spacious.
+        DataType: Text
+        Default: ="Compact"
+      FilterButtonText:
+        PropertyKind: Input
+        DisplayName: FilterButtonText
+        Description: Advanced filters button label.
+        DataType: Text
+        Default: ="Filters"
+      FilterKeyToRemove:
+        PropertyKind: Output
+        DisplayName: FilterKeyToRemove
+        Description: Key of the chip that requested removal.
+        DataType: Text
+      HasActiveFilters:
+        PropertyKind: Output
+        DisplayName: HasActiveFilters
+        Description: True when one or more active filters exist.
+        DataType: Boolean
+      IsLoading:
+        PropertyKind: Input
+        DisplayName: IsLoading
+        Description: Displays a compact loading indicator and disables actions.
+        DataType: Boolean
+        Default: =false
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        Description: Secondary text color.
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      NoFiltersText:
+        PropertyKind: Input
+        DisplayName: NoFiltersText
+        Description: Message displayed when no filters are active.
+        DataType: Text
+        Default: ="No active filters"
+      OnClearAll:
+        PropertyKind: Event
+        DisplayName: OnClearAll
+        Description: Raised when all active filters are cleared.
+        ReturnType: None
+        Default: =false
+      OnColumnSelector:
+        PropertyKind: Event
+        DisplayName: OnColumnSelector
+        Description: Raised when the column selector is selected.
+        ReturnType: None
+        Default: =false
+      OnDensityChanged:
+        PropertyKind: Event
+        DisplayName: OnDensityChanged
+        Description: Raised after cycling table density.
+        ReturnType: None
+        Default: =false
+      OnExport:
+        PropertyKind: Event
+        DisplayName: OnExport
+        Description: Raised when export is selected.
+        ReturnType: None
+        Default: =false
+      OnOpenFilters:
+        PropertyKind: Event
+        DisplayName: OnOpenFilters
+        Description: Raised when the advanced filters button is selected.
+        ReturnType: None
+        Default: =false
+      OnOpenSavedViews:
+        PropertyKind: Event
+        DisplayName: OnOpenSavedViews
+        Description: Raised when saved views is selected.
+        ReturnType: None
+        Default: =false
+      OnQuickFilterSelected:
+        PropertyKind: Event
+        DisplayName: OnQuickFilterSelected
+        Description: Raised when a quick filter is selected.
+        ReturnType: None
+        Default: =false
+      OnRefresh:
+        PropertyKind: Event
+        DisplayName: OnRefresh
+        Description: Raised when refresh is selected.
+        ReturnType: None
+        Default: =false
+      OnRemoveFilter:
+        PropertyKind: Event
+        DisplayName: OnRemoveFilter
+        Description: Raised when an active filter chip is selected for removal.
+        ReturnType: None
+        Default: =false
+      OnSearchChanged:
+        PropertyKind: Event
+        DisplayName: OnSearchChanged
+        Description: Raised when the search text changes.
+        ReturnType: None
+        Default: =false
+      QuickFilters:
+        PropertyKind: Input
+        DisplayName: QuickFilters
+        Description: Normalized table with Key, Label, Count and Tone.
+        DataType: Table
+        Default: |-
+          =
+          Table(
+              {
+                  Key: "ALL",
+                  Label: "All",
+                  Count: 0,
+                  Tone: "neutral"
+              },
+              {
+                  Key: "OPEN",
+                  Label: "Open",
+                  Count: 0,
+                  Tone: "info"
+              },
+              {
+                  Key: "CLOSED",
+                  Label: "Closed",
+                  Count: 0,
+                  Tone: "success"
+              }
+          )
+      ResultCount:
+        PropertyKind: Input
+        DisplayName: ResultCount
+        Description: Number of records in the current filtered result.
+        DataType: Number
+        Default: =0
+      SavedViewsText:
+        PropertyKind: Input
+        DisplayName: SavedViewsText
+        Description: Saved views button label.
+        DataType: Text
+        Default: ="Views"
+      SearchPlaceholder:
+        PropertyKind: Input
+        DisplayName: SearchPlaceholder
+        Description: Search input placeholder.
+        DataType: Text
+        Default: ="Search punches..."
+      SearchText:
+        PropertyKind: Output
+        DisplayName: SearchText
+        Description: Current search text.
+        DataType: Text
+      SearchTextIn:
+        PropertyKind: Input
+        DisplayName: SearchTextIn
+        Description: Initial or externally controlled search text. Reset the component after changing it.
+        DataType: Text
+        Default: =""
+      SelectedQuickFilterIn:
+        PropertyKind: Input
+        DisplayName: SelectedQuickFilterIn
+        Description: Initially selected quick filter key.
+        DataType: Text
+        Default: ="ALL"
+      SelectedQuickFilterKey:
+        PropertyKind: Output
+        DisplayName: SelectedQuickFilterKey
+        Description: Current quick filter key.
+        DataType: Text
+      ShowActiveFilters:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowColumnSelector:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowDensity:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowExport:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowFiltersButton:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowQuickFilters:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowRefresh:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowSavedViews:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      ShowSearch:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
+      SurfaceAltColor:
+        PropertyKind: Input
+        DisplayName: SurfaceAltColor
+        Description: Secondary surface and chip color.
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        Description: Main text color.
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      TotalCount:
+        PropertyKind: Input
+        DisplayName: TotalCount
+        Description: Total number of records before current filters.
+        DataType: Number
+        Default: =0
+    Properties:
+      ActiveFilterCount: =CountRows(Filter(cmp_SmartFilterBarPro.ActiveFilters, !IsBlank(Key)))
+      Density: =If(IsBlank(varSFB_Density), cmp_SmartFilterBarPro.DensityIn, varSFB_Density)
+      FilterKeyToRemove: =If(IsBlank(varSFB_FilterKeyToRemove), "", varSFB_FilterKeyToRemove)
+      HasActiveFilters: =CountRows(Filter(cmp_SmartFilterBarPro.ActiveFilters, !IsBlank(Key))) > 0
+      Height: =118
+      OnReset: |-
+        =
+        Set(varSFB_SelectedQuickFilter, cmp_SmartFilterBarPro.SelectedQuickFilterIn);
+        Set(varSFB_FilterKeyToRemove, "");
+        Set(varSFB_Density, cmp_SmartFilterBarPro.DensityIn)
+      SearchText: =Coalesce(txtSFB_Search.Text, "")
+      SelectedQuickFilterKey: =If(IsBlank(varSFB_SelectedQuickFilter), cmp_SmartFilterBarPro.SelectedQuickFilterIn, varSFB_SelectedQuickFilter)
+      Width: =1180
+    Children:
+      - conSFB_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =cmp_SmartFilterBarPro.BorderColor
+            BorderThickness: =1
+            DropShadow: =DropShadow.None
+            Fill: =cmp_SmartFilterBarPro.BackgroundColor
+            Height: =Parent.Height
+            RadiusBottomLeft: =12
+            RadiusBottomRight: =12
+            RadiusTopLeft: =12
+            RadiusTopRight: =12
+            Width: =Parent.Width
+            X: =0
+            Y: =0
+          Children:
+            - txtSFB_Search:
+                Control: ModernTextInput@1.1.1
+                Properties:
+                  Appearance: =Appearance.Outline
+                  Default: =cmp_SmartFilterBarPro.SearchTextIn
+                  DisplayMode: =If(cmp_SmartFilterBarPro.IsLoading, DisplayMode.Disabled, DisplayMode.Edit)
+                  Height: =36
+                  OnChange: =cmp_SmartFilterBarPro.OnSearchChanged()
+                  Placeholder: =cmp_SmartFilterBarPro.SearchPlaceholder
+                  Visible: =cmp_SmartFilterBarPro.ShowSearch
+                  Width: =260
+                  X: =16
+                  Y: =13
+            - galSFB_QuickFilters:
+                Control: Gallery@2.15.0
+                Variant: Horizontal
+                Properties:
+                  BorderColor: =RGBA(245, 245, 245, 1)
+                  DelayItemLoading: =true
+                  Height: =40
+                  Items: =Filter(cmp_SmartFilterBarPro.QuickFilters, !IsBlank(Key))
+                  ShowScrollbar: =false
+                  TemplatePadding: =4
+                  TemplateSize: =110
+                  Visible: =cmp_SmartFilterBarPro.ShowQuickFilters
+                  Width: =Max(180, btnSFB_Filters.X - Self.X - 12)
+                  X: =If(cmp_SmartFilterBarPro.ShowSearch, txtSFB_Search.X + txtSFB_Search.Width + 8, 16)
+                  Y: =11
+                Children:
+                  - btnSFB_QuickFilter:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =If(ThisItem.Key = cmp_SmartFilterBarPro.SelectedQuickFilterKey, cmp_SmartFilterBarPro.AccentColor, cmp_SmartFilterBarPro.BorderColor)
+                        BorderThickness: =1
+                        Color: =If(ThisItem.Key = cmp_SmartFilterBarPro.SelectedQuickFilterKey, cmp_SmartFilterBarPro.AccentColor, cmp_SmartFilterBarPro.TextColor)
+                        DisabledBorderColor: =cmp_SmartFilterBarPro.BorderColor
+                        DisabledColor: =cmp_SmartFilterBarPro.MutedTextColor
+                        DisabledFill: =cmp_SmartFilterBarPro.SurfaceAltColor
+                        DisplayMode: =If(cmp_SmartFilterBarPro.IsLoading, DisplayMode.Disabled, DisplayMode.Edit)
+                        Fill: =If(ThisItem.Key = cmp_SmartFilterBarPro.SelectedQuickFilterKey, ColorFade(cmp_SmartFilterBarPro.AccentColor, 0.88), cmp_SmartFilterBarPro.BackgroundColor)
+                        Font: =Font.'Segoe UI'
+                        Height: =32
+                        HoverBorderColor: =cmp_SmartFilterBarPro.AccentColor
+                        HoverColor: =cmp_SmartFilterBarPro.AccentColor
+                        HoverFill: =ColorFade(cmp_SmartFilterBarPro.AccentColor, 0.92)
+                        OnSelect: |-
+                          =
+                          Set(varSFB_SelectedQuickFilter, ThisItem.Key);
+                          cmp_SmartFilterBarPro.OnQuickFilterSelected()
+                        PressedBorderColor: =cmp_SmartFilterBarPro.AccentColor
+                        PressedColor: =cmp_SmartFilterBarPro.AccentColor
+                        PressedFill: =ColorFade(cmp_SmartFilterBarPro.AccentColor, 0.86)
+                        RadiusBottomLeft: =16
+                        RadiusBottomRight: =16
+                        RadiusTopLeft: =16
+                        RadiusTopRight: =16
+                        Size: =9
+                        Text: =ThisItem.Label & If(ThisItem.Count >= 0, "  " & Text(ThisItem.Count), "")
+                        Width: =102
+                        Y: =4
+            - btnSFB_Filters:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =If(cmp_SmartFilterBarPro.HasActiveFilters, cmp_SmartFilterBarPro.AccentColor, cmp_SmartFilterBarPro.BorderColor)
+                  BorderThickness: =1
+                  Color: =If(cmp_SmartFilterBarPro.HasActiveFilters, cmp_SmartFilterBarPro.AccentColor, cmp_SmartFilterBarPro.TextColor)
+                  DisabledBorderColor: =cmp_SmartFilterBarPro.BorderColor
+                  DisabledColor: =cmp_SmartFilterBarPro.MutedTextColor
+                  DisabledFill: =cmp_SmartFilterBarPro.SurfaceAltColor
+                  DisplayMode: =If(cmp_SmartFilterBarPro.IsLoading, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =If(cmp_SmartFilterBarPro.HasActiveFilters, ColorFade(cmp_SmartFilterBarPro.AccentColor, 0.92), cmp_SmartFilterBarPro.BackgroundColor)
+                  Font: =Font.'Segoe UI'
+                  Height: =34
+                  HoverBorderColor: =cmp_SmartFilterBarPro.AccentColor
+                  HoverColor: =cmp_SmartFilterBarPro.AccentColor
+                  HoverFill: =ColorFade(cmp_SmartFilterBarPro.AccentColor, 0.94)
+                  OnSelect: =cmp_SmartFilterBarPro.OnOpenFilters()
+                  PressedBorderColor: =cmp_SmartFilterBarPro.AccentColor
+                  PressedColor: =cmp_SmartFilterBarPro.AccentColor
+                  PressedFill: =ColorFade(cmp_SmartFilterBarPro.AccentColor, 0.88)
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =9
+                  Text: =cmp_SmartFilterBarPro.FilterButtonText & If(cmp_SmartFilterBarPro.HasActiveFilters, "  " & Text(cmp_SmartFilterBarPro.ActiveFilterCount), "")
+                  Visible: =cmp_SmartFilterBarPro.ShowFiltersButton
+                  Width: =96
+                  X: =btnSFB_Views.X - If(cmp_SmartFilterBarPro.ShowFiltersButton, Self.Width + 8, 0)
+                  Y: =14
+            - btnSFB_Views:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =cmp_SmartFilterBarPro.BorderColor
+                  BorderThickness: =1
+                  Color: =cmp_SmartFilterBarPro.TextColor
+                  DisabledBorderColor: =cmp_SmartFilterBarPro.BorderColor
+                  DisabledColor: =cmp_SmartFilterBarPro.MutedTextColor
+                  DisabledFill: =cmp_SmartFilterBarPro.SurfaceAltColor
+                  DisplayMode: =If(cmp_SmartFilterBarPro.IsLoading, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =cmp_SmartFilterBarPro.BackgroundColor
+                  Font: =Font.'Segoe UI'
+                  Height: =34
+                  HoverBorderColor: =cmp_SmartFilterBarPro.AccentColor
+                  HoverColor: =cmp_SmartFilterBarPro.AccentColor
+                  HoverFill: =cmp_SmartFilterBarPro.SurfaceAltColor
+                  OnSelect: =cmp_SmartFilterBarPro.OnOpenSavedViews()
+                  PressedBorderColor: =cmp_SmartFilterBarPro.AccentColor
+                  PressedColor: =cmp_SmartFilterBarPro.AccentColor
+                  PressedFill: =ColorFade(cmp_SmartFilterBarPro.AccentColor, 0.92)
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =9
+                  Text: =cmp_SmartFilterBarPro.SavedViewsText
+                  Visible: =cmp_SmartFilterBarPro.ShowSavedViews
+                  Width: =82
+                  X: =icoSFB_Refresh.X - If(cmp_SmartFilterBarPro.ShowSavedViews, Self.Width + 8, 0)
+                  Y: =14
+            - icoSFB_Refresh:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledColor: =ColorFade(cmp_SmartFilterBarPro.MutedTextColor, 0.45)
+                  DisabledFill: =RGBA(0, 0, 0, 0)
+                  Color: =cmp_SmartFilterBarPro.MutedTextColor
+                  DisplayMode: =If(cmp_SmartFilterBarPro.IsLoading, DisplayMode.Disabled, DisplayMode.Edit)
+                  Height: =20
+                  HoverBorderColor: =RGBA(0, 0, 0, 0)
+                  HoverColor: =cmp_SmartFilterBarPro.AccentColor
+                  HoverFill: =RGBA(0, 0, 0, 0)
+                  Icon: =Icon.Reload
+                  OnSelect: =cmp_SmartFilterBarPro.OnRefresh()
+                  PressedBorderColor: =RGBA(0, 0, 0, 0)
+                  PressedColor: =cmp_SmartFilterBarPro.AccentColor
+                  PressedFill: =RGBA(0, 0, 0, 0)
+                  Tooltip: ="Refresh"
+                  Visible: =cmp_SmartFilterBarPro.ShowRefresh
+                  Width: =20
+                  X: =icoSFB_Export.X - If(cmp_SmartFilterBarPro.ShowRefresh, Self.Width + 16, 0)
+                  Y: =21
+            - icoSFB_Export:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledColor: =ColorFade(cmp_SmartFilterBarPro.MutedTextColor, 0.45)
+                  DisabledFill: =RGBA(0, 0, 0, 0)
+                  Color: =cmp_SmartFilterBarPro.MutedTextColor
+                  DisplayMode: =If(cmp_SmartFilterBarPro.IsLoading, DisplayMode.Disabled, DisplayMode.Edit)
+                  Height: =20
+                  HoverBorderColor: =RGBA(0, 0, 0, 0)
+                  HoverColor: =cmp_SmartFilterBarPro.AccentColor
+                  HoverFill: =RGBA(0, 0, 0, 0)
+                  Icon: =Icon.Download
+                  OnSelect: =cmp_SmartFilterBarPro.OnExport()
+                  PressedBorderColor: =RGBA(0, 0, 0, 0)
+                  PressedColor: =cmp_SmartFilterBarPro.AccentColor
+                  PressedFill: =RGBA(0, 0, 0, 0)
+                  Tooltip: ="Export"
+                  Visible: =cmp_SmartFilterBarPro.ShowExport
+                  Width: =20
+                  X: =icoSFB_Columns.X - If(cmp_SmartFilterBarPro.ShowExport, Self.Width + 16, 0)
+                  Y: =21
+            - icoSFB_Columns:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledColor: =ColorFade(cmp_SmartFilterBarPro.MutedTextColor, 0.45)
+                  DisabledFill: =RGBA(0, 0, 0, 0)
+                  Color: =cmp_SmartFilterBarPro.MutedTextColor
+                  DisplayMode: =If(cmp_SmartFilterBarPro.IsLoading, DisplayMode.Disabled, DisplayMode.Edit)
+                  Height: =20
+                  HoverBorderColor: =RGBA(0, 0, 0, 0)
+                  HoverColor: =cmp_SmartFilterBarPro.AccentColor
+                  HoverFill: =RGBA(0, 0, 0, 0)
+                  Icon: =Icon.Items
+                  OnSelect: =cmp_SmartFilterBarPro.OnColumnSelector()
+                  PressedBorderColor: =RGBA(0, 0, 0, 0)
+                  PressedColor: =cmp_SmartFilterBarPro.AccentColor
+                  PressedFill: =RGBA(0, 0, 0, 0)
+                  Tooltip: ="Columns"
+                  Visible: =cmp_SmartFilterBarPro.ShowColumnSelector
+                  Width: =20
+                  X: =btnSFB_Density.X - If(cmp_SmartFilterBarPro.ShowColumnSelector, Self.Width + 16, 0)
+                  Y: =21
+            - btnSFB_Density:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =cmp_SmartFilterBarPro.BorderColor
+                  BorderThickness: =1
+                  Color: =cmp_SmartFilterBarPro.TextColor
+                  DisabledBorderColor: =cmp_SmartFilterBarPro.BorderColor
+                  DisabledColor: =cmp_SmartFilterBarPro.MutedTextColor
+                  DisabledFill: =cmp_SmartFilterBarPro.SurfaceAltColor
+                  DisplayMode: =If(cmp_SmartFilterBarPro.IsLoading, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =cmp_SmartFilterBarPro.BackgroundColor
+                  Font: =Font.'Segoe UI'
+                  Height: =34
+                  HoverBorderColor: =cmp_SmartFilterBarPro.AccentColor
+                  HoverColor: =cmp_SmartFilterBarPro.AccentColor
+                  HoverFill: =cmp_SmartFilterBarPro.SurfaceAltColor
+                  OnSelect: |-
+                    =
+                    Set(
+                        varSFB_Density,
+                        Switch(
+                            Lower(cmp_SmartFilterBarPro.Density),
+                            "compact", "Comfortable",
+                            "comfortable", "Spacious",
+                            "spacious", "Compact",
+                            "Compact"
+                        )
+                    );
+                    cmp_SmartFilterBarPro.OnDensityChanged()
+                  PressedBorderColor: =cmp_SmartFilterBarPro.AccentColor
+                  PressedColor: =cmp_SmartFilterBarPro.AccentColor
+                  PressedFill: =ColorFade(cmp_SmartFilterBarPro.AccentColor, 0.92)
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =8
+                  Text: =cmp_SmartFilterBarPro.Density
+                  Visible: =cmp_SmartFilterBarPro.ShowDensity
+                  Width: =90
+                  X: =If(cmp_SmartFilterBarPro.ShowDensity, Parent.Width - Self.Width - 16, Parent.Width - 16)
+                  Y: =14
+            - rectSFB_Divider:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  BorderStyle: =BorderStyle.None
+                  DisabledFill: =cmp_SmartFilterBarPro.BorderColor
+                  Fill: =cmp_SmartFilterBarPro.BorderColor
+                  Height: =1
+                  HoverFill: =cmp_SmartFilterBarPro.BorderColor
+                  PressedFill: =cmp_SmartFilterBarPro.BorderColor
+                  Width: =Parent.Width
+                  Y: =59
+            - lblSFB_ResultCount:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Color: =cmp_SmartFilterBarPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =38
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: =Text(cmp_SmartFilterBarPro.ResultCount) & " results" & If(cmp_SmartFilterBarPro.TotalCount > 0, " from " & Text(cmp_SmartFilterBarPro.TotalCount), "")
+                  Width: =178
+                  X: =16
+                  Y: =68
+            - galSFB_ActiveFilters:
+                Control: Gallery@2.15.0
+                Variant: Horizontal
+                Properties:
+                  BorderColor: =RGBA(245, 245, 245, 1)
+                  DelayItemLoading: =true
+                  Height: =42
+                  Items: =Filter(cmp_SmartFilterBarPro.ActiveFilters, !IsBlank(Key))
+                  ShowScrollbar: =false
+                  TemplatePadding: =4
+                  TemplateSize: =170
+                  Visible: =cmp_SmartFilterBarPro.ShowActiveFilters && cmp_SmartFilterBarPro.HasActiveFilters
+                  Width: =Max(140, btnSFB_ClearAll.X - Self.X - 8)
+                  X: =194
+                  Y: =66
+                Children:
+                  - btnSFB_FilterChip:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =cmp_SmartFilterBarPro.BorderColor
+                        BorderThickness: =1
+                        Color: =cmp_SmartFilterBarPro.TextColor
+                        DisabledBorderColor: =cmp_SmartFilterBarPro.BorderColor
+                        DisabledColor: =cmp_SmartFilterBarPro.MutedTextColor
+                        DisabledFill: =cmp_SmartFilterBarPro.SurfaceAltColor
+                        DisplayMode: =If(cmp_SmartFilterBarPro.IsLoading, DisplayMode.Disabled, DisplayMode.Edit)
+                        Fill: =cmp_SmartFilterBarPro.SurfaceAltColor
+                        Font: =Font.'Segoe UI'
+                        Height: =30
+                        HoverBorderColor: =cmp_SmartFilterBarPro.AccentColor
+                        HoverColor: =cmp_SmartFilterBarPro.AccentColor
+                        HoverFill: =ColorFade(cmp_SmartFilterBarPro.AccentColor, 0.94)
+                        OnSelect: |-
+                          =
+                          Set(varSFB_FilterKeyToRemove, ThisItem.Key);
+                          cmp_SmartFilterBarPro.OnRemoveFilter()
+                        PressedBorderColor: =cmp_SmartFilterBarPro.AccentColor
+                        PressedColor: =cmp_SmartFilterBarPro.AccentColor
+                        PressedFill: =ColorFade(cmp_SmartFilterBarPro.AccentColor, 0.88)
+                        RadiusBottomLeft: =15
+                        RadiusBottomRight: =15
+                        RadiusTopLeft: =15
+                        RadiusTopRight: =15
+                        Size: =8
+                        Text: =ThisItem.DisplayText & "  ×"
+                        Width: =162
+                        Y: =4
+            - lblSFB_NoFilters:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Color: =cmp_SmartFilterBarPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =38
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: =cmp_SmartFilterBarPro.NoFiltersText
+                  Visible: =cmp_SmartFilterBarPro.ShowActiveFilters && !cmp_SmartFilterBarPro.HasActiveFilters
+                  Width: =260
+                  X: =194
+                  Y: =68
+            - btnSFB_ClearAll:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  BorderThickness: =0
+                  Color: =cmp_SmartFilterBarPro.MutedTextColor
+                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                  DisabledColor: =cmp_SmartFilterBarPro.MutedTextColor
+                  DisabledFill: =Color.Transparent
+                  DisplayMode: =If(cmp_SmartFilterBarPro.IsLoading, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =30
+                  HoverBorderColor: =RGBA(0, 0, 0, 0)
+                  HoverColor: =cmp_SmartFilterBarPro.DangerColor
+                  HoverFill: =Color.Transparent
+                  OnSelect: =cmp_SmartFilterBarPro.OnClearAll()
+                  PressedBorderColor: =RGBA(0, 0, 0, 0)
+                  PressedColor: =cmp_SmartFilterBarPro.DangerColor
+                  PressedFill: =Color.Transparent
+                  Size: =9
+                  Text: ="Clear all"
+                  Visible: =cmp_SmartFilterBarPro.ShowActiveFilters && cmp_SmartFilterBarPro.HasActiveFilters
+                  Width: =72
+                  X: =Parent.Width - Self.Width - If(cmp_SmartFilterBarPro.IsLoading, 58, 16)
+                  Y: =72
+            - spnSFB_Loading:
+                Control: Spinner@1.4.6
+                Properties:
+                  Height: =24
+                  SpinnerColor: =cmp_SmartFilterBarPro.AccentColor
+                  Visible: =cmp_SmartFilterBarPro.IsLoading
+                  Width: =24
+                  X: =Parent.Width - 40
+                  Y: =75
 
