@@ -1,0 +1,288 @@
+ComponentDefinitions:
+  cmp_PunchReviewActionsPro:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      AccentColor:
+        PropertyKind: Input
+        DisplayName: AccentColor
+        Description: Primary interaction color.
+        DataType: Color
+        Default: =ColorValue("#1677FF")
+      BackgroundColor:
+        PropertyKind: Input
+        DisplayName: BackgroundColor
+        Description: Actions surface color.
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        Description: Actions border color.
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      CanAddComment:
+        PropertyKind: Input
+        DisplayName: CanAddComment
+        Description: Enables Add Comment.
+        DataType: Boolean
+        Default: =true
+      CanMarkReviewed:
+        PropertyKind: Input
+        DisplayName: CanMarkReviewed
+        Description: Enables Mark Reviewed.
+        DataType: Boolean
+        Default: =true
+      CanOpenPunch:
+        PropertyKind: Input
+        DisplayName: CanOpenPunch
+        Description: Enables Open in Punch List.
+        DataType: Boolean
+        Default: =true
+      CanSave:
+        PropertyKind: Input
+        DisplayName: CanSave
+        Description: Enables Save Changes.
+        DataType: Boolean
+        Default: =false
+      IsDirty:
+        PropertyKind: Input
+        DisplayName: IsDirty
+        Description: Indicates pending changes.
+        DataType: Boolean
+        Default: =false
+      IsLoading:
+        PropertyKind: Input
+        DisplayName: IsLoading
+        Description: Disables all actions.
+        DataType: Boolean
+        Default: =false
+      IsReviewed:
+        PropertyKind: Input
+        DisplayName: IsReviewed
+        Description: Current review state.
+        DataType: Boolean
+        Default: =false
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        Description: Secondary text color.
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      OnAddComment:
+        PropertyKind: Event
+        DisplayName: OnAddComment
+        Description: Raised when Add Comment is selected.
+        ReturnType: None
+        Default: =
+      OnMarkReviewed:
+        PropertyKind: Event
+        DisplayName: OnMarkReviewed
+        Description: Raised when Mark Reviewed is selected.
+        ReturnType: None
+        Default: =
+      OnOpenPunch:
+        PropertyKind: Event
+        DisplayName: OnOpenPunch
+        Description: Raised when Open in Punch List is selected.
+        ReturnType: None
+        Default: =
+      OnSave:
+        PropertyKind: Event
+        DisplayName: OnSave
+        Description: Raised when Save Changes is selected.
+        ReturnType: None
+        Default: =
+      SurfaceAltColor:
+        PropertyKind: Input
+        DisplayName: SurfaceAltColor
+        Description: Alternate surface color.
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        Description: Primary text color.
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      Title:
+        PropertyKind: Input
+        DisplayName: Title
+        Description: Actions title.
+        DataType: Text
+        Default: ="Review Actions"
+    Properties:
+      Height: =92
+      Width: =640
+    Children:
+      - conPRA_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =cmp_PunchReviewActionsPro.BorderColor
+            BorderThickness: =1
+            DropShadow: =DropShadow.Semilight
+            Fill: =cmp_PunchReviewActionsPro.BackgroundColor
+            Height: =Parent.Height
+            RadiusBottomLeft: =14
+            RadiusBottomRight: =14
+            RadiusTopLeft: =14
+            RadiusTopRight: =14
+            Width: =Parent.Width
+          Children:
+            - lblPRA_Title:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewActionsPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =22
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =10
+                  Text: =cmp_PunchReviewActionsPro.Title
+                  Width: =180
+                  X: =16
+                  Y: =10
+            - lblPRA_Dirty:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Right
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewActionsPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =22
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: =If(cmp_PunchReviewActionsPro.IsDirty, "Unsaved changes", "Session state")
+                  Width: =130
+                  X: =Parent.Width - Self.Width - 16
+                  Y: =10
+            - btnPRA_MarkReviewed:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =cmp_PunchReviewActionsPro.AccentColor
+                  BorderStyle: =BorderStyle.None
+                  BorderThickness: =0
+                  Color: =Color.White
+                  DisabledBorderColor: =cmp_PunchReviewActionsPro.BorderColor
+                  DisabledColor: =cmp_PunchReviewActionsPro.MutedTextColor
+                  DisabledFill: =cmp_PunchReviewActionsPro.SurfaceAltColor
+                  DisplayMode: =If(cmp_PunchReviewActionsPro.IsLoading || !cmp_PunchReviewActionsPro.CanMarkReviewed || cmp_PunchReviewActionsPro.IsReviewed, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =cmp_PunchReviewActionsPro.AccentColor
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =36
+                  HoverBorderColor: =cmp_PunchReviewActionsPro.AccentColor
+                  HoverColor: =Color.White
+                  HoverFill: =ColorFade(cmp_PunchReviewActionsPro.AccentColor, -0.10)
+                  OnSelect: =cmp_PunchReviewActionsPro.OnMarkReviewed()
+                  PressedBorderColor: =cmp_PunchReviewActionsPro.AccentColor
+                  PressedColor: =Color.White
+                  PressedFill: =ColorFade(cmp_PunchReviewActionsPro.AccentColor, -0.18)
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =9
+                  Text: =If(cmp_PunchReviewActionsPro.IsReviewed, "Reviewed in session", "Mark Reviewed")
+                  Width: =132
+                  X: =16
+                  Y: =42
+            - btnPRA_OpenPunch:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =cmp_PunchReviewActionsPro.AccentColor
+                  BorderThickness: =1
+                  Color: =cmp_PunchReviewActionsPro.AccentColor
+                  DisabledBorderColor: =cmp_PunchReviewActionsPro.BorderColor
+                  DisabledColor: =cmp_PunchReviewActionsPro.MutedTextColor
+                  DisabledFill: =cmp_PunchReviewActionsPro.SurfaceAltColor
+                  DisplayMode: =If(cmp_PunchReviewActionsPro.IsLoading || !cmp_PunchReviewActionsPro.CanOpenPunch, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =cmp_PunchReviewActionsPro.BackgroundColor
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =36
+                  HoverBorderColor: =cmp_PunchReviewActionsPro.AccentColor
+                  HoverColor: =cmp_PunchReviewActionsPro.AccentColor
+                  HoverFill: =ColorFade(cmp_PunchReviewActionsPro.AccentColor, 0.94)
+                  OnSelect: =cmp_PunchReviewActionsPro.OnOpenPunch()
+                  PressedBorderColor: =cmp_PunchReviewActionsPro.AccentColor
+                  PressedColor: =cmp_PunchReviewActionsPro.AccentColor
+                  PressedFill: =ColorFade(cmp_PunchReviewActionsPro.AccentColor, 0.88)
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =9
+                  Text: ="Open in Punch List"
+                  Width: =142
+                  X: =156
+                  Y: =42
+            - btnPRA_AddComment:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =cmp_PunchReviewActionsPro.AccentColor
+                  BorderThickness: =1
+                  Color: =cmp_PunchReviewActionsPro.AccentColor
+                  DisabledBorderColor: =cmp_PunchReviewActionsPro.BorderColor
+                  DisabledColor: =cmp_PunchReviewActionsPro.MutedTextColor
+                  DisabledFill: =cmp_PunchReviewActionsPro.SurfaceAltColor
+                  DisplayMode: =If(cmp_PunchReviewActionsPro.IsLoading || !cmp_PunchReviewActionsPro.CanAddComment, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =cmp_PunchReviewActionsPro.BackgroundColor
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =36
+                  HoverBorderColor: =cmp_PunchReviewActionsPro.AccentColor
+                  HoverColor: =cmp_PunchReviewActionsPro.AccentColor
+                  HoverFill: =ColorFade(cmp_PunchReviewActionsPro.AccentColor, 0.94)
+                  OnSelect: =cmp_PunchReviewActionsPro.OnAddComment()
+                  PressedBorderColor: =cmp_PunchReviewActionsPro.AccentColor
+                  PressedColor: =cmp_PunchReviewActionsPro.AccentColor
+                  PressedFill: =ColorFade(cmp_PunchReviewActionsPro.AccentColor, 0.88)
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =9
+                  Text: ="Add Comment"
+                  Width: =118
+                  X: =306
+                  Y: =42
+            - btnPRA_Save:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =cmp_PunchReviewActionsPro.AccentColor
+                  BorderThickness: =1
+                  Color: =cmp_PunchReviewActionsPro.AccentColor
+                  DisabledBorderColor: =cmp_PunchReviewActionsPro.BorderColor
+                  DisabledColor: =cmp_PunchReviewActionsPro.MutedTextColor
+                  DisabledFill: =cmp_PunchReviewActionsPro.SurfaceAltColor
+                  DisplayMode: =If(cmp_PunchReviewActionsPro.IsLoading || !cmp_PunchReviewActionsPro.CanSave, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =cmp_PunchReviewActionsPro.BackgroundColor
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =36
+                  HoverBorderColor: =cmp_PunchReviewActionsPro.AccentColor
+                  HoverColor: =cmp_PunchReviewActionsPro.AccentColor
+                  HoverFill: =ColorFade(cmp_PunchReviewActionsPro.AccentColor, 0.94)
+                  OnSelect: =cmp_PunchReviewActionsPro.OnSave()
+                  PressedBorderColor: =cmp_PunchReviewActionsPro.AccentColor
+                  PressedColor: =cmp_PunchReviewActionsPro.AccentColor
+                  PressedFill: =ColorFade(cmp_PunchReviewActionsPro.AccentColor, 0.88)
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =9
+                  Text: ="Save Changes"
+                  Width: =118
+                  X: =432
+                  Y: =42
