@@ -1,0 +1,489 @@
+# BLOCK 06 — PREMIUM PUNCH OVERVIEW
+#
+# Operation: REPLACE CONTROL COMPLETELY.
+# Target control: conPR_OverviewSlot
+# Parent: conPR_CenterColumn
+#
+# Replace the complete placeholder control created in Block 03 with this node.
+# Do not keep lblPR_OverviewPlaceholder.
+#
+# Dependencies:
+# - Blocks 01–05 validated.
+# - varPunchReviewCurrent and varPunchReviewCurrentId are initialized by Block 04.
+# - Block 05 updates the current record when the queue selection changes.
+#
+# Compatibility rule:
+# - Label@2.5.1 contains no Radius* properties.
+# - The rounded status pill is a GroupContainer@1.5.0 containing a plain Label.
+#
+# Validation after paste:
+# 1. Empty queue shows the overview empty state.
+# 2. Loading state can cover the card when varPunchReviewIsLoading = true.
+# 3. Selecting a queue row updates every displayed field.
+# 4. Status colours change for OPEN, IN PROGRESS and CLOSED.
+
+- conPR_OverviewCard:
+    Control: GroupContainer@1.5.0
+    Variant: ManualLayout
+    Properties:
+      BorderColor: =varTheme_Border
+      BorderThickness: =1
+      DropShadow: =DropShadow.Semilight
+      Fill: =varTheme_Surface
+      FillPortions: =0
+      Height: =210
+      LayoutMinHeight: =200
+      LayoutMinWidth: =300
+      RadiusBottomLeft: =12
+      RadiusBottomRight: =12
+      RadiusTopLeft: =12
+      RadiusTopRight: =12
+      Width: =Parent.Width
+    Children:
+      - lblPR_OverviewTitle:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_Text
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =26
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =11
+            Text: ="Punch Overview"
+            Width: =220
+            X: =16
+            Y: =10
+      - lblPR_OverviewPosition:
+          Control: Label@2.5.1
+          Properties:
+            Align: =Align.Right
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_TextMuted
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =24
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =8
+            Text: |-
+              =If(
+                  CountRows(colPunchReviewQueue) = 0,
+                  "No active punch",
+                  Text(varPunchReviewCurrentIndex) & " of " & Text(CountRows(colPunchReviewQueue))
+              )
+            Width: =150
+            X: =Parent.Width - 166
+            Y: =11
+      - rectPR_OverviewDivider:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            BorderStyle: =BorderStyle.None
+            Fill: =varTheme_Border
+            Height: =1
+            Width: =Parent.Width
+            Y: =43
+      - lblPR_PunchIdLabel:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_TextMuted
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =16
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =8
+            Text: ="Punch ID"
+            Width: =130
+            X: =16
+            Y: =52
+      - lblPR_PunchIdValue:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_Text
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =21
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =9
+            Text: =Coalesce(varPunchReviewCurrent.PunchCode, Text(varPunchReviewCurrent.PunchIdNumber), "-")
+            Width: =Min(170, Parent.Width * 0.28)
+            Wrap: =false
+            X: =16
+            Y: =68
+      - lblPR_SubsystemLabel:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_TextMuted
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =16
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =8
+            Text: ="Subsystem"
+            Width: =140
+            X: =Max(180, Parent.Width * 0.34)
+            Y: =52
+      - lblPR_SubsystemValue:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_Text
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =21
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =9
+            Text: =Coalesce(varPunchReviewCurrent.SubsystemCode, "-")
+            Width: =Min(180, Parent.Width * 0.27)
+            Wrap: =false
+            X: =lblPR_SubsystemLabel.X
+            Y: =68
+      - lblPR_StatusLabel:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_TextMuted
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =16
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =8
+            Text: ="Status"
+            Width: =100
+            X: =Parent.Width - 126
+            Y: =52
+      - conPR_OverviewStatusPill:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            BorderThickness: =0
+            DropShadow: =DropShadow.None
+            Fill: |-
+              =Switch(
+                  Upper(Coalesce(varPunchReviewCurrent.StatusCode, varPunchReviewCurrent.StatusLabel, "")),
+                  "OPEN", ColorValue("#FEE2E2"),
+                  "IN PROGRESS", ColorValue("#FEF3C7"),
+                  "IN_PROGRESS", ColorValue("#FEF3C7"),
+                  "CLOSED", ColorValue("#DCFCE7"),
+                  "CLEARED", ColorValue("#DBEAFE"),
+                  varTheme_SurfaceAlt
+              )
+            Height: =24
+            RadiusBottomLeft: =12
+            RadiusBottomRight: =12
+            RadiusTopLeft: =12
+            RadiusTopRight: =12
+            Width: =104
+            X: =Parent.Width - 120
+            Y: =67
+          Children:
+            - lblPR_StatusValue:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: |-
+                    =Switch(
+                        Upper(Coalesce(varPunchReviewCurrent.StatusCode, varPunchReviewCurrent.StatusLabel, "")),
+                        "OPEN", ColorValue("#B91C1C"),
+                        "IN PROGRESS", ColorValue("#B45309"),
+                        "IN_PROGRESS", ColorValue("#B45309"),
+                        "CLOSED", ColorValue("#15803D"),
+                        "CLEARED", ColorValue("#1D4ED8"),
+                        varTheme_TextMuted
+                    )
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =Parent.Height
+                  PaddingBottom: =0
+                  PaddingLeft: =4
+                  PaddingRight: =4
+                  PaddingTop: =0
+                  Size: =7
+                  Text: =Upper(Coalesce(varPunchReviewCurrent.StatusLabel, varPunchReviewCurrent.StatusCode, "-"))
+                  Width: =Parent.Width
+      - lblPR_DescriptionLabel:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_TextMuted
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =16
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =8
+            Text: ="Description"
+            Width: =150
+            X: =16
+            Y: =101
+      - lblPR_DescriptionValue:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_Text
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =38
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =8
+            PaddingTop: =0
+            Size: =8
+            Text: =Coalesce(varPunchReviewCurrent.Description, "-")
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Max(220, Parent.Width * 0.56)
+            Wrap: =true
+            X: =16
+            Y: =118
+      - lblPR_DisciplineLabel:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_TextMuted
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =16
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =8
+            Text: ="Discipline"
+            Width: =130
+            X: =Max(250, Parent.Width * 0.62)
+            Y: =101
+      - lblPR_DisciplineValue:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_Text
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =9
+            Text: =Coalesce(varPunchReviewCurrent.Discipline, "-")
+            Width: =Parent.Width - Self.X - 16
+            Wrap: =false
+            X: =lblPR_DisciplineLabel.X
+            Y: =118
+      - lblPR_ResponsibleLabel:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_TextMuted
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =16
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =8
+            Text: ="Responsible party"
+            Width: =160
+            X: =16
+            Y: =164
+      - lblPR_ResponsibleValue:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_Text
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =20
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =8
+            Text: =Coalesce(varPunchReviewCurrent.ResponsibleParty, "-")
+            Width: =Max(150, Parent.Width * 0.30)
+            Wrap: =false
+            X: =16
+            Y: =180
+      - lblPR_CategoryLabel:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_TextMuted
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =16
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =8
+            Text: ="Category"
+            Width: =110
+            X: =Max(185, Parent.Width * 0.36)
+            Y: =164
+      - lblPR_CategoryValue:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_Text
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =20
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =8
+            Text: =Coalesce(varPunchReviewCurrent.Category, "-")
+            Width: =Max(100, Parent.Width * 0.20)
+            Wrap: =false
+            X: =lblPR_CategoryLabel.X
+            Y: =180
+      - lblPR_OriginatorLabel:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_TextMuted
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =16
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =8
+            Text: ="Originator"
+            Width: =110
+            X: =Max(300, Parent.Width * 0.67)
+            Y: =164
+      - lblPR_OriginatorValue:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_Text
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =20
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =8
+            Text: =Coalesce(varPunchReviewCurrent.Originator, "-")
+            Width: =Parent.Width - Self.X - 16
+            Wrap: =false
+            X: =lblPR_OriginatorLabel.X
+            Y: =180
+      - conPR_OverviewEmpty:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =varTheme_Surface
+            Height: =Parent.Height - 44
+            Visible: =IsBlank(varPunchReviewCurrentId) && !varPunchReviewIsLoading
+            Width: =Parent.Width
+            Y: =44
+          Children:
+            - icoPR_OverviewEmpty:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_PulseBlueDark
+                  Height: =32
+                  Icon: =Icon.DocumentWithContent
+                  Width: =32
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =35
+            - lblPR_OverviewEmptyTitle:
+                Control: ModernText@1.0.0
+                Properties:
+                  Align: =Align.Center
+                  AutoHeight: =true
+                  Color: =varTheme_Text
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  Size: =11
+                  Text: ="No Punch selected"
+                  Width: =Parent.Width - 48
+                  X: =24
+                  Y: =78
+            - lblPR_OverviewEmptyText:
+                Control: ModernText@1.0.0
+                Properties:
+                  Align: =Align.Center
+                  AutoHeight: =true
+                  Color: =varTheme_TextMuted
+                  Height: =38
+                  Size: =9
+                  Text: ="Select a Punch from the review queue to inspect its current context."
+                  Width: =Parent.Width - 72
+                  X: =36
+                  Y: =106
+      - conPR_OverviewLoading:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =RGBA(255,255,255,0.86)
+            Height: =Parent.Height - 44
+            Visible: =varPunchReviewIsLoading
+            Width: =Parent.Width
+            Y: =44
+          Children:
+            - spnPR_OverviewLoading:
+                Control: Spinner@1.4.6
+                Properties:
+                  Height: =30
+                  SpinnerColor: =varTheme_PulseBlueDark
+                  Width: =30
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =56
+            - lblPR_OverviewLoading:
+                Control: ModernText@1.0.0
+                Properties:
+                  Align: =Align.Center
+                  Color: =varTheme_TextMuted
+                  Height: =24
+                  Size: =9
+                  Text: ="Loading Punch context..."
+                  Width: =Parent.Width - 48
+                  X: =24
+                  Y: =96
