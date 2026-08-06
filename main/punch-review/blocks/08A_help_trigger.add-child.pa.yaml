@@ -1,0 +1,47 @@
+# BLOCK 08A — HELP MODAL TRIGGER
+#
+# Operation: ADD AS LAST CHILD.
+# Parent control: conPR_HeaderSelectors
+# Exact location: after btnPR_Back.
+#
+# Dependencies:
+# - Blocks 01–08 validated.
+# - Block 08B must also be added before testing the trigger.
+#
+# This control opens the bilingual user-help modal.
+# It is an icon inside a rounded container, not one of the language tabs.
+
+- conPR_HelpTrigger:
+    Control: GroupContainer@1.5.0
+    Variant: ManualLayout
+    Properties:
+      BorderColor: =varTheme_Border
+      BorderThickness: =1
+      DropShadow: =DropShadow.None
+      Fill: =varTheme_Surface
+      FillPortions: =0
+      Height: =40
+      LayoutMinHeight: =40
+      LayoutMinWidth: =40
+      RadiusBottomLeft: =10
+      RadiusBottomRight: =10
+      RadiusTopLeft: =10
+      RadiusTopRight: =10
+      Width: =40
+    Children:
+      - icoPR_OpenHelp:
+          Control: Classic/Icon@2.5.0
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_PulseBlueDark
+            Height: =22
+            HoverColor: =ColorFade(varTheme_PulseBlueDark, -0.12)
+            Icon: =Icon.Information
+            OnSelect: |-
+              =Set(varPunchReviewHelpLanguage, "ES");
+              Set(varPunchReviewHelpVisible, true);
+              Reset(tabPR_HelpLanguage)
+            Tooltip: ="Ayuda / Help"
+            Width: =22
+            X: =9
+            Y: =9
