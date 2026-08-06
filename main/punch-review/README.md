@@ -4,7 +4,7 @@ Esta carpeta contiene los bloques incrementales para construir `scr_PunchReview`
 
 ## Rama de publicación
 
-Los bloques validados y listos para utilizar se publican directamente en `main`:
+Los bloques listos para utilizar se publican directamente en `main`:
 
 ```text
 main/punch-review/blocks/
@@ -27,16 +27,50 @@ Cada bloque indica:
 1. `01_screen_shell.pa.yaml` — validado
 2. `02_header_premium.children.pa.yaml` — validado
 3. `03_workspace_layout.children.pa.yaml` — validado
-4. `04_runtime_state.onvisible.pa.yaml` — corrección tipada publicada; pendiente de revalidación
+4. `04_runtime_state.onvisible.pa.yaml` — validado tras corrección tipada
 5. `05_review_queue.replace-control.pa.yaml` — validado
 6. `05A_review_queue_test_seed.optional.powerfx` — opcional para pruebas
 7. `06_punch_overview.replace-control.pa.yaml` — validado
 8. `07_review_actions.replace-control.pa.yaml` — validado
-9. `08_session_activity.replace-control.pa.yaml` — integrado; pendiente de validación final junto con las correcciones
-10. `08A_help_trigger.add-child.pa.yaml` — corrección de `Reset(TabList)` publicada; pendiente de revalidación
-11. `08B_bilingual_help_modal.add-screen-child.pa.yaml` — integrado; `TabList@2.2.30` validado para sus propiedades declaradas
+9. `08_session_activity.replace-control.pa.yaml` — validado
+10. `08A_help_trigger.add-child.pa.yaml` — validado tras eliminar `Reset(TabList)`
+11. `08B_bilingual_help_modal.add-screen-child.pa.yaml` — validado
+12. `09_comments.replace-control.pa.yaml` — pendiente de validación en Studio
+13. `09A_comments_selection_hook.replace-formula.powerfx` — integrar después de validar visualmente el panel
+14. `09B_comments_test_seed.optional.powerfx` — opcional para pruebas visuales
+15. `09C_help_comments.incremental-patch.pa.yaml` — aplicar después de validar el Bloque 09
 
-No se debe iniciar el Bloque 09 hasta que las correcciones de los Bloques 04 y 08A guarden sin errores nuevos en Studio.
+No se debe iniciar el Bloque 10 hasta que el panel Comments, su carga real, la paginación y el alta de comentarios hayan sido validados.
+
+## Contratos del Bloque 09
+
+Carga confirmada desde la pantalla Punches:
+
+```text
+Warroom_GetTaskCommentsPaged.Run(
+    ProjectId,
+    RecordId,
+    Page,
+    PageSize,
+    EntityType
+)
+```
+
+Alta utilizada por la arquitectura de comentarios:
+
+```text
+Warroom_AddTaskComment.Run(
+    ProjectId,
+    RecordId,
+    CommentHtml,
+    UserEmail,
+    EntityType,
+    UserName,
+    CommentType
+)
+```
+
+La validación visual con los Punches ficticios del Bloque 05A debe realizarse mediante `09B_comments_test_seed.optional.powerfx`. La validación de flows necesita un Punch real.
 
 ## Manual de usuario
 
