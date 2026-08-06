@@ -1,0 +1,151 @@
+// BLOCK 05A — OPTIONAL TEST DATA FOR REVIEW QUEUE
+//
+// Use only to validate Block 05 before integrating Home and Punches.
+// Paste this formula into the OnSelect property of a temporary button on scr_PunchReview.
+// After testing, delete the temporary button. Do not keep this data in production.
+
+ClearCollect(
+    colPunchReviewQueue,
+    {
+        ReviewOrder: 1,
+        RowKey: "100345",
+        PunchIdNumber: 100345,
+        PunchCode: "P-100345",
+        Description: "Handrail gap exceeds 100mm",
+        AreaCode: "A1",
+        UnitCode: "U1",
+        SystemCode: "SYS-01",
+        SubsystemCode: "STRUCTURAL",
+        ElementCode: "EL-100345",
+        Discipline: "Structural",
+        Category: "A",
+        StatusCode: "OPEN",
+        StatusLabel: "Open",
+        ResponsibleParty: "SteelFab Ltd.",
+        InspectionName: "Walkdown",
+        Originator: "Ravi Verma",
+        CommentCount: 1,
+        LastCommentOn: DateAdd(Now(), -3, TimeUnit.Days),
+        IsReviewedInSession: true,
+        IsDirty: false
+    },
+    {
+        ReviewOrder: 2,
+        RowKey: "100346",
+        PunchIdNumber: 100346,
+        PunchCode: "P-100346",
+        Description: "Missing identification tag",
+        AreaCode: "A2",
+        UnitCode: "U1",
+        SystemCode: "HVAC",
+        SubsystemCode: "HVAC",
+        ElementCode: "TAG-100346",
+        Discipline: "Mechanical",
+        Category: "B",
+        StatusCode: "OPEN",
+        StatusLabel: "Open",
+        ResponsibleParty: "ABC Mechanical",
+        InspectionName: "Tag verification",
+        Originator: "Ravi Verma",
+        CommentCount: 3,
+        LastCommentOn: DateAdd(Now(), -1, TimeUnit.Days),
+        IsReviewedInSession: false,
+        IsDirty: false
+    },
+    {
+        ReviewOrder: 3,
+        RowKey: "100347",
+        PunchIdNumber: 100347,
+        PunchCode: "P-100347",
+        Description: "Paint touch-up required at flange",
+        AreaCode: "A2",
+        UnitCode: "U1",
+        SystemCode: "PIPING",
+        SubsystemCode: "PIPING",
+        ElementCode: "FL-100347",
+        Discipline: "Mechanical",
+        Category: "C",
+        StatusCode: "IN PROGRESS",
+        StatusLabel: "In Progress",
+        ResponsibleParty: "ABC Mechanical",
+        InspectionName: "Visual inspection",
+        Originator: "Sahil Khan",
+        CommentCount: 2,
+        LastCommentOn: DateAdd(Now(), -2, TimeUnit.Days),
+        IsReviewedInSession: true,
+        IsDirty: false
+    },
+    {
+        ReviewOrder: 4,
+        RowKey: "100348",
+        PunchIdNumber: 100348,
+        PunchCode: "P-100348",
+        Description: "Cable tray support loose",
+        AreaCode: "A3",
+        UnitCode: "U2",
+        SystemCode: "ELECTRICAL",
+        SubsystemCode: "ELECTRICAL",
+        ElementCode: "CT-100348",
+        Discipline: "Electrical",
+        Category: "B",
+        StatusCode: "OPEN",
+        StatusLabel: "Open",
+        ResponsibleParty: "ElectroWorks",
+        InspectionName: "Installation check",
+        Originator: "Anita Mehra",
+        CommentCount: 0,
+        LastCommentOn: Blank(),
+        IsReviewedInSession: false,
+        IsDirty: false
+    },
+    {
+        ReviewOrder: 5,
+        RowKey: "100349",
+        PunchIdNumber: 100349,
+        PunchCode: "P-100349",
+        Description: "Insulation damage on line",
+        AreaCode: "A3",
+        UnitCode: "U2",
+        SystemCode: "PIPING",
+        SubsystemCode: "PIPING",
+        ElementCode: "LN-100349",
+        Discipline: "Piping",
+        Category: "B",
+        StatusCode: "OPEN",
+        StatusLabel: "Open",
+        ResponsibleParty: "PipePro Ltd.",
+        InspectionName: "Insulation inspection",
+        Originator: "Anita Mehra",
+        CommentCount: 1,
+        LastCommentOn: DateAdd(Now(), -4, TimeUnit.Days),
+        IsReviewedInSession: false,
+        IsDirty: false
+    }
+);
+
+Set(varPunchReviewSearch, "");
+Set(varPunchReviewQuickFilter, "ALL");
+Set(varPunchReviewCurrentIndex, 2);
+Set(varPunchReviewRequestedIndex, 2);
+
+ClearCollect(
+    colPunchReviewQueueView,
+    SortByColumns(
+        colPunchReviewQueue,
+        "ReviewOrder",
+        SortOrder.Ascending
+    )
+);
+
+Set(
+    varPunchReviewCurrent,
+    LookUp(
+        colPunchReviewQueue,
+        ReviewOrder = varPunchReviewCurrentIndex
+    )
+);
+
+Set(
+    varPunchReviewCurrentId,
+    varPunchReviewCurrent.PunchIdNumber
+);
