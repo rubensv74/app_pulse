@@ -1,0 +1,400 @@
+# BLOCK 02 — PREMIUM HEADER
+#
+# Operation: ADD AS FIRST CHILD.
+# Parent control: conPR_ContentShell
+# Exact location: conPR_ContentShell > Children, before any future body/workspace control.
+# Dependency: Block 01 must already be valid.
+#
+# Validation after paste:
+# 1. Header title/subtitle are visible.
+# 2. Project, template and queue-scope contexts are aligned.
+# 3. Back returns to the previous screen.
+# 4. The blue session-only banner is visible.
+# 5. At narrow widths the selector row scrolls horizontally rather than overlapping.
+
+- conPR_HeaderCard:
+    Control: GroupContainer@1.5.0
+    Variant: AutoLayout
+    Properties:
+      BorderColor: =varTheme_Border
+      BorderThickness: =1
+      DropShadow: =DropShadow.Semilight
+      Fill: =varTheme_Surface
+      FillPortions: =0
+      Height: =If(App.Width < 1400, 168, 118)
+      LayoutAlignItems: =LayoutAlignItems.Stretch
+      LayoutDirection: =LayoutDirection.Vertical
+      LayoutGap: =6
+      LayoutMinHeight: =118
+      LayoutMinWidth: =320
+      PaddingBottom: =10
+      PaddingLeft: =14
+      PaddingRight: =14
+      PaddingTop: =10
+      RadiusBottomLeft: =14
+      RadiusBottomRight: =14
+      RadiusTopLeft: =14
+      RadiusTopRight: =14
+      Width: =Parent.Width
+    Children:
+      - conPR_HeaderMain:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =Color.Transparent
+            FillPortions: =0
+            Height: =If(App.Width < 1400, 112, 66)
+            LayoutAlignItems: =LayoutAlignItems.Center
+            LayoutDirection: =If(App.Width < 1400, LayoutDirection.Vertical, LayoutDirection.Horizontal)
+            LayoutGap: =8
+            LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+            LayoutMinHeight: =66
+            LayoutMinWidth: =300
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Width: =Parent.Width
+          Children:
+            - conPR_HeaderIdentity:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.Stretch
+                  DropShadow: =DropShadow.None
+                  Fill: =Color.Transparent
+                  FillPortions: =1
+                  Height: =50
+                  LayoutAlignItems: =LayoutAlignItems.Start
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =0
+                  LayoutJustifyContent: =LayoutJustifyContent.Center
+                  LayoutMinHeight: =48
+                  LayoutMinWidth: =260
+                  PaddingLeft: =4
+                  Width: =If(App.Width < 1400, Parent.Width, 360)
+                Children:
+                  - lblPR_Title:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_Text
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =28
+                        LayoutMinHeight: =24
+                        LayoutMinWidth: =220
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =18
+                        Text: ="Punch Review Workspace"
+                        VerticalAlign: =VerticalAlign.Middle
+                        Width: =Parent.Width
+                  - lblPR_Subtitle:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_TextMuted
+                        Font: =Font.'Segoe UI'
+                        Height: =20
+                        LayoutMinHeight: =18
+                        LayoutMinWidth: =220
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =10
+                        Text: ="Sequential review, comments and custom fields"
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =Parent.Width
+            - conPR_HeaderSelectors:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.Stretch
+                  DropShadow: =DropShadow.None
+                  Fill: =Color.Transparent
+                  FillPortions: =0
+                  Height: =56
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =8
+                  LayoutJustifyContent: =LayoutJustifyContent.End
+                  LayoutMinHeight: =54
+                  LayoutMinWidth: =300
+                  LayoutOverflowX: =LayoutOverflow.Scroll
+                  Width: =If(App.Width < 1400, Parent.Width, Min(930, Parent.Width * 0.68))
+                Children:
+                  - conPR_ProjectContext:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: =varTheme_Border
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =varTheme_Surface
+                        Height: =48
+                        LayoutMinHeight: =48
+                        LayoutMinWidth: =300
+                        RadiusBottomLeft: =9
+                        RadiusBottomRight: =9
+                        RadiusTopLeft: =9
+                        RadiusTopRight: =9
+                        Width: =320
+                      Children:
+                        - icoPR_Project:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =varTheme_PulseBlueDark
+                              Height: =20
+                              Icon: =Icon.Folder
+                              Width: =20
+                              X: =12
+                              Y: =14
+                        - lblPR_ProjectLabel:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =varTheme_TextMuted
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              Height: =16
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =8
+                              Text: ="Project"
+                              Width: =Parent.Width - 52
+                              X: =42
+                              Y: =4
+                        - lblPR_ProjectValue:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =varTheme_Text
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =22
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =4
+                              PaddingTop: =0
+                              Size: =9
+                              Text: |-
+                                =If(
+                                    IsBlank(varProjectId),
+                                    "No project selected",
+                                    Coalesce(varSelectedProject.ProjectCode, Text(varProjectId)) &
+                                    " · " &
+                                    Coalesce(varSelectedProject.ProjectName, "Project")
+                                )
+                              Width: =Parent.Width - 52
+                              Wrap: =false
+                              X: =42
+                              Y: =20
+                  - conPR_TemplateContext:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: =varTheme_Border
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =varTheme_Surface
+                        Height: =48
+                        LayoutMinHeight: =48
+                        LayoutMinWidth: =200
+                        RadiusBottomLeft: =9
+                        RadiusBottomRight: =9
+                        RadiusTopLeft: =9
+                        RadiusTopRight: =9
+                        Width: =220
+                      Children:
+                        - lblPR_TemplateLabel:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =varTheme_TextMuted
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              Height: =15
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =8
+                              Text: ="Punch template"
+                              Width: =Parent.Width - 20
+                              X: =10
+                              Y: =2
+                        - cmbPR_Template:
+                            Control: ModernCombobox@1.1.1
+                            Properties:
+                              Appearance: =Appearance.Outline
+                              DefaultSelectedItems: |-
+                                =If(
+                                    IsBlank(varFilter_PunchTemplateId),
+                                    Blank(),
+                                    Filter(
+                                        colPunchTemplates_Filter,
+                                        Text(TemplateId) = Text(varFilter_PunchTemplateId)
+                                    )
+                                )
+                              Height: =29
+                              InputTextPlaceholder: ="Template"
+                              ItemDisplayText: =ThisItem.TemplateLabel
+                              Items: =colPunchTemplates_Filter
+                              OnChange: |-
+                                =Set(
+                                    varPunchReviewTemplateId,
+                                    If(
+                                        IsBlank(cmbPR_Template.Selected.TemplateId),
+                                        Blank(),
+                                        Value(cmbPR_Template.Selected.TemplateId)
+                                    )
+                                )
+                              SelectMultiple: =false
+                              Width: =Parent.Width - 12
+                              X: =6
+                              Y: =17
+                  - conPR_QueueScopeContext:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: =varTheme_Border
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =varTheme_Surface
+                        Height: =48
+                        LayoutMinHeight: =48
+                        LayoutMinWidth: =180
+                        RadiusBottomLeft: =9
+                        RadiusBottomRight: =9
+                        RadiusTopLeft: =9
+                        RadiusTopRight: =9
+                        Width: =190
+                      Children:
+                        - lblPR_QueueScopeLabel:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =varTheme_TextMuted
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              Height: =15
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =8
+                              Text: ="Queue scope"
+                              Width: =Parent.Width - 20
+                              X: =10
+                              Y: =2
+                        - cmbPR_QueueScope:
+                            Control: ModernCombobox@1.1.1
+                            Properties:
+                              Appearance: =Appearance.Outline
+                              DefaultSelectedItems: |-
+                                =Filter(
+                                    Table(
+                                        {Key:"CURRENT_PAGE", Label:"Current loaded page"},
+                                        {Key:"HOME_CONTEXT", Label:"Current Home context"},
+                                        {Key:"SELECTED", Label:"Selected punches"}
+                                    ),
+                                    Key = Coalesce(varPunchReviewQueueScope, "CURRENT_PAGE")
+                                )
+                              Height: =29
+                              InputTextPlaceholder: ="Queue scope"
+                              ItemDisplayText: =ThisItem.Label
+                              Items: |-
+                                =Table(
+                                    {Key:"CURRENT_PAGE", Label:"Current loaded page"},
+                                    {Key:"HOME_CONTEXT", Label:"Current Home context"},
+                                    {Key:"SELECTED", Label:"Selected punches"}
+                                )
+                              OnChange: =Set(varPunchReviewQueueScope, cmbPR_QueueScope.Selected.Key)
+                              SelectMultiple: =false
+                              Width: =Parent.Width - 12
+                              X: =6
+                              Y: =17
+                  - btnPR_Back:
+                      Control: ModernButton@1.0.0
+                      Properties:
+                        Appearance: =ButtonAppearance.Primary
+                        BasePaletteColor: =varTheme_PulseBlueDark
+                        Height: =40
+                        Icon: ="ChevronLeft"
+                        IconStyle: =IconStyle.Filled
+                        LayoutMinHeight: =40
+                        LayoutMinWidth: =142
+                        OnSelect: =Back()
+                        Text: ="Back to Punches"
+                        Width: =150
+      - conPR_SessionBanner:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =ColorValue("#BFDBFE")
+            BorderThickness: =1
+            DropShadow: =DropShadow.None
+            Fill: =ColorValue("#EFF6FF")
+            Height: =30
+            LayoutMinHeight: =30
+            LayoutMinWidth: =280
+            RadiusBottomLeft: =8
+            RadiusBottomRight: =8
+            RadiusTopLeft: =8
+            RadiusTopRight: =8
+            Width: =Parent.Width
+          Children:
+            - icoPR_SessionInfo:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_PulseBlueDark
+                  Height: =15
+                  Icon: =Icon.Information
+                  Width: =15
+                  X: =10
+                  Y: =7
+            - lblPR_SessionBadge:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_PulseBlueDark
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =8
+                  Text: ="Session review only"
+                  Width: =112
+                  X: =31
+                  Y: =3
+            - lblPR_SessionText:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_TextMuted
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =8
+                  Text: ="Reviewed items are stored locally for this session only."
+                  Width: =Parent.Width - 155
+                  X: =145
+                  Y: =3

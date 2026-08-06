@@ -1,0 +1,90 @@
+# BLOCK 01 — SCREEN SHELL
+#
+# Operation: CREATE NEW SCREEN FROM SOURCE CODE.
+# Target file in Studio/export: scr_PunchReview.pa.yaml
+# Dependencies: cmp_SidebarNav must already exist in the app.
+#
+# Validation after paste:
+# 1. The screen opens without formula errors.
+# 2. The sidebar is visible at the left.
+# 3. The remaining area is an empty light-grey content surface.
+# 4. App Checker reports no new PA1001/PA2108 errors.
+
+Screens:
+  scr_PunchReview:
+    Properties:
+      Fill: =varTheme_PageBg
+      LoadingSpinnerColor: =varTheme_PulseBlueDark
+      OnVisible: |-
+        =
+        // =====================================================
+        // BLOCK 01 — MINIMUM SCREEN INITIALIZATION
+        // No flows and no business collections in this block.
+        // =====================================================
+
+        If(IsBlank(varTheme_PageBg), Set(varTheme_PageBg, ColorValue("#F6F8FB")));
+        If(IsBlank(varTheme_Surface), Set(varTheme_Surface, ColorValue("#FFFFFF")));
+        If(IsBlank(varTheme_SurfaceAlt), Set(varTheme_SurfaceAlt, ColorValue("#F8FAFC")));
+        If(IsBlank(varTheme_Border), Set(varTheme_Border, ColorValue("#E2E8F0")));
+        If(IsBlank(varTheme_Text), Set(varTheme_Text, ColorValue("#0F172A")));
+        If(IsBlank(varTheme_TextMuted), Set(varTheme_TextMuted, ColorValue("#64748B")));
+        If(IsBlank(varTheme_PulseBlueDark), Set(varTheme_PulseBlueDark, ColorValue("#1677FF")));
+        If(IsBlank(varTheme_NavBg), Set(varTheme_NavBg, ColorValue("#07111F")));
+
+        Set(varAppView, "PunchReview");
+        Set(varPageKey, "PUNCH_REVIEW");
+        Set(varPageTitle, "Punch Review Workspace");
+        Set(varPageSubtitle, "Sequential review, comments and custom fields");
+
+        If(IsBlank(varPunchReviewSource), Set(varPunchReviewSource, "NAVIGATION"));
+        If(IsBlank(varPunchReviewReturnScreen), Set(varPunchReviewReturnScreen, "HOME"));
+    Children:
+      - conPR_ScreenRoot:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =varTheme_PageBg
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutGap: =0
+            Width: =Parent.Width
+          Children:
+            - cmpPR_Sidebar:
+                Control: CanvasComponent
+                ComponentName: cmp_SidebarNav
+                Properties:
+                  ActiveKey: ="PunchReview"
+                  AppVersion: ="PULSE"
+                  EnvironmentLabel: ="ENV.PRE.TR.162"
+                  Fill: =varTheme_NavBg
+                  Height: =Parent.Height
+                  IsCollapsed: =true
+                  Items: =colSidebarNavItems
+                  NavItems: =colSidebarNavItems
+                  ProjectCode: =Coalesce(varSelectedProject.ProjectCode, "")
+                  ProjectName: =Coalesce(varSelectedProject.ProjectName, "")
+                  UserRole: =Coalesce(varUserRole, "reader")
+                  Width: =154
+            - conPR_ContentShell:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.Stretch
+                  DropShadow: =DropShadow.None
+                  Fill: =varTheme_PageBg
+                  FillPortions: =1
+                  Height: =Parent.Height
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =10
+                  LayoutMinHeight: =320
+                  LayoutMinWidth: =320
+                  PaddingBottom: =10
+                  PaddingLeft: =10
+                  PaddingRight: =10
+                  PaddingTop: =10
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0

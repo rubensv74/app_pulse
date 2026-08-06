@@ -1,0 +1,296 @@
+# BLOCK 04 — TYPED RUNTIME STATE
+#
+# Operation: REPLACE PROPERTY COMPLETELY.
+# Target: scr_PunchReview > Properties > OnVisible
+# Replace the minimum OnVisible formula from Block 01 with the complete property below.
+# Dependencies: Blocks 01–03 must already be valid.
+#
+# This block creates typed empty collections and session variables only.
+# It does not call any flow and does not load comments or custom fields.
+# It preserves a queue that may have been created before Navigate(scr_PunchReview).
+#
+# Validation after paste:
+# 1. The screen opens with an empty queue without errors.
+# 2. All colPunchReview* collections appear in the Collections viewer.
+# 3. Reopening the screen does not erase an existing review queue.
+# 4. varPunchReviewCurrentIndex is clamped to the available queue.
+
+OnVisible: |-
+  =
+  // =====================================================
+  // BLOCK 04 — PUNCH REVIEW RUNTIME INITIALIZATION
+  // Typed client state only. No flow calls in this block.
+  // =====================================================
+
+  // -----------------------------------------------------
+  // 1. Theme safety and page identity
+  // -----------------------------------------------------
+
+  If(IsBlank(varTheme_PageBg), Set(varTheme_PageBg, ColorValue("#F6F8FB")));
+  If(IsBlank(varTheme_Surface), Set(varTheme_Surface, ColorValue("#FFFFFF")));
+  If(IsBlank(varTheme_SurfaceAlt), Set(varTheme_SurfaceAlt, ColorValue("#F8FAFC")));
+  If(IsBlank(varTheme_Border), Set(varTheme_Border, ColorValue("#E2E8F0")));
+  If(IsBlank(varTheme_Text), Set(varTheme_Text, ColorValue("#0F172A")));
+  If(IsBlank(varTheme_TextMuted), Set(varTheme_TextMuted, ColorValue("#64748B")));
+  If(IsBlank(varTheme_PulseBlueDark), Set(varTheme_PulseBlueDark, ColorValue("#1677FF")));
+  If(IsBlank(varTheme_NavBg), Set(varTheme_NavBg, ColorValue("#07111F")));
+
+  Set(varAppView, "PunchReview");
+  Set(varPageKey, "PUNCH_REVIEW");
+  Set(varPageTitle, "Punch Review Workspace");
+  Set(varPageSubtitle, "Sequential review, comments and custom fields");
+
+  If(IsBlank(varPunchReviewSource), Set(varPunchReviewSource, "NAVIGATION"));
+  If(IsBlank(varPunchReviewReturnScreen), Set(varPunchReviewReturnScreen, "HOME"));
+
+  If(
+      IsBlank(varPunchReviewQueueScope),
+      Set(
+          varPunchReviewQueueScope,
+          Switch(
+              Upper(Coalesce(varPunchReviewSource, "NAVIGATION")),
+              "PUNCHES", "CURRENT_PAGE",
+              "HOME", "HOME_CONTEXT",
+              "NAVIGATION"
+          )
+      )
+  );
+
+  // -----------------------------------------------------
+  // 2. Stable typed collections
+  // -----------------------------------------------------
+
+  If(
+      IsBlank(varPunchReviewCollectionsInitialized),
+
+      // Queue can already contain rows when the source screen builds it
+      // immediately before Navigate(scr_PunchReview).
+      If(
+          CountRows(colPunchReviewQueue) = 0,
+          ClearCollect(
+              colPunchReviewQueue,
+              {
+                  ReviewOrder: 0,
+                  RowKey: "",
+                  PunchIdNumber: 0,
+                  PunchCode: "",
+                  Description: "",
+                  AreaCode: "",
+                  UnitCode: "",
+                  SystemCode: "",
+                  SubsystemCode: "",
+                  ElementCode: "",
+                  Discipline: "",
+                  Category: "",
+                  StatusCode: "",
+                  StatusLabel: "",
+                  ResponsibleParty: "",
+                  InspectionName: "",
+                  Originator: "",
+                  CommentCount: 0,
+                  LastCommentOn: Blank(),
+                  IsReviewedInSession: false,
+                  IsDirty: false
+              }
+          );
+          Clear(colPunchReviewQueue)
+      );
+
+      ClearCollect(
+          colPunchReviewQueueView,
+          {
+              ReviewOrder: 0,
+              RowKey: "",
+              PunchIdNumber: 0,
+              PunchCode: "",
+              Description: "",
+              AreaCode: "",
+              UnitCode: "",
+              SystemCode: "",
+              SubsystemCode: "",
+              ElementCode: "",
+              Discipline: "",
+              Category: "",
+              StatusCode: "",
+              StatusLabel: "",
+              ResponsibleParty: "",
+              InspectionName: "",
+              Originator: "",
+              CommentCount: 0,
+              LastCommentOn: Blank(),
+              IsReviewedInSession: false,
+              IsDirty: false
+          }
+      );
+      Clear(colPunchReviewQueueView);
+
+      ClearCollect(
+          colPunchReviewComments,
+          {
+              CommentId: 0,
+              CommentType: "",
+              CreatedOn: Blank(),
+              CreatedByEmail: "",
+              CreatedByName: "",
+              ModifiedOn: Blank(),
+              ModifiedByEmail: "",
+              CommentText: "",
+              TotalRows: 0,
+              TotalPages: 0,
+              PageNumber: 1,
+              PageSize: 20
+          }
+      );
+      Clear(colPunchReviewComments);
+
+      ClearCollect(
+          colPunchReviewFieldsUI,
+          {
+              FieldKey: "",
+              FieldLabel: "",
+              FieldType: "",
+              HelpText: "",
+              IsRequired: false,
+              IsPinned: false,
+              IsEditable: true,
+              SortOrder: 0,
+              OptionsJson: "",
+              ValueText: "",
+              ValueNumber: Blank(),
+              ValueDate: Blank(),
+              ValueBool: false,
+              ValueJson: "",
+              LastUpdatedOn: Blank(),
+              LastUpdatedByEmail: ""
+          }
+      );
+      Clear(colPunchReviewFieldsUI);
+
+      ClearCollect(
+          colPunchReviewFieldsBase,
+          {
+              FieldKey: "",
+              FieldLabel: "",
+              FieldType: "",
+              HelpText: "",
+              IsRequired: false,
+              IsPinned: false,
+              IsEditable: true,
+              SortOrder: 0,
+              OptionsJson: "",
+              ValueText: "",
+              ValueNumber: Blank(),
+              ValueDate: Blank(),
+              ValueBool: false,
+              ValueJson: "",
+              LastUpdatedOn: Blank(),
+              LastUpdatedByEmail: ""
+          }
+      );
+      Clear(colPunchReviewFieldsBase);
+
+      ClearCollect(
+          colPunchReviewFieldsDirty,
+          {
+              FieldKey: "",
+              FieldType: "",
+              ValueText: "",
+              ValueNumber: Blank(),
+              ValueDate: Blank(),
+              ValueBool: false,
+              ValueJson: ""
+          }
+      );
+      Clear(colPunchReviewFieldsDirty);
+
+      ClearCollect(
+          colPunchReviewSessionEvents,
+          {
+              EventKey: "",
+              PunchIdNumber: 0,
+              EventLabel: "",
+              EventOn: Blank(),
+              EventBy: "",
+              EventType: ""
+          }
+      );
+      Clear(colPunchReviewSessionEvents);
+
+      Set(varPunchReviewCollectionsInitialized, true)
+  );
+
+  // -----------------------------------------------------
+  // 3. Runtime variables — initialize only when blank
+  // -----------------------------------------------------
+
+  If(IsBlank(varPunchReviewSearch), Set(varPunchReviewSearch, ""));
+  If(IsBlank(varPunchReviewCurrentIndex), Set(varPunchReviewCurrentIndex, 1));
+  If(IsBlank(varPunchReviewCurrentId), Set(varPunchReviewCurrentId, Blank()));
+  If(IsBlank(varPunchReviewDirty), Set(varPunchReviewDirty, false));
+  If(IsBlank(varPunchReviewIsLoading), Set(varPunchReviewIsLoading, false));
+  If(IsBlank(varPunchReviewError), Set(varPunchReviewError, ""));
+
+  If(IsBlank(varPunchReviewCommentsLoading), Set(varPunchReviewCommentsLoading, false));
+  If(IsBlank(varPunchReviewCommentsError), Set(varPunchReviewCommentsError, ""));
+  If(IsBlank(varPunchReviewCommentsPage), Set(varPunchReviewCommentsPage, 1));
+  If(IsBlank(varPunchReviewCommentsPageSize), Set(varPunchReviewCommentsPageSize, 20));
+
+  If(IsBlank(varPunchReviewFieldsLoading), Set(varPunchReviewFieldsLoading, false));
+  If(IsBlank(varPunchReviewFieldsSaving), Set(varPunchReviewFieldsSaving, false));
+  If(IsBlank(varPunchReviewFieldsError), Set(varPunchReviewFieldsError, ""));
+
+  If(IsBlank(varPunchReviewRequestedIndex), Set(varPunchReviewRequestedIndex, Blank()));
+  If(IsBlank(varPunchReviewPendingIndex), Set(varPunchReviewPendingIndex, Blank()));
+  If(IsBlank(varPunchReviewShowDirtyDialog), Set(varPunchReviewShowDirtyDialog, false));
+
+  // -----------------------------------------------------
+  // 4. Queue projection and current record
+  // -----------------------------------------------------
+
+  ClearCollect(
+      colPunchReviewQueueView,
+      SortByColumns(
+          Filter(
+              colPunchReviewQueue,
+              IsBlank(varPunchReviewSearch) ||
+              Lower(varPunchReviewSearch) in
+                  Lower(
+                      Coalesce(PunchCode, "") & " " &
+                      Coalesce(Description, "") & " " &
+                      Coalesce(SubsystemCode, "") & " " &
+                      Coalesce(Discipline, "")
+                  )
+          ),
+          "ReviewOrder",
+          SortOrder.Ascending
+      )
+  );
+
+  If(
+      CountRows(colPunchReviewQueue) = 0,
+
+      Set(varPunchReviewCurrentIndex, 1);
+      Set(varPunchReviewCurrentId, Blank());
+      Set(varPunchReviewCurrent, Blank()),
+
+      Set(
+          varPunchReviewCurrentIndex,
+          Min(
+              Max(1, Coalesce(varPunchReviewCurrentIndex, 1)),
+              CountRows(colPunchReviewQueue)
+          )
+      );
+
+      Set(
+          varPunchReviewCurrent,
+          LookUp(
+              colPunchReviewQueue,
+              ReviewOrder = varPunchReviewCurrentIndex
+          )
+      );
+
+      Set(
+          varPunchReviewCurrentId,
+          varPunchReviewCurrent.PunchIdNumber
+      )
+  )
