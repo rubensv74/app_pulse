@@ -1,0 +1,360 @@
+# BLOCK 08 — SESSION ACTIVITY
+#
+# Operation: REPLACE CONTROL COMPLETELY.
+# Target control: conPR_HistorySlot
+# Parent: conPR_CenterColumn
+#
+# Replace the complete placeholder created in Block 03 with this control.
+# Do not keep lblPR_HistoryPlaceholder.
+#
+# Dependencies:
+# - Blocks 01–07 validated.
+# - colPunchReviewSessionEvents exists from Block 04.
+# - Block 07 writes REVIEWED and REVIEW_UNDONE events.
+#
+# Scope:
+# - Shows session events for the currently selected Punch.
+# - Does not claim to be the corporate Punch history.
+# - Contains no flow calls.
+#
+# Compatibility:
+# - Label@2.5.1 contains no Radius* properties.
+# - Rounded visual elements use GroupContainer@1.5.0.
+#
+# Validation:
+# 1. A Punch with no events displays the empty state.
+# 2. Mark Reviewed creates a visible event.
+# 3. Undo Review creates a second event.
+# 4. Selecting another Punch shows only its own events.
+# 5. Returning to the previous Punch restores its session activity.
+
+- conPR_HistoryCard:
+    Control: GroupContainer@1.5.0
+    Variant: AutoLayout
+    Properties:
+      AlignInContainer: =AlignInContainer.Stretch
+      BorderColor: =varTheme_Border
+      BorderThickness: =1
+      DropShadow: =DropShadow.Semilight
+      Fill: =varTheme_Surface
+      FillPortions: =1
+      LayoutAlignItems: =LayoutAlignItems.Stretch
+      LayoutDirection: =LayoutDirection.Vertical
+      LayoutGap: =0
+      LayoutMinHeight: =130
+      LayoutMinWidth: =300
+      RadiusBottomLeft: =12
+      RadiusBottomRight: =12
+      RadiusTopLeft: =12
+      RadiusTopRight: =12
+      Width: =Parent.Width
+    Children:
+      - conPR_HistoryHeader:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =varTheme_Surface
+            FillPortions: =0
+            Height: =48
+            LayoutMinHeight: =48
+            LayoutMinWidth: =280
+            Width: =Parent.Width
+          Children:
+            - lblPR_HistoryTitle:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_Text
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =11
+                  Text: ="Session Activity"
+                  Width: =180
+                  X: =14
+                  Y: =6
+            - lblPR_HistorySubtitle:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_TextMuted
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =16
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =8
+                  Text: ="Actions recorded in this app session"
+                  Width: =260
+                  X: =14
+                  Y: =28
+            - conPR_HistoryBadge:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#BFDBFE")
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =ColorValue("#EFF6FF")
+                  Height: =24
+                  RadiusBottomLeft: =12
+                  RadiusBottomRight: =12
+                  RadiusTopLeft: =12
+                  RadiusTopRight: =12
+                  Width: =92
+                  X: =Parent.Width - 106
+                  Y: =12
+                Children:
+                  - lblPR_HistoryBadge:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_PulseBlueDark
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =Parent.Height
+                        PaddingBottom: =0
+                        PaddingLeft: =2
+                        PaddingRight: =2
+                        PaddingTop: =0
+                        Size: =7
+                        Text: |-
+                          =Text(
+                              CountIf(
+                                  colPunchReviewSessionEvents,
+                                  PunchIdNumber = varPunchReviewCurrentId
+                              )
+                          ) & " events"
+                        Width: =Parent.Width
+      - rectPR_HistoryDivider:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            BorderStyle: =BorderStyle.None
+            Fill: =varTheme_Border
+            FillPortions: =0
+            Height: =1
+            Width: =Parent.Width
+      - conPR_HistoryBody:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =varTheme_Surface
+            FillPortions: =1
+            LayoutMinHeight: =80
+            LayoutMinWidth: =280
+            Width: =Parent.Width
+          Children:
+            - galPR_History:
+                Control: Gallery@2.15.0
+                Variant: Vertical
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Fill: =varTheme_Surface
+                  Height: =Parent.Height
+                  Items: |-
+                    =SortByColumns(
+                        Filter(
+                            colPunchReviewSessionEvents,
+                            PunchIdNumber = varPunchReviewCurrentId
+                        ),
+                        "EventOn",
+                        SortOrder.Descending
+                    )
+                  ShowScrollbar: =true
+                  TemplatePadding: =4
+                  TemplateSize: =62
+                  Visible: |-
+                    =!IsBlank(varPunchReviewCurrentId) &&
+                    CountIf(
+                        colPunchReviewSessionEvents,
+                        PunchIdNumber = varPunchReviewCurrentId
+                    ) > 0
+                  Width: =Parent.Width
+                Children:
+                  - conPR_HistoryEventIcon:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: |-
+                          =Switch(
+                              ThisItem.EventType,
+                              "REVIEWED", ColorValue("#BBF7D0"),
+                              "REVIEW_UNDONE", ColorValue("#FED7AA"),
+                              "COMMENT_ADDED", ColorValue("#BFDBFE"),
+                              "FIELDS_SAVED", ColorValue("#DDD6FE"),
+                              varTheme_Border
+                          )
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: |-
+                          =Switch(
+                              ThisItem.EventType,
+                              "REVIEWED", ColorValue("#F0FDF4"),
+                              "REVIEW_UNDONE", ColorValue("#FFF7ED"),
+                              "COMMENT_ADDED", ColorValue("#EFF6FF"),
+                              "FIELDS_SAVED", ColorValue("#F5F3FF"),
+                              varTheme_SurfaceAlt
+                          )
+                        Height: =34
+                        RadiusBottomLeft: =17
+                        RadiusBottomRight: =17
+                        RadiusTopLeft: =17
+                        RadiusTopRight: =17
+                        Width: =34
+                        X: =10
+                        Y: =10
+                      Children:
+                        - lblPR_HistoryEventIcon:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: |-
+                                =Switch(
+                                    ThisItem.EventType,
+                                    "REVIEWED", ColorValue("#15803D"),
+                                    "REVIEW_UNDONE", ColorValue("#C2410C"),
+                                    "COMMENT_ADDED", ColorValue("#1D4ED8"),
+                                    "FIELDS_SAVED", ColorValue("#6D28D9"),
+                                    varTheme_TextMuted
+                                )
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =Parent.Height
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =11
+                              Text: |-
+                                =Switch(
+                                    ThisItem.EventType,
+                                    "REVIEWED", "✓",
+                                    "REVIEW_UNDONE", "↶",
+                                    "COMMENT_ADDED", "◫",
+                                    "FIELDS_SAVED", "◆",
+                                    "•"
+                                )
+                              Width: =Parent.Width
+                  - lblPR_HistoryEventLabel:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_Text
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =22
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: =Coalesce(ThisItem.EventLabel, "Session event")
+                        Width: =Parent.TemplateWidth - 66
+                        Wrap: =false
+                        X: =54
+                        Y: =8
+                  - lblPR_HistoryEventMeta:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_TextMuted
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =18
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =7
+                        Text: |-
+                          =Coalesce(ThisItem.EventBy, "PULSE user") &
+                          " · " &
+                          Text(ThisItem.EventOn, "[$-en-GB]dd mmm yyyy HH:mm")
+                        Width: =Parent.TemplateWidth - 66
+                        X: =54
+                        Y: =31
+                  - rectPR_HistoryRowDivider:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        BorderStyle: =BorderStyle.None
+                        Fill: =varTheme_Border
+                        Height: =1
+                        Width: =Parent.TemplateWidth - 20
+                        X: =10
+                        Y: =Parent.TemplateHeight - 2
+            - conPR_HistoryEmpty:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =varTheme_Surface
+                  Height: =Parent.Height
+                  Visible: |-
+                    =IsBlank(varPunchReviewCurrentId) ||
+                    CountIf(
+                        colPunchReviewSessionEvents,
+                        PunchIdNumber = varPunchReviewCurrentId
+                    ) = 0
+                  Width: =Parent.Width
+                Children:
+                  - icoPR_HistoryEmpty:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_TextMuted
+                        Height: =28
+                        Icon: =Icon.History
+                        Width: =28
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Max(14, Parent.Height * 0.22)
+                  - lblPR_HistoryEmptyTitle:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Align: =Align.Center
+                        AutoHeight: =true
+                        Color: =varTheme_Text
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        Size: =10
+                        Text: |-
+                          =If(
+                              IsBlank(varPunchReviewCurrentId),
+                              "No Punch selected",
+                              "No session activity yet"
+                          )
+                        Width: =Parent.Width - 40
+                        X: =20
+                        Y: =icoPR_HistoryEmpty.Y + icoPR_HistoryEmpty.Height + 8
+                  - lblPR_HistoryEmptyText:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Align: =Align.Center
+                        AutoHeight: =true
+                        Color: =varTheme_TextMuted
+                        Height: =40
+                        Size: =8
+                        Text: |-
+                          =If(
+                              IsBlank(varPunchReviewCurrentId),
+                              "Select a Punch to view its activity.",
+                              "Review actions performed during this session will appear here."
+                          )
+                        Width: =Parent.Width - 54
+                        X: =27
+                        Y: =lblPR_HistoryEmptyTitle.Y + lblPR_HistoryEmptyTitle.Height + 4
