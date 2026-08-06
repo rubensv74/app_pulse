@@ -18,18 +18,22 @@ No es un registro histórico pasivo. Cada error confirmado debe convertirse en u
 6. Tras cada error de importación, corregir el bloque fuente del repositorio; no limitarse a dar una corrección manual en Studio.
 7. Anotar el error, su causa, la corrección y una regla preventiva en este documento.
 8. Todo tipo de control que aparezca por primera vez en Punch Review debe considerarse **pendiente de validación en Studio** hasta completar una importación real sin errores.
+9. No utilizar `Reset()` sobre un control sin confirmar que implementa el contrato de control reseteable.
+10. Las variables reservadas para valores numéricos no deben inicializarse únicamente con `Blank()` si todavía no existe otra asignación que establezca su tipo.
 
 ---
 
-## Matriz de propiedades confirmadas como incompatibles
+## Matriz de propiedades y patrones confirmados como incompatibles
 
-| Control | Propiedad incompatible | Error | Alternativa segura |
+| Control o patrón | Incompatibilidad | Error | Alternativa segura |
 |---|---|---|---|
 | `Label@2.5.1` | `RadiusBottomLeft` | `PA2108` | Aplicar el radio a un `GroupContainer@1.5.0` o a un botón de fondo |
 | `Label@2.5.1` | `RadiusBottomRight` | `PA2108` | Aplicar el radio a un `GroupContainer@1.5.0` o a un botón de fondo |
 | `Label@2.5.1` | `RadiusTopLeft` | `PA2108` | Aplicar el radio a un `GroupContainer@1.5.0` o a un botón de fondo |
 | `Label@2.5.1` | `RadiusTopRight` | `PA2108` | Aplicar el radio a un `GroupContainer@1.5.0` o a un botón de fondo |
 | `Classic/Button@2.2.0` | `AccessibleLabel` | `PA2108` | No declarar la propiedad en este tipo de control; verificar alternativas soportadas en Studio |
+| `TabList@2.2.30` | `Reset(tabListControl)` | Error de fórmula: el control no es reseteable | Controlar idioma mediante variable y conservar la selección durante la sesión |
+| Variable numérica nueva | Leerla con `IsBlank()` y asignarle solo `Blank()` | Nombre no reconocido / tipo no establecido | Inicializar directamente con un valor numérico centinela, por ejemplo `0` |
 
 ---
 
@@ -79,16 +83,99 @@ No declarar `AccessibleLabel` en `Classic/Button@2.2.0` sin comprobar antes que 
 
 ---
 
-## Control en validación PR-SC-V001 — `TabList@2.2.30`
+## Incidente PR-SC-003 — `TabList@2.2.30` no admite `Reset()`
+
+**Fecha:** 2026-08-06  
+**Bloque afectado:** `08A_help_trigger.add-child.pa.yaml`  
+**Control origen:** `icoPR_OpenHelp`  
+**Control pasado a Reset:** `tabPR_HelpLanguage`  
+**Session ID:** no disponible; error detectado mediante validación inline de Studio.
+
+### Error
+
+```text
+The function expects a resettable control as its input.
+```
+
+### Causa
+
+El control moderno `TabList@2.2.30` acepta las propiedades empleadas para mostrar y cambiar las pestañas, pero no implementa el contrato requerido por la función `Reset()`.
+
+### Corrección aplicada
+
+Se eliminó:
+
+```powerfx
+Reset(tabPR_HelpLanguage)
+```
+
+El trigger ahora ejecuta únicamente:
+
+```powerfx
+Set(varPunchReviewHelpVisible, true)
+```
+
+`OnVisible` inicializa el idioma en español cuando se entra en la pantalla. Mientras el usuario permanece en ella, el modal conserva la última pestaña seleccionada al cerrarse y volver a abrirse.
+
+### Regla preventiva
+
+No asumir que todos los controles modernos son reseteables. Antes de usar `Reset(control)`, comprobar el comportamiento real en Studio.
+
+---
+
+## Incidente PR-SC-004 — Variable numérica no reconocida al inicializarse con `Blank()`
+
+**Fecha:** 2026-08-06  
+**Bloque afectado:** `04_runtime_state.onvisible.pa.yaml`  
+**Variable:** `varPunchReviewPendingIndex`  
+**Session ID:** no disponible; error detectado mediante validación inline de Studio.
+
+### Error
+
+```text
+Name isn't valid. 'varPunchReviewPendingIndex' isn't recognized.
+```
+
+### Causa
+
+La variable estaba reservada para almacenar un índice numérico futuro, pero su primera aparición era:
+
+```powerfx
+If(
+    IsBlank(varPunchReviewPendingIndex),
+    Set(varPunchReviewPendingIndex, Blank())
+)
+```
+
+La lectura se producía antes de disponer de una asignación numérica inequívoca y `Blank()` no establecía por sí solo el tipo esperado.
+
+### Corrección aplicada
+
+Se sustituyó por una inicialización directa y tipada:
+
+```powerfx
+Set(varPunchReviewPendingIndex, 0)
+```
+
+El valor `0` funciona como centinela y significa que no existe todavía una navegación pendiente.
+
+### Regla preventiva
+
+Para una variable nueva que representa un índice, contador o identificador numérico:
+
+- establecer primero un valor numérico;
+- utilizar `0` como centinela cuando sea compatible con el dominio;
+- no leer la variable con `IsBlank()` antes de que exista una asignación tipada.
+
+---
+
+## Control validado PR-SC-V001 — `TabList@2.2.30`
 
 **Fecha de introducción:** 2026-08-06  
-**Bloque:** `08B_bilingual_help_modal.add-screen-child.pa.yaml`
+**Bloque:** `08B_bilingual_help_modal.add-screen-child.pa.yaml`  
+**Estado:** validado para las propiedades listadas; no reseteable mediante `Reset()`.
 
-### Motivo
-
-Es el primer uso del control moderno Tab List dentro de Punch Review. El modal bilingüe necesita dos pestañas reales, no dos botones independientes.
-
-### Propiedades utilizadas deliberadamente
+### Propiedades validadas en Studio
 
 ```text
 Items
@@ -101,16 +188,12 @@ X
 Y
 ```
 
-### Regla preventiva
+### Regla de uso
 
-Hasta validar el Bloque 08B en Studio:
-
-- no añadir propiedades visuales adicionales al TabList;
-- no cambiar la versión del control;
-- registrar cualquier error PA2108 con líneas y Session ID;
-- corregir primero el bloque fuente de `main`.
-
-Cuando el bloque se importe sin errores, este apartado debe marcarse como validado.
+- utilizarlo como conjunto real de pestañas;
+- controlar el contenido mediante `Selected` y una variable de idioma o sección;
+- no llamar a `Reset()` sobre el control;
+- no añadir propiedades no verificadas sin una nueva validación.
 
 ---
 
@@ -155,6 +238,9 @@ Antes de guardar un nuevo archivo `.pa.yaml`:
 
 - [ ] No existe ninguna propiedad `Radius*` dentro de un `Label@2.5.1`.
 - [ ] No existe `AccessibleLabel` dentro de un `Classic/Button@2.2.0`.
+- [ ] No existe `Reset()` sobre un control que no haya sido confirmado como reseteable.
+- [ ] Las variables nuevas tienen una primera asignación que establece su tipo.
+- [ ] Los índices y contadores usan un valor numérico centinela cuando corresponde.
 - [ ] Cada propiedad compleja aparece en al menos un control equivalente ya validado en el repositorio.
 - [ ] Los placeholders usan propiedades mínimas y conocidas.
 - [ ] Los bloques no mezclan propiedades de controles modernos, clásicos y canvas sin verificación.
@@ -167,7 +253,7 @@ Antes de guardar un nuevo archivo `.pa.yaml`:
 ## Procedimiento cuando aparezca un nuevo error
 
 1. Detener el siguiente bloque.
-2. Registrar el mensaje completo, líneas, control, versión y Session ID.
+2. Registrar el mensaje completo, líneas, control, versión y Session ID cuando esté disponible.
 3. Corregir el archivo fuente en `main`.
 4. Buscar el mismo patrón en el resto de bloques pendientes.
 5. Añadir la propiedad o patrón a la matriz de incompatibilidades.
