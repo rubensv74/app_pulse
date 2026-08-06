@@ -1,0 +1,75 @@
+// BLOCK 09B — OPTIONAL TEST DATA FOR COMMENTS
+//
+// Use only to validate the visual behaviour of Block 09 with the fictional
+// Punches from Block 05A.
+//
+// Paste this formula into the OnSelect property of a temporary button named:
+// btnPR_LoadTestComments
+//
+// Prerequisite:
+// - A Punch must be selected in varPunchReviewCurrent.
+//
+// This formula does not call a flow and does not save anything.
+// Delete the temporary button after real comment integration is validated.
+
+If(
+    IsBlank(varPunchReviewCurrentId),
+
+    Notify(
+        "Select a test Punch before loading test comments.",
+        NotificationType.Information
+    ),
+
+    ClearCollect(
+        colPunchReviewComments,
+        {
+            CommentId: 900001,
+            CommentType: "GENERAL",
+            CreatedOn: DateAdd(Now(), -3, TimeUnit.Hours),
+            CreatedByEmail: "ravi.verma@example.com",
+            CreatedByName: "Ravi Verma",
+            ModifiedOn: Blank(),
+            ModifiedByEmail: "",
+            CommentText:
+                "The subcontractor confirmed that the missing identification tag will be installed during the next shift.",
+            TotalRows: 3,
+            TotalPages: 1,
+            PageNumber: 1,
+            PageSize: 20
+        },
+        {
+            CommentId: 900002,
+            CommentType: "GENERAL",
+            CreatedOn: DateAdd(Now(), -90, TimeUnit.Minutes),
+            CreatedByEmail: "anita.mehra@example.com",
+            CreatedByName: "Anita Mehra",
+            ModifiedOn: Blank(),
+            ModifiedByEmail: "",
+            CommentText:
+                "Please attach the field verification evidence before this Punch is proposed for clearance.",
+            TotalRows: 3,
+            TotalPages: 1,
+            PageNumber: 1,
+            PageSize: 20
+        },
+        {
+            CommentId: 900003,
+            CommentType: "MEETING",
+            CreatedOn: DateAdd(Now(), -20, TimeUnit.Minutes),
+            CreatedByEmail: User().Email,
+            CreatedByName: User().FullName,
+            ModifiedOn: Blank(),
+            ModifiedByEmail: "",
+            CommentText:
+                "Reviewed in the coordination meeting. Responsible party and target action were confirmed.",
+            TotalRows: 3,
+            TotalPages: 1,
+            PageNumber: 1,
+            PageSize: 20
+        }
+    );
+
+    Set(varPunchReviewCommentsPage, 1);
+    Set(varPunchReviewCommentsLoading, false);
+    Set(varPunchReviewCommentsError, "")
+)
