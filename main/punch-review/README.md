@@ -2,42 +2,53 @@
 
 Esta carpeta contiene los bloques incrementales para construir `scr_PunchReview` en Power Apps Studio sin pegar una pantalla monolítica.
 
-## Rama de trabajo
+## Rama de publicación
 
-`feature/phase-7-punch-review-blocks`
+Los bloques validados y listos para utilizar se publican directamente en `main`:
+
+```text
+main/punch-review/blocks/
+```
 
 ## Regla de uso
 
-Los archivos de `blocks/` no sustituyen automáticamente los YAML canónicos de `main/screens`. Son bloques controlados para copiar en Studio o incorporar más adelante al archivo canónico después de validar cada incremento.
+Los archivos de `blocks/` no sustituyen automáticamente los YAML canónicos de `main/screens`. Son bloques controlados para copiar en Studio o incorporar al archivo canónico después de validar cada incremento.
 
 Cada bloque indica:
 
 - archivo y control afectados;
-- operación exacta: crear, añadir como hijo o sustituir propiedad;
+- operación exacta: crear, añadir como hijo o sustituir propiedad/control;
 - dependencias previas;
 - prueba mínima;
 - criterio de aceptación.
 
-## Orden obligatorio
+## Orden obligatorio y estado
 
-1. `01_screen_shell.pa.yaml`
-2. `02_header_premium.children.pa.yaml`
-3. `03_workspace_layout.children.pa.yaml`
-4. `04_runtime_state.onvisible.pa.yaml`
+1. `01_screen_shell.pa.yaml` — validado
+2. `02_header_premium.children.pa.yaml` — validado
+3. `03_workspace_layout.children.pa.yaml` — validado
+4. `04_runtime_state.onvisible.pa.yaml` — validado
+5. `05_review_queue.replace-control.pa.yaml` — validado
+6. `05A_review_queue_test_seed.optional.powerfx` — opcional para pruebas
+7. `06_punch_overview.replace-control.pa.yaml` — pendiente de validación en Studio
 
 No se debe pegar un bloque posterior si el anterior no guarda, abre la pantalla y pasa App Checker sin errores nuevos.
 
-## Alcance del primer lote
+## Registro de compatibilidad
 
-Este primer lote construye únicamente:
+Antes de crear o modificar un bloque debe revisarse:
 
-- la pantalla `scr_PunchReview`;
-- el sidebar reutilizando `cmp_SidebarNav`;
-- el header premium;
-- la geometría global del workspace;
-- el estado tipado de sesión y las colecciones vacías.
+```text
+main/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
+```
 
-Todavía no incluye flows, comentarios, custom fields, donut, DataTable ni integración desde Home/Punches. Esa separación es deliberada: permite validar la estructura y los tipos antes de introducir contratos externos.
+Regla confirmada:
+
+```text
+Label@2.5.1 no admite RadiusBottomLeft, RadiusBottomRight, RadiusTopLeft ni RadiusTopRight.
+```
+
+Para una píldora redondeada se utiliza un `GroupContainer@1.5.0` con radios y un `Label@2.5.1` sin radios en su interior.
 
 ## Convención de nombres
 
@@ -49,16 +60,17 @@ Todavía no incluye flows, comentarios, custom fields, donut, DataTable ni integ
 
 ## Validación mínima por bloque
 
-1. Guardar en Studio.
-2. Esperar a que termine la validación de fórmulas.
-3. Abrir App Checker.
-4. Navegar a la pantalla.
-5. Confirmar que no aparecen controles solapados ni referencias rotas.
-6. No continuar si aparece PA1001, PA2108, una propiedad no soportada o un error de tipo.
+1. Ejecutar `git pull origin main`.
+2. Guardar el bloque en Studio.
+3. Esperar a que termine la validación de fórmulas.
+4. Abrir App Checker.
+5. Navegar a la pantalla.
+6. Confirmar que no existen solapamientos ni referencias rotas.
+7. No continuar si aparece PA1001, PA2108, una propiedad no soportada o un error de tipo.
 
 ## Fuente de verdad
 
-Las referencias visuales y de componentes se basan en:
+Las referencias visuales y funcionales se basan en:
 
 - `main/screens/Home/scr_Home.pa.yaml`
 - `main/screens/Punches/scr_Punches_1.pa.yaml`
