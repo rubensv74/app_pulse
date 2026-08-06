@@ -31,9 +31,28 @@ Cada bloque indica:
 5. `05_review_queue.replace-control.pa.yaml` — validado
 6. `05A_review_queue_test_seed.optional.powerfx` — opcional para pruebas
 7. `06_punch_overview.replace-control.pa.yaml` — validado
-8. `07_review_actions.replace-control.pa.yaml` — pendiente de validación en Studio
+8. `07_review_actions.replace-control.pa.yaml` — validado
+9. `08_session_activity.replace-control.pa.yaml` — pendiente de validación en Studio
+10. `08A_help_trigger.add-child.pa.yaml` — pendiente de validación en Studio
+11. `08B_bilingual_help_modal.add-screen-child.pa.yaml` — pendiente de validación en Studio
 
 No se debe pegar un bloque posterior si el anterior no guarda, abre la pantalla y pasa App Checker sin errores nuevos.
+
+## Manual de usuario
+
+El manual funcional en español se mantiene en:
+
+```text
+main/punch-review/user-guide/MANUAL_USUARIO_PUNCH_REVIEW.md
+```
+
+Es un documento vivo y debe actualizarse cuando se valide una nueva función de la pantalla.
+
+La pantalla también incorpora una ayuda resumida bilingüe mediante un modal con dos pestañas modernas:
+
+```text
+Español | English
+```
 
 ## Registro de compatibilidad
 
