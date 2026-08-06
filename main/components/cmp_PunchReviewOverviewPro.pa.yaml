@@ -1,0 +1,491 @@
+ComponentDefinitions:
+  cmp_PunchReviewOverviewPro:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      AccentColor:
+        PropertyKind: Input
+        DisplayName: AccentColor
+        Description: Primary interaction color.
+        DataType: Color
+        Default: =ColorValue("#1677FF")
+      BackgroundColor:
+        PropertyKind: Input
+        DisplayName: BackgroundColor
+        Description: Overview surface color.
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        Description: Overview border color.
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      EmptyText:
+        PropertyKind: Input
+        DisplayName: EmptyText
+        Description: Empty state text.
+        DataType: Text
+        Default: ="Select a Punch from the review queue."
+      HasRecord:
+        PropertyKind: Output
+        DisplayName: HasRecord
+        Description: True when the component received a Punch.
+        DataType: Boolean
+      IsLoading:
+        PropertyKind: Input
+        DisplayName: IsLoading
+        Description: Shows a loading overlay.
+        DataType: Boolean
+        Default: =false
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        Description: Secondary text color.
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      PunchRecord:
+        PropertyKind: Input
+        DisplayName: PunchRecord
+        Description: Normalized Punch record.
+        DataType: Record
+        Default: |-
+          ={
+              PunchId: 0,
+              PunchCode: "",
+              Title: "",
+              Description: "",
+              Category: "",
+              Subsystem: "",
+              Discipline: "",
+              Priority: "",
+              Status: "",
+              ResponsibleParty: "",
+              DueDateText: ""
+          }
+      SurfaceAltColor:
+        PropertyKind: Input
+        DisplayName: SurfaceAltColor
+        Description: Alternate surface color.
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        Description: Primary text color.
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      Title:
+        PropertyKind: Input
+        DisplayName: Title
+        Description: Card title.
+        DataType: Text
+        Default: ="Punch Overview"
+    Properties:
+      HasRecord: =!IsBlank(cmp_PunchReviewOverviewPro.PunchRecord.PunchCode) || Coalesce(cmp_PunchReviewOverviewPro.PunchRecord.PunchId, 0) > 0
+      Height: =300
+      Width: =640
+    Children:
+      - conPRO_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =cmp_PunchReviewOverviewPro.BorderColor
+            BorderThickness: =1
+            DropShadow: =DropShadow.Semilight
+            Fill: =cmp_PunchReviewOverviewPro.BackgroundColor
+            Height: =Parent.Height
+            RadiusBottomLeft: =14
+            RadiusBottomRight: =14
+            RadiusTopLeft: =14
+            RadiusTopRight: =14
+            Width: =Parent.Width
+          Children:
+            - lblPRO_Title:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =26
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =11
+                  Text: =cmp_PunchReviewOverviewPro.Title
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =14
+            - lblPRO_Empty:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =60
+                  Size: =10
+                  Text: =cmp_PunchReviewOverviewPro.EmptyText
+                  Visible: =!cmp_PunchReviewOverviewPro.HasRecord && !cmp_PunchReviewOverviewPro.IsLoading
+                  Width: =Parent.Width - 48
+                  X: =24
+                  Y: =(Parent.Height - Self.Height) / 2
+            - lblPRO_PunchIdCaption:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: ="PUNCH ID"
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =130
+                  X: =16
+                  Y: =52
+            - lblPRO_PunchId:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: =Coalesce(cmp_PunchReviewOverviewPro.PunchRecord.PunchCode, Text(cmp_PunchReviewOverviewPro.PunchRecord.PunchId))
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =160
+                  X: =16
+                  Y: =70
+            - lblPRO_SubsystemCaption:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: ="SUBSYSTEM"
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =150
+                  X: =Parent.Width * 0.43
+                  Y: =52
+            - lblPRO_Subsystem:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  Overflow: =Overflow.Ellipsis
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: =Coalesce(cmp_PunchReviewOverviewPro.PunchRecord.Subsystem, "—")
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =Parent.Width * 0.25
+                  X: =Parent.Width * 0.43
+                  Y: =70
+            - lblPRO_StatusCaption:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: ="STATUS"
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =100
+                  X: =Parent.Width - 150
+                  Y: =52
+            - lblPRO_Status:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =If(Upper(Coalesce(cmp_PunchReviewOverviewPro.PunchRecord.Status, "")) = "CLOSED", ColorValue("#047857"), ColorValue("#B91C1C"))
+                  Fill: =If(Upper(Coalesce(cmp_PunchReviewOverviewPro.PunchRecord.Status, "")) = "CLOSED", ColorValue("#D1FAE5"), ColorValue("#FEE2E2"))
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =22
+                  PaddingBottom: =0
+                  PaddingLeft: =4
+                  PaddingRight: =4
+                  PaddingTop: =0
+                  RadiusBottomLeft: =11
+                  RadiusBottomRight: =11
+                  RadiusTopLeft: =11
+                  RadiusTopRight: =11
+                  Size: =7
+                  Text: =Upper(Coalesce(cmp_PunchReviewOverviewPro.PunchRecord.Status, "—"))
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =84
+                  X: =Parent.Width - 150
+                  Y: =70
+            - lblPRO_TitleCaption:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: ="TITLE"
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =120
+                  X: =16
+                  Y: =106
+            - lblPRO_RecordTitle:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =26
+                  Overflow: =Overflow.Ellipsis
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =10
+                  Text: =Coalesce(cmp_PunchReviewOverviewPro.PunchRecord.Title, cmp_PunchReviewOverviewPro.PunchRecord.Description, "—")
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =Parent.Width * 0.58
+                  X: =16
+                  Y: =124
+            - lblPRO_DisciplineCaption:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: ="DISCIPLINE"
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =120
+                  X: =Parent.Width * 0.43
+                  Y: =106
+            - lblPRO_Discipline:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =26
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: ="●  " & Coalesce(cmp_PunchReviewOverviewPro.PunchRecord.Discipline, "—")
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =Parent.Width * 0.25
+                  X: =Parent.Width * 0.43
+                  Y: =124
+            - lblPRO_ResponsibleCaption:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: ="RESPONSIBLE PARTY"
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =130
+                  X: =Parent.Width - 190
+                  Y: =106
+            - lblPRO_Responsible:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =26
+                  Overflow: =Overflow.Ellipsis
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: =Coalesce(cmp_PunchReviewOverviewPro.PunchRecord.ResponsibleParty, "—")
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =174
+                  X: =Parent.Width - 190
+                  Y: =124
+            - lblPRO_DescriptionCaption:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: ="DESCRIPTION"
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =120
+                  X: =16
+                  Y: =164
+            - lblPRO_Description:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =64
+                  Overflow: =Overflow.Scroll
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =8
+                  PaddingTop: =0
+                  Size: =8
+                  Text: =Coalesce(cmp_PunchReviewOverviewPro.PunchRecord.Description, "—")
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =Parent.Width * 0.55
+                  X: =16
+                  Y: =182
+            - lblPRO_PriorityCaption:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: ="PRIORITY"
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =100
+                  X: =Parent.Width * 0.60
+                  Y: =164
+            - lblPRO_Priority:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: ="●  " & Coalesce(cmp_PunchReviewOverviewPro.PunchRecord.Priority, "—")
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =130
+                  X: =Parent.Width * 0.60
+                  Y: =182
+            - lblPRO_DueDateCaption:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: ="DUE DATE"
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =100
+                  X: =Parent.Width - 190
+                  Y: =164
+            - lblPRO_DueDate:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewOverviewPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: =Coalesce(cmp_PunchReviewOverviewPro.PunchRecord.DueDateText, "—")
+                  Visible: =cmp_PunchReviewOverviewPro.HasRecord
+                  Width: =174
+                  X: =Parent.Width - 190
+                  Y: =182
+            - conPRO_Loading:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =Color.Transparent
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255,255,255,0.82)
+                  Height: =Parent.Height
+                  Visible: =cmp_PunchReviewOverviewPro.IsLoading
+                  Width: =Parent.Width
+                Children:
+                  - spnPRO_Loading:
+                      Control: Spinner@1.4.6
+                      Properties:
+                        Height: =40
+                        SpinnerColor: =cmp_PunchReviewOverviewPro.AccentColor
+                        Width: =40
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =(Parent.Height - Self.Height) / 2

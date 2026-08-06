@@ -1,0 +1,428 @@
+ComponentDefinitions:
+  cmp_PunchReviewHeaderPro:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      AccentColor:
+        PropertyKind: Input
+        DisplayName: AccentColor
+        Description: Primary interaction color.
+        DataType: Color
+        Default: =ColorValue("#1677FF")
+      BackgroundColor:
+        PropertyKind: Input
+        DisplayName: BackgroundColor
+        Description: Header surface color.
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        Description: Header border color.
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      CurrentPosition:
+        PropertyKind: Input
+        DisplayName: CurrentPosition
+        Description: Current position inside the review queue.
+        DataType: Number
+        Default: =0
+      IsLoading:
+        PropertyKind: Input
+        DisplayName: IsLoading
+        Description: Disables actions while the workspace is loading.
+        DataType: Boolean
+        Default: =false
+      IsSessionOnly:
+        PropertyKind: Input
+        DisplayName: IsSessionOnly
+        Description: Shows the session-only review warning.
+        DataType: Boolean
+        Default: =true
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        Description: Secondary text color.
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      OnBack:
+        PropertyKind: Event
+        DisplayName: OnBack
+        Description: Raised when the user leaves the workspace.
+        ReturnType: None
+        Default: =
+      ProjectLabel:
+        PropertyKind: Input
+        DisplayName: ProjectLabel
+        Description: Selected project display label.
+        DataType: Text
+        Default: ="No project selected"
+      QueueScopeLabel:
+        PropertyKind: Input
+        DisplayName: QueueScopeLabel
+        Description: Review queue scope.
+        DataType: Text
+        Default: ="Current queue"
+      SessionLabel:
+        PropertyKind: Input
+        DisplayName: SessionLabel
+        Description: Session-only explanatory text.
+        DataType: Text
+        Default: ="Reviewed items are saved locally for this session only."
+      SourceLabel:
+        PropertyKind: Input
+        DisplayName: SourceLabel
+        Description: Screen that opened the workspace.
+        DataType: Text
+        Default: ="Punches"
+      Subtitle:
+        PropertyKind: Input
+        DisplayName: Subtitle
+        Description: Workspace subtitle.
+        DataType: Text
+        Default: ="Sequential review, comments and custom fields"
+      SurfaceAltColor:
+        PropertyKind: Input
+        DisplayName: SurfaceAltColor
+        Description: Secondary surface color.
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      TemplateLabel:
+        PropertyKind: Input
+        DisplayName: TemplateLabel
+        Description: Selected Punch template.
+        DataType: Text
+        Default: ="All templates"
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        Description: Primary text color.
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      Title:
+        PropertyKind: Input
+        DisplayName: Title
+        Description: Workspace title.
+        DataType: Text
+        Default: ="Punch Review Workspace"
+      TotalItems:
+        PropertyKind: Input
+        DisplayName: TotalItems
+        Description: Total items in the current queue.
+        DataType: Number
+        Default: =0
+    Properties:
+      Height: =112
+      Width: =1400
+    Children:
+      - conPRH_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =cmp_PunchReviewHeaderPro.BorderColor
+            BorderThickness: =1
+            DropShadow: =DropShadow.Semilight
+            Fill: =cmp_PunchReviewHeaderPro.BackgroundColor
+            Height: =Parent.Height
+            RadiusBottomLeft: =14
+            RadiusBottomRight: =14
+            RadiusTopLeft: =14
+            RadiusTopRight: =14
+            Width: =Parent.Width
+          Children:
+            - lblPRH_Title:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewHeaderPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =28
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =15
+                  Text: =cmp_PunchReviewHeaderPro.Title
+                  Width: =360
+                  X: =20
+                  Y: =14
+            - lblPRH_Subtitle:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewHeaderPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =20
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: =cmp_PunchReviewHeaderPro.Subtitle
+                  Width: =360
+                  X: =20
+                  Y: =42
+            - conPRH_SessionPill:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorFade(cmp_PunchReviewHeaderPro.AccentColor, 0.65)
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =ColorFade(cmp_PunchReviewHeaderPro.AccentColor, 0.90)
+                  Height: =26
+                  RadiusBottomLeft: =13
+                  RadiusBottomRight: =13
+                  RadiusTopLeft: =13
+                  RadiusTopRight: =13
+                  Visible: =cmp_PunchReviewHeaderPro.IsSessionOnly
+                  Width: =130
+                  X: =20
+                  Y: =74
+                Children:
+                  - lblPRH_SessionPill:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_PunchReviewHeaderPro.AccentColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =Parent.Height
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: ="Session review only"
+                        Width: =Parent.Width
+            - lblPRH_SessionText:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewHeaderPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =26
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =8
+                  Text: =cmp_PunchReviewHeaderPro.SessionLabel
+                  Visible: =cmp_PunchReviewHeaderPro.IsSessionOnly
+                  Width: =360
+                  X: =160
+                  Y: =74
+            - conPRH_Project:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_PunchReviewHeaderPro.BorderColor
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_PunchReviewHeaderPro.SurfaceAltColor
+                  Height: =54
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Width: =300
+                  X: =Parent.Width - 782
+                  Y: =16
+                Children:
+                  - lblPRH_ProjectCaption:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_PunchReviewHeaderPro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =16
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =7
+                        Text: ="PROJECT"
+                        Width: =Parent.Width - 24
+                        X: =12
+                        Y: =6
+                  - lblPRH_ProjectValue:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_PunchReviewHeaderPro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        Overflow: =Overflow.Ellipsis
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =cmp_PunchReviewHeaderPro.ProjectLabel
+                        Width: =Parent.Width - 24
+                        X: =12
+                        Y: =23
+            - conPRH_Template:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_PunchReviewHeaderPro.BorderColor
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_PunchReviewHeaderPro.SurfaceAltColor
+                  Height: =54
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Width: =150
+                  X: =Parent.Width - 474
+                  Y: =16
+                Children:
+                  - lblPRH_TemplateCaption:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_PunchReviewHeaderPro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =16
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =7
+                        Text: ="PUNCH TEMPLATE"
+                        Width: =Parent.Width - 24
+                        X: =12
+                        Y: =6
+                  - lblPRH_TemplateValue:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_PunchReviewHeaderPro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        Overflow: =Overflow.Ellipsis
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =cmp_PunchReviewHeaderPro.TemplateLabel
+                        Width: =Parent.Width - 24
+                        X: =12
+                        Y: =23
+            - conPRH_QueueScope:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_PunchReviewHeaderPro.BorderColor
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_PunchReviewHeaderPro.SurfaceAltColor
+                  Height: =54
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Width: =150
+                  X: =Parent.Width - 316
+                  Y: =16
+                Children:
+                  - lblPRH_QueueCaption:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_PunchReviewHeaderPro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =16
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =7
+                        Text: ="QUEUE SCOPE"
+                        Width: =Parent.Width - 24
+                        X: =12
+                        Y: =6
+                  - lblPRH_QueueValue:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_PunchReviewHeaderPro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        Overflow: =Overflow.Ellipsis
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =cmp_PunchReviewHeaderPro.QueueScopeLabel
+                        Width: =Parent.Width - 24
+                        X: =12
+                        Y: =23
+            - btnPRH_Back:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =cmp_PunchReviewHeaderPro.AccentColor
+                  BorderStyle: =BorderStyle.None
+                  BorderThickness: =0
+                  Color: =Color.White
+                  DisabledBorderColor: =cmp_PunchReviewHeaderPro.BorderColor
+                  DisabledColor: =cmp_PunchReviewHeaderPro.MutedTextColor
+                  DisabledFill: =cmp_PunchReviewHeaderPro.SurfaceAltColor
+                  DisplayMode: =If(cmp_PunchReviewHeaderPro.IsLoading, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =cmp_PunchReviewHeaderPro.AccentColor
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =40
+                  HoverBorderColor: =cmp_PunchReviewHeaderPro.AccentColor
+                  HoverColor: =Color.White
+                  HoverFill: =ColorFade(cmp_PunchReviewHeaderPro.AccentColor, -0.10)
+                  OnSelect: =cmp_PunchReviewHeaderPro.OnBack()
+                  PressedBorderColor: =cmp_PunchReviewHeaderPro.AccentColor
+                  PressedColor: =Color.White
+                  PressedFill: =ColorFade(cmp_PunchReviewHeaderPro.AccentColor, -0.18)
+                  RadiusBottomLeft: =9
+                  RadiusBottomRight: =9
+                  RadiusTopLeft: =9
+                  RadiusTopRight: =9
+                  Size: =10
+                  Text: ="Back to " & cmp_PunchReviewHeaderPro.SourceLabel
+                  Width: =140
+                  X: =Parent.Width - 158
+                  Y: =23
+            - lblPRH_Position:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Right
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewHeaderPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =22
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =8
+                  Text: =Text(cmp_PunchReviewHeaderPro.CurrentPosition) & " of " & Text(cmp_PunchReviewHeaderPro.TotalItems)
+                  Width: =140
+                  X: =btnPRH_Back.X
+                  Y: =72

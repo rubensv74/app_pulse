@@ -1,0 +1,563 @@
+ComponentDefinitions:
+  cmp_PunchReviewQueuePro:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      AccentColor:
+        PropertyKind: Input
+        DisplayName: AccentColor
+        Description: Primary interaction color.
+        DataType: Color
+        Default: =ColorValue("#1677FF")
+      BackgroundColor:
+        PropertyKind: Input
+        DisplayName: BackgroundColor
+        Description: Queue surface color.
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        Description: Queue border color.
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      CurrentPosition:
+        PropertyKind: Input
+        DisplayName: CurrentPosition
+        Description: Current queue position.
+        DataType: Number
+        Default: =0
+      FilterSummary:
+        PropertyKind: Input
+        DisplayName: FilterSummary
+        Description: Human-readable filter summary.
+        DataType: Text
+        Default: ="Status: All  •  Discipline: All  •  Priority: All"
+      IsLoading:
+        PropertyKind: Input
+        DisplayName: IsLoading
+        Description: Disables queue interactions.
+        DataType: Boolean
+        Default: =false
+      Items:
+        PropertyKind: Input
+        DisplayName: Items
+        Description: Queue records normalized for Punch review.
+        DataType: Table
+        Default: |-
+          =Table(
+              {
+                  ReviewOrder: 1,
+                  RowKey: "1",
+                  PunchCode: "P-000001",
+                  PunchDescription: "Sample Punch",
+                  Discipline: "Mechanical",
+                  Subsystem: "SYS-001",
+                  Status: "OPEN",
+                  IsReviewedInSession: false
+              }
+          )
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        Description: Secondary text color.
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      OnNext:
+        PropertyKind: Event
+        DisplayName: OnNext
+        Description: Raised when the next queue item is requested.
+        ReturnType: None
+        Default: =
+      OnPrevious:
+        PropertyKind: Event
+        DisplayName: OnPrevious
+        Description: Raised when the previous queue item is requested.
+        ReturnType: None
+        Default: =
+      OnRefresh:
+        PropertyKind: Event
+        DisplayName: OnRefresh
+        Description: Raised when the queue must be refreshed.
+        ReturnType: None
+        Default: =
+      OnRowSelect:
+        PropertyKind: Event
+        DisplayName: OnRowSelect
+        Description: Raised when a Punch row is selected.
+        ReturnType: None
+        Default: =
+      OnSearchChanged:
+        PropertyKind: Event
+        DisplayName: OnSearchChanged
+        Description: Raised when the search value changes.
+        ReturnType: None
+        Default: =
+      QueueTitle:
+        PropertyKind: Input
+        DisplayName: QueueTitle
+        Description: Queue card title.
+        DataType: Text
+        Default: ="Review Queue"
+      SearchPlaceholder:
+        PropertyKind: Input
+        DisplayName: SearchPlaceholder
+        Description: Search placeholder.
+        DataType: Text
+        Default: ="Search Punch ID or title..."
+      SearchText:
+        PropertyKind: Output
+        DisplayName: SearchText
+        Description: Current search value.
+        DataType: Text
+      SearchTextIn:
+        PropertyKind: Input
+        DisplayName: SearchTextIn
+        Description: Initial search value.
+        DataType: Text
+        Default: =""
+      SelectedRowKey:
+        PropertyKind: Output
+        DisplayName: SelectedRowKey
+        Description: Selected queue row key.
+        DataType: Text
+      SelectedRowKeyIn:
+        PropertyKind: Input
+        DisplayName: SelectedRowKeyIn
+        Description: Externally selected row key.
+        DataType: Text
+        Default: =""
+      SurfaceAltColor:
+        PropertyKind: Input
+        DisplayName: SurfaceAltColor
+        Description: Alternate surface color.
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        Description: Primary text color.
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      TotalItems:
+        PropertyKind: Input
+        DisplayName: TotalItems
+        Description: Total queue items.
+        DataType: Number
+        Default: =0
+    Properties:
+      Height: =690
+      OnReset: =Reset(txtPRQ_Search)
+      SearchText: =Coalesce(txtPRQ_Search.Text, "")
+      SelectedRowKey: =Coalesce(Text(galPRQ_Items.Selected.RowKey), cmp_PunchReviewQueuePro.SelectedRowKeyIn)
+      Width: =330
+    Children:
+      - conPRQ_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =cmp_PunchReviewQueuePro.BorderColor
+            BorderThickness: =1
+            DropShadow: =DropShadow.Semilight
+            Fill: =cmp_PunchReviewQueuePro.BackgroundColor
+            Height: =Parent.Height
+            RadiusBottomLeft: =14
+            RadiusBottomRight: =14
+            RadiusTopLeft: =14
+            RadiusTopRight: =14
+            Width: =Parent.Width
+          Children:
+            - lblPRQ_Title:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewQueuePro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =11
+                  Text: =cmp_PunchReviewQueuePro.QueueTitle
+                  Width: =190
+                  X: =14
+                  Y: =12
+            - lblPRQ_Count:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Right
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewQueuePro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =8
+                  Text: =Text(cmp_PunchReviewQueuePro.TotalItems, "[$-en-US]#,##0") & " punches"
+                  Width: =100
+                  X: =Parent.Width - Self.Width - 14
+                  Y: =12
+            - txtPRQ_Search:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  BorderColor: =cmp_PunchReviewQueuePro.BorderColor
+                  Color: =cmp_PunchReviewQueuePro.TextColor
+                  Default: =cmp_PunchReviewQueuePro.SearchTextIn
+                  DisabledBorderColor: =cmp_PunchReviewQueuePro.BorderColor
+                  DisabledColor: =cmp_PunchReviewQueuePro.MutedTextColor
+                  DisabledFill: =cmp_PunchReviewQueuePro.SurfaceAltColor
+                  DisplayMode: =If(cmp_PunchReviewQueuePro.IsLoading, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =cmp_PunchReviewQueuePro.BackgroundColor
+                  Font: =Font.'Segoe UI'
+                  Height: =34
+                  HintText: =cmp_PunchReviewQueuePro.SearchPlaceholder
+                  HoverBorderColor: =cmp_PunchReviewQueuePro.AccentColor
+                  HoverColor: =cmp_PunchReviewQueuePro.TextColor
+                  HoverFill: =cmp_PunchReviewQueuePro.BackgroundColor
+                  OnChange: =cmp_PunchReviewQueuePro.OnSearchChanged()
+                  PaddingLeft: =10
+                  PressedBorderColor: =cmp_PunchReviewQueuePro.AccentColor
+                  PressedColor: =cmp_PunchReviewQueuePro.TextColor
+                  PressedFill: =cmp_PunchReviewQueuePro.BackgroundColor
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =9
+                  Width: =Parent.Width - 94
+                  X: =14
+                  Y: =46
+            - btnPRQ_Filter:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =cmp_PunchReviewQueuePro.BorderColor
+                  BorderThickness: =1
+                  Color: =cmp_PunchReviewQueuePro.TextColor
+                  DisabledBorderColor: =cmp_PunchReviewQueuePro.BorderColor
+                  DisabledColor: =cmp_PunchReviewQueuePro.MutedTextColor
+                  DisabledFill: =cmp_PunchReviewQueuePro.SurfaceAltColor
+                  DisplayMode: =DisplayMode.Disabled
+                  Fill: =cmp_PunchReviewQueuePro.SurfaceAltColor
+                  Font: =Font.'Segoe UI'
+                  Height: =34
+                  HoverBorderColor: =cmp_PunchReviewQueuePro.BorderColor
+                  HoverColor: =cmp_PunchReviewQueuePro.TextColor
+                  HoverFill: =cmp_PunchReviewQueuePro.SurfaceAltColor
+                  PressedBorderColor: =cmp_PunchReviewQueuePro.BorderColor
+                  PressedColor: =cmp_PunchReviewQueuePro.TextColor
+                  PressedFill: =cmp_PunchReviewQueuePro.SurfaceAltColor
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Size: =8
+                  Text: ="Filters"
+                  Width: =58
+                  X: =Parent.Width - Self.Width - 14
+                  Y: =46
+            - lblPRQ_Filters:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewQueuePro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =24
+                  Overflow: =Overflow.Ellipsis
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: =cmp_PunchReviewQueuePro.FilterSummary
+                  Width: =Parent.Width - 28
+                  X: =14
+                  Y: =88
+            - rectPRQ_DividerTop:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Fill: =cmp_PunchReviewQueuePro.BorderColor
+                  Height: =1
+                  Width: =Parent.Width
+                  Y: =116
+            - btnPRQ_Previous:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderStyle: =BorderStyle.None
+                  BorderThickness: =0
+                  Color: =cmp_PunchReviewQueuePro.MutedTextColor
+                  DisabledBorderColor: =RGBA(0,0,0,0)
+                  DisabledColor: =ColorFade(cmp_PunchReviewQueuePro.MutedTextColor, 0.45)
+                  DisabledFill: =Color.Transparent
+                  DisplayMode: =If(cmp_PunchReviewQueuePro.IsLoading || cmp_PunchReviewQueuePro.CurrentPosition <= 1, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =30
+                  HoverBorderColor: =RGBA(0,0,0,0)
+                  HoverColor: =cmp_PunchReviewQueuePro.AccentColor
+                  HoverFill: =cmp_PunchReviewQueuePro.SurfaceAltColor
+                  OnSelect: =cmp_PunchReviewQueuePro.OnPrevious()
+                  PressedBorderColor: =RGBA(0,0,0,0)
+                  PressedColor: =cmp_PunchReviewQueuePro.AccentColor
+                  PressedFill: =cmp_PunchReviewQueuePro.SurfaceAltColor
+                  Size: =10
+                  Text: ="‹"
+                  Width: =42
+                  X: =12
+                  Y: =122
+            - lblPRQ_Position:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewQueuePro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =30
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: =Text(cmp_PunchReviewQueuePro.CurrentPosition) & " of " & Text(cmp_PunchReviewQueuePro.TotalItems)
+                  Width: =120
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =122
+            - btnPRQ_Next:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderStyle: =BorderStyle.None
+                  BorderThickness: =0
+                  Color: =cmp_PunchReviewQueuePro.MutedTextColor
+                  DisabledBorderColor: =RGBA(0,0,0,0)
+                  DisabledColor: =ColorFade(cmp_PunchReviewQueuePro.MutedTextColor, 0.45)
+                  DisabledFill: =Color.Transparent
+                  DisplayMode: =If(cmp_PunchReviewQueuePro.IsLoading || cmp_PunchReviewQueuePro.CurrentPosition >= cmp_PunchReviewQueuePro.TotalItems, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =30
+                  HoverBorderColor: =RGBA(0,0,0,0)
+                  HoverColor: =cmp_PunchReviewQueuePro.AccentColor
+                  HoverFill: =cmp_PunchReviewQueuePro.SurfaceAltColor
+                  OnSelect: =cmp_PunchReviewQueuePro.OnNext()
+                  PressedBorderColor: =RGBA(0,0,0,0)
+                  PressedColor: =cmp_PunchReviewQueuePro.AccentColor
+                  PressedFill: =cmp_PunchReviewQueuePro.SurfaceAltColor
+                  Size: =10
+                  Text: ="›"
+                  Width: =42
+                  X: =Parent.Width - Self.Width - 12
+                  Y: =122
+            - rectPRQ_DividerQueue:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Fill: =cmp_PunchReviewQueuePro.BorderColor
+                  Height: =1
+                  Width: =Parent.Width
+                  Y: =156
+            - galPRQ_Items:
+                Control: Gallery@2.15.0
+                Variant: BrowseLayout_Vertical_OneTextVariant_ver5.0
+                Properties:
+                  BorderColor: =RGBA(245,245,245,1)
+                  Height: =Parent.Height - 202
+                  Items: |-
+                    =SortByColumns(
+                        Filter(
+                            cmp_PunchReviewQueuePro.Items,
+                            IsBlank(Trim(cmp_PunchReviewQueuePro.SearchText)) ||
+                            Lower(Trim(cmp_PunchReviewQueuePro.SearchText)) in Lower(Coalesce(PunchCode, "")) ||
+                            Lower(Trim(cmp_PunchReviewQueuePro.SearchText)) in Lower(Coalesce(PunchDescription, "")) ||
+                            Lower(Trim(cmp_PunchReviewQueuePro.SearchText)) in Lower(Coalesce(Discipline, "")) ||
+                            Lower(Trim(cmp_PunchReviewQueuePro.SearchText)) in Lower(Coalesce(Subsystem, "")) ||
+                            Lower(Trim(cmp_PunchReviewQueuePro.SearchText)) in Lower(Coalesce(Status, ""))
+                        ),
+                        "ReviewOrder",
+                        SortOrder.Ascending
+                    )
+                  ShowScrollbar: =true
+                  TemplatePadding: =4
+                  TemplateSize: =86
+                  Width: =Parent.Width
+                  Y: =157
+                Children:
+                  - btnPRQ_Row:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =If(Text(ThisItem.RowKey) = cmp_PunchReviewQueuePro.SelectedRowKeyIn, cmp_PunchReviewQueuePro.AccentColor, cmp_PunchReviewQueuePro.BorderColor)
+                        BorderThickness: =If(Text(ThisItem.RowKey) = cmp_PunchReviewQueuePro.SelectedRowKeyIn, 2, 1)
+                        Color: =Color.Transparent
+                        DisabledBorderColor: =cmp_PunchReviewQueuePro.BorderColor
+                        DisabledColor: =Color.Transparent
+                        DisabledFill: =cmp_PunchReviewQueuePro.SurfaceAltColor
+                        DisplayMode: =If(cmp_PunchReviewQueuePro.IsLoading, DisplayMode.Disabled, DisplayMode.Edit)
+                        Fill: =If(Text(ThisItem.RowKey) = cmp_PunchReviewQueuePro.SelectedRowKeyIn, ColorFade(cmp_PunchReviewQueuePro.AccentColor, 0.93), cmp_PunchReviewQueuePro.BackgroundColor)
+                        Font: =Font.'Segoe UI'
+                        Height: =Parent.TemplateHeight - 4
+                        HoverBorderColor: =cmp_PunchReviewQueuePro.AccentColor
+                        HoverColor: =Color.Transparent
+                        HoverFill: =ColorFade(cmp_PunchReviewQueuePro.AccentColor, 0.96)
+                        OnSelect: =cmp_PunchReviewQueuePro.OnRowSelect()
+                        PressedBorderColor: =cmp_PunchReviewQueuePro.AccentColor
+                        PressedColor: =Color.Transparent
+                        PressedFill: =ColorFade(cmp_PunchReviewQueuePro.AccentColor, 0.90)
+                        RadiusBottomLeft: =9
+                        RadiusBottomRight: =9
+                        RadiusTopLeft: =9
+                        RadiusTopRight: =9
+                        Text: =""
+                        Width: =Parent.TemplateWidth - 8
+                        X: =4
+                  - lblPRQ_Code:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_PunchReviewQueuePro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =18
+                        OnSelect: =Select(btnPRQ_Row)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: =ThisItem.PunchCode
+                        Width: =150
+                        X: =14
+                        Y: =9
+                  - lblPRQ_Status:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =If(Upper(Coalesce(ThisItem.Status, "")) = "CLOSED", ColorValue("#047857"), ColorValue("#B91C1C"))
+                        Fill: =If(Upper(Coalesce(ThisItem.Status, "")) = "CLOSED", ColorValue("#D1FAE5"), ColorValue("#FEE2E2"))
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =20
+                        OnSelect: =Select(btnPRQ_Row)
+                        PaddingBottom: =0
+                        PaddingLeft: =4
+                        PaddingRight: =4
+                        PaddingTop: =0
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                        Size: =7
+                        Text: =Upper(Coalesce(ThisItem.Status, "—"))
+                        Width: =70
+                        X: =Parent.TemplateWidth - Self.Width - 14
+                        Y: =8
+                  - lblPRQ_Description:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_PunchReviewQueuePro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =24
+                        OnSelect: =Select(btnPRQ_Row)
+                        Overflow: =Overflow.Ellipsis
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: =ThisItem.PunchDescription
+                        Width: =Parent.TemplateWidth - 28
+                        X: =14
+                        Y: =30
+                  - lblPRQ_Discipline:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_PunchReviewQueuePro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =18
+                        OnSelect: =Select(btnPRQ_Row)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =7
+                        Text: ="●  " & Coalesce(ThisItem.Discipline, ThisItem.Subsystem, "No discipline")
+                        Width: =165
+                        X: =14
+                        Y: =58
+                  - lblPRQ_Reviewed:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Right
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =If(Coalesce(ThisItem.IsReviewedInSession, false), ColorValue("#047857"), cmp_PunchReviewQueuePro.MutedTextColor)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =18
+                        OnSelect: =Select(btnPRQ_Row)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =7
+                        Text: =If(Coalesce(ThisItem.IsReviewedInSession, false), "Reviewed  ✓", "Not reviewed  ○")
+                        Width: =120
+                        X: =Parent.TemplateWidth - Self.Width - 14
+                        Y: =58
+            - btnPRQ_Refresh:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderStyle: =BorderStyle.None
+                  BorderThickness: =0
+                  Color: =cmp_PunchReviewQueuePro.AccentColor
+                  DisabledBorderColor: =RGBA(0,0,0,0)
+                  DisabledColor: =cmp_PunchReviewQueuePro.MutedTextColor
+                  DisabledFill: =Color.Transparent
+                  DisplayMode: =If(cmp_PunchReviewQueuePro.IsLoading, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =34
+                  HoverBorderColor: =RGBA(0,0,0,0)
+                  HoverColor: =cmp_PunchReviewQueuePro.AccentColor
+                  HoverFill: =cmp_PunchReviewQueuePro.SurfaceAltColor
+                  OnSelect: =cmp_PunchReviewQueuePro.OnRefresh()
+                  PressedBorderColor: =RGBA(0,0,0,0)
+                  PressedColor: =cmp_PunchReviewQueuePro.AccentColor
+                  PressedFill: =cmp_PunchReviewQueuePro.SurfaceAltColor
+                  Size: =8
+                  Text: ="Refresh"
+                  Width: =72
+                  X: =Parent.Width - Self.Width - 12
+                  Y: =Parent.Height - 38
+            - lblPRQ_Footer:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_PunchReviewQueuePro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =34
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: ="Showing queue context"
+                  Width: =150
+                  X: =14
+                  Y: =Parent.Height - 38
