@@ -1,0 +1,138 @@
+// BLOCK 05A — OPTIONAL TEST DATA FOR REVIEW QUEUE
+//
+// Use only to validate Block 05 before integrating Home and Punches.
+// Paste this formula into the OnSelect property of a temporary button on scr_PunchReview.
+// After testing, delete the temporary button. Do not keep this data in production.
+
+ClearCollect(
+    colPunchReviewQueue,
+    {
+        ReviewOrder: 1,
+        RowKey: "100345",
+        PunchIdNumber: 100345,
+        PunchCode: "P-100345",
+        Description: "Handrail gap exceeds 100 mm",
+        AreaCode: "A2",
+        UnitCode: "U01",
+        SystemCode: "SYS-01",
+        SubsystemCode: "STRUCT-01",
+        ElementCode: "HR-204",
+        Discipline: "Structural",
+        Category: "A",
+        StatusCode: "OPEN",
+        StatusLabel: "Open",
+        ResponsibleParty: "SteelFab Ltd.",
+        InspectionName: "Walkdown",
+        Originator: "Ravi Verma",
+        CommentCount: 1,
+        LastCommentOn: DateTimeValue("05/02/2026 09:18"),
+        IsReviewedInSession: true,
+        IsDirty: false
+    },
+    {
+        ReviewOrder: 2,
+        RowKey: "100346",
+        PunchIdNumber: 100346,
+        PunchCode: "P-100346",
+        Description: "Missing identification tag",
+        AreaCode: "A2",
+        UnitCode: "U01",
+        SystemCode: "HVAC",
+        SubsystemCode: "HVAC-02",
+        ElementCode: "TAG-205",
+        Discipline: "Mechanical",
+        Category: "B",
+        StatusCode: "OPEN",
+        StatusLabel: "Open",
+        ResponsibleParty: "ABC Mechanical",
+        InspectionName: "Final inspection",
+        Originator: "Ravi Verma",
+        CommentCount: 3,
+        LastCommentOn: DateTimeValue("05/03/2026 08:45"),
+        IsReviewedInSession: false,
+        IsDirty: false
+    },
+    {
+        ReviewOrder: 3,
+        RowKey: "100347",
+        PunchIdNumber: 100347,
+        PunchCode: "P-100347",
+        Description: "Paint touch-up required at flange",
+        AreaCode: "A2",
+        UnitCode: "U01",
+        SystemCode: "PIP-01",
+        SubsystemCode: "PIPING-04",
+        ElementCode: "FL-047",
+        Discipline: "Mechanical",
+        Category: "C",
+        StatusCode: "IN_PROGRESS",
+        StatusLabel: "In Progress",
+        ResponsibleParty: "ABC Mechanical",
+        InspectionName: "Coating inspection",
+        Originator: "Sahil Khan",
+        CommentCount: 0,
+        LastCommentOn: Blank(),
+        IsReviewedInSession: true,
+        IsDirty: false
+    },
+    {
+        ReviewOrder: 4,
+        RowKey: "100348",
+        PunchIdNumber: 100348,
+        PunchCode: "P-100348",
+        Description: "Cable tray support loose",
+        AreaCode: "A2",
+        UnitCode: "U01",
+        SystemCode: "ELE-01",
+        SubsystemCode: "ELECTRICAL-03",
+        ElementCode: "CT-118",
+        Discipline: "Electrical",
+        Category: "B",
+        StatusCode: "OPEN",
+        StatusLabel: "Open",
+        ResponsibleParty: "ElectroWorks",
+        InspectionName: "Electrical walkdown",
+        Originator: "Anita Mehra",
+        CommentCount: 2,
+        LastCommentOn: DateTimeValue("05/04/2026 10:30"),
+        IsReviewedInSession: false,
+        IsDirty: false
+    },
+    {
+        ReviewOrder: 5,
+        RowKey: "100349",
+        PunchIdNumber: 100349,
+        PunchCode: "P-100349",
+        Description: "Insulation damage on line",
+        AreaCode: "A2",
+        UnitCode: "U01",
+        SystemCode: "PIP-02",
+        SubsystemCode: "PIPING-06",
+        ElementCode: "LN-411",
+        Discipline: "Piping",
+        Category: "B",
+        StatusCode: "OPEN",
+        StatusLabel: "Open",
+        ResponsibleParty: "PipePro Ltd.",
+        InspectionName: "Insulation inspection",
+        Originator: "Ravi Verma",
+        CommentCount: 1,
+        LastCommentOn: DateTimeValue("05/04/2026 11:05"),
+        IsReviewedInSession: false,
+        IsDirty: false
+    }
+);
+
+Set(varPunchReviewSearch, "");
+Set(varPunchReviewQueueQuickFilter, "ALL");
+Set(varPunchReviewCurrentIndex, 2);
+Set(varPunchReviewRequestedIndex, 2);
+Set(varPunchReviewDirty, false);
+
+Select(btnPR_RebuildQueue);
+Select(btnPR_SelectCurrent);
+
+Notify(
+    "Temporary Punch Review queue loaded for Block 05 validation.",
+    NotificationType.Success
+)
