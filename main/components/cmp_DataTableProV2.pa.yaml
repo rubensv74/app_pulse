@@ -1464,7 +1464,13 @@ ComponentDefinitions:
                   BorderThickness: =1
                   DropShadow: =DropShadow.Regular
                   Fill: =cmp_DataTableProV2.BackgroundColor
-                  Height: =332
+                  Height: = Min(
+                            332,
+                            Max(
+                                220,
+                                Parent.Height - 52
+                            )
+                        )
                   RadiusBottomLeft: =12
                   RadiusBottomRight: =12
                   RadiusTopLeft: =12
@@ -1532,13 +1538,14 @@ ComponentDefinitions:
                       Variant: Vertical
                       Properties:
                         BorderColor: =RGBA(0,0,0,0)
-                        Height: =232
+                        Height: = Parent.Height - 100
                         Items: =SortByColumns(cmp_DataTableProV2.Columns, "Order", SortOrder.Ascending)
                         TemplatePadding: =0
                         TemplateSize: =32
                         Width: =Parent.Width - 20
                         X: =10
                         Y: =48
+                        ShowScrollbar: = true
                       Children:
                         - btnDTP2_ColumnCheck:
                             Control: Classic/Button@2.2.0
@@ -1632,7 +1639,7 @@ ComponentDefinitions:
                         Text: ="Reset"
                         Width: =92
                         X: =14
-                        Y: =288
+                        Y: =Parent.Height - Self.Height - 10
                   - btnDTP2_ColumnApply:
                       Control: Classic/Button@2.2.0
                       Properties:
@@ -1661,7 +1668,7 @@ ComponentDefinitions:
                         Text: ="Apply"
                         Width: =150
                         X: =Parent.Width - Self.Width - 14
-                        Y: =288
+                        Y: =Parent.Height - Self.Height - 10
             - conDTP2_ContextMenu:
                 Control: GroupContainer@1.5.0
                 Variant: ManualLayout

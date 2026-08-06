@@ -1,0 +1,287 @@
+ComponentDefinitions:
+  cmp_ActionToolbarPro:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      AccentColor:
+        PropertyKind: Input
+        DisplayName: AccentColor
+        DataType: Color
+        Default: =ColorValue("#1677FF")
+      Actions:
+        PropertyKind: Input
+        DisplayName: Actions
+        Description: Table with Key, Label, IconText, Tone, IsVisible, IsEnabled and Order.
+        DataType: Table
+        Default: |-
+          =Table(
+              {Key:"REVIEW", Label:"Review", IconText:"▶", Tone:"primary", IsVisible:true, IsEnabled:true, Order:1},
+              {Key:"OPEN_PUNCHES", Label:"Punch List", IconText:"↗", Tone:"neutral", IsVisible:true, IsEnabled:true, Order:2},
+              {Key:"REFRESH", Label:"Refresh", IconText:"↻", Tone:"neutral", IsVisible:true, IsEnabled:true, Order:3},
+              {Key:"EXPORT", Label:"Export", IconText:"⇩", Tone:"neutral", IsVisible:true, IsEnabled:true, Order:4},
+              {Key:"COMMENTS", Label:"Comment", IconText:"◫", Tone:"neutral", IsVisible:true, IsEnabled:true, Order:5},
+              {Key:"COLUMNS", Label:"Columns", IconText:"▥", Tone:"neutral", IsVisible:true, IsEnabled:true, Order:6},
+              {Key:"DENSITY", Label:"Density", IconText:"≡", Tone:"neutral", IsVisible:true, IsEnabled:true, Order:7},
+              {Key:"SELECT_VISIBLE", Label:"Select", IconText:"✓", Tone:"neutral", IsVisible:true, IsEnabled:true, Order:8},
+              {Key:"CLEAR_FILTERS", Label:"Clear", IconText:"×", Tone:"danger", IsVisible:true, IsEnabled:true, Order:9},
+              {Key:"MORE", Label:"More", IconText:"•••", Tone:"neutral", IsVisible:true, IsEnabled:true, Order:10}
+          )
+      BackgroundColor:
+        PropertyKind: Input
+        DisplayName: BackgroundColor
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      ContextText:
+        PropertyKind: Input
+        DisplayName: ContextText
+        DataType: Text
+        Default: ="Select a heatmap cell"
+      DangerColor:
+        PropertyKind: Input
+        DisplayName: DangerColor
+        DataType: Color
+        Default: =ColorValue("#EF4444")
+      IsLoading:
+        PropertyKind: Input
+        DisplayName: IsLoading
+        DataType: Boolean
+        Default: =false
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      OnAction:
+        PropertyKind: Event
+        DisplayName: OnAction
+        ReturnType: None
+        Default: =
+      SecondaryText:
+        PropertyKind: Input
+        DisplayName: SecondaryText
+        DataType: Text
+        Default: =""
+      SelectedActionKey:
+        PropertyKind: Output
+        DisplayName: SelectedActionKey
+        DataType: Text
+      ShowContext:
+        PropertyKind: Input
+        DisplayName: ShowContext
+        DataType: Boolean
+        Default: =true
+      SurfaceAltColor:
+        PropertyKind: Input
+        DisplayName: SurfaceAltColor
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+    Properties:
+      Height: =60
+      SelectedActionKey: =Coalesce(varATP_SelectedActionKey, "")
+      Width: =1380
+    Children:
+      - conATP_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =cmp_ActionToolbarPro.BorderColor
+            BorderThickness: =1
+            DropShadow: =DropShadow.Semilight
+            Fill: =cmp_ActionToolbarPro.BackgroundColor
+            Height: =Parent.Height
+            RadiusBottomLeft: =12
+            RadiusBottomRight: =12
+            RadiusTopLeft: =12
+            RadiusTopRight: =12
+            Width: =Parent.Width
+          Children:
+            - conATP_Context:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_ActionToolbarPro.SurfaceAltColor
+                  Height: =44
+                  RadiusBottomLeft: =9
+                  RadiusBottomRight: =9
+                  RadiusTopLeft: =9
+                  RadiusTopRight: =9
+                  Visible: =cmp_ActionToolbarPro.ShowContext
+                  Width: =Min(320, Max(220, Parent.Width * 0.24))
+                  X: =8
+                  Y: =8
+                Children:
+                  - lblATP_ContextIcon:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_ActionToolbarPro.AccentColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =44
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =13
+                        Text: ="◎"
+                        Width: =34
+                        X: =4
+                  - lblATP_Context:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_ActionToolbarPro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =22
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =cmp_ActionToolbarPro.ContextText
+                        Width: =Parent.Width - 48
+                        X: =40
+                        Y: =4
+                  - lblATP_Secondary:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_ActionToolbarPro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =18
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: =cmp_ActionToolbarPro.SecondaryText
+                        Width: =Parent.Width - 48
+                        X: =40
+                        Y: =23
+            - galATP_Actions:
+                Control: Gallery@2.15.0
+                Variant: Horizontal
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Height: =44
+                  Items: =SortByColumns(Filter(cmp_ActionToolbarPro.Actions, IsVisible), "Order", SortOrder.Ascending)
+                  ShowScrollbar: =false
+                  TemplatePadding: =3
+                  TemplateSize: =104
+                  Width: =Parent.Width - Self.X - 8
+                  X: =If(cmp_ActionToolbarPro.ShowContext, conATP_Context.X + conATP_Context.Width + 8, 8)
+                  Y: =8
+                Children:
+                  - btnATP_Action:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: |-
+                          =Switch(
+                              Lower(Coalesce(ThisItem.Tone, "neutral")),
+                              "primary", cmp_ActionToolbarPro.AccentColor,
+                              "danger", ColorFade(cmp_ActionToolbarPro.DangerColor, 0.45),
+                              cmp_ActionToolbarPro.BorderColor
+                          )
+                        BorderThickness: =1
+                        Color: |-
+                          =Switch(
+                              Lower(Coalesce(ThisItem.Tone, "neutral")),
+                              "primary", Color.White,
+                              "danger", cmp_ActionToolbarPro.DangerColor,
+                              cmp_ActionToolbarPro.TextColor
+                          )
+                        DisabledBorderColor: =cmp_ActionToolbarPro.BorderColor
+                        DisabledColor: =cmp_ActionToolbarPro.MutedTextColor
+                        DisabledFill: =cmp_ActionToolbarPro.SurfaceAltColor
+                        DisplayMode: |-
+                          =If(
+                              cmp_ActionToolbarPro.IsLoading || !Coalesce(ThisItem.IsEnabled, true),
+                              DisplayMode.Disabled,
+                              DisplayMode.Edit
+                          )
+                        Fill: |-
+                          =Switch(
+                              Lower(Coalesce(ThisItem.Tone, "neutral")),
+                              "primary", cmp_ActionToolbarPro.AccentColor,
+                              "danger", ColorFade(cmp_ActionToolbarPro.DangerColor, 0.93),
+                              cmp_ActionToolbarPro.BackgroundColor
+                          )
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =36
+                        HoverBorderColor: |-
+                          =If(
+                              Lower(Coalesce(ThisItem.Tone, "neutral")) = "danger",
+                              cmp_ActionToolbarPro.DangerColor,
+                              cmp_ActionToolbarPro.AccentColor
+                          )
+                        HoverColor: |-
+                          =If(
+                              Lower(Coalesce(ThisItem.Tone, "neutral")) = "primary",
+                              Color.White,
+                              If(
+                                  Lower(Coalesce(ThisItem.Tone, "neutral")) = "danger",
+                                  cmp_ActionToolbarPro.DangerColor,
+                                  cmp_ActionToolbarPro.AccentColor
+                              )
+                          )
+                        HoverFill: |-
+                          =If(
+                              Lower(Coalesce(ThisItem.Tone, "neutral")) = "primary",
+                              ColorFade(cmp_ActionToolbarPro.AccentColor, -0.08),
+                              If(
+                                  Lower(Coalesce(ThisItem.Tone, "neutral")) = "danger",
+                                  ColorFade(cmp_ActionToolbarPro.DangerColor, 0.88),
+                                  cmp_ActionToolbarPro.SurfaceAltColor
+                              )
+                          )
+                        OnSelect: |-
+                          =Set(varATP_SelectedActionKey, Text(ThisItem.Key));
+                          cmp_ActionToolbarPro.OnAction()
+                        PressedBorderColor: =cmp_ActionToolbarPro.AccentColor
+                        PressedColor: =If(Lower(Coalesce(ThisItem.Tone, "neutral")) = "primary", Color.White, cmp_ActionToolbarPro.AccentColor)
+                        PressedFill: =ColorFade(cmp_ActionToolbarPro.AccentColor, 0.86)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =8
+                        Text: =Trim(Coalesce(ThisItem.IconText, "") & "  " & Coalesce(ThisItem.Label, ThisItem.Key))
+                        Width: =98
+                        X: =3
+                        Y: =4
+            - conATP_Loading:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =RGBA(255,255,255,0.82)
+                  Height: =Parent.Height - 2
+                  Visible: =cmp_ActionToolbarPro.IsLoading
+                  Width: =Parent.Width - 2
+                  X: =1
+                  Y: =1
+                Children:
+                  - spnATP_Loading:
+                      Control: Spinner@1.4.6
+                      Properties:
+                        Height: =24
+                        SpinnerColor: =cmp_ActionToolbarPro.AccentColor
+                        Width: =24
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =(Parent.Height - Self.Height) / 2
