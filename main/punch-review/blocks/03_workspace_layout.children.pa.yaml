@@ -1,0 +1,453 @@
+# BLOCK 03 — GLOBAL WORKSPACE LAYOUT
+#
+# Operation: ADD AS SECOND CHILD.
+# Parent control: conPR_ContentShell
+# Exact location: conPR_ContentShell > Children, immediately after conPR_HeaderCard.
+# Dependencies: Blocks 01 and 02 must already be valid.
+#
+# This block is intentionally visual only. It contains named slots and temporary labels,
+# but no galleries, flows, custom fields, donut or table component.
+#
+# Validation after paste:
+# 1. Review Queue remains at the left on desktop.
+# 2. Center and right columns occupy the remaining width.
+# 3. Related Punches / Context remains at the bottom.
+# 4. At narrow widths the body and upper grid stack vertically without overlapping.
+# 5. The screen can scroll vertically when the stacked layout is taller than the viewport.
+
+- conPR_Body:
+    Control: GroupContainer@1.5.0
+    Variant: AutoLayout
+    Properties:
+      DropShadow: =DropShadow.None
+      Fill: =Color.Transparent
+      FillPortions: =1
+      LayoutAlignItems: =LayoutAlignItems.Stretch
+      LayoutDirection: =If(App.Width < 1100, LayoutDirection.Vertical, LayoutDirection.Horizontal)
+      LayoutGap: =10
+      LayoutMinHeight: =400
+      LayoutMinWidth: =300
+      LayoutOverflowY: =LayoutOverflow.Scroll
+      RadiusBottomLeft: =0
+      RadiusBottomRight: =0
+      RadiusTopLeft: =0
+      RadiusTopRight: =0
+      Width: =Parent.Width
+    Children:
+      - conPR_QueueCard:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            AlignInContainer: =AlignInContainer.Stretch
+            BorderColor: =varTheme_Border
+            BorderThickness: =1
+            DropShadow: =DropShadow.Semilight
+            Fill: =varTheme_Surface
+            FillPortions: =0
+            Height: =If(App.Width < 1100, 300, Parent.Height)
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =0
+            LayoutMinHeight: =260
+            LayoutMinWidth: =300
+            RadiusBottomLeft: =12
+            RadiusBottomRight: =12
+            RadiusTopLeft: =12
+            RadiusTopRight: =12
+            Width: =If(App.Width < 1100, Parent.Width, 330)
+          Children:
+            - conPR_QueueHeaderSlot:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =varTheme_Border
+                  BorderThickness: =0
+                  DropShadow: =DropShadow.None
+                  Fill: =varTheme_Surface
+                  FillPortions: =0
+                  Height: =48
+                  LayoutMinHeight: =48
+                  LayoutMinWidth: =280
+                  Width: =Parent.Width
+                Children:
+                  - lblPR_QueueSlotTitle:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_Text
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =11
+                        Text: ="Review Queue"
+                        Width: =190
+                        X: =14
+                        Y: =12
+                  - lblPR_QueueSlotCount:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Right
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_TextMuted
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =24
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: ="0 punches"
+                        Width: =100
+                        X: =Parent.Width - 114
+                        Y: =12
+            - rectPR_QueueHeaderDivider:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderStyle: =BorderStyle.None
+                  Fill: =varTheme_Border
+                  FillPortions: =0
+                  Height: =1
+                  Width: =Parent.Width
+            - conPR_QueueContentSlot:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =varTheme_Surface
+                  FillPortions: =1
+                  LayoutMinHeight: =180
+                  LayoutMinWidth: =280
+                  Width: =Parent.Width
+                Children:
+                  - lblPR_QueuePlaceholder:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Align: =Align.Center
+                        AutoHeight: =true
+                        Color: =varTheme_TextMuted
+                        Height: =44
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =10
+                        Text: ="Queue controls and rows will be inserted in Block 05."
+                        VerticalAlign: =VerticalAlign.Middle
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =(Parent.Height - Self.Height) / 2
+      - conPR_Workspace:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            AlignInContainer: =AlignInContainer.Stretch
+            DropShadow: =DropShadow.None
+            Fill: =Color.Transparent
+            FillPortions: =1
+            Height: =If(App.Width < 1100, 1080, Parent.Height)
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =10
+            LayoutMinHeight: =400
+            LayoutMinWidth: =300
+            LayoutOverflowY: =LayoutOverflow.Scroll
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Width: =Parent.Width
+          Children:
+            - conPR_UpperGrid:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =Color.Transparent
+                  FillPortions: =1
+                  Height: =If(App.Width < 1320, 820, Parent.Height - 200)
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =If(App.Width < 1320, LayoutDirection.Vertical, LayoutDirection.Horizontal)
+                  LayoutGap: =10
+                  LayoutMinHeight: =420
+                  LayoutMinWidth: =280
+                  LayoutOverflowY: =LayoutOverflow.Scroll
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Width: =Parent.Width
+                Children:
+                  - conPR_CenterColumn:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        AlignInContainer: =AlignInContainer.Stretch
+                        DropShadow: =DropShadow.None
+                        Fill: =Color.Transparent
+                        FillPortions: =If(App.Width < 1320, 0, 1.35)
+                        Height: =If(App.Width < 1320, 390, Parent.Height)
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =10
+                        LayoutMinHeight: =360
+                        LayoutMinWidth: =300
+                        Width: =Parent.Width
+                      Children:
+                        - conPR_OverviewSlot:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.Semilight
+                              Fill: =varTheme_Surface
+                              FillPortions: =0
+                              Height: =190
+                              LayoutMinHeight: =180
+                              LayoutMinWidth: =300
+                              RadiusBottomLeft: =12
+                              RadiusBottomRight: =12
+                              RadiusTopLeft: =12
+                              RadiusTopRight: =12
+                              Width: =Parent.Width
+                            Children:
+                              - lblPR_OverviewPlaceholder:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    Color: =varTheme_TextMuted
+                                    Height: =44
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =10
+                                    Text: ="Punch Overview slot — Block 06"
+                                    Width: =Parent.Width - 40
+                                    X: =20
+                                    Y: =(Parent.Height - Self.Height) / 2
+                        - conPR_ActionsSlot:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.Semilight
+                              Fill: =varTheme_Surface
+                              FillPortions: =0
+                              Height: =62
+                              LayoutMinHeight: =60
+                              LayoutMinWidth: =300
+                              RadiusBottomLeft: =12
+                              RadiusBottomRight: =12
+                              RadiusTopLeft: =12
+                              RadiusTopRight: =12
+                              Width: =Parent.Width
+                            Children:
+                              - lblPR_ActionsPlaceholder:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    Color: =varTheme_TextMuted
+                                    Height: =24
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =10
+                                    Text: ="Review Actions slot — Block 07"
+                                    Width: =Parent.Width - 40
+                                    X: =20
+                                    Y: =(Parent.Height - Self.Height) / 2
+                        - conPR_HistorySlot:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.Semilight
+                              Fill: =varTheme_Surface
+                              FillPortions: =1
+                              LayoutMinHeight: =120
+                              LayoutMinWidth: =300
+                              RadiusBottomLeft: =12
+                              RadiusBottomRight: =12
+                              RadiusTopLeft: =12
+                              RadiusTopRight: =12
+                              Width: =Parent.Width
+                            Children:
+                              - lblPR_HistoryPlaceholder:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    Color: =varTheme_TextMuted
+                                    Height: =44
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =10
+                                    Text: ="Session Activity / History slot — Block 08"
+                                    Width: =Parent.Width - 40
+                                    X: =20
+                                    Y: =(Parent.Height - Self.Height) / 2
+                  - conPR_RightColumn:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        AlignInContainer: =AlignInContainer.Stretch
+                        DropShadow: =DropShadow.None
+                        Fill: =Color.Transparent
+                        FillPortions: =If(App.Width < 1320, 0, 1)
+                        Height: =If(App.Width < 1320, 420, Parent.Height)
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =10
+                        LayoutMinHeight: =390
+                        LayoutMinWidth: =300
+                        Width: =Parent.Width
+                      Children:
+                        - conPR_CommentsSlot:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.Semilight
+                              Fill: =varTheme_Surface
+                              FillPortions: =1
+                              LayoutMinHeight: =150
+                              LayoutMinWidth: =300
+                              RadiusBottomLeft: =12
+                              RadiusBottomRight: =12
+                              RadiusTopLeft: =12
+                              RadiusTopRight: =12
+                              Width: =Parent.Width
+                            Children:
+                              - lblPR_CommentsPlaceholder:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    Color: =varTheme_TextMuted
+                                    Height: =44
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =10
+                                    Text: ="Comments slot — Block 09"
+                                    Width: =Parent.Width - 40
+                                    X: =20
+                                    Y: =(Parent.Height - Self.Height) / 2
+                        - conPR_CustomFieldsSlot:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.Semilight
+                              Fill: =varTheme_Surface
+                              FillPortions: =1
+                              LayoutMinHeight: =150
+                              LayoutMinWidth: =300
+                              RadiusBottomLeft: =12
+                              RadiusBottomRight: =12
+                              RadiusTopLeft: =12
+                              RadiusTopRight: =12
+                              Width: =Parent.Width
+                            Children:
+                              - lblPR_CustomFieldsPlaceholder:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    Color: =varTheme_TextMuted
+                                    Height: =44
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =10
+                                    Text: ="Custom Fields slot — Block 10"
+                                    Width: =Parent.Width - 40
+                                    X: =20
+                                    Y: =(Parent.Height - Self.Height) / 2
+                        - conPR_ProgressSlot:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.Semilight
+                              Fill: =varTheme_Surface
+                              FillPortions: =0
+                              Height: =120
+                              LayoutMinHeight: =110
+                              LayoutMinWidth: =300
+                              RadiusBottomLeft: =12
+                              RadiusBottomRight: =12
+                              RadiusTopLeft: =12
+                              RadiusTopRight: =12
+                              Width: =Parent.Width
+                            Children:
+                              - lblPR_ProgressPlaceholder:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    Color: =varTheme_TextMuted
+                                    Height: =44
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =10
+                                    Text: ="Review Progress slot — Block 11"
+                                    Width: =Parent.Width - 40
+                                    X: =20
+                                    Y: =(Parent.Height - Self.Height) / 2
+            - conPR_RelatedCard:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =varTheme_Border
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.Semilight
+                  Fill: =varTheme_Surface
+                  FillPortions: =0
+                  Height: =190
+                  LayoutMinHeight: =180
+                  LayoutMinWidth: =300
+                  RadiusBottomLeft: =12
+                  RadiusBottomRight: =12
+                  RadiusTopLeft: =12
+                  RadiusTopRight: =12
+                  Width: =Parent.Width
+                Children:
+                  - lblPR_RelatedPlaceholder:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Align: =Align.Center
+                        AutoHeight: =true
+                        Color: =varTheme_TextMuted
+                        Height: =44
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =10
+                        Text: ="Related Punches / Context slot — Block 12"
+                        Width: =Parent.Width - 40
+                        X: =20
+                        Y: =(Parent.Height - Self.Height) / 2
