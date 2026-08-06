@@ -1,0 +1,62 @@
+// BLOCK 09A — COMMENTS SELECTION HOOK
+//
+// Operation: REPLACE FORMULA COMPLETELY.
+// Target control: btnPR_SelectCurrent
+// Target property: OnSelect
+// Parent: conPR_QueueCard
+//
+// Dependencies:
+// - Block 09 must already exist because this formula selects btnPR_LoadComments.
+// - Keep every statement below; this replaces the Block 05 formula completely.
+//
+// Scope:
+// - Preserves the current queue selection behaviour.
+// - Resets comment pagination to page 1.
+// - Loads comments for the newly selected Punch.
+// - Clears comments when the queue is empty.
+//
+// Important for optional test data:
+// - The Punch IDs in Block 05A are fictional.
+// - Use Block 09B to test the visual comments panel.
+// - Real flow validation requires a real Punch ID and active varProjectId.
+
+If(
+    CountRows(colPunchReviewQueue) = 0,
+
+    Set(varPunchReviewCurrent, Blank());
+    Set(varPunchReviewCurrentId, Blank());
+    Set(varPunchReviewCommentsPage, 1);
+    Clear(colPunchReviewComments);
+    Set(varPunchReviewCommentsError, ""),
+
+    Set(
+        varPunchReviewCurrentIndex,
+        Min(
+            Max(
+                1,
+                Coalesce(
+                    varPunchReviewRequestedIndex,
+                    varPunchReviewCurrentIndex,
+                    1
+                )
+            ),
+            CountRows(colPunchReviewQueue)
+        )
+    );
+
+    Set(
+        varPunchReviewCurrent,
+        LookUp(
+            colPunchReviewQueue,
+            ReviewOrder = varPunchReviewCurrentIndex
+        )
+    );
+
+    Set(
+        varPunchReviewCurrentId,
+        varPunchReviewCurrent.PunchIdNumber
+    );
+
+    Set(varPunchReviewCommentsPage, 1);
+    Select(btnPR_LoadComments)
+)
