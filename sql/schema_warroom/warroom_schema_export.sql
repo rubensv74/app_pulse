@@ -41,6 +41,12 @@ SET XACT_ABORT ON;
 
 DECLARE @SchemaName sysname = N'warroom';
 
+/*
+    0 = salida limpia para generar warroom-schema.sql mediante sqlcmd.
+    1 = muestra también el resumen y el detalle por objeto en SSMS.
+*/
+DECLARE @IncludeDiagnosticResults bit = 0;
+
 DECLARE @CRLF nvarchar(2) =
     NCHAR(13) + NCHAR(10);
 
@@ -1081,6 +1087,9 @@ WHERE
   Resumen de objetos encontrados
 ==============================================================================*/
 
+IF @IncludeDiagnosticResults = 1
+BEGIN
+
 SELECT
     ObjectType,
     COUNT(*) AS ObjectCount
@@ -1125,6 +1134,9 @@ ORDER BY
     DefinitionOrder,
     SchemaName,
     ObjectName;
+
+
+END;
 
 /*==============================================================================
   RESULTADO 3
