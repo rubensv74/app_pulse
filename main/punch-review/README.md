@@ -30,7 +30,8 @@ Cada bloque indica:
 4. `04_runtime_state.onvisible.pa.yaml` — validado
 5. `05_review_queue.replace-control.pa.yaml` — validado
 6. `05A_review_queue_test_seed.optional.powerfx` — opcional para pruebas
-7. `06_punch_overview.replace-control.pa.yaml` — pendiente de validación en Studio
+7. `06_punch_overview.replace-control.pa.yaml` — validado
+8. `07_review_actions.replace-control.pa.yaml` — pendiente de validación en Studio
 
 No se debe pegar un bloque posterior si el anterior no guarda, abre la pantalla y pasa App Checker sin errores nuevos.
 
