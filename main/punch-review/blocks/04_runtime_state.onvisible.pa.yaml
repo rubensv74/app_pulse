@@ -14,6 +14,8 @@
 # 2. All colPunchReview* collections appear in the Collections viewer.
 # 3. Reopening the screen does not erase an existing review queue.
 # 4. varPunchReviewCurrentIndex is clamped to the available queue.
+# 5. varPunchReviewPendingIndex is a numeric sentinel initialized to 0.
+# 6. The help modal is closed and Spanish is the initial language on screen entry.
 
 OnVisible: |-
   =
@@ -240,8 +242,16 @@ OnVisible: |-
   If(IsBlank(varPunchReviewFieldsError), Set(varPunchReviewFieldsError, ""));
 
   If(IsBlank(varPunchReviewRequestedIndex), Set(varPunchReviewRequestedIndex, Blank()));
-  If(IsBlank(varPunchReviewPendingIndex), Set(varPunchReviewPendingIndex, Blank()));
+
+  // Numeric sentinel reserved for the future unsaved-change guard.
+  // Blank() did not establish a stable numeric type in Studio.
+  Set(varPunchReviewPendingIndex, 0);
+
   If(IsBlank(varPunchReviewShowDirtyDialog), Set(varPunchReviewShowDirtyDialog, false));
+
+  // Help modal state. Entering the screen starts in Spanish and closed.
+  Set(varPunchReviewHelpLanguage, "ES");
+  Set(varPunchReviewHelpVisible, false);
 
   // -----------------------------------------------------
   // 4. Queue projection and current record
