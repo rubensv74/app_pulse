@@ -10,6 +10,12 @@
 #
 # This control opens the bilingual user-help modal.
 # It is an icon inside a rounded container, not one of the language tabs.
+#
+# Compatibility:
+# - TabList@2.2.30 is not resettable with Reset().
+# - The trigger only opens the modal.
+# - The selected language is preserved while the user remains on the screen.
+# - Block 04 initializes Spanish when the screen is entered.
 
 - conPR_HelpTrigger:
     Control: GroupContainer@1.5.0
@@ -37,10 +43,7 @@
             Height: =22
             HoverColor: =ColorFade(varTheme_PulseBlueDark, -0.12)
             Icon: =Icon.Information
-            OnSelect: |-
-              =Set(varPunchReviewHelpLanguage, "ES");
-              Set(varPunchReviewHelpVisible, true);
-              Reset(tabPR_HelpLanguage)
+            OnSelect: =Set(varPunchReviewHelpVisible, true)
             Tooltip: ="Ayuda / Help"
             Width: =22
             X: =9
