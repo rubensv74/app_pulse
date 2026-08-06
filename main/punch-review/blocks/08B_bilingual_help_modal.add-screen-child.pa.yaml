@@ -1,0 +1,575 @@
+# BLOCK 08B — BILINGUAL HELP MODAL WITH PREMIUM TABS
+#
+# Operation: ADD AS SCREEN CHILD.
+# Parent: scr_PunchReview > Children
+# Exact location: after conPR_ScreenRoot.
+#
+# Final screen structure:
+# scr_PunchReview
+# ├── conPR_ScreenRoot
+# └── conPR_HelpModalLayer
+#
+# Dependencies:
+# - Blocks 01–08 validated.
+# - Block 08A adds the header trigger.
+#
+# Language navigation:
+# - Uses the modern TabList control.
+# - Español and English are tabs, not two independent buttons.
+# - The selected tab controls all modal content.
+#
+# Compatibility notes:
+# - TabList@2.2.30 uses Items, DefaultSelectedItems, Selected and OnChange.
+# - Label@2.5.1 contains no Radius* properties.
+# - Dialog/card rounding is handled by GroupContainer@1.5.0.
+#
+# Validation:
+# 1. The information icon opens the modal in Spanish.
+# 2. The English tab changes all help content.
+# 3. The Español tab restores Spanish content.
+# 4. Close icon and footer button close the modal.
+# 5. Background content is visually blocked by the modal layer.
+
+- conPR_HelpModalLayer:
+    Control: GroupContainer@1.5.0
+    Variant: ManualLayout
+    Properties:
+      DropShadow: =DropShadow.None
+      Fill: =Color.Transparent
+      Height: =Parent.Height
+      Visible: =Coalesce(varPunchReviewHelpVisible, false)
+      Width: =Parent.Width
+      X: =0
+      Y: =0
+    Children:
+      - rectPR_HelpBackdrop:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            BorderStyle: =BorderStyle.None
+            Fill: =RGBA(15,23,42,0.58)
+            Height: =Parent.Height
+            Width: =Parent.Width
+      - conPR_HelpDialog:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =varTheme_Border
+            BorderThickness: =1
+            DropShadow: =DropShadow.Bold
+            Fill: =varTheme_Surface
+            Height: =Min(720, Parent.Height - 64)
+            RadiusBottomLeft: =20
+            RadiusBottomRight: =20
+            RadiusTopLeft: =20
+            RadiusTopRight: =20
+            Width: =Min(980, Parent.Width - 64)
+            X: =(Parent.Width - Self.Width) / 2
+            Y: =(Parent.Height - Self.Height) / 2
+          Children:
+            - conPR_HelpHeader:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  DropShadow: =DropShadow.None
+                  Fill: =varTheme_Surface
+                  Height: =76
+                  Width: =Parent.Width
+                Children:
+                  - conPR_HelpHeaderIcon:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: =ColorValue("#BFDBFE")
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =ColorValue("#EFF6FF")
+                        Height: =42
+                        RadiusBottomLeft: =12
+                        RadiusBottomRight: =12
+                        RadiusTopLeft: =12
+                        RadiusTopRight: =12
+                        Width: =42
+                        X: =18
+                        Y: =17
+                      Children:
+                        - icoPR_HelpHeader:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =varTheme_PulseBlueDark
+                              Height: =22
+                              Icon: =Icon.Information
+                              Width: =22
+                              X: =10
+                              Y: =10
+                  - lblPR_HelpTitle:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_Text
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =28
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =15
+                        Text: |-
+                          =If(
+                              Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                              "Punch Review Workspace guide",
+                              "Guía de Punch Review Workspace"
+                          )
+                        Width: =Parent.Width - 150
+                        X: =74
+                        Y: =13
+                  - lblPR_HelpSubtitle:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_TextMuted
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =22
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: |-
+                          =If(
+                              Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                              "Learn what this workspace includes and how to use it during a review session.",
+                              "Conoce las funciones de este espacio y cómo utilizarlo durante una sesión de revisión."
+                          )
+                        Width: =Parent.Width - 150
+                        X: =74
+                        Y: =42
+                  - icoPR_CloseHelp:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_TextMuted
+                        Height: =24
+                        HoverColor: =varTheme_Text
+                        Icon: =Icon.Cancel
+                        OnSelect: =Set(varPunchReviewHelpVisible, false)
+                        Tooltip: ="Cerrar / Close"
+                        Width: =24
+                        X: =Parent.Width - 42
+                        Y: =18
+            - rectPR_HelpHeaderDivider:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderStyle: =BorderStyle.None
+                  Fill: =varTheme_Border
+                  Height: =1
+                  Width: =Parent.Width
+                  Y: =76
+            - conPR_HelpTabsHost:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  DropShadow: =DropShadow.None
+                  Fill: =varTheme_Surface
+                  Height: =62
+                  Width: =Parent.Width
+                  Y: =77
+                Children:
+                  - tabPR_HelpLanguage:
+                      Control: TabList@2.2.30
+                      Properties:
+                        DefaultSelectedItems: |-
+                          =If(
+                              Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                              ["English"],
+                              ["Español"]
+                          )
+                        Height: =44
+                        Items: =["Español", "English"]
+                        OnChange: |-
+                          =Set(
+                              varPunchReviewHelpLanguage,
+                              If(
+                                  Self.Selected.Value = "English",
+                                  "EN",
+                                  "ES"
+                              )
+                          )
+                        Width: =300
+                        X: =18
+                        Y: =9
+                  - lblPR_HelpTabHint:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Right
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_TextMuted
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =30
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: |-
+                          =If(
+                              Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                              "Session guide · current capabilities",
+                              "Guía de sesión · funciones actuales"
+                          )
+                        Width: =300
+                        X: =Parent.Width - 318
+                        Y: =16
+            - conPR_HelpContent:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  DropShadow: =DropShadow.None
+                  Fill: =varTheme_SurfaceAlt
+                  Height: =Parent.Height - 203
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =10
+                  LayoutOverflowY: =LayoutOverflow.Scroll
+                  PaddingBottom: =16
+                  PaddingLeft: =18
+                  PaddingRight: =18
+                  PaddingTop: =16
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Width: =Parent.Width
+                  Y: =139
+                Children:
+                  - conPR_HelpPurposeCard:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: =ColorValue("#BFDBFE")
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =ColorValue("#EFF6FF")
+                        FillPortions: =0
+                        Height: =92
+                        LayoutMinHeight: =92
+                        LayoutMinWidth: =300
+                        RadiusBottomLeft: =14
+                        RadiusBottomRight: =14
+                        RadiusTopLeft: =14
+                        RadiusTopRight: =14
+                        Width: =Parent.Width
+                      Children:
+                        - lblPR_HelpPurposeTitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =varTheme_PulseBlueDark
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =24
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =11
+                              Text: |-
+                                =If(
+                                    Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                                    "What is this workspace for?",
+                                    "¿Para qué sirve este espacio?"
+                                )
+                              Width: =Parent.Width - 32
+                              X: =16
+                              Y: =12
+                        - lblPR_HelpPurposeBody:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =varTheme_Text
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              Height: =46
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =9
+                              Text: |-
+                                =If(
+                                    Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                                    "Review Punches sequentially from one screen. The queue, Punch overview, actions and session activity remain visible while you move through the records.",
+                                    "Permite revisar Punches de forma secuencial desde una sola pantalla. La cola, el resumen, las acciones y la actividad de sesión permanecen visibles mientras avanzas."
+                                )
+                              VerticalAlign: =VerticalAlign.Top
+                              Width: =Parent.Width - 32
+                              X: =16
+                              Y: =39
+                  - lblPR_HelpQueueTitle:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_Text
+                        FontWeight: =FontWeight.Semibold
+                        Height: =26
+                        Size: =11
+                        Text: |-
+                          =If(
+                              Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                              "1. Use the Review Queue",
+                              "1. Utiliza la Review Queue"
+                          )
+                        Width: =Parent.Width
+                  - lblPR_HelpQueueBody:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_TextMuted
+                        Height: =62
+                        Size: =9
+                        Text: |-
+                          =If(
+                              Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                              "Select a row to make it the current Punch. Use Previous and Next to review in order. Search by Punch code, description, subsystem or discipline. Use All, Remaining and Reviewed to change the visible subset.",
+                              "Selecciona una fila para convertirla en el Punch actual. Usa Anterior y Siguiente para revisar en orden. Busca por código, descripción, subsistema o disciplina. Usa All, Remaining y Reviewed para cambiar el subconjunto visible."
+                          )
+                        Width: =Parent.Width
+                  - lblPR_HelpOverviewTitle:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_Text
+                        FontWeight: =FontWeight.Semibold
+                        Height: =26
+                        Size: =11
+                        Text: |-
+                          =If(
+                              Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                              "2. Check Punch Overview",
+                              "2. Comprueba Punch Overview"
+                          )
+                        Width: =Parent.Width
+                  - lblPR_HelpOverviewBody:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_TextMuted
+                        Height: =58
+                        Size: =9
+                        Text: |-
+                          =If(
+                              Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                              "Confirm the Punch ID, subsystem, operational status, description, discipline, responsible party, category and originator before taking an action.",
+                              "Confirma el identificador, subsistema, estado operativo, descripción, disciplina, responsable, categoría y originador antes de realizar una acción."
+                          )
+                        Width: =Parent.Width
+                  - lblPR_HelpActionsTitle:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_Text
+                        FontWeight: =FontWeight.Semibold
+                        Height: =26
+                        Size: =11
+                        Text: |-
+                          =If(
+                              Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                              "3. Record the session review",
+                              "3. Registra la revisión de la sesión"
+                          )
+                        Width: =Parent.Width
+                  - lblPR_HelpActionsBody:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_TextMuted
+                        Height: =70
+                        Size: =9
+                        Text: |-
+                          =If(
+                              Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                              "Mark Reviewed records that the Punch was discussed in the current session. Undo Review removes that temporary mark. Open Punch List returns to the operational Punch screen with the current identifier prepared as context.",
+                              "Mark Reviewed registra que el Punch se ha tratado en la sesión actual. Undo Review elimina esa marca temporal. Open Punch List vuelve a la pantalla operativa de Punches con el identificador actual preparado como contexto."
+                          )
+                        Width: =Parent.Width
+                  - conPR_HelpWarningCard:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: =ColorValue("#FDE68A")
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =ColorValue("#FFFBEB")
+                        FillPortions: =0
+                        Height: =94
+                        LayoutMinHeight: =94
+                        LayoutMinWidth: =300
+                        RadiusBottomLeft: =14
+                        RadiusBottomRight: =14
+                        RadiusTopLeft: =14
+                        RadiusTopRight: =14
+                        Width: =Parent.Width
+                      Children:
+                        - lblPR_HelpWarningTitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =ColorValue("#92400E")
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =24
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =10
+                              Text: |-
+                                =If(
+                                    Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                                    "Session-only review",
+                                    "Revisión limitada a la sesión"
+                                )
+                              Width: =Parent.Width - 32
+                              X: =16
+                              Y: =12
+                        - lblPR_HelpWarningBody:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =ColorValue("#78350F")
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              Height: =48
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =9
+                              Text: |-
+                                =If(
+                                    Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                                    "Reviewed is not yet stored in SQL. It can be lost when the app is closed or reloaded. It does not change the real Punch status.",
+                                    "Reviewed todavía no se guarda en SQL. Puede perderse al cerrar o recargar la aplicación y no modifica el estado operativo real del Punch."
+                                )
+                              VerticalAlign: =VerticalAlign.Top
+                              Width: =Parent.Width - 32
+                              X: =16
+                              Y: =39
+                  - lblPR_HelpActivityTitle:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_Text
+                        FontWeight: =FontWeight.Semibold
+                        Height: =26
+                        Size: =11
+                        Text: |-
+                          =If(
+                              Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                              "4. Read Session Activity",
+                              "4. Consulta Session Activity"
+                          )
+                        Width: =Parent.Width
+                  - lblPR_HelpActivityBody:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_TextMuted
+                        Height: =58
+                        Size: =9
+                        Text: |-
+                          =If(
+                              Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                              "This panel shows actions performed during the current app session for the selected Punch. It is not the complete corporate history.",
+                              "Este panel muestra las acciones realizadas durante la sesión actual para el Punch seleccionado. No es el historial corporativo completo."
+                          )
+                        Width: =Parent.Width
+                  - lblPR_HelpLimitationsTitle:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_Text
+                        FontWeight: =FontWeight.Semibold
+                        Height: =26
+                        Size: =11
+                        Text: |-
+                          =If(
+                              Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                              "5. Current implementation status",
+                              "5. Estado actual de implementación"
+                          )
+                        Width: =Parent.Width
+                  - lblPR_HelpLimitationsBody:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        AutoHeight: =true
+                        Color: =varTheme_TextMuted
+                        Height: =82
+                        Size: =9
+                        Text: |-
+                          =If(
+                              Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                              "Comments, custom fields, progress, related Punches and unsaved-change protection are being added in later blocks. The screen always labels temporary or incomplete capabilities explicitly.",
+                              "Los comentarios, campos personalizados, progreso, Punches relacionados y protección ante cambios sin guardar se añadirán en bloques posteriores. La pantalla identifica de forma expresa las funciones temporales o incompletas."
+                          )
+                        Width: =Parent.Width
+            - conPR_HelpFooter:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  DropShadow: =DropShadow.None
+                  Fill: =varTheme_Surface
+                  Height: =64
+                  Width: =Parent.Width
+                  Y: =Parent.Height - 64
+                Children:
+                  - lblPR_HelpFooterNote:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_TextMuted
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =32
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: |-
+                          =If(
+                              Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                              "For the complete guide, see main/punch-review/user-guide/ in the repository.",
+                              "Consulta la guía completa en main/punch-review/user-guide/ del repositorio."
+                          )
+                        Width: =Parent.Width - 190
+                        X: =18
+                        Y: =16
+                  - btnPR_CloseHelp:
+                      Control: ModernButton@1.0.0
+                      Properties:
+                        Appearance: =ButtonAppearance.Primary
+                        BasePaletteColor: =varTheme_PulseBlueDark
+                        Height: =40
+                        OnSelect: =Set(varPunchReviewHelpVisible, false)
+                        Text: |-
+                          =If(
+                              Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+                              "Close guide",
+                              "Cerrar guía"
+                          )
+                        Width: =142
+                        X: =Parent.Width - 160
+                        Y: =12
