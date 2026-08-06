@@ -27,16 +27,16 @@ Cada bloque indica:
 1. `01_screen_shell.pa.yaml` — validado
 2. `02_header_premium.children.pa.yaml` — validado
 3. `03_workspace_layout.children.pa.yaml` — validado
-4. `04_runtime_state.onvisible.pa.yaml` — validado
+4. `04_runtime_state.onvisible.pa.yaml` — corrección tipada publicada; pendiente de revalidación
 5. `05_review_queue.replace-control.pa.yaml` — validado
 6. `05A_review_queue_test_seed.optional.powerfx` — opcional para pruebas
 7. `06_punch_overview.replace-control.pa.yaml` — validado
 8. `07_review_actions.replace-control.pa.yaml` — validado
-9. `08_session_activity.replace-control.pa.yaml` — pendiente de validación en Studio
-10. `08A_help_trigger.add-child.pa.yaml` — pendiente de validación en Studio
-11. `08B_bilingual_help_modal.add-screen-child.pa.yaml` — pendiente de validación en Studio
+9. `08_session_activity.replace-control.pa.yaml` — integrado; pendiente de validación final junto con las correcciones
+10. `08A_help_trigger.add-child.pa.yaml` — corrección de `Reset(TabList)` publicada; pendiente de revalidación
+11. `08B_bilingual_help_modal.add-screen-child.pa.yaml` — integrado; `TabList@2.2.30` validado para sus propiedades declaradas
 
-No se debe pegar un bloque posterior si el anterior no guarda, abre la pantalla y pasa App Checker sin errores nuevos.
+No se debe iniciar el Bloque 09 hasta que las correcciones de los Bloques 04 y 08A guarden sin errores nuevos en Studio.
 
 ## Manual de usuario
 
@@ -62,10 +62,12 @@ Antes de crear o modificar un bloque debe revisarse:
 main/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
 ```
 
-Regla confirmada:
+Reglas confirmadas:
 
 ```text
 Label@2.5.1 no admite RadiusBottomLeft, RadiusBottomRight, RadiusTopLeft ni RadiusTopRight.
+TabList@2.2.30 no es reseteable mediante Reset().
+Una variable numérica nueva debe recibir primero una asignación numérica inequívoca.
 ```
 
 Para una píldora redondeada se utiliza un `GroupContainer@1.5.0` con radios y un `Label@2.5.1` sin radios en su interior.
