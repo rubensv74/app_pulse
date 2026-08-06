@@ -17,6 +17,7 @@ No es un registro histórico pasivo. Cada error confirmado debe convertirse en u
 5. Mantener separados los radios visuales del contenedor y el texto interior: cuando una etiqueta necesite aspecto de píldora, usar un `GroupContainer` o un botón compatible como fondo y colocar la etiqueta dentro.
 6. Tras cada error de importación, corregir el bloque fuente del repositorio; no limitarse a dar una corrección manual en Studio.
 7. Anotar el error, su causa, la corrección y una regla preventiva en este documento.
+8. Todo tipo de control que aparezca por primera vez en Punch Review debe considerarse **pendiente de validación en Studio** hasta completar una importación real sin errores.
 
 ---
 
@@ -78,6 +79,41 @@ No declarar `AccessibleLabel` en `Classic/Button@2.2.0` sin comprobar antes que 
 
 ---
 
+## Control en validación PR-SC-V001 — `TabList@2.2.30`
+
+**Fecha de introducción:** 2026-08-06  
+**Bloque:** `08B_bilingual_help_modal.add-screen-child.pa.yaml`
+
+### Motivo
+
+Es el primer uso del control moderno Tab List dentro de Punch Review. El modal bilingüe necesita dos pestañas reales, no dos botones independientes.
+
+### Propiedades utilizadas deliberadamente
+
+```text
+Items
+DefaultSelectedItems
+Selected
+OnChange
+Height
+Width
+X
+Y
+```
+
+### Regla preventiva
+
+Hasta validar el Bloque 08B en Studio:
+
+- no añadir propiedades visuales adicionales al TabList;
+- no cambiar la versión del control;
+- registrar cualquier error PA2108 con líneas y Session ID;
+- corregir primero el bloque fuente de `main`.
+
+Cuando el bloque se importe sin errores, este apartado debe marcarse como validado.
+
+---
+
 ## Patrón visual seguro para una etiqueta tipo píldora
 
 Cuando se necesite una etiqueta redondeada:
@@ -122,6 +158,7 @@ Antes de guardar un nuevo archivo `.pa.yaml`:
 - [ ] Cada propiedad compleja aparece en al menos un control equivalente ya validado en el repositorio.
 - [ ] Los placeholders usan propiedades mínimas y conocidas.
 - [ ] Los bloques no mezclan propiedades de controles modernos, clásicos y canvas sin verificación.
+- [ ] Todo control nuevo está registrado como pendiente de validación.
 - [ ] La operación de inserción o sustitución está documentada al principio del archivo.
 - [ ] Existe una prueba mínima y un resultado esperado.
 
