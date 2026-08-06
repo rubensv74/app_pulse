@@ -20,6 +20,10 @@
 # 2. Search and quick-filter controls render without overlap.
 # 3. Previous/Next update the active record.
 # 4. Row selection updates varPunchReviewCurrent.
+#
+# Source Code compatibility:
+# - Label@2.5.1 does not support RadiusBottomLeft, RadiusBottomRight,
+#   RadiusTopLeft or RadiusTopRight. See ../POWER_APPS_SOURCE_CODE_COMPATIBILITY.md.
 
 - conPR_QueueCard:
     Control: GroupContainer@1.5.0
@@ -492,10 +496,6 @@
                         PaddingLeft: =2
                         PaddingRight: =2
                         PaddingTop: =0
-                        RadiusBottomLeft: =10
-                        RadiusBottomRight: =10
-                        RadiusTopLeft: =10
-                        RadiusTopRight: =10
                         Size: =7
                         Text: =Upper(Coalesce(ThisItem.StatusLabel, ThisItem.StatusCode, "-"))
                         Width: =84
