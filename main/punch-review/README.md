@@ -24,20 +24,39 @@ Cada bloque indica:
 2. `02_header_premium.children.pa.yaml`
 3. `03_workspace_layout.children.pa.yaml`
 4. `04_runtime_state.onvisible.pa.yaml`
+5. `05_review_queue.replace-control.pa.yaml`
+6. `05A_review_queue_test_seed.optional.powerfx` — opcional y temporal
 
 No se debe pegar un bloque posterior si el anterior no guarda, abre la pantalla y pasa App Checker sin errores nuevos.
 
-## Alcance del primer lote
+## Estado actual
 
-Este primer lote construye únicamente:
+Validado por el usuario en Power Apps Studio:
+
+- Bloque 01 — shell de pantalla.
+- Bloque 02 — header premium.
+- Bloque 03 — estructura global del workspace.
+- Bloque 04 — estado tipado de ejecución.
+
+Pendiente de validación:
+
+- Bloque 05 — cola interactiva de revisión.
+
+## Alcance implementado
+
+Los bloques disponibles construyen:
 
 - la pantalla `scr_PunchReview`;
 - el sidebar reutilizando `cmp_SidebarNav`;
 - el header premium;
 - la geometría global del workspace;
-- el estado tipado de sesión y las colecciones vacías.
+- el estado tipado de sesión y las colecciones;
+- la cola interactiva con búsqueda;
+- filtros locales All, Remaining y Reviewed;
+- selección de Punch y navegación Previous/Next;
+- estados vacío, filtrado y contador de revisión.
 
-Todavía no incluye flows, comentarios, custom fields, donut, DataTable ni integración desde Home/Punches. Esa separación es deliberada: permite validar la estructura y los tipos antes de introducir contratos externos.
+Todavía no incluyen flows, comentarios, custom fields, donut, DataTable ni integración desde Home/Punches. Esa separación es deliberada: permite validar la estructura y los tipos antes de introducir contratos externos.
 
 ## Convención de nombres
 
@@ -55,6 +74,20 @@ Todavía no incluye flows, comentarios, custom fields, donut, DataTable ni integ
 4. Navegar a la pantalla.
 5. Confirmar que no aparecen controles solapados ni referencias rotas.
 6. No continuar si aparece PA1001, PA2108, una propiedad no soportada o un error de tipo.
+
+## Validación del Bloque 05
+
+El Bloque 05 sustituye completamente `conPR_QueueCard`.
+
+Para validar sus interacciones antes de integrar Home y Punches:
+
+1. Crear temporalmente un botón en `scr_PunchReview`.
+2. Pegar en su propiedad `OnSelect` la fórmula de `05A_review_queue_test_seed.optional.powerfx`.
+3. Ejecutar el botón.
+4. Probar búsqueda, filtros, selección y Previous/Next.
+5. Eliminar el botón temporal al finalizar.
+
+Los datos de `05A` son exclusivamente de prueba y no deben mantenerse en producción.
 
 ## Fuente de verdad
 
