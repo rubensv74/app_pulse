@@ -1,0 +1,84 @@
+# BLOCK 09C — COMMENTS IN BILINGUAL HELP
+#
+# This file contains three small operations. Apply them only after Block 09
+# has been validated in Studio.
+#
+# OPERATION 1 — ADD TWO CHILDREN
+# Parent: conPR_HelpContent
+# Exact location: after lblPR_HelpActionsBody and before conPR_HelpWarningCard.
+#
+# OPERATION 2 — REPLACE TEXT PROPERTY
+# Control: lblPR_HelpActivityTitle
+#
+# OPERATION 3 — REPLACE TEXT PROPERTY
+# Controls: lblPR_HelpLimitationsTitle and lblPR_HelpLimitationsBody
+#
+# The language selector remains the existing TabList. No additional language
+# buttons are introduced.
+
+# =====================================================
+# OPERATION 1 — ADD AFTER lblPR_HelpActionsBody
+# =====================================================
+
+- lblPR_HelpCommentsTitle:
+    Control: ModernText@1.0.0
+    Properties:
+      AutoHeight: =true
+      Color: =varTheme_Text
+      FontWeight: =FontWeight.Semibold
+      Height: =26
+      Size: =11
+      Text: |-
+        =If(
+            Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+            "4. Read and add comments",
+            "4. Consulta y añade comentarios"
+        )
+      Width: =Parent.Width
+- lblPR_HelpCommentsBody:
+    Control: ModernText@1.0.0
+    Properties:
+      AutoHeight: =true
+      Color: =varTheme_TextMuted
+      Height: =78
+      Size: =9
+      Text: |-
+        =If(
+            Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+            "Comments are loaded from the selected Punch using the real service. Use Refresh or the page controls to navigate. Write a comment and select Add comment to save it. Empty comments are not accepted.",
+            "Los comentarios se cargan desde el Punch seleccionado mediante el servicio real. Usa Actualizar o los controles de página para navegar. Escribe un comentario y selecciona Add comment para guardarlo. No se admiten comentarios vacíos."
+        )
+      Width: =Parent.Width
+
+# =====================================================
+# OPERATION 2 — REPLACE lblPR_HelpActivityTitle.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "5. Read Session Activity",
+      "5. Consulta Session Activity"
+  )
+
+# =====================================================
+# OPERATION 3A — REPLACE lblPR_HelpLimitationsTitle.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "6. Current implementation status",
+      "6. Estado actual de implementación"
+  )
+
+# =====================================================
+# OPERATION 3B — REPLACE lblPR_HelpLimitationsBody.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "Custom fields, progress, related Punches and unsaved-change protection are being added in later blocks. The screen always labels temporary or incomplete capabilities explicitly.",
+      "Los campos personalizados, el progreso, los Punches relacionados y la protección ante cambios sin guardar se añadirán en bloques posteriores. La pantalla identifica de forma expresa las funciones temporales o incompletas."
+  )
