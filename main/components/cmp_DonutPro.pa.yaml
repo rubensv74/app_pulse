@@ -432,11 +432,15 @@ ComponentDefinitions:
                   Width: =15
                   X: =Parent.Width - 24
                   Y: =17
-            - htmlDNP_Donut:
-                Control: HtmlViewer@2.1.0
+            - imgDNP_Donut:
+                Control: Image@2.2.3
                 Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderStyle: =BorderStyle.None
+                  BorderThickness: =0
+                  Fill: =Color.Transparent
                   Height: =Parent.Height - 52
-                  HtmlText: |-
+                  Image: |-
                     =With(
                         {
                             _positiveItems:
@@ -448,11 +452,9 @@ ComponentDefinitions:
                                     "SegmentOrder",
                                     SortOrder.Ascending
                                 ),
-                            _total: cmp_DonutPro.TotalValue,
-                            _centerNumber:
-                                If(
-                                    cmp_DonutPro.HasSelection,
-                                    cmp_DonutPro.SelectedSegmentValue,
+                            _total:
+                                Max(
+                                    0.0001,
                                     cmp_DonutPro.TotalValue
                                 ),
                             _centerText:
@@ -467,7 +469,8 @@ ComponentDefinitions:
                                             cmp_DonutPro.TotalValue
                                         ),
                                         cmp_DonutPro.ValueFormat
-                                    ) & cmp_DonutPro.ValueSuffix
+                                    ) &
+                                    cmp_DonutPro.ValueSuffix
                                 ),
                             _centerLabelRaw:
                                 Upper(
@@ -521,143 +524,207 @@ ComponentDefinitions:
                                         "&quot;"
                                     )
                             },
-                            "<div style='width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Segoe UI,Arial,sans-serif;'>" &
-                            "<svg viewBox='0 0 190 120' width='100%' height='100%' role='img' aria-label='Donut distribution'>" &
-                            "<circle cx='82' cy='60' r='43' pathLength='100' fill='none' stroke='" &
+                            "data:image/svg+xml;utf8," &
+                            EncodeUrl(
+                                "<svg viewBox='0 0 190 120' " &
+                                "xmlns='http://www.w3.org/2000/svg' " &
+                                "preserveAspectRatio='xMidYMid meet'>" &
+
+                                "<circle " &
+                                "cx='82' cy='60' r='43' " &
+                                "pathLength='100' " &
+                                "fill='none' " &
+                                "stroke='" &
                                 cmp_DonutPro.TrackColorHex &
-                                "' stroke-width='" &
-                                Text(cmp_DonutPro.DonutThickness, "[$-en-US]0.##") &
+                                "' " &
+                                "stroke-width='" &
+                                Text(
+                                    cmp_DonutPro.DonutThickness,
+                                    "[$-en-US]0.##"
+                                ) &
                                 "'/>" &
-                            Concat(
-                                Sequence(CountRows(_positiveItems)) As DNPIndex,
-                                With(
-                                    {
-                                        _item:
-                                            Last(
-                                                FirstN(
-                                                    _positiveItems,
-                                                    DNPIndex.Value
-                                                )
-                                            ),
-                                        _percent:
-                                            100 *
-                                            Coalesce(
-                                                Value(
-                                                    Last(
-                                                        FirstN(
-                                                            _positiveItems,
-                                                            DNPIndex.Value
-                                                        )
-                                                    ).SegmentValue
-                                                ),
-                                                0
-                                            ) /
-                                            Max(0.0001, _total),
-                                        _previousPercent:
-                                            100 *
-                                            Sum(
-                                                FirstN(
-                                                    _positiveItems,
-                                                    DNPIndex.Value - 1
-                                                ),
-                                                Coalesce(Value(SegmentValue), 0)
-                                            ) /
-                                            Max(0.0001, _total),
-                                        _isSelected:
-                                            cmp_DonutPro.SelectedSegmentKey =
-                                            Text(
+
+                                Concat(
+                                    Sequence(
+                                        CountRows(_positiveItems)
+                                    ) As DNPIndex,
+                                    With(
+                                        {
+                                            _item:
                                                 Last(
                                                     FirstN(
                                                         _positiveItems,
                                                         DNPIndex.Value
                                                     )
-                                                ).SegmentKey
-                                            )
-                                    },
-                                    "<circle cx='82' cy='60' r='43' pathLength='100' fill='none' stroke='" &
-                                        Coalesce(Text(_item.SegmentColor), "#64748B") &
-                                        "' stroke-width='" &
-                                        Text(
+                                                ),
+                                            _percent:
+                                                100 *
+                                                Coalesce(
+                                                    Value(
+                                                        Last(
+                                                            FirstN(
+                                                                _positiveItems,
+                                                                DNPIndex.Value
+                                                            )
+                                                        ).SegmentValue
+                                                    ),
+                                                    0
+                                                ) /
+                                                _total,
+                                            _previousPercent:
+                                                100 *
+                                                Sum(
+                                                    FirstN(
+                                                        _positiveItems,
+                                                        DNPIndex.Value - 1
+                                                    ),
+                                                    Coalesce(
+                                                        Value(SegmentValue),
+                                                        0
+                                                    )
+                                                ) /
+                                                _total,
+                                            _isSelected:
+                                                cmp_DonutPro.SelectedSegmentKey =
+                                                Text(
+                                                    Last(
+                                                        FirstN(
+                                                            _positiveItems,
+                                                            DNPIndex.Value
+                                                        )
+                                                    ).SegmentKey
+                                                )
+                                        },
+                                        With(
+                                            {
+                                                _visiblePercent:
+                                                    Max(
+                                                        0.15,
+                                                        _percent -
+                                                        If(
+                                                            CountRows(
+                                                                _positiveItems
+                                                            ) > 1,
+                                                            cmp_DonutPro.SegmentGapPercent,
+                                                            0
+                                                        )
+                                                    )
+                                            },
+                                            "<circle " &
+                                            "cx='82' cy='60' r='43' " &
+                                            "pathLength='100' " &
+                                            "fill='none' " &
+                                            "stroke='" &
+                                            Coalesce(
+                                                Text(
+                                                    _item.SegmentColor
+                                                ),
+                                                "#64748B"
+                                            ) &
+                                            "' " &
+                                            "stroke-width='" &
+                                            Text(
+                                                If(
+                                                    _isSelected,
+                                                    cmp_DonutPro.DonutThickness + 2,
+                                                    cmp_DonutPro.DonutThickness
+                                                ),
+                                                "[$-en-US]0.##"
+                                            ) &
+                                            "' " &
+                                            "stroke-dasharray='" &
+                                            Text(
+                                                _visiblePercent,
+                                                "[$-en-US]0.########"
+                                            ) &
+                                            " " &
+                                            Text(
+                                                100 - _visiblePercent,
+                                                "[$-en-US]0.########"
+                                            ) &
+                                            "' " &
+                                            "stroke-dashoffset='-" &
+                                            Text(
+                                                _previousPercent,
+                                                "[$-en-US]0.########"
+                                            ) &
+                                            "' " &
+                                            "stroke-linecap='butt' " &
+                                            "transform='rotate(-90 82 60)' " &
+                                            "opacity='" &
                                             If(
-                                                _isSelected,
-                                                cmp_DonutPro.DonutThickness + 2,
-                                                cmp_DonutPro.DonutThickness
-                                            ),
-                                            "[$-en-US]0.##"
-                                        ) &
-                                        "' stroke-dasharray='" &
-                                        Text(
-                                            Max(
-                                                0.15,
-                                                _percent -
-                                                If(
-                                                    CountRows(_positiveItems) > 1,
-                                                    cmp_DonutPro.SegmentGapPercent,
-                                                    0
-                                                )
-                                            ),
-                                            "[$-en-US]0.########"
-                                        ) &
-                                        " " &
-                                        Text(
-                                            100 -
-                                            Max(
-                                                0.15,
-                                                _percent -
-                                                If(
-                                                    CountRows(_positiveItems) > 1,
-                                                    cmp_DonutPro.SegmentGapPercent,
-                                                    0
-                                                )
-                                            ),
-                                            "[$-en-US]0.########"
-                                        ) &
-                                        "' stroke-dashoffset='-" &
-                                        Text(
-                                            _previousPercent,
-                                            "[$-en-US]0.########"
-                                        ) &
-                                        "' stroke-linecap='butt' transform='rotate(-90 82 60)' opacity='" &
-                                        If(
-                                            cmp_DonutPro.HasSelection && !_isSelected,
-                                            "0.48",
-                                            "1"
-                                        ) &
-                                        "'/>"
-                                )
-                            ) &
-                            "<circle cx='82' cy='60' r='31' fill='" &
+                                                cmp_DonutPro.HasSelection &&
+                                                !_isSelected,
+                                                "0.48",
+                                                "1"
+                                            ) &
+                                            "'/>"
+                                        )
+                                    )
+                                ) &
+
+                                "<circle " &
+                                "cx='82' cy='60' r='31' " &
+                                "fill='" &
                                 cmp_DonutPro.CenterFillColorHex &
                                 "'/>" &
-                            "<text x='82' y='57' text-anchor='middle' dominant-baseline='middle' fill='" &
+
+                                "<text " &
+                                "x='82' y='57' " &
+                                "text-anchor='middle' " &
+                                "dominant-baseline='middle' " &
+                                "font-family='Segoe UI,Arial,sans-serif' " &
+                                "font-size='17' " &
+                                "font-weight='700' " &
+                                "fill='" &
                                 cmp_DonutPro.CenterValueColorHex &
-                                "' font-size='17' font-weight='700'>" &
+                                "'>" &
                                 _safeCenterText &
                                 "</text>" &
-                            "<text x='82' y='75' text-anchor='middle' dominant-baseline='middle' fill='" &
+
+                                "<text " &
+                                "x='82' y='75' " &
+                                "text-anchor='middle' " &
+                                "dominant-baseline='middle' " &
+                                "font-family='Segoe UI,Arial,sans-serif' " &
+                                "font-size='7.5' " &
+                                "font-weight='600' " &
+                                "letter-spacing='0.5' " &
+                                "fill='" &
                                 cmp_DonutPro.CenterLabelColorHex &
-                                "' font-size='7.5' font-weight='600' letter-spacing='0.5'>" &
+                                "'>" &
                                 _centerLabel &
                                 "</text>" &
-                            If(
-                                cmp_DonutPro.HasSelection,
-                                "<text x='82' y='88' text-anchor='middle' dominant-baseline='middle' fill='" &
+
+                                If(
+                                    cmp_DonutPro.HasSelection,
+                                    "<text " &
+                                    "x='82' y='88' " &
+                                    "text-anchor='middle' " &
+                                    "dominant-baseline='middle' " &
+                                    "font-family='Segoe UI,Arial,sans-serif' " &
+                                    "font-size='7' " &
+                                    "fill='" &
                                     cmp_DonutPro.CenterLabelColorHex &
-                                    "' font-size='7'>" &
+                                    "'>" &
                                     Text(
                                         cmp_DonutPro.SelectedPercentage,
                                         cmp_DonutPro.PercentageFormat
                                     ) &
                                     "</text>",
-                                ""
-                            ) &
-                            "</svg></div>"
+                                    ""
+                                ) &
+
+                                "</svg>"
+                            )
                         )
                     )
+                  ImagePosition: =ImagePosition.Fit
                   Visible: =!cmp_DonutPro.IsLoading && !cmp_DonutPro.IsEmpty && !cmp_DonutPro.IsError
                   Width: |-
                     =If(
-                        cmp_DonutPro.ShowLegend && Parent.Width >= 420,
+                        cmp_DonutPro.ShowLegend &&
+                        Parent.Width >= 420,
                         194,
                         Parent.Width - 24
                     )
@@ -932,4 +999,3 @@ ComponentDefinitions:
                         Width: =Parent.Width - 80
                         X: =40
                         Y: =(Parent.Height - Self.Height) / 2 + If(cmp_DonutPro.IsLoading, 24, 0)
-
