@@ -1,7 +1,8 @@
 # HOME_PDS — Screen Architecture
 
-**Status:** Frozen for first construction pass / pending Block 00 validation  
+**Status:** Frozen for first construction pass / Block 00 validated  
 **Screen:** `scr_Home_PDS`  
+**Validation date:** 2026-08-07  
 
 ---
 
@@ -48,7 +49,7 @@ scr_Home_PDS
         │   │   ├── conHPDS_HeatmapPanel
         │   │   │   └── cmpHPDS_Heatmap
         │   │   └── conHPDS_DisciplinePanel
-        │   │       ├── cmpHPDS_Donut
+        │   │       ├── cmpHPDS_DisciplinePie
         │   │       └── conHPDS_DisciplineBarsHost
         │   │
         │   ├── conHPDS_ActiveContext
@@ -104,6 +105,37 @@ scr_Home_PDS
 - discipline panel is the secondary analysis/control area;
 - both create shared active context.
 
+### `conHPDS_DisciplinePanel`
+
+The discipline panel uses two complementary visual encodings of the **same distribution and the same selection state**:
+
+```text
+cmpHPDS_DisciplinePie
+    → part-to-whole perception
+
+conHPDS_DisciplineBarsHost
+    → ranking + precise relative comparison
+```
+
+The pie is the primary composition visualization because the business question is the distribution of a meaningful total across disciplines. The bars are not a second independent chart state; they are a complementary analytical control.
+
+Selection contract:
+
+```text
+Pie segment ─────┐
+                 ├──> shared selected discipline ──> Active Context ──> Data Explorer
+Discipline bar ──┘
+```
+
+Rules:
+
+- `cmp_PieChartPro` is the selected component for `cmpHPDS_DisciplinePie`;
+- pie slices and bars use the stable discipline palette;
+- selecting either representation selects the same discipline;
+- selected state also uses the common PDS selection language;
+- the pie must not create private chart-only business state;
+- when discipline cardinality makes a pie unreadable, bars remain the precision surface and a later approved block may adapt the pie presentation without changing the shared selection contract.
+
 ### `conHPDS_ActiveContext`
 
 - compact bridge between analytics and record exploration;
@@ -130,12 +162,15 @@ scr_Home_PDS
 cmp_SidebarNav       → reuse
 cmp_KpiCardPro       → reuse with PDS inputs
 cmp_HeatMapPro       → reuse with PDS inputs
-cmp_DonutPro         → preferred discipline donut
+cmp_PieChartPro      → preferred discipline composition chart
+cmp_DonutPro         → not used for Home_PDS discipline distribution
 cmp_ActionToolbarPro → reuse with Home_PDS action table
 cmp_DataTableProV2   → reuse with PDS inputs
 cmp_EmptyState       → reuse/harden
 cmp_SkeletonLoader   → reuse/harden
 ```
+
+`cmp_DonutPro` remains available in the broader PDS/component catalog for use cases where a central KPI plus ring progression is the correct encoding, such as completion, utilization, capacity or readiness. It is not the selected encoding for discipline share in Home_PDS.
 
 New shared components should only be introduced when they solve a repeated PDS contract rather than a one-off Home layout problem.
 
@@ -233,10 +268,13 @@ Conceptually:
 ```text
 Heatmap selection
       ┐
-      ├──> Active Context ──> Cell details / Data Explorer
-Discipline selection
-      ┘
+      │
+Pie selection ────────┐
+                      ├──> Active Context ──> Cell details / Data Explorer
+Discipline bar ───────┘
 ```
+
+Pie and bars represent the same discipline dimension and therefore must share one selected-discipline state.
 
 PDS selection language:
 
@@ -294,7 +332,7 @@ The following are outside the first Home_PDS implementation unless explicitly re
 
 ## 11. Architecture change policy
 
-After Block 00 validation, any change that alters a major branch of the frozen tree must be documented before implementation.
+Block 00 is validated. Any change that alters a major branch of this frozen tree must now be documented before implementation.
 
 A change such as replacing the discipline panel with a drawer, adding a permanent fourth page column, or moving the Data Explorer above analytics is an **architecture change**, not a cosmetic patch.
 
