@@ -70,7 +70,7 @@ The following architectural decisions are therefore frozen for the first constru
 |---:|---|---|
 | 00 | Foundation audit and reuse matrix | **validated** |
 | 01 | Blank screen shell | **validated for progression — Studio visual gate accepted** |
-| 02 | PDS Page Header contract / implementation | **integrated — VQA-001 corrective visual pass pending** |
+| 02 | PDS Page Header contract / implementation | **corrected — Block 02A pending Studio revalidation** |
 | 03 | Home_PDS header integration | planned |
 | 04 | Workspace/body structural layout | planned |
 | 05 | Minimum typed runtime state | planned |
@@ -128,10 +128,16 @@ Shared component specification:
 docs/design-system/components/CMP_PAGE_HEADER_PRO.md
 ```
 
-Published construction artifact:
+Original construction artifact:
 
 ```text
 docs/development/screens/home-pds/blocks/02_page_header_component.pa.yaml
+```
+
+Corrective artifact:
+
+```text
+docs/development/screens/home-pds/blocks/02A_page_header_text_overflow_fix.pa.yaml
 ```
 
 Purpose:
@@ -146,25 +152,44 @@ Purpose:
 
 ### Studio integration result — 2026-08-07
 
-The component integrates successfully and the intended Page Header architecture is visually confirmed.
+The original component integrates successfully and the intended Page Header architecture is visually confirmed.
 
-A reusable visual defect was nevertheless detected during the Studio review:
+A reusable visual defect was detected during the Studio review:
 
 ```text
 VQA-001 — Small fixed-height text controls can expose unintended internal scrollbars.
 ```
 
-In the current Page Header this is visible in compact context labels/values. The defect is not a business-logic failure, but it is a premium-UI acceptance failure and must not become accepted visual debt.
-
-The general preventive rule has been promoted to the normative PDS visual QA document:
+The general preventive rule has been promoted to:
 
 ```text
 docs/design-system/POWER_APPS_VISUAL_QA_GUARDRAILS.md
 ```
 
-For the current component, compact context labels/values must use an explicit single-line sizing strategy (`Wrap = false` plus Studio-validated safe height) or an appropriate `AutoHeight` strategy when growth is permitted.
+### Block 02A compatibility incident
 
-Block 02 therefore remains open only for this corrective visual pass. Block 03 should not treat the visible scrollbar behavior as an accepted baseline.
+The first 02A revision incorrectly represented the protocol-level operation as a top-level PaYaml node:
+
+```yaml
+Patch:
+```
+
+Power Apps Studio rejected that source with:
+
+```text
+PA1001 / YamlInvalidSyntax
+Property 'Patch' not found on type PaModule
+```
+
+This is now recorded as compatibility rule `PA-COMP-011` in:
+
+```text
+docs/development/screens/home-pds/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
+```
+
+The corrected `02A_page_header_text_overflow_fix.pa.yaml` is now a complete pasteable `ComponentDefinitions:` replacement for `cmp_PageHeaderPro`. The protocol concepts `PATCH`, `ADD CHILD`, `REPLACE CONTROL`, etc. remain valid construction-operation labels, but they must never be invented as PaYaml root properties.
+
+Block 02 remains open until the corrected 02A component is accepted by Studio and the unintended static-text scrollbars are visually removed.
 
 ---
 
@@ -199,6 +224,7 @@ docs/development/screens/home-pds/
 ├── blocks/
 │   ├── 01_screen_shell.pa.yaml
 │   ├── 02_page_header_component.pa.yaml
+│   ├── 02A_page_header_text_overflow_fix.pa.yaml
 │   └── ...
 └── user-guide/
     └── MANUAL_USUARIO_HOME_PDS.md
