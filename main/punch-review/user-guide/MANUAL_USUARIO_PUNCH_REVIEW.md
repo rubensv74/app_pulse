@@ -2,7 +2,7 @@
 
 **Aplicación:** PULSE  
 **Pantalla:** Punch Review Workspace  
-**Versión del manual:** 0.9  
+**Versión del manual:** 1.0  
 **Idioma:** Español  
 **Estado:** Documento vivo. Se actualizará con cada bloque funcional validado.
 
@@ -18,8 +18,8 @@ La pantalla reúne en un único espacio:
 - la información principal del Punch seleccionado;
 - acciones de revisión;
 - comentarios del Punch;
+- campos personalizados del Punch;
 - actividad realizada durante la sesión;
-- campos personalizados;
 - progreso de revisión;
 - Punches relacionados o contexto de la selección.
 
@@ -42,7 +42,7 @@ La pantalla muestra el aviso **Session review only** para recordar esta limitaci
 
 Los comentarios son diferentes: se consultan y guardan mediante los servicios reales de comentarios. Por tanto, un comentario añadido correctamente no es una marca temporal de la sesión.
 
-Los campos personalizados se conectarán a su servicio real en un bloque posterior.
+Los campos personalizados también utilizan sus servicios reales de carga y guardado. Los cambios no se consideran persistidos hasta que Save termina correctamente.
 
 ---
 
@@ -108,7 +108,24 @@ El panel Comments permite:
 
 El contador del encabezado muestra el número total de comentarios informado por el servicio.
 
-### 3.6. Session Activity
+### 3.6. Custom Fields
+
+El panel Custom Fields carga los campos personalizados configurados para el Punch y muestra el editor adecuado según el tipo de dato.
+
+Los tipos cubiertos son:
+
+- Text;
+- Number;
+- YesNo;
+- Date;
+- Choice;
+- MultiChoice.
+
+Los usuarios con rol `manager` pueden editar, guardar y restablecer valores. El resto de roles permanece en modo de solo lectura.
+
+El indicador del encabezado muestra **Saved** cuando no hay modificaciones locales y **Unsaved** cuando existen cambios pendientes de guardar.
+
+### 3.7. Session Activity
 
 Este panel registra las acciones realizadas durante la sesión, por ejemplo:
 
@@ -135,7 +152,7 @@ Pulsa cualquier fila de Review Queue.
 
 La fila seleccionada cambia de color y el panel Punch Overview se actualiza.
 
-Cuando la integración del Bloque 09A está activa, Comments también carga la página 1 del Punch seleccionado.
+Con la integración del Bloque 10A activa, la selección también carga Comments y Custom Fields del Punch seleccionado.
 
 ### Paso 3 — Navegar en secuencia
 
@@ -146,6 +163,8 @@ El indicador muestra la posición actual, por ejemplo:
 ```text
 2 of 5
 ```
+
+Si Custom Fields contiene cambios sin guardar, la navegación queda temporalmente bloqueada. Utiliza **Save** o **Reset** antes de seleccionar otro Punch. El diálogo completo de decisión se incorporará en el Bloque 13.
 
 ### Paso 4 — Buscar
 
@@ -220,35 +239,78 @@ En esta versión, los comentarios nuevos se guardan con el tipo `GENERAL`. La ed
 
 ---
 
-## 8. Uso recomendado durante una reunión
+## 8. Cómo revisar y editar Custom Fields
+
+1. Selecciona un Punch real.
+2. Espera a que termine **Loading custom fields...**.
+3. Revisa cada campo y su tipo.
+4. Si tu rol es `manager`, modifica los valores necesarios.
+5. Comprueba que el indicador cambia a **Unsaved**.
+6. Pulsa **Save** para persistir los cambios o **Reset** para descartarlos.
+
+### Save
+
+Save envía únicamente los campos modificados mediante el servicio de guardado masivo. Cuando la operación termina correctamente:
+
+- se vuelven a cargar los valores devueltos por el servidor;
+- se vacía el conjunto de cambios pendientes;
+- el indicador vuelve a **Saved**;
+- la fila deja de estar marcada como dirty;
+- Session Activity registra `CUSTOM_FIELDS_SAVED`.
+
+### Reset
+
+Reset no realiza una llamada de guardado. Restaura los últimos valores cargados del servidor y elimina las modificaciones locales todavía no guardadas.
+
+### Usuarios de solo lectura
+
+Cuando el rol no es `manager`, los campos se muestran en modo View y Save/Reset permanecen deshabilitados.
+
+---
+
+## 9. Protección temporal ante cambios sin guardar
+
+Hasta que se implemente el diálogo completo del Bloque 13, Punch Review utiliza una protección conservadora:
+
+- si existen cambios de Custom Fields sin guardar, no permite cambiar de Punch;
+- tampoco recarga los servicios del Punch actual mediante el hook de selección;
+- el usuario debe utilizar Save o Reset para continuar.
+
+Esta protección evita que una nueva carga sobrescriba silenciosamente cambios locales.
+
+---
+
+## 10. Uso recomendado durante una reunión
 
 1. Abre la cola desde el contexto correcto.
 2. Comienza por el primer Punch.
 3. Lee la descripción y comprueba disciplina, responsable y categoría.
 4. Revisa los comentarios existentes.
 5. Añade las observaciones o acuerdos necesarios.
-6. Revisa los campos personalizados cuando estén disponibles.
-7. Marca el Punch como revisado.
-8. Continúa con el siguiente.
-9. Comprueba el progreso antes de cerrar la reunión.
+6. Revisa y, si corresponde, actualiza los campos personalizados.
+7. Guarda cualquier cambio pendiente.
+8. Marca el Punch como revisado.
+9. Continúa con el siguiente.
+10. Comprueba el progreso antes de cerrar la reunión.
 
 La marca Reviewed indica que el Punch ha sido tratado en la sesión, no que esté cerrado técnicamente.
 
 ---
 
-## 9. Diferencia entre estado del Punch, revisión y comentarios
+## 11. Diferencia entre estado del Punch, revisión, comentarios y Custom Fields
 
 No deben confundirse:
 
 - **Punch Status:** estado operativo real, como Open, In Progress, Cleared o Closed.
 - **Reviewed in Session:** indica únicamente que el Punch ya se ha revisado durante la sesión actual.
 - **Comment:** observación persistida mediante el servicio real de comentarios.
+- **Custom Field:** dato adicional configurable que se persiste mediante el servicio de campos personalizados cuando Save finaliza correctamente.
 
-Un Punch puede estar Open, aparecer como Reviewed en la sesión y contener varios comentarios guardados.
+Un Punch puede estar Open, aparecer como Reviewed en la sesión, contener comentarios guardados y tener Custom Fields actualizados.
 
 ---
 
-## 10. Ayuda integrada bilingüe
+## 12. Ayuda integrada bilingüe
 
 La pantalla incorpora un modal de ayuda accesible desde el icono de información del encabezado.
 
@@ -257,11 +319,11 @@ El modal contiene dos pestañas reales:
 - **Español**
 - **English**
 
-La pestaña seleccionada cambia todo el contenido de ayuda. Tras validar Comments, la ayuda integrada debe ampliarse con el parche `09C_help_comments.incremental-patch.pa.yaml`.
+La pestaña seleccionada cambia todo el contenido de ayuda. Tras validar Custom Fields, la ayuda integrada debe ampliarse con `10D_help_custom_fields.incremental-patch.pa.yaml`.
 
 ---
 
-## 11. Limitaciones actuales
+## 13. Limitaciones actuales
 
 En la versión actual:
 
@@ -269,14 +331,15 @@ En la versión actual:
 - la cola completa de todos los Punches no está disponible como snapshot de servidor;
 - la navegación a Punch List prepara el identificador, pero puede requerir cargar la página correcta;
 - los comentarios no permiten edición, borrado, adjuntos ni formato enriquecido;
-- los campos personalizados se implementarán en el siguiente bloque funcional;
+- Custom Fields no incluye administración de definiciones desde Punch Review;
+- la protección de cambios sin guardar es un bloqueo temporal, no el diálogo de decisión final;
 - Session Activity no sustituye al historial corporativo del Punch.
 
 Estas limitaciones deben mostrarse de forma explícita para evitar interpretaciones incorrectas.
 
 ---
 
-## 12. Resolución de problemas básicos
+## 14. Resolución de problemas básicos
 
 ### La cola está vacía
 
@@ -304,15 +367,35 @@ Comprueba que existe un proyecto activo, que el Punch es real y que los flows es
 
 ### Add comment permanece deshabilitado
 
-Comprueba que:
+Comprueba que hay un Punch seleccionado, que el panel no está cargando y que el cuadro contiene texto no vacío.
 
-- hay un Punch seleccionado;
-- el panel no está cargando;
-- el cuadro contiene texto no vacío.
+### Custom Fields muestra No Punch selected
+
+Selecciona una fila de Review Queue. Con el hook del Bloque 10A, los campos se cargan junto con Comments.
+
+### Custom Fields muestra Custom fields unavailable
+
+Comprueba el proyecto activo, el Punch seleccionado y la disponibilidad de `WarRoom_GetCustomBundle`. Utiliza Retry cuando el problema esté resuelto.
+
+### Los campos aparecen en solo lectura
+
+La edición está restringida al rol `manager`, igual que en la arquitectura actual del drawer.
+
+### No puedo cambiar de Punch
+
+Comprueba el indicador Custom Fields. Si muestra **Unsaved**, utiliza Save o Reset. El bloqueo es intencionado hasta la implementación del Bloque 13.
+
+### El campo Yes/No no refleja el valor guardado
+
+Comprueba que se haya aplicado `10C_yesno_initial_state.incremental-patch.pa.yaml` y que el control contenga:
+
+```powerfx
+Checked = ThisItem.ValueBool
+```
 
 ### Estoy usando los Punches ficticios del Bloque 05A
 
-Los identificadores del Bloque 05A no existen necesariamente en SQL. Utiliza `09B_comments_test_seed.optional.powerfx` para validar el diseño visual. La prueba completa de los flows requiere un Punch real.
+Los identificadores del Bloque 05A no existen necesariamente en SQL. Utiliza `09B_comments_test_seed.optional.powerfx` y `10B_custom_fields_test_seed.optional.powerfx` para validar el diseño visual. No pulses Save con un Punch ficticio. La validación completa de los flows requiere un Punch real.
 
 ### No veo los cambios después de actualizar el repositorio
 
@@ -327,11 +410,11 @@ Después vuelve a copiar el bloque correspondiente en Power Apps Studio.
 
 ### La pantalla muestra Session review only
 
-Es un aviso previsto. La marca Reviewed todavía es temporal; los comentarios guardados correctamente no dependen de esta marca.
+Es un aviso previsto. La marca Reviewed todavía es temporal; los comentarios y Custom Fields guardados correctamente utilizan sus servicios reales.
 
 ---
 
-## 13. Historial de actualización del manual
+## 15. Historial de actualización del manual
 
 | Versión | Bloques cubiertos | Cambios principales |
 |---|---|---|
@@ -340,16 +423,16 @@ Es un aviso previsto. La marca Reviewed todavía es temporal; los comentarios gu
 | 0.7 | 07 | Mark Reviewed, Undo Review y Open Punch List |
 | 0.8 | 08 | Session Activity y ayuda bilingüe integrada |
 | 0.9 | 09 | Carga, paginación y alta de comentarios reales |
+| 1.0 | 10 | Carga, edición, Reset, Save y protección temporal de Custom Fields |
 
 ---
 
-## 14. Próximas ampliaciones previstas
+## 16. Próximas ampliaciones previstas
 
 El manual se ampliará cuando estén validados:
 
-- editor de campos personalizados;
 - progreso de revisión;
 - tabla de Punches relacionados;
-- protección ante cambios sin guardar;
+- diálogo completo de protección ante cambios sin guardar;
 - integración definitiva desde Home y Punch List;
 - persistencia del estado Reviewed.
