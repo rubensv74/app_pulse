@@ -136,14 +136,18 @@ OnHelp               Event
 ### Visual inputs
 
 ```text
-SurfaceColor         Color
-SurfaceAltColor      Color
-BorderColor          Color
-TextColor            Color
-MutedTextColor       Color
-AccentColor          Color
-AccentSoftColor      Color
+SurfaceColor               Color
+SurfaceAltColor            Color
+BorderColor                Color
+TextColor                  Color
+MutedTextColor             Color
+AccentColor                Color
+AccentSoftColor            Color
+AccentHoverOverlayColor    Color
+AccentPressedOverlayColor  Color
 ```
+
+The two overlay colors are deliberately translucent. They are used only by the transparent click surface above an interactive context block so the underlying label/value remain readable on hover/press.
 
 ---
 
@@ -199,7 +203,8 @@ The title/subtitle area has higher visual priority than context metadata, while 
 For an interactive context slot:
 
 - default: SurfaceAlt + Border;
-- hover: AccentSoftColor overlay;
+- hover: translucent ActionPrimary overlay that preserves label/value readability;
+- press: slightly stronger translucent overlay;
 - a `›` affordance is visible;
 - click triggers the corresponding component event.
 
@@ -255,6 +260,7 @@ Block 02 is acceptable when:
 [ ] three context slots render from public inputs
 [ ] each context slot can be hidden independently
 [ ] interactive context slots expose a clear affordance
+[ ] hover/press overlay does not hide context text
 [ ] informational context slots do not imply click behavior
 [ ] utility action can be hidden/disabled
 [ ] help can be hidden
