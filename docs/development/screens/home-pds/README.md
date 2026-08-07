@@ -67,7 +67,7 @@ The following architectural decisions are therefore frozen for the first constru
 | Block | Name | Status |
 |---:|---|---|
 | 00 | Foundation audit and reuse matrix | **validated** |
-| 01 | Blank screen shell | **next allowed block** |
+| 01 | Blank screen shell | **published — pending Studio validation** |
 | 02 | PDS Page Header contract / implementation | planned |
 | 03 | Home_PDS header integration | planned |
 | 04 | Workspace/body structural layout | planned |
@@ -93,9 +93,27 @@ The following architectural decisions are therefore frozen for the first constru
 
 ---
 
-## Construction policy
+## Block 01 publication
 
-`Block 01` is now authorized because `Block 00` has been explicitly accepted.
+Published construction artifact:
+
+```text
+docs/development/screens/home-pds/blocks/01_screen_shell.pa.yaml
+```
+
+Purpose:
+
+- create `scr_Home_PDS` from Source Code;
+- establish the root horizontal AutoLayout;
+- reuse `cmp_SidebarNav` with `Home` as the active business key;
+- create an empty PDS content shell;
+- introduce no business collections, flows, charts, KPIs or production navigation changes.
+
+Block 01 must now be pasted/saved in Power Apps Studio and validated with App Checker before Block 02 is published.
+
+---
+
+## Construction policy
 
 The new screen must be created from a blank screen. Do not duplicate `scr_Home`.
 
@@ -107,6 +125,8 @@ scr_Home_PDS = isolated PDS implementation
 ```
 
 Do not change `StartScreen` or the production Home navigation before final acceptance.
+
+No dependent block advances while the current block is `failed`.
 
 ---
 
