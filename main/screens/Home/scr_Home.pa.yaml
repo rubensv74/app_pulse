@@ -10,6 +10,21 @@ Screens:
         // Runtime state only. DO NOT reset selected project here.
         // =====================================================
 
+        ClearCollect(
+            colDisciplinePalette,
+            { DisciplineCode: "ELECTRICAL",       DisciplineName: "Electrical",       DisciplineColor: "#F97316", DisciplineOrder: 1 },
+            { DisciplineCode: "PIPING",           DisciplineName: "Piping",           DisciplineColor: "#14B8A6", DisciplineOrder: 2 },
+            { DisciplineCode: "MECHANICAL",       DisciplineName: "Mechanical",       DisciplineColor: "#2563EB", DisciplineOrder: 3 },
+            { DisciplineCode: "INSTRUMENTATION",  DisciplineName: "Instrumentation",  DisciplineColor: "#8B5CF6", DisciplineOrder: 4 },
+            { DisciplineCode: "CIVIL",            DisciplineName: "Civil",            DisciplineColor: "#06B6D4", DisciplineOrder: 5 },
+            { DisciplineCode: "HVAC",             DisciplineName: "HVAC",             DisciplineColor: "#0EA5E9", DisciplineOrder: 6 },
+            { DisciplineCode: "STRUCTURAL",       DisciplineName: "Structural",       DisciplineColor: "#6366F1", DisciplineOrder: 7 },
+            { DisciplineCode: "FIREPROOFING",     DisciplineName: "Fireproofing",     DisciplineColor: "#EF4444", DisciplineOrder: 8 },
+            { DisciplineCode: "TELECOM",          DisciplineName: "Telecom",          DisciplineColor: "#22C55E", DisciplineOrder: 9 },
+            { DisciplineCode: "SAFETY",           DisciplineName: "Safety",           DisciplineColor: "#F59E0B", DisciplineOrder: 10 },
+            { DisciplineCode: "OTHER",            DisciplineName: "Other",            DisciplineColor: "#64748B", DisciplineOrder: 999 }
+        );
+
         // =====================================================
         // PREMIUM PUNCH DASHBOARD UI STATE
         // =====================================================
@@ -4704,8 +4719,26 @@ Screens:
 
                                                               Set(varFilter_SubsystemsCsv, "");
                                                               Set(varFilter_Subsystem, Blank());
+
+
                                                               Set(varFilter_PunchStatusCode, "OPEN");
-                                                              Set(varFilter_PunchDiscipline, "");
+                                                              Set(
+                                                                  varFilter_PunchDiscipline,
+
+                                                                  If(
+                                                                      IsBlank(
+                                                                          varHomePunchSelectedDisciplineCode
+                                                                      ),
+
+                                                                      Blank(),
+
+                                                                      Upper(
+                                                                          Trim(
+                                                                              varHomePunchSelectedDisciplineCode
+                                                                          )
+                                                                      )
+                                                                  )
+                                                              );
 
                                                               Set(
                                                                   varPunchCustomFiltersJson,
@@ -4731,130 +4764,299 @@ Screens:
                                                             Width: =166
                                                             X: =Parent.Width - Self.Width - 12
                                                             Y: =42
+                                                - conPunchExecutiveDonutSlot:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: ManualLayout
+                                                    Properties:
+                                                      BorderColor: =varTheme_Border
+                                                      BorderThickness: =1
+                                                      DropShadow: =DropShadow.Semilight
+                                                      Fill: =varTheme_Surface
+                                                      Height: =Parent.Height
+                                                      RadiusBottomLeft: =14
+                                                      RadiusBottomRight: =14
+                                                      RadiusTopLeft: =14
+                                                      RadiusTopRight: =14
+                                                      Width: =Parent.Width
+                                                    Children:
+                                                      - cmp_PieChartPro_1:
+                                                          Control: CanvasComponent
+                                                          ComponentName: cmp_PieChartPro
+                                                          Properties:
+                                                            AccentColor: =varTheme_PulseBlueDark
+                                                            BackgroundColor: =Color.Transparent
+                                                            BorderColor: =varTheme_Border
+                                                            ChartBaseColorHex: ="#FFFFFF"
+                                                            DangerColor: =varTheme_Red
+                                                            DimUnselectedOpacity: =0.22
+                                                            EmptyText: ="No discipline distribution is available for the selected cell."
+                                                            EnableSelection: =false
+                                                            ErrorText: ="Discipline distribution unavailable."
+                                                            ExplodeSelected: =false
+                                                            FooterLabel: |-
+                                                              =If(
+                                                                  Sum(
+                                                                      colPunchExecutiveDisciplineDistribution,
+                                                                      PunchCount
+                                                                  ) <
+                                                                  Coalesce(
+                                                                      varPunchExecutiveGridTotalRows,
+                                                                      0
+                                                                  ),
+                                                                  "CURRENT PAGE",
+                                                                  "OPEN"
+                                                              )
+                                                            Height: =240
+                                                            Items: =colPunchExecutiveDonutItems
+                                                            LoadingText: ="Loading discipline distribution..."
+                                                            MutedTextColor: =varTheme_TextMuted
+                                                            OnClearSelection: =
+                                                            OnSegmentSelect: =
+                                                            PercentageFormat: ="[$-en-US]0.0%"
+                                                            SelectedKey: |-
+                                                              =Upper(
+                                                                  Trim(
+                                                                      Coalesce(
+                                                                          varHomePunchSelectedDisciplineCode,
+                                                                          ""
+                                                                      )
+                                                                  )
+                                                              )
+                                                            SelectedOffset: =0
+                                                            ShowBorder: =false
+                                                            ShowFooter: =true
+                                                            ShowHeader: =false
+                                                            ShowLegend: =false
+                                                            ShowPercentages: =false
+                                                            ShowValues: =false
+                                                            ShowZeroSegments: =false
+                                                            SliceSeparatorColorHex: ="#FFFFFF"
+                                                            SliceSeparatorWidth: =2
+                                                            StartAngleDegrees: =-90
+                                                            State: |-
+                                                              =If(
+                                                                  varPunchExecutiveGridLoading,
+                                                                  "loading",
+                                                                  If(
+                                                                      !IsBlank(
+                                                                          varPunchExecutiveGridError
+                                                                      ),
+                                                                      "error",
+                                                                      If(
+                                                                          CountRows(
+                                                                              colPunchExecutiveDonutItems
+                                                                          ) = 0,
+                                                                          "empty",
+                                                                          "ready"
+                                                                      )
+                                                                  )
+                                                              )
+                                                            Subtitle: =""
+                                                            SurfaceAltColor: =varTheme_SurfaceAlt
+                                                            TextColor: =varTheme_Text
+                                                            Title: =""
+                                                            ValueFormat: ="[$-en-US]#,##0"
+                                                            ValueSuffix: =""
+                                                            Width: =220
+                                                            X: =18
+                                                            Y: =66
+                                                      - lblPunchExecutiveDonutSlotTitle:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            AutoHeight: =true
+                                                            Color: =varTheme_Text
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =24
+                                                            Size: =14
+                                                            Text: ="Open Punches by Discipline"
+                                                            Visible: |
+                                                              =true
+                                                            Width: =Parent.Width - 36
+                                                            X: =18
+                                                            Y: =14
+                                                      - lblPunchExecutiveDonutSlotState:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            AutoHeight: =true
+                                                            Color: =varTheme_TextMuted
+                                                            Height: =20
+                                                            Size: =9
+                                                            Text: |-
+                                                              =If(
+                                                                  CountRows(colPunchExecutiveSelection) > 0 &&
+                                                                  First(colPunchExecutiveSelection).IsSelection,
+                                                                  First(colPunchExecutiveSelection).SelectedRow &
+                                                                  " × " &
+                                                                  First(colPunchExecutiveSelection).SelectedColumn &
+                                                                  If(
+                                                                      Sum(
+                                                                          colPunchExecutiveDisciplineDistribution,
+                                                                          PunchCount
+                                                                      ) <
+                                                                      Coalesce(
+                                                                          varPunchExecutiveGridTotalRows,
+                                                                          0
+                                                                      ),
+                                                                      " · current page only",
+                                                                      ""
+                                                                  ),
+                                                                  "Select a heatmap cell to inspect the open-punch distribution."
+                                                              )
+                                                            Width: =Parent.Width - 36
+                                                            X: =18
+                                                            Y: =38
+                                                      - lblPunchExecutiveDonutTotal:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Align: =Align.Center
+                                                            AutoHeight: =true
+                                                            Color: =varTheme_Text
+                                                            FontWeight: =FontWeight.Bold
+                                                            Height: =30
+                                                            Size: =16
+                                                            Text: =Text(Sum(colPunchExecutiveDistribution, PunchCount), "[$-en-US]#,##0")
+                                                            Visible: |
+                                                              =false
+                                                            Width: =76
+                                                            X: =33
+                                                            Y: =75
+                                                      - galPunchExecutiveDonutLegend:
+                                                          Control: Gallery@2.15.0
+                                                          Variant: Vertical
+                                                          Properties:
+                                                            Height: =Parent.Height
+                                                            Items: =SortByColumns(colPunchExecutiveDistribution, "StatusOrder", SortOrder.Ascending)
+                                                            ShowScrollbar: =false
+                                                            TemplatePadding: =1
+                                                            TemplateSize: =27
+                                                            Visible: |
+                                                              =false
+                                                            Width: =Parent.Width - 144
+                                                            X: =132
+                                                          Children:
+                                                            - recPunchExecutiveDonutLegendColor:
+                                                                Control: Rectangle@2.3.0
+                                                                Properties:
+                                                                  Fill: =ColorValue(Coalesce(ThisItem.StatusColor, "#94A3B8"))
+                                                                  Height: =10
+                                                                  Width: =10
+                                                                  X: =2
+                                                                  Y: =8
+                                                            - lblPunchExecutiveDonutLegendName:
+                                                                Control: ModernText@1.0.0
+                                                                Properties:
+                                                                  AutoHeight: =true
+                                                                  Color: =varTheme_Text
+                                                                  Height: =26
+                                                                  Size: =8
+                                                                  Text: =Coalesce(ThisItem.StatusName, ThisItem.StatusCode)
+                                                                  Width: =Parent.TemplateWidth - 92
+                                                                  X: =18
+                                                            - lblPunchExecutiveDonutLegendValue:
+                                                                Control: ModernText@1.0.0
+                                                                Properties:
+                                                                  Align: =Align.Right
+                                                                  AutoHeight: =true
+                                                                  Color: =varTheme_TextMuted
+                                                                  Height: =26
+                                                                  Size: =8
+                                                                  Text: =Text(ThisItem.PunchCount, "[$-en-US]#,##0") & " (" & Text(100 * ThisItem.PunchCount / Max(1, Sum(colPunchExecutiveDistribution, PunchCount)), "0.0") & "%)"
+                                                                  Width: =78
+                                                                  X: =Parent.TemplateWidth - 82
+                                                      - lblPunchExecutiveDonutEmpty:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            Align: =Align.Center
+                                                            AutoHeight: =true
+                                                            Color: =varTheme_TextMuted
+                                                            Height: =50
+                                                            Text: ="No distribution available."
+                                                            Visible: |
+                                                              =false
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =96
                                                       - galPunchExecutiveDisciplineBars:
                                                           Control: Gallery@2.15.0
                                                           Variant: BrowseLayout_Vertical_OneTextVariant_ver5.0
                                                           Properties:
                                                             BorderColor: =RGBA(0,0,0,0)
-                                                            Height: =214
+                                                            Height: =Parent.Height - 76
                                                             Items: =colPunchExecutiveDisciplineDistribution
-                                                            TemplatePadding: =4
-                                                            TemplateSize: =42
+                                                            TemplatePadding: =3
+                                                            TemplateSize: =48
                                                             Visible: |-
                                                               =    CountRows(colPunchExecutiveSelection) > 0 &&
                                                                   First(colPunchExecutiveSelection).IsSelection &&
                                                                   CountRows(colPunchExecutiveDisciplineDistribution) > 0
-                                                            Width: =Parent.Width - Self.X - 16
-                                                            X: =254
-                                                            Y: =84
+                                                            Width: =Parent.Width - Self.X - 18
+                                                            X: =cmp_PieChartPro_1.X + cmp_PieChartPro_1.Width + 28
+                                                            Y: =68
                                                           Children:
-                                                            - btnPEDisciplineSelect:
-                                                                Control: Classic/Button@2.2.0
+                                                            - recPEDisciplineSelected_1:
+                                                                Control: GroupContainer@1.5.0
+                                                                Variant: ManualLayout
                                                                 Properties:
-                                                                  BorderColor: =RGBA(0,0,0,0)
-                                                                  BorderThickness: =0
-                                                                  Color: =Color.Transparent
-                                                                  Fill: =Color.Transparent
-                                                                  Height: =Parent.TemplateHeight
-                                                                  HoverBorderColor: =RGBA(0,0,0,0)
-                                                                  HoverColor: =Color.Transparent
-                                                                  HoverFill: =RGBA(22,119,255,0.05)
-                                                                  OnSelect: |-
-                                                                    =Set(
-                                                                        varHomePunchSelectedDisciplineCode,
-                                                                        If(
+                                                                  BorderColor: |-
+                                                                    =    If(
                                                                             Upper(Coalesce(varHomePunchSelectedDisciplineCode, "")) =
-                                                                                Upper(Coalesce(ThisItem.DisciplineCode, "")),
-                                                                            "",
-                                                                            Upper(Coalesce(ThisItem.DisciplineCode, ""))
+                                                                            Upper(Coalesce(ThisItem.DisciplineCode, "")),
+                                                                            ColorFade(
+                                                                                ColorValue(Coalesce(ThisItem.DisciplineColor, "#1677FF")),
+                                                                                0.35
+                                                                            ),
+                                                                            RGBA(0,0,0,0)
                                                                         )
-                                                                    );
-
-                                                                    Set(varHomePunchGridSelectedKey, "");
-                                                                    Clear(colHomePunchGridSelectedKeys);
-                                                                    Set(varHomePunchGridAllMatchingSelected, false);
-
-                                                                    Select(btnHome_RebuildPunchGridView)
-                                                                  PressedBorderColor: =RGBA(0,0,0,0)
-                                                                  PressedColor: =Color.Transparent
-                                                                  PressedFill: =RGBA(22,119,255,0.09)
+                                                                  BorderThickness: |
+                                                                    =    If(
+                                                                            Upper(Coalesce(varHomePunchSelectedDisciplineCode, "")) =
+                                                                            Upper(Coalesce(ThisItem.DisciplineCode, "")),
+                                                                            1,
+                                                                            0
+                                                                        )
+                                                                  DropShadow: =DropShadow.None
+                                                                  Fill: |-
+                                                                    =    If(
+                                                                            Upper(Coalesce(varHomePunchSelectedDisciplineCode, "")) =
+                                                                            Upper(Coalesce(ThisItem.DisciplineCode, "")),
+                                                                            ColorFade(
+                                                                                ColorValue(Coalesce(ThisItem.DisciplineColor, "#1677FF")),
+                                                                                0.88
+                                                                            ),
+                                                                            Color.Transparent
+                                                                        )
+                                                                  Height: =Parent.TemplateHeight - 2
                                                                   RadiusBottomLeft: =6
                                                                   RadiusBottomRight: =6
                                                                   RadiusTopLeft: =6
                                                                   RadiusTopRight: =6
-                                                                  Text: =""
                                                                   Width: =Parent.TemplateWidth
-                                                            - lblPEDisciplineCount:
+                                                                  Y: =1
+                                                            - lblPEDisciplineName_1:
                                                                 Control: ModernText@1.0.0
                                                                 Properties:
-                                                                  Align: =Align.Right
-                                                                  Color: =varTheme_Text
-                                                                  FontWeight: =FontWeight.Semibold
+                                                                  AutoHeight: =true
+                                                                  Color: |-
+                                                                    =    If(
+                                                                            Upper(Coalesce(varHomePunchSelectedDisciplineCode, "")) =
+                                                                            Upper(Coalesce(ThisItem.DisciplineCode, "")),
+                                                                            ColorValue(Coalesce(ThisItem.DisciplineColor, "#1677FF")),
+                                                                            varTheme_Text
+                                                                        )
+                                                                  FontWeight: |-
+                                                                    =    If(
+                                                                            Upper(Coalesce(varHomePunchSelectedDisciplineCode, "")) =
+                                                                            Upper(Coalesce(ThisItem.DisciplineCode, "")),
+                                                                            FontWeight.Bold,
+                                                                            FontWeight.Semibold
+                                                                        )
                                                                   Height: =18
                                                                   OnSelect: =Select(Parent)
-                                                                  Size: =8
-                                                                  Text: |-
-                                                                    =    Text(
-                                                                            ThisItem.PunchCount,
-                                                                            "[$-en-US]#,##0"
-                                                                        )
-                                                                  Width: =42
-                                                                  X: =Parent.TemplateWidth - 52
-                                                                  Y: =3
-                                                            - btnPEDisciplineFill:
-                                                                Control: Classic/Button@2.2.0
-                                                                Properties:
-                                                                  Align: =Align.Right
-                                                                  BorderColor: =Color.Transparent
-                                                                  BorderStyle: =BorderStyle.None
-                                                                  BorderThickness: =0
-                                                                  Color: =varTheme_TextMuted
-                                                                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
-                                                                  DisabledColor: =RGBA(161, 159, 157, 1)
-                                                                  DisabledFill: =RGBA(242, 242, 241, 0)
-                                                                  DisplayMode: =DisplayMode.View
-                                                                  Fill: |-
-                                                                    =    ColorValue(
-                                                                            Coalesce(
-                                                                                ThisItem.DisciplineColor,
-                                                                                "#64748B"
-                                                                            )
-                                                                        )
-                                                                  Font: =Font.'Segoe UI'
-                                                                  Height: =btnPEDisciplineTrack.Height
-                                                                  HoverBorderColor: =RGBA(0, 0, 0, 0)
-                                                                  HoverColor: =RGBA(255, 255, 255, 1)
-                                                                  HoverFill: =RGBA(16, 110, 190, 1)
-                                                                  OnSelect: =Select(Parent)
-                                                                  PressedBorderColor: =RGBA(0, 69, 120, 1)
-                                                                  PressedColor: =RGBA(255, 255, 255, 1)
-                                                                  PressedFill: =RGBA(16, 110, 190, 1)
-                                                                  RadiusBottomLeft: =3
-                                                                  RadiusBottomRight: =3
-                                                                  RadiusTopLeft: =3
-                                                                  RadiusTopRight: =3
-                                                                  Size: =8
-                                                                  Text: =
-                                                                  Width: |-
-                                                                    =    If(
-                                                                            ThisItem.PunchCount <= 0,
-                                                                            0,
-                                                                            Max(
-                                                                                6,
-                                                                                btnPEDisciplineTrack.Width *
-                                                                                ThisItem.PunchCount /
-                                                                                Max(
-                                                                                    1,
-                                                                                    Max(
-                                                                                        colPunchExecutiveDisciplineDistribution,
-                                                                                        PunchCount
-                                                                                    )
-                                                                                )
-                                                                            )
-                                                                        )
-                                                                  X: =btnPEDisciplineTrack.X
-                                                                  Y: =btnPEDisciplineTrack.Y
-                                                            - btnPEDisciplineTrack:
+                                                                  Size: =9
+                                                                  Text: =ThisItem.DisciplineName
+                                                                  Width: =111.19999999999993
+                                                                  Y: =4
+                                                            - btnPEDisciplineTrack_1:
                                                                 Control: Classic/Button@2.2.0
                                                                 Properties:
                                                                   BorderColor: =Color.Transparent
@@ -4880,274 +5082,208 @@ Screens:
                                                                   RadiusTopLeft: =4
                                                                   RadiusTopRight: =4
                                                                   Text: =
-                                                                  Width: =Parent.TemplateWidth - 214
-                                                                  X: =112
-                                                                  Y: =18
-                                                            - lblPEDisciplineName:
-                                                                Control: ModernText@1.0.0
+                                                                  Width: =Max(0, Parent.TemplateWidth - 254)
+                                                                  X: =111.19999999999993
+                                                                  Y: =22
+                                                            - btnPEDisciplineFill_1:
+                                                                Control: Classic/Button@2.2.0
                                                                 Properties:
-                                                                  Color: |-
-                                                                    =    If(
-                                                                            Upper(Coalesce(varHomePunchSelectedDisciplineCode, "")) =
-                                                                            Upper(Coalesce(ThisItem.DisciplineCode, "")),
-                                                                            ColorValue(Coalesce(ThisItem.DisciplineColor, "#1677FF")),
-                                                                            varTheme_Text
-                                                                        )
-                                                                  FontWeight: |-
-                                                                    =    If(
-                                                                            Upper(Coalesce(varHomePunchSelectedDisciplineCode, "")) =
-                                                                            Upper(Coalesce(ThisItem.DisciplineCode, "")),
-                                                                            FontWeight.Bold,
-                                                                            FontWeight.Semibold
-                                                                        )
-                                                                  Height: =18
-                                                                  OnSelect: =Select(Parent)
-                                                                  Size: =8
-                                                                  Text: =ThisItem.DisciplineName
-                                                                  Width: =118
-                                                                  X: =10
-                                                                  Y: =4
-                                                            - recPEDisciplineSelected:
-                                                                Control: GroupContainer@1.5.0
-                                                                Variant: ManualLayout
-                                                                Properties:
-                                                                  BorderColor: |-
-                                                                    =    If(
-                                                                            Upper(Coalesce(varHomePunchSelectedDisciplineCode, "")) =
-                                                                            Upper(Coalesce(ThisItem.DisciplineCode, "")),
-                                                                            ColorFade(
-                                                                                ColorValue(Coalesce(ThisItem.DisciplineColor, "#1677FF")),
-                                                                                0.35
-                                                                            ),
-                                                                            RGBA(0,0,0,0)
-                                                                        )
-                                                                  BorderThickness: |+
-                                                                    =    If(
-                                                                            Upper(Coalesce(varHomePunchSelectedDisciplineCode, "")) =
-                                                                            Upper(Coalesce(ThisItem.DisciplineCode, "")),
-                                                                            1,
-                                                                            0
-                                                                        )
-                                                                  DropShadow: =DropShadow.None
+                                                                  Align: =Align.Right
+                                                                  BorderColor: =Color.Transparent
+                                                                  BorderStyle: =BorderStyle.None
+                                                                  BorderThickness: =0
+                                                                  Color: =varTheme_TextMuted
+                                                                  DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                                                                  DisabledColor: =RGBA(161, 159, 157, 1)
+                                                                  DisabledFill: =RGBA(242, 242, 241, 0)
+                                                                  DisplayMode: =DisplayMode.View
                                                                   Fill: |-
-                                                                    =    If(
-                                                                            Upper(Coalesce(varHomePunchSelectedDisciplineCode, "")) =
-                                                                            Upper(Coalesce(ThisItem.DisciplineCode, "")),
-                                                                            ColorFade(
-                                                                                ColorValue(Coalesce(ThisItem.DisciplineColor, "#1677FF")),
-                                                                                0.88
-                                                                            ),
-                                                                            Color.Transparent
+                                                                    =ColorValue(
+                                                                        Coalesce(
+                                                                            ThisItem.DisciplineColor,
+                                                                            "#64748B"
                                                                         )
-                                                                  Height: =Parent.TemplateHeight - 2
-                                                                  RadiusBottomLeft: =6
-                                                                  RadiusBottomRight: =6
-                                                                  RadiusTopLeft: =6
-                                                                  RadiusTopRight: =6
-                                                                  Width: =Parent.TemplateWidth
-                                                                  Y: =1
-                                                            - lblPEDisciplinePercent:
+                                                                    )
+                                                                  Font: =Font.'Segoe UI'
+                                                                  Height: =btnPEDisciplineTrack_1.Height
+                                                                  HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                                                  HoverColor: =RGBA(255, 255, 255, 1)
+                                                                  HoverFill: =RGBA(16, 110, 190, 1)
+                                                                  OnSelect: =Select(Parent)
+                                                                  PressedBorderColor: =RGBA(0, 69, 120, 1)
+                                                                  PressedColor: =RGBA(255, 255, 255, 1)
+                                                                  PressedFill: =RGBA(16, 110, 190, 1)
+                                                                  RadiusBottomLeft: =3
+                                                                  RadiusBottomRight: =3
+                                                                  RadiusTopLeft: =3
+                                                                  RadiusTopRight: =3
+                                                                  Size: =8
+                                                                  Text: =
+                                                                  Width: |-
+                                                                    =If(
+                                                                        ThisItem.PunchCount <= 0,
+                                                                        0,
+                                                                        Max(
+                                                                            6,
+                                                                            btnPEDisciplineTrack_1.Width *
+                                                                            ThisItem.PunchCount /
+                                                                            Max(
+                                                                                1,
+                                                                                Max(
+                                                                                    colPunchExecutiveDisciplineDistribution,
+                                                                                    PunchCount
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                  X: =105.19999999999993
+                                                                  Y: =btnPEDisciplineTrack_1.Y
+                                                            - lblPEDisciplinePercent_1:
                                                                 Control: ModernText@1.0.0
                                                                 Properties:
                                                                   Align: =Align.Right
+                                                                  AutoHeight: =true
                                                                   Color: =varTheme_TextMuted
                                                                   Height: =18
                                                                   OnSelect: =Select(Parent)
                                                                   Size: =8
                                                                   Text: |-
-                                                                    =    Text(
-                                                                            ThisItem.PunchCount /
-                                                                            Max(
-                                                                                1,
-                                                                                First(colPunchExecutiveSelection).PunchCount
-                                                                            ),
-                                                                            "[$-en-US]0.0%"
-                                                                        )
-                                                                  Width: =40
-                                                                  X: =Parent.TemplateWidth - 96
-                                                                  Y: =3
-                                                - conPunchExecutiveDonutSlot:
-                                                    Control: GroupContainer@1.5.0
-                                                    Variant: ManualLayout
-                                                    Properties:
-                                                      BorderColor: =varTheme_Border
-                                                      BorderThickness: =1
-                                                      DropShadow: =DropShadow.Semilight
-                                                      Fill: =varTheme_Surface
-                                                      Height: =Parent.Height
-                                                      RadiusBottomLeft: =14
-                                                      RadiusBottomRight: =14
-                                                      RadiusTopLeft: =14
-                                                      RadiusTopRight: =14
-                                                      Width: =Parent.Width
-                                                    Children:
-                                                      - lblPunchExecutiveDonutSlotTitle:
-                                                          Control: ModernText@1.0.0
-                                                          Properties:
-                                                            AutoHeight: =true
-                                                            Color: =varTheme_Text
-                                                            FontWeight: =FontWeight.Semibold
-                                                            Height: =24
-                                                            Size: =14
-                                                            Text: ="Open Punches by Discipline"
-                                                            Visible: |+
-                                                              =true
-                                                            Width: =Parent.Width - 220
-                                                            X: =18
-                                                            Y: =14
-                                                      - lblPunchExecutiveDonutSlotState:
-                                                          Control: ModernText@1.0.0
-                                                          Properties:
-                                                            AutoHeight: =true
-                                                            Color: =varTheme_TextMuted
-                                                            Height: =20
-                                                            Size: =9
-                                                            Text: |+
-                                                              =
-                                                                  If(
-                                                                      CountRows(colPunchExecutiveSelection) > 0 &&
-                                                                      First(colPunchExecutiveSelection).IsSelection,
-                                                                      First(colPunchExecutiveSelection).SelectedRow & " × " &
-                                                                      First(colPunchExecutiveSelection).SelectedColumn,
-                                                                      "Select a heatmap cell to inspect the open-punch distribution."
-                                                                  )
-
-                                                            Visible: |+
-                                                              =true
-                                                            Width: =Parent.Width - 220
-                                                            X: =18
-                                                            Y: =36
-                                                      - lblPunchExecutiveDonutTotal:
-                                                          Control: ModernText@1.0.0
-                                                          Properties:
-                                                            Align: =Align.Center
-                                                            AutoHeight: =true
-                                                            Color: =varTheme_Text
-                                                            FontWeight: =FontWeight.Bold
-                                                            Height: =30
-                                                            Size: =16
-                                                            Text: =Text(Sum(colPunchExecutiveDistribution, PunchCount), "[$-en-US]#,##0")
-                                                            Visible: |+
-                                                              =false
-                                                            Width: =76
-                                                            X: =33
-                                                            Y: =75
-                                                      - galPunchExecutiveDonutLegend:
-                                                          Control: Gallery@2.15.0
-                                                          Variant: Vertical
-                                                          Properties:
-                                                            Height: =Parent.Height
-                                                            Items: =SortByColumns(colPunchExecutiveDistribution, "StatusOrder", SortOrder.Ascending)
-                                                            ShowScrollbar: =false
-                                                            TemplatePadding: =1
-                                                            TemplateSize: =27
-                                                            Visible: |+
-                                                              =false
-                                                            Width: =Parent.Width - 144
-                                                            X: =132
-                                                            Y: =40
-                                                          Children:
-                                                            - recPunchExecutiveDonutLegendColor:
-                                                                Control: Rectangle@2.3.0
-                                                                Properties:
-                                                                  Fill: =ColorValue(Coalesce(ThisItem.StatusColor, "#94A3B8"))
-                                                                  Height: =10
-                                                                  Width: =10
-                                                                  X: =2
-                                                                  Y: =8
-                                                            - lblPunchExecutiveDonutLegendName:
-                                                                Control: ModernText@1.0.0
-                                                                Properties:
-                                                                  Color: =varTheme_Text
-                                                                  Height: =26
-                                                                  Size: =8
-                                                                  Text: =Coalesce(ThisItem.StatusName, ThisItem.StatusCode)
-                                                                  Width: =Parent.TemplateWidth - 92
-                                                                  X: =18
-                                                            - lblPunchExecutiveDonutLegendValue:
+                                                                    =Text(
+                                                                        100 *
+                                                                        ThisItem.PunchCount /
+                                                                        Max(
+                                                                            1,
+                                                                            Sum(
+                                                                                colPunchExecutiveDisciplineDistribution,
+                                                                                PunchCount
+                                                                            )
+                                                                        ),
+                                                                        "[$-en-US]0.0"
+                                                                    ) & "%"
+                                                                  Width: =42
+                                                                  X: =Parent.TemplateWidth - 90
+                                                                  Y: =4
+                                                            - lblPEDisciplineCount_1:
                                                                 Control: ModernText@1.0.0
                                                                 Properties:
                                                                   Align: =Align.Right
-                                                                  Color: =varTheme_TextMuted
-                                                                  Height: =26
+                                                                  AutoHeight: =true
+                                                                  Color: =varTheme_Text
+                                                                  FontWeight: =FontWeight.Semibold
+                                                                  Height: =18
+                                                                  OnSelect: =Select(Parent)
                                                                   Size: =8
-                                                                  Text: =Text(ThisItem.PunchCount, "[$-en-US]#,##0") & " (" & Text(100 * ThisItem.PunchCount / Max(1, Sum(colPunchExecutiveDistribution, PunchCount)), "0.0") & "%)"
-                                                                  Width: =78
-                                                                  X: =Parent.TemplateWidth - 82
-                                                      - lblPunchExecutiveDonutEmpty:
-                                                          Control: ModernText@1.0.0
-                                                          Properties:
-                                                            Align: =Align.Center
-                                                            Color: =varTheme_TextMuted
-                                                            Height: =50
-                                                            Text: ="No distribution available."
-                                                            Visible: |+
-                                                              =false
-                                                            Width: =Parent.Width - 32
-                                                            X: =16
-                                                            Y: =96
-                                                      - cmp_DonutPro_1:
-                                                          Control: CanvasComponent
-                                                          ComponentName: cmp_DonutPro
-                                                          Properties:
-                                                            AccentColor: =ColorValue("#1677FF")
-                                                            BackgroundColor: =ColorValue("#FFFFFF")
-                                                            BorderColor: =ColorValue("#E2E8F0")
-                                                            CenterFillColorHex: ="#FFFFFF"
-                                                            CenterLabel: ="OPEN"
-                                                            CenterLabelColorHex: ="#64748B"
-                                                            CenterValueColorHex: ="#0F172A"
-                                                            CenterValueText: |-
-                                                              =    Text(
-                                                                      If(
-                                                                          CountRows(colPunchExecutiveSelection) > 0,
-                                                                          First(colPunchExecutiveSelection).PunchCount,
-                                                                          0
-                                                                      ),
-                                                                      "[$-en-US]#,##0"
-                                                                  )
-                                                            CompactMode: =false
-                                                            DangerColor: =ColorValue("#DC2626")
-                                                            DonutThickness: =14
-                                                            EmptyText: ="Select a cell to view the open-punch distribution by discipline."
-                                                            EnableSelection: =false
-                                                            ErrorText: ="Discipline distribution unavailable."
-                                                            Height: =210
-                                                            Items: =colPunchExecutiveDonutItems
-                                                            LoadingText: ="Loading distribution..."
-                                                            MutedTextColor: =ColorValue("#64748B")
-                                                            OnClearSelection: =
-                                                            OnSegmentSelect: =
-                                                            PercentageFormat: ="[$-en-US]0.0%"
-                                                            SegmentGapPercent: =0.65
-                                                            ShowLegend: =false
-                                                            ShowPercentages: =false
-                                                            ShowValues: =false
-                                                            ShowZeroSegments: =true
-                                                            State: |-
-                                                              =    If(
-                                                                      varPunchExecutiveGridLoading,
-                                                                      "loading",
-                                                                      If(
-                                                                          !IsBlank(varPunchExecutiveGridError),
-                                                                          "error",
-                                                                          If(
-                                                                              CountRows(colPunchExecutiveDonutItems) = 0,
-                                                                              "empty",
-                                                                              "ready"
-                                                                          )
-                                                                      )
-                                                                  )
-                                                            Subtitle: =
-                                                            SurfaceAltColor: =ColorValue("#F8FAFC")
-                                                            TextColor: =ColorValue("#0F172A")
-                                                            Title: =
-                                                            TrackColorHex: ="#E2E8F0"
-                                                            ValueFormat: ="[$-en-US]#,##0"
-                                                            ValueSuffix: =""
-                                                            Width: =220
-                                                            X: =18
-                                                            Y: =84
+                                                                  Text: |-
+                                                                    =    Text(
+                                                                            ThisItem.PunchCount,
+                                                                            "[$-en-US]#,##0"
+                                                                        )
+                                                                  Width: =38
+                                                                  X: =Parent.TemplateWidth - 42
+                                                                  Y: =4
+                                                            - btnPEDisciplineSelect_1:
+                                                                Control: Classic/Button@2.2.0
+                                                                Properties:
+                                                                  BorderColor: =RGBA(0,0,0,0)
+                                                                  BorderThickness: =0
+                                                                  Color: =Color.Transparent
+                                                                  Fill: =Color.Transparent
+                                                                  Height: =Parent.TemplateHeight
+                                                                  HoverBorderColor: =RGBA(0,0,0,0)
+                                                                  HoverColor: =Color.Transparent
+                                                                  HoverFill: =RGBA(22,119,255,0.05)
+                                                                  OnSelect: |
+                                                                    =/*Set(
+                                                                        varHomePunchSelectedDisciplineCode,
+                                                                        If(
+                                                                            Upper(Coalesce(varHomePunchSelectedDisciplineCode, "")) =
+                                                                                Upper(Coalesce(ThisItem.DisciplineCode, "")),
+                                                                            "",
+                                                                            Upper(Coalesce(ThisItem.DisciplineCode, ""))
+                                                                        )
+                                                                    );
+
+                                                                    Set(varHomePunchGridSelectedKey, "");
+                                                                    Clear(colHomePunchGridSelectedKeys);
+                                                                    Set(varHomePunchGridAllMatchingSelected, false);
+
+                                                                    Select(btnHome_RebuildPunchGridView)
+                                                                    */
+
+                                                                    With(
+                                                                        {
+                                                                            _nextDiscipline:
+                                                                                If(
+                                                                                    Upper(
+                                                                                        Trim(
+                                                                                            Coalesce(
+                                                                                                varHomePunchSelectedDisciplineCode,
+                                                                                                ""
+                                                                                            )
+                                                                                        )
+                                                                                    ) =
+                                                                                    Upper(
+                                                                                        Trim(
+                                                                                            Coalesce(
+                                                                                                ThisItem.DisciplineCode,
+                                                                                                "NO_DISCIPLINE"
+                                                                                            )
+                                                                                        )
+                                                                                    ),
+
+                                                                                    "",
+
+                                                                                    Upper(
+                                                                                        Trim(
+                                                                                            Coalesce(
+                                                                                                ThisItem.DisciplineCode,
+                                                                                                "NO_DISCIPLINE"
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                        },
+
+                                                                        Set(
+                                                                            varHomePunchSelectedDisciplineCode,
+                                                                            _nextDiscipline
+                                                                        );
+
+                                                                        Set(
+                                                                            varPunchDrillDisciplineCode,
+                                                                            _nextDiscipline
+                                                                        )
+                                                                    );
+
+                                                                    Set(varPunchExecutiveGridPage, 1);
+                                                                    Set(varPunchExecutiveGridSelectedId, Blank());
+
+                                                                    Set(varHomePunchGridSelectedKey, "");
+                                                                    Clear(colHomePunchGridSelectedKeys);
+                                                                    Set(varHomePunchGridAllMatchingSelected, false);
+
+                                                                    Set(varPunchExecutiveGridLoading, true);
+                                                                    Set(varPunchExecutiveGridError, "");
+
+                                                                    Set(
+                                                                        varPunchExecutiveGridMessage,
+                                                                        If(
+                                                                            IsBlank(varHomePunchSelectedDisciplineCode),
+                                                                            "Loading all disciplines for the selected cell...",
+                                                                            "Loading " & varHomePunchSelectedDisciplineCode & " punches..."
+                                                                        )
+                                                                    );
+
+                                                                    Set(varPunchExecutiveGridLoadPending, true)
+                                                                  PressedBorderColor: =RGBA(0,0,0,0)
+                                                                  PressedColor: =Color.Transparent
+                                                                  PressedFill: =RGBA(22,119,255,0.09)
+                                                                  RadiusBottomLeft: =6
+                                                                  RadiusBottomRight: =6
+                                                                  RadiusTopLeft: =6
+                                                                  RadiusTopRight: =6
+                                                                  Text: =""
+                                                                  Width: =Parent.TemplateWidth
                                           - conPunchExecutiveHeatmapSlot:
                                               Control: GroupContainer@1.5.0
                                               Variant: ManualLayout
@@ -6543,82 +6679,13 @@ Screens:
                                           Height: =60
                                           IsLoading: =varPunchExecutiveGridLoading
                                           MutedTextColor: =varTheme_TextMuted
-                                          OnAction: |-
-                                            =Switch(
-                                                Self.SelectedActionKey,
-
-                                                "REVIEW",
-                                                    Notify(
-                                                        "Punch Review Workspace will open with the current grid context.",
-                                                        NotificationType.Information
-                                                    ),
-
-                                                "OPEN_PUNCHES",
-                                                  "",  //Select(btnPunchExecutiveOpenInPunchList),
-
-                                                "REFRESH",
-                                                    Select(btnPunchExecutiveLoadCellDetails),
-
-                                                "EXPORT",
-                                                    Select(btnPunchExecutiveGridExport),
-
-                                                "COMMENTS",
-                                                    If(
-                                                        IsBlank(varHomePunchGridSelectedKey),
-                                                        Notify(
-                                                            "Select a Punch first.",
-                                                            NotificationType.Warning
-                                                        ),
-                                                        Notify(
-                                                            "The selected Punch will open in the review workspace.",
-                                                            NotificationType.Information
-                                                        )
-                                                    ),
-
-                                                "COLUMNS",
-                                                    Notify(
-                                                        "Use the grid gear while the column selector remains inside DataTableProV2.",
-                                                        NotificationType.Information
-                                                    ),
-
-                                                "DENSITY",
-                                                    Set(
-                                                        varHomePunchGridDensity,
-                                                        Switch(
-                                                            Lower(varHomePunchGridDensity),
-                                                            "compact", "Comfortable",
-                                                            "comfortable", "Spacious",
-                                                            "Compact"
-                                                        )
-                                                    ),
-
-                                                "SELECT_VISIBLE",
-                                                    ClearCollect(
-                                                        colHomePunchGridSelectedKeys,
-                                                        ForAll(
-                                                            colHomePunchGridView,
-                                                            {
-                                                                RowKey: Text(RowKey)
-                                                            }
-                                                        )
-                                                    ),
-
-                                                "CLEAR_FILTERS",
-                                                    Set(varHomePunchSelectedDisciplineCode, "");
-                                                    Set(varHomePunchGridSelectedKey, "");
-                                                    Clear(colHomePunchGridSelectedKeys);
-                                                    Set(varHomePunchGridAllMatchingSelected, false);
-                                                    Select(btnHome_RebuildPunchGridView),
-
-                                                "MORE",
-                                                    Notify(
-                                                        "Additional actions will be added here.",
-                                                        NotificationType.Information
-                                                    )
-                                            )
+                                          OnAction: "=Switch(\n    Self.SelectedActionKey,\n\n    \"REVIEW\",\n        Notify(\n            \"Punch Review Workspace will open with the current grid context.\",\n            NotificationType.Information\n        ),\n\n    \"OPEN_PUNCHES\",\n        Select(\n            btnPunchExecutiveOpenInPunchList\n        ),\n\n    \"REFRESH\",\n        Select(btnPunchExecutiveLoadCellDetails),\n\n    \"EXPORT\",\n        Select(btnPunchExecutiveGridExport),\n\n    \"COMMENTS\",\n        If(\n            IsBlank(varHomePunchGridSelectedKey),\n            Notify(\n                \"Select a Punch first.\",\n                NotificationType.Warning\n            ),\n            Notify(\n                \"The selected Punch will open in the review workspace.\",\n                NotificationType.Information\n            )\n        ),\n\n    \"COLUMNS\",\n        Notify(\n            \"Use the grid gear while the column selector remains inside DataTableProV2.\",\n            NotificationType.Information\n        ),\n\n    \"DENSITY\",\n        Set(\n            varHomePunchGridDensity,\n            Switch(\n                Lower(varHomePunchGridDensity),\n                \"compact\", \"Comfortable\",\n                \"comfortable\", \"Spacious\",\n                \"Compact\"\n            )\n        ),\n\n    \"SELECT_VISIBLE\",\n        ClearCollect(\n            colHomePunchGridSelectedKeys,\n            ForAll(\n                colHomePunchGridView,\n                {\n                    RowKey: Text(RowKey)\n                }\n            )\n        ),\n\n\"CLEAR_FILTERS\",\n\n    Set(\n        varHomePunchSelectedDisciplineCode,\n        \"\"\n    );\n\n    Set(\n        varPunchDrillDisciplineCode,\n        \"\"\n    );\n\n    Set(\n        varPunchExecutiveGridPage,\n        1\n    );\n\n    Set(\n        varPunchExecutiveGridSelectedId,\n        Blank()\n    );\n\n    Set(\n        varHomePunchGridSelectedKey,\n        \"\"\n    );\n\n    Clear(\n        colHomePunchGridSelectedKeys\n    );\n\n    Set(\n        varHomePunchGridAllMatchingSelected,\n        false\n    );\n\n    Set(\n        varPunchExecutiveGridLoading,\n        true\n    );\n\n    Set(\n        varPunchExecutiveGridError,\n        \"\"\n    );\n\n    Set(\n        varPunchExecutiveGridMessage,\n        \"Loading all disciplines for the selected cell...\"\n    );\n\n    Set(\n        varPunchExecutiveGridLoadPending,\n        false\n    );\n\n    Set(\n        varPunchExecutiveGridLoadPending,\n        true\n    ),\n    \n    \"MORE\",\n        Notify(\n            \"Additional actions will be added here.\",\n            NotificationType.Information\n        )\n)"
                                           SecondaryText: |-
                                             =Text(
-                                                CountRows(colHomePunchGridView),
+                                                Coalesce(
+                                                    varPunchExecutiveGridTotalRows,
+                                                    0
+                                                ),
                                                 "[$-en-US]#,##0"
                                             ) &
                                             " open punches" &
@@ -9398,12 +9465,7 @@ Screens:
                   With(
                       {
                           _filtered:
-                              Filter(
-                                  colHomePunchGridNormalized,
-
-                                  IsBlank(_selectedDiscipline) ||
-                                  DisciplineCode = _selectedDiscipline
-                              )
+                                  colHomePunchGridNormalized
                       },
 
                       With(
@@ -9637,7 +9699,15 @@ Screens:
                                               varPunchExecutiveGridPageSize,
                                               25
                                           )
-                                      )
+                                      ),
+                                      Upper(
+                                          Trim(
+                                              Coalesce(
+                                                  varHomePunchSelectedDisciplineCode,
+                                                  ""
+                                              )
+                                          )
+                                      )       
                                   )
                           },
 
@@ -9952,95 +10022,54 @@ Screens:
 
                                       // =====================================================
                                       // DISCIPLINE DISTRIBUTION
-                                      // Use server aggregate when available.
-                                      // Fall back to the returned OPEN page.
+                                      // Uses the complete server aggregate when available.
+                                      // Falls back to the OPEN rows returned on the current page.
+                                      // Normalizes code/name aliases before assigning colors.
                                       // =====================================================
 
                                       With(
                                           {
-                                              _serverDistribution:
+                                              _serverDistributionRaw:
                                                   Filter(
                                                       ForAll(
                                                           Table(
                                                               _payload.disciplineDistribution
-                                                          ),
+                                                          ) As _serverRow,
 
                                                           {
-                                                              DisciplineCode:
+                                                              RawDisciplineCode:
                                                                   Upper(
                                                                       Trim(
                                                                           Coalesce(
                                                                               Text(
-                                                                                  Value.DisciplineCode
+                                                                                  _serverRow.Value.DisciplineCode
                                                                               ),
-                                                                              "NO_DISCIPLINE"
+                                                                              ""
                                                                           )
                                                                       )
                                                                   ),
 
-                                                              DisciplineName:
-                                                                  Coalesce(
-                                                                      Text(
-                                                                          Value.DisciplineName
-                                                                      ),
-                                                                      Text(
-                                                                          Value.DisciplineCode
-                                                                      ),
-                                                                      "No discipline"
+                                                              RawDisciplineName:
+                                                                  Trim(
+                                                                      Coalesce(
+                                                                          Text(
+                                                                              _serverRow.Value.DisciplineName
+                                                                          ),
+                                                                          Text(
+                                                                              _serverRow.Value.DisciplineCode
+                                                                          ),
+                                                                          "No discipline"
+                                                                      )
                                                                   ),
 
                                                               PunchCount:
                                                                   Value(
                                                                       Coalesce(
                                                                           Text(
-                                                                              Value.PunchCount
+                                                                              _serverRow.Value.PunchCount
                                                                           ),
                                                                           "0"
                                                                       )
-                                                                  ),
-
-                                                              DisciplineColor:
-                                                                  Switch(
-                                                                      Upper(
-                                                                          Trim(
-                                                                              Coalesce(
-                                                                                  Text(
-                                                                                      Value.DisciplineCode
-                                                                                  ),
-                                                                                  "NO_DISCIPLINE"
-                                                                              )
-                                                                          )
-                                                                      ),
-
-                                                                      "MECHANICAL", "#2563EB",
-                                                                      "MECH", "#2563EB",
-
-                                                                      "ELECTRICAL", "#F97316",
-                                                                      "ELEC", "#F97316",
-
-                                                                      "INSTRUMENTATION", "#DC2626",
-                                                                      "INSTR", "#DC2626",
-                                                                      "I&C", "#7C3AED",
-                                                                      "IC", "#7C3AED",
-
-                                                                      "PIPING", "#14B8A6",
-                                                                      "PIPE", "#14B8A6",
-
-                                                                      "HVAC", "#0EA5E9",
-
-                                                                      "CIVIL", "#A16207",
-                                                                      "CIV", "#A16207",
-
-                                                                      "STRUCTURAL", "#0F766E",
-                                                                      "STR", "#0F766E",
-
-                                                                      "COMMS", "#9333EA",
-                                                                      "COMMUNICATIONS", "#9333EA",
-
-                                                                      "FIRE & GAS", "#E11D48",
-                                                                      "FIRE_AND_GAS", "#E11D48",
-
-                                                                      "#64748B"
                                                                   )
                                                           }
                                                       ),
@@ -10049,17 +10078,9 @@ Screens:
                                                   )
                                           },
 
-                                          ClearCollect(
-                                              colPunchExecutiveDisciplineDistribution,
-
-                                              SortByColumns(
-                                                  If(
-                                                      CountRows(
-                                                          _serverDistribution
-                                                      ) > 0,
-
-                                                      _serverDistribution,
-
+                                          With(
+                                              {
+                                                  _fallbackDistributionRaw:
                                                       ForAll(
                                                           GroupBy(
                                                               colPunchExecutiveGridFiltered,
@@ -10069,71 +10090,303 @@ Screens:
                                                           ) As _discipline,
 
                                                           {
-                                                              DisciplineCode:
-                                                                  Coalesce(
-                                                                      _discipline.DisciplineCode,
-                                                                      "NO_DISCIPLINE"
+                                                              RawDisciplineCode:
+                                                                  Upper(
+                                                                      Trim(
+                                                                          Coalesce(
+                                                                              _discipline.DisciplineCode,
+                                                                              ""
+                                                                          )
+                                                                      )
                                                                   ),
 
-                                                              DisciplineName:
-                                                                  Coalesce(
-                                                                      _discipline.DisciplineName,
-                                                                      _discipline.DisciplineCode,
-                                                                      "No discipline"
+                                                              RawDisciplineName:
+                                                                  Trim(
+                                                                      Coalesce(
+                                                                          _discipline.DisciplineName,
+                                                                          _discipline.DisciplineCode,
+                                                                          "No discipline"
+                                                                      )
                                                                   ),
 
                                                               PunchCount:
                                                                   CountRows(
                                                                       _discipline.DisciplineRows
-                                                                  ),
-
-                                                              DisciplineColor:
-                                                                  Switch(
-                                                                      Upper(
-                                                                          Trim(
-                                                                              Coalesce(
-                                                                                  _discipline.DisciplineCode,
-                                                                                  "NO_DISCIPLINE"
-                                                                              )
-                                                                          )
-                                                                      ),
-
-                                                                      "MECHANICAL", "#2563EB",
-                                                                      "MECH", "#2563EB",
-
-                                                                      "ELECTRICAL", "#F97316",
-                                                                      "ELEC", "#F97316",
-
-                                                                      "INSTRUMENTATION", "#DC2626",
-                                                                      "INSTR", "#DC2626",
-                                                                      "I&C", "#7C3AED",
-                                                                      "IC", "#7C3AED",
-
-                                                                      "PIPING", "#14B8A6",
-                                                                      "PIPE", "#14B8A6",
-
-                                                                      "HVAC", "#0EA5E9",
-
-                                                                      "CIVIL", "#A16207",
-                                                                      "CIV", "#A16207",
-
-                                                                      "STRUCTURAL", "#0F766E",
-                                                                      "STR", "#0F766E",
-
-                                                                      "COMMS", "#9333EA",
-                                                                      "COMMUNICATIONS", "#9333EA",
-
-                                                                      "FIRE & GAS", "#E11D48",
-                                                                      "FIRE_AND_GAS", "#E11D48",
-
-                                                                      "#64748B"
                                                                   )
                                                           }
                                                       )
-                                                  ),
+                                              },
 
-                                                  "PunchCount",
-                                                  SortOrder.Descending
+                                              With(
+                                                  {
+                                                      _distributionSource:
+                                                          If(
+                                                              CountRows(
+                                                                  _serverDistributionRaw
+                                                              ) > 0,
+
+                                                              _serverDistributionRaw,
+                                                              _fallbackDistributionRaw
+                                                          )
+                                                  },
+
+                                                  With(
+                                                      {
+                                                          _normalizedDistribution:
+                                                              ForAll(
+                                                                  _distributionSource As _source,
+
+                                                                  With(
+                                                                      {
+                                                                          _rawCode:
+                                                                              Upper(
+                                                                                  Trim(
+                                                                                      Coalesce(
+                                                                                          _source.RawDisciplineCode,
+                                                                                          ""
+                                                                                      )
+                                                                                  )
+                                                                              ),
+
+                                                                          _rawName:
+                                                                              Trim(
+                                                                                  Coalesce(
+                                                                                      _source.RawDisciplineName,
+                                                                                      _source.RawDisciplineCode,
+                                                                                      "No discipline"
+                                                                                  )
+                                                                              )
+                                                                      },
+
+                                                                      With(
+                                                                          {
+                                                                              _searchToken:
+                                                                                  Upper(
+                                                                                      _rawCode &
+                                                                                      "|" &
+                                                                                      _rawName
+                                                                                  )
+                                                                          },
+
+                                                                          With(
+                                                                              {
+                                                                                  _canonicalCode:
+                                                                                      Switch(
+                                                                                          true,
+
+                                                                                          "ELECT" in _searchToken ||
+                                                                                          _rawCode in [
+                                                                                              "EL",
+                                                                                              "ELEC"
+                                                                                          ],
+                                                                                              "ELECTRICAL",
+
+                                                                                          "PIP" in _searchToken ||
+                                                                                          _rawCode = "PIPE",
+                                                                                              "PIPING",
+
+                                                                                          "MECH" in _searchToken ||
+                                                                                          _rawCode = "MEC",
+                                                                                              "MECHANICAL",
+
+                                                                                          "INSTR" in _searchToken ||
+                                                                                          "I&C" in _searchToken ||
+                                                                                          "I AND C" in _searchToken ||
+                                                                                          _rawCode in [
+                                                                                              "IC",
+                                                                                              "INST"
+                                                                                          ],
+                                                                                              "INSTRUMENTATION",
+
+                                                                                          "HVAC" in _searchToken,
+                                                                                              "HVAC",
+
+                                                                                          "CIVIL" in _searchToken ||
+                                                                                          _rawCode = "CIV",
+                                                                                              "CIVIL",
+
+                                                                                          "STRUCT" in _searchToken ||
+                                                                                          "STEEL" in _searchToken ||
+                                                                                          _rawCode = "STR",
+                                                                                              "STRUCTURAL",
+
+                                                                                          "FIREPROOF" in _searchToken ||
+                                                                                          "FIRE PROOF" in _searchToken,
+                                                                                              "FIREPROOFING",
+
+                                                                                          (
+                                                                                              "FIRE" in _searchToken &&
+                                                                                              "GAS" in _searchToken
+                                                                                          ) ||
+                                                                                          _rawCode in [
+                                                                                              "FG",
+                                                                                              "F&G"
+                                                                                          ],
+                                                                                              "FIRE_AND_GAS",
+
+                                                                                          "TELECOM" in _searchToken ||
+                                                                                          "COMMUNICATION" in _searchToken ||
+                                                                                          "COMMS" in _searchToken,
+                                                                                              "TELECOM",
+
+                                                                                          "SAFETY" in _searchToken ||
+                                                                                          "HSE" in _searchToken,
+                                                                                              "SAFETY",
+
+                                                                                          "PROCESS" in _searchToken ||
+                                                                                          _rawCode = "PROC",
+                                                                                              "PROCESS",
+
+                                                                                          "ARCH" in _searchToken,
+                                                                                              "ARCHITECTURAL",
+
+                                                                                              If(
+                                                                                                      !IsBlank(_rawCode) &&
+                                                                                                      Lower(_rawCode) <> "null" &&
+                                                                                                      _rawCode <> "NO_DISCIPLINE",
+
+                                                                                                      _rawCode,
+
+                                                                                                      If(
+                                                                                                          !IsBlank(_rawName) &&
+                                                                                                          Lower(_rawName) <> "null" &&
+                                                                                                          Upper(_rawName) <> "NO DISCIPLINE",
+
+                                                                                                          Upper(
+                                                                                                              Trim(_rawName)
+                                                                                                          ),
+
+                                                                                                          "NO_DISCIPLINE"
+                                                                                                      )
+                                                                                                  )
+                                                                                      )
+                                                                              },
+
+                                                                              {
+                                                                                  DisciplineCode:
+                                                                                      _canonicalCode,
+
+                                                                                  DisciplineName:
+                                                                                      Switch(
+                                                                                          _canonicalCode,
+                                                                                          "ELECTRICAL", "Electrical",
+                                                                                          "PIPING", "Piping",
+                                                                                          "MECHANICAL", "Mechanical",
+                                                                                          "INSTRUMENTATION", "Instrumentation",
+                                                                                          "HVAC", "HVAC",
+                                                                                          "CIVIL", "Civil",
+                                                                                          "STRUCTURAL", "Structural",
+                                                                                          "FIREPROOFING", "Fireproofing",
+                                                                                          "FIRE_AND_GAS", "Fire & Gas",
+                                                                                          "TELECOM", "Telecom",
+                                                                                          "SAFETY", "Safety",
+                                                                                          "PROCESS", "Process",
+                                                                                          "ARCHITECTURAL", "Architectural",
+                                                                                          If(
+                                                                                              IsBlank(_rawName) ||
+                                                                                              Lower(_rawName) = "null" ||
+                                                                                              Upper(_rawName) = "NO_DISCIPLINE",
+                                                                                              "Other",
+                                                                                              _rawName
+                                                                                          )
+                                                                                      ),
+
+                                                                                  PunchCount:
+                                                                                      Coalesce(
+                                                                                          _source.PunchCount,
+                                                                                          0
+                                                                                      ),
+
+                                                                                  DisciplineColor:
+                                                                                      Switch(
+                                                                                          _canonicalCode,
+                                                                                          "ELECTRICAL", "#F97316",
+                                                                                          "PIPING", "#14B8A6",
+                                                                                          "MECHANICAL", "#2563EB",
+                                                                                          "INSTRUMENTATION", "#8B5CF6",
+                                                                                          "HVAC", "#0EA5E9",
+                                                                                          "CIVIL", "#06B6D4",
+                                                                                          "STRUCTURAL", "#6366F1",
+                                                                                          "FIREPROOFING", "#DC2626",
+                                                                                          "FIRE_AND_GAS", "#E11D48",
+                                                                                          "TELECOM", "#22C55E",
+                                                                                          "SAFETY", "#F59E0B",
+                                                                                          "PROCESS", "#0F766E",
+                                                                                          "ARCHITECTURAL", "#A855F7",
+                                                                                          "#64748B"
+                                                                                      ),
+
+                                                                                  DisciplineOrder:
+                                                                                      Switch(
+                                                                                          _canonicalCode,
+                                                                                          "ELECTRICAL", 1,
+                                                                                          "PIPING", 2,
+                                                                                          "MECHANICAL", 3,
+                                                                                          "INSTRUMENTATION", 4,
+                                                                                          "CIVIL", 5,
+                                                                                          "HVAC", 6,
+                                                                                          "STRUCTURAL", 7,
+                                                                                          "TELECOM", 8,
+                                                                                          "FIRE_AND_GAS", 9,
+                                                                                          "FIREPROOFING", 10,
+                                                                                          "SAFETY", 11,
+                                                                                          "PROCESS", 12,
+                                                                                          "ARCHITECTURAL", 13,
+                                                                                          999
+                                                                                      )
+                                                                              }
+                                                                          )
+                                                                      )
+                                                                  )
+                                                              )
+                                                      },
+
+                                                      ClearCollect(
+                                                          colPunchExecutiveDisciplineDistribution,
+
+                                                          SortByColumns(
+                                                              ForAll(
+                                                                  GroupBy(
+                                                                      _normalizedDistribution,
+                                                                      DisciplineCode,
+                                                                      DisciplineName,
+                                                                      DisciplineColor,
+                                                                      DisciplineOrder,
+                                                                      DisciplineRows
+                                                                  ) As _discipline,
+
+                                                                  {
+                                                                      DisciplineCode:
+                                                                          _discipline.DisciplineCode,
+
+                                                                      DisciplineName:
+                                                                          _discipline.DisciplineName,
+
+                                                                      PunchCount:
+                                                                          Sum(
+                                                                              _discipline.DisciplineRows,
+                                                                              PunchCount
+                                                                          ),
+
+                                                                      DisciplineColor:
+                                                                          _discipline.DisciplineColor,
+
+                                                                      DisciplineOrder:
+                                                                          _discipline.DisciplineOrder
+                                                                  }
+                                                              ),
+
+                                                              "PunchCount",
+                                                              SortOrder.Descending,
+
+                                                              "DisciplineOrder",
+                                                              SortOrder.Ascending,
+
+                                                              "DisciplineName",
+                                                              SortOrder.Ascending
+                                                          )
+                                                      )
+                                                  )
                                               )
                                           )
                                       );
@@ -10201,85 +10454,128 @@ Screens:
                                       // SERVER PAGE METADATA
                                       // =====================================================
 
-                                      Set(
-                                          varPunchExecutiveGridPage,
+                                      // =====================================================
+              // SERVER PAGE METADATA
+              // Contract v1.2: SQL is authoritative
+              // =====================================================
+
+              Set(
+                  varPunchExecutiveGridPage,
+                  Max(
+                      1,
+                      Value(
+                          Coalesce(
+                              Text(_payload.pageNumber),
+                              Text(varPunchExecutiveGridPage)
+                          )
+                      )
+                  )
+              );
+
+              Set(
+                  varPunchExecutiveGridPageSize,
+                  Max(
+                      1,
+                      Value(
+                          Coalesce(
+                              Text(_payload.pageSize),
+                              Text(varPunchExecutiveGridPageSize)
+                          )
+                      )
+                  )
+              );
+
+              Set(
+                  varPunchExecutiveGridTotalRows,
+                  Max(
+                      0,
+                      Value(
+                          Coalesce(
+                              Text(_payload.totalRows),
+                              Text(
+                                  CountRows(
+                                      colPunchExecutiveGridFiltered
+                                  )
+                              ),
+                              "0"
+                          )
+                      )
+                  )
+              );
+
+              Set(
+                  varPunchExecutiveGridTotalPages,
+                  Max(
+                      0,
+                      Value(
+                          Coalesce(
+                              Text(_payload.totalPages),
+
+                              If(
+                                  varPunchExecutiveGridTotalRows = 0,
+                                  "0",
+
+                                  Text(
+                                      RoundUp(
+                                          varPunchExecutiveGridTotalRows /
                                           Max(
                                               1,
-                                              Value(
-                                                  Coalesce(
-                                                      Text(_payload.pageNumber),
-                                                      Text(varPunchExecutiveGridPage)
-                                                  )
-                                              )
-                                          )
-                                      );
+                                              varPunchExecutiveGridPageSize
+                                          ),
+                                          0
+                                      )
+                                  )
+                              )
+                          )
+                      )
+                  )
+              );
 
-                                      Set(
-                                          varPunchExecutiveGridPageSize,
-                                          Max(
-                                              1,
-                                              Value(
-                                                  Coalesce(
-                                                      Text(_payload.pageSize),
-                                                      Text(varPunchExecutiveGridPageSize)
-                                                  )
-                                              )
-                                          )
-                                      );
+              Set(
+                  varPunchExecutiveGridHasPreviousPage,
+                  If(
+                      IsBlank(
+                          Text(_payload.hasPreviousPage)
+                      ),
 
-                                      Set(
-                                          varPunchExecutiveGridTotalRows,
-                                          Max(
-                                              CountRows(
-                                                  colPunchExecutiveGridFiltered
-                                              ),
+                      varPunchExecutiveGridPage > 1,
 
-                                              If(
-                                                  CountRows(
-                                                      colPunchExecutiveSelection
-                                                  ) > 0,
+                      Lower(
+                          Text(_payload.hasPreviousPage)
+                      ) = "true" ||
+                      Text(_payload.hasPreviousPage) = "1"
+                  )
+              );
 
-                                                  Value(
-                                                      First(
-                                                          colPunchExecutiveSelection
-                                                      ).PunchCount
-                                                  ),
+              Set(
+                  varPunchExecutiveGridHasNextPage,
+                  If(
+                      IsBlank(
+                          Text(_payload.hasNextPage)
+                      ),
 
-                                                  0
-                                              ),
+                      varPunchExecutiveGridPage <
+                          varPunchExecutiveGridTotalPages,
 
-                                              Value(
-                                                  Coalesce(
-                                                      Text(_payload.totalRows),
-                                                      "0"
-                                                  )
-                                              )
-                                          )
-                                      );
+                      Lower(
+                          Text(_payload.hasNextPage)
+                      ) = "true" ||
+                      Text(_payload.hasNextPage) = "1"
+                  )
+              );
 
-                                      Set(
-                                          varPunchExecutiveGridTotalPages,
-                                          If(
-                                              varPunchExecutiveGridTotalRows = 0,
-                                              0,
-                                              RoundUp(
-                                                  varPunchExecutiveGridTotalRows /
-                                                  varPunchExecutiveGridPageSize,
-                                                  0
-                                              )
-                                          )
-                                      );
-
-                                      Set(
-                                          varPunchExecutiveGridHasPreviousPage,
-                                          varPunchExecutiveGridPage > 1
-                                      );
-
-                                      Set(
-                                          varPunchExecutiveGridHasNextPage,
-                                          varPunchExecutiveGridPage <
-                                          varPunchExecutiveGridTotalPages
-                                      );
+              Set(
+                  varPunchDrillDisciplineCode,
+                  Upper(
+                      Trim(
+                          Coalesce(
+                              Text(_payload.disciplineCode),
+                              varHomePunchSelectedDisciplineCode,
+                              ""
+                          )
+                      )
+                  )
+              );
 
                                       Set(varPunchExecutiveGridError, "");
 
