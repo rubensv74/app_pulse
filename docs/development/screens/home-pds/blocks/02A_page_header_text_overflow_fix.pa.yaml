@@ -1,0 +1,103 @@
+# HOME_PDS — BLOCK 02A — PAGE HEADER TEXT OVERFLOW VISUAL FIX
+#
+# Status: PUBLISHED — PENDING POWER APPS STUDIO REVALIDATION
+# Operation: PATCH
+# Target component: cmp_PageHeaderPro
+# Depends on: Block 02
+# Visual QA rule: VQA-001
+# Normative reference: docs/design-system/POWER_APPS_VISUAL_QA_GUARDRAILS.md
+#
+# Purpose:
+# - eliminate unintended internal scrollbars in static ModernText controls;
+# - make the single-line sizing contract explicit;
+# - preserve the accepted Page Header architecture and 80 px outer height.
+#
+# IMPORTANT:
+# This is a targeted property patch, not a complete component replacement.
+# Apply the listed properties to the existing controls in cmp_PageHeaderPro.
+# Do not change business events, colors, widths, context logic or component inputs.
+#
+# Studio validation:
+# [ ] no small vertical scrollbar beside title/subtitle;
+# [ ] no small vertical scrollbar in Context 1/2/3 label/value;
+# [ ] title and subtitle remain vertically balanced;
+# [ ] context label/value remain vertically balanced inside 52 px surfaces;
+# [ ] chevrons remain centered;
+# [ ] no text is vertically clipped;
+# [ ] no new App Checker error attributable to this patch.
+
+Patch:
+  cmp_PageHeaderPro:
+    lblPH_Title:
+      AutoHeight: =false
+      Wrap: =false
+      Height: =30
+      Y: =0
+
+    lblPH_Subtitle:
+      AutoHeight: =false
+      Wrap: =false
+      Height: =20
+      Y: =31
+
+    lblPH_Context1Label:
+      AutoHeight: =false
+      Wrap: =false
+      Height: =18
+      Y: =5
+
+    lblPH_Context1Value:
+      AutoHeight: =false
+      Wrap: =false
+      Height: =22
+      Y: =24
+
+    lblPH_Context1Chevron:
+      AutoHeight: =false
+      Wrap: =false
+      Height: =22
+      Y: =23
+
+    lblPH_Context2Label:
+      AutoHeight: =false
+      Wrap: =false
+      Height: =18
+      Y: =5
+
+    lblPH_Context2Value:
+      AutoHeight: =false
+      Wrap: =false
+      Height: =22
+      Y: =24
+
+    lblPH_Context2Chevron:
+      AutoHeight: =false
+      Wrap: =false
+      Height: =22
+      Y: =23
+
+    lblPH_Context3Label:
+      AutoHeight: =false
+      Wrap: =false
+      Height: =18
+      Y: =5
+
+    lblPH_Context3Value:
+      AutoHeight: =false
+      Wrap: =false
+      Height: =22
+      Y: =24
+
+    lblPH_Context3Chevron:
+      AutoHeight: =false
+      Wrap: =false
+      Height: =22
+      Y: =23
+
+# Notes:
+# - Page Header title/subtitle/context content is intentionally single-line.
+# - Wrap=false prevents these controls from becoming accidental mini scroll regions.
+# - Fixed heights are deliberately larger than the previous compact values.
+# - If Studio still exposes an internal scrollbar for the current Power Apps control build,
+#   use AutoHeight=true for the affected static text and revalidate parent geometry before
+#   accepting the component. Do not suppress or ignore the visible artifact.
