@@ -2,25 +2,25 @@ ComponentDefinitions:
   cmp_SkeletonLoader:
     DefinitionType: CanvasComponent
     CustomProperties:
-      VisibleState:
-        PropertyKind: Input
-        DataType: Boolean
-        Default: =true
       BackgroundColor:
         PropertyKind: Input
         DataType: Color
         Default: =ColorValue("#FFFFFF")
-      SkeletonColor:
-        PropertyKind: Input
-        DataType: Color
-        Default: =ColorValue("#E8EEF6")
       BorderColor:
         PropertyKind: Input
         DataType: Color
         Default: =ColorValue("#E2E8F0")
+      SkeletonColor:
+        PropertyKind: Input
+        DataType: Color
+        Default: =ColorValue("#E8EEF6")
+      VisibleState:
+        PropertyKind: Input
+        DataType: Boolean
+        Default: =true
     Properties:
-      Width: =900
       Height: =280
+      Width: =900
     Children:
       - conSKL_Root:
           Control: GroupContainer@1.5.0
