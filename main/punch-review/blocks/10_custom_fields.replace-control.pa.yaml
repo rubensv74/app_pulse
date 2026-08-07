@@ -1,0 +1,1224 @@
+# BLOCK 10 — CUSTOM FIELDS
+#
+# Operation: REPLACE CONTROL COMPLETELY.
+# Target control: conPR_CustomFieldsSlot
+# Parent: conPR_RightColumn
+#
+# Replace the complete placeholder created in Block 03 with this card.
+# Do not keep lblPR_CustomFieldsPlaceholder.
+#
+# Dependencies:
+# - Blocks 01–09 validated.
+# - Block 04 provides colPunchReviewFieldsUI, colPunchReviewFieldsBase,
+#   colPunchReviewFieldsDirty and varPunchReviewFields* runtime state.
+# - The following flows must exist in the app:
+#   WarRoom_GetCustomBundle
+#   WarRoom_SaveCustomBulk
+#
+# Confirmed load contract from the current Punch drawer:
+# WarRoom_GetCustomBundle.Run(ProjectId, EntityType, RecordId).bundlejson
+# bundlejson.merged contains definitions + current values.
+#
+# Confirmed save contract from cmp_DetailDrawer_old:
+# WarRoom_SaveCustomBulk.Run(
+#     ProjectId,
+#     EntityType,
+#     RecordId,
+#     JSON(colDirty, JSONFormat.Compact),
+#     UserEmail
+# )
+#
+# Supported field types in this block:
+# - Text
+# - Number
+# - YesNo
+# - Date
+# - Choice
+# - MultiChoice
+#
+# Permission parity with the existing drawer:
+# - manager: edit/save/reset
+# - other roles: read-only
+#
+# Scope:
+# - Loads real custom fields for the selected Punch.
+# - Renders controls according to FieldType.
+# - Tracks dirty values in colPunchReviewFieldsDirty.
+# - Saves changes through the existing bulk-save flow.
+# - Reloads the authoritative merged bundle returned by the save flow.
+# - Marks the current queue row dirty while local changes exist.
+# - Registers CUSTOM_FIELDS_SAVED in Session Activity after success.
+#
+# Out of scope:
+# - Creating or modifying field definitions.
+# - Manage Fields administration.
+# - Permanent reviewed-state persistence.
+# - Full unsaved-change modal (Block 13). Block 10A temporarily blocks
+#   navigation while custom-field changes remain unsaved.
+#
+# Source compatibility:
+# Every field editor control below already exists in the current
+# cmp_DetailDrawer_old source with the same control version:
+# ModernTextInput@1.1.1, ModernNumberInput@1.1.1,
+# ModernDatePicker@1.0.1, Toggle@1.1.5 and Classic/ComboBox@2.4.0.
+#
+# Validation:
+# 1. The card imports without PA1001/PA2108.
+# 2. No selected Punch shows the deliberate empty state.
+# 3. A real Punch loads bundlejson.merged.
+# 4. Each supported FieldType displays the correct editor.
+# 5. Editing creates exactly one dirty row per FieldKey.
+# 6. Reset restores the server-loaded base values.
+# 7. Save calls WarRoom_SaveCustomBulk and clears dirty state on success.
+
+- conPR_CustomFieldsCard:
+    Control: GroupContainer@1.5.0
+    Variant: AutoLayout
+    Properties:
+      AlignInContainer: =AlignInContainer.Stretch
+      BorderColor: =varTheme_Border
+      BorderThickness: =1
+      DropShadow: =DropShadow.Semilight
+      Fill: =varTheme_Surface
+      FillPortions: =1
+      LayoutAlignItems: =LayoutAlignItems.Stretch
+      LayoutDirection: =LayoutDirection.Vertical
+      LayoutGap: =0
+      LayoutMinHeight: =220
+      LayoutMinWidth: =300
+      RadiusBottomLeft: =12
+      RadiusBottomRight: =12
+      RadiusTopLeft: =12
+      RadiusTopRight: =12
+      Width: =Parent.Width
+    Children:
+      - btnPR_LoadCustomFields:
+          Control: Classic/Button@2.2.0
+          Properties:
+            Height: =1
+            OnSelect: |-
+              =
+              If(
+                  IsBlank(varPunchReviewCurrentId),
+
+                  Clear(colPunchReviewFieldsUI);
+                  Clear(colPunchReviewFieldsBase);
+                  Clear(colPunchReviewFieldsDirty);
+                  Set(varPunchReviewFieldsError, "");
+                  Set(varPunchReviewFieldsLoading, false);
+                  Set(varPunchReviewDirty, false),
+
+                  IsBlank(varProjectId),
+
+                  Clear(colPunchReviewFieldsUI);
+                  Clear(colPunchReviewFieldsBase);
+                  Clear(colPunchReviewFieldsDirty);
+                  Set(
+                      varPunchReviewFieldsError,
+                      "No active project is available for loading custom fields."
+                  );
+                  Set(varPunchReviewFieldsLoading, false);
+                  Set(varPunchReviewDirty, false),
+
+                  Set(varPunchReviewFieldsLoading, true);
+                  Set(varPunchReviewFieldsError, "");
+                  Set(varPunchReviewDirty, false);
+                  Clear(colPunchReviewFieldsDirty);
+                  Clear(colPunchReviewFieldsUI);
+                  Clear(colPunchReviewFieldsBase);
+
+                  IfError(
+                      With(
+                          {
+                              resp:
+                                  WarRoom_GetCustomBundle.Run(
+                                      varProjectId,
+                                      "PUNCH",
+                                      varPunchReviewCurrentId
+                                  )
+                          },
+                          With(
+                              {
+                                  bundle:
+                                      ParseJSON(
+                                          Coalesce(
+                                              resp.bundlejson,
+                                              "{}"
+                                          )
+                                      )
+                              },
+                              ClearCollect(
+                                  colPunchReviewFieldsUI,
+                                  ForAll(
+                                      Table(bundle.merged),
+                                      With(
+                                          {r: ThisRecord.Value},
+                                          {
+                                              FieldKey:
+                                                  Coalesce(Text(r.FieldKey), ""),
+                                              FieldLabel:
+                                                  Coalesce(Text(r.Label), Text(r.FieldKey), ""),
+                                              FieldType:
+                                                  Coalesce(Text(r.FieldType), "Text"),
+                                              HelpText:
+                                                  Coalesce(Text(r.HelpText), ""),
+                                              IsRequired:
+                                                  Boolean(r.IsRequired),
+                                              IsPinned:
+                                                  Boolean(r.IsPinned),
+                                              IsEditable:
+                                                  Lower(Coalesce(varUserRole, "reader")) = "manager",
+                                              SortOrder:
+                                                  If(
+                                                      IsBlank(Text(r.SortOrder)) ||
+                                                      Text(r.SortOrder) = "null",
+                                                      0,
+                                                      Value(Text(r.SortOrder))
+                                                  ),
+                                              OptionsJson:
+                                                  Coalesce(Text(r.OptionsJson), ""),
+                                              ValueText:
+                                                  Coalesce(Text(r.ValueText), ""),
+                                              ValueNumber:
+                                                  If(
+                                                      IsBlank(Text(r.ValueNumber)) ||
+                                                      Text(r.ValueNumber) = "null",
+                                                      Blank(),
+                                                      Value(Text(r.ValueNumber))
+                                                  ),
+                                              ValueDate:
+                                                  If(
+                                                      IsBlank(Text(r.ValueDate)) ||
+                                                      Text(r.ValueDate) = "null",
+                                                      Blank(),
+                                                      DateValue(Text(r.ValueDate))
+                                                  ),
+                                              ValueBool:
+                                                  Boolean(r.ValueBool),
+                                              ValueJson:
+                                                  Coalesce(Text(r.ValueJson), ""),
+                                              LastUpdatedOn:
+                                                  If(
+                                                      IsBlank(Text(r.LastUpdatedOn)) ||
+                                                      Text(r.LastUpdatedOn) = "null",
+                                                      Blank(),
+                                                      DateTimeValue(Text(r.LastUpdatedOn))
+                                                  ),
+                                              LastUpdatedByEmail:
+                                                  Coalesce(Text(r.LastUpdatedByEmail), "")
+                                          }
+                                      )
+                                  )
+                              );
+
+                              ClearCollect(
+                                  colPunchReviewFieldsBase,
+                                  colPunchReviewFieldsUI
+                              )
+                          )
+                      ),
+
+                      Set(
+                          varPunchReviewFieldsError,
+                          Coalesce(
+                              FirstError.Message,
+                              "Custom fields could not be loaded."
+                          )
+                      );
+                      Clear(colPunchReviewFieldsUI);
+                      Clear(colPunchReviewFieldsBase)
+                  );
+
+                  UpdateIf(
+                      colPunchReviewQueue,
+                      PunchIdNumber = varPunchReviewCurrentId,
+                      {IsDirty: false}
+                  );
+
+                  Set(varPunchReviewFieldsLoading, false)
+              )
+            Text: =""
+            Visible: =false
+            Width: =1
+      - btnPR_SaveCustomFields:
+          Control: Classic/Button@2.2.0
+          Properties:
+            Height: =1
+            OnSelect: |-
+              =
+              If(
+                  IsBlank(varPunchReviewCurrentId),
+
+                  Notify(
+                      "Select a Punch before saving custom fields.",
+                      NotificationType.Information
+                  ),
+
+                  Lower(Coalesce(varUserRole, "reader")) <> "manager",
+
+                  Notify(
+                      "Your current role has read-only access to custom fields.",
+                      NotificationType.Warning
+                  ),
+
+                  CountRows(colPunchReviewFieldsDirty) = 0,
+
+                  Notify(
+                      "There are no custom-field changes to save.",
+                      NotificationType.Information
+                  ),
+
+                  IsBlank(varProjectId),
+
+                  Notify(
+                      "No active project is available.",
+                      NotificationType.Error
+                  ),
+
+                  With(
+                      {
+                          currentPunchId: varPunchReviewCurrentId,
+                          currentPunchCode:
+                              Coalesce(
+                                  varPunchReviewCurrent.PunchCode,
+                                  Text(varPunchReviewCurrentId)
+                              ),
+                          saveJson:
+                              JSON(
+                                  colPunchReviewFieldsDirty,
+                                  JSONFormat.Compact
+                              )
+                      },
+
+                      Set(varPunchReviewFieldsSaving, true);
+                      Set(varPunchReviewFieldsError, "");
+
+                      IfError(
+                          With(
+                              {
+                                  resp:
+                                      WarRoom_SaveCustomBulk.Run(
+                                          varProjectId,
+                                          "PUNCH",
+                                          currentPunchId,
+                                          saveJson,
+                                          Lower(User().Email)
+                                      )
+                              },
+                              With(
+                                  {
+                                      saveOuter:
+                                          Table(
+                                              ParseJSON(
+                                                  Coalesce(
+                                                      resp.result,
+                                                      "[]"
+                                                  )
+                                              )
+                                          )
+                                  },
+                                  If(
+                                      CountRows(saveOuter) = 0,
+
+                                      Set(
+                                          varPunchReviewFieldsError,
+                                          "Save returned no data."
+                                      ),
+
+                                      With(
+                                          {
+                                              bundle:
+                                                  ParseJSON(
+                                                      Text(
+                                                          First(saveOuter).Value.result
+                                                      )
+                                                  )
+                                          },
+                                          ClearCollect(
+                                              colPunchReviewFieldsUI,
+                                              ForAll(
+                                                  Table(bundle.merged),
+                                                  With(
+                                                      {r: ThisRecord.Value},
+                                                      {
+                                                          FieldKey:
+                                                              Coalesce(Text(r.FieldKey), ""),
+                                                          FieldLabel:
+                                                              Coalesce(Text(r.Label), Text(r.FieldKey), ""),
+                                                          FieldType:
+                                                              Coalesce(Text(r.FieldType), "Text"),
+                                                          HelpText:
+                                                              Coalesce(Text(r.HelpText), ""),
+                                                          IsRequired:
+                                                              Boolean(r.IsRequired),
+                                                          IsPinned:
+                                                              Boolean(r.IsPinned),
+                                                          IsEditable:
+                                                              Lower(Coalesce(varUserRole, "reader")) = "manager",
+                                                          SortOrder:
+                                                              If(
+                                                                  IsBlank(Text(r.SortOrder)) ||
+                                                                  Text(r.SortOrder) = "null",
+                                                                  0,
+                                                                  Value(Text(r.SortOrder))
+                                                              ),
+                                                          OptionsJson:
+                                                              Coalesce(Text(r.OptionsJson), ""),
+                                                          ValueText:
+                                                              Coalesce(Text(r.ValueText), ""),
+                                                          ValueNumber:
+                                                              If(
+                                                                  IsBlank(Text(r.ValueNumber)) ||
+                                                                  Text(r.ValueNumber) = "null",
+                                                                  Blank(),
+                                                                  Value(Text(r.ValueNumber))
+                                                              ),
+                                                          ValueDate:
+                                                              If(
+                                                                  IsBlank(Text(r.ValueDate)) ||
+                                                                  Text(r.ValueDate) = "null",
+                                                                  Blank(),
+                                                                  DateValue(Text(r.ValueDate))
+                                                              ),
+                                                          ValueBool:
+                                                              Boolean(r.ValueBool),
+                                                          ValueJson:
+                                                              Coalesce(Text(r.ValueJson), ""),
+                                                          LastUpdatedOn:
+                                                              If(
+                                                                  IsBlank(Text(r.LastUpdatedOn)) ||
+                                                                  Text(r.LastUpdatedOn) = "null",
+                                                                  Blank(),
+                                                                  DateTimeValue(Text(r.LastUpdatedOn))
+                                                              ),
+                                                          LastUpdatedByEmail:
+                                                              Coalesce(Text(r.LastUpdatedByEmail), "")
+                                                      }
+                                                  )
+                                              )
+                                          );
+
+                                          ClearCollect(
+                                              colPunchReviewFieldsBase,
+                                              colPunchReviewFieldsUI
+                                          );
+
+                                          Clear(colPunchReviewFieldsDirty);
+                                          Set(varPunchReviewDirty, false);
+
+                                          UpdateIf(
+                                              colPunchReviewQueue,
+                                              PunchIdNumber = currentPunchId,
+                                              {IsDirty: false}
+                                          );
+
+                                          Collect(
+                                              colPunchReviewSessionEvents,
+                                              {
+                                                  EventKey: Text(GUID()),
+                                                  PunchIdNumber: currentPunchId,
+                                                  EventLabel:
+                                                      "Custom fields saved for " &
+                                                      currentPunchCode,
+                                                  EventOn: Now(),
+                                                  EventBy: User().FullName,
+                                                  EventType: "CUSTOM_FIELDS_SAVED"
+                                              }
+                                          );
+
+                                          Notify(
+                                              "Custom fields saved successfully.",
+                                              NotificationType.Success
+                                          )
+                                      )
+                                  )
+                              )
+                          ),
+
+                          Set(
+                              varPunchReviewFieldsError,
+                              Coalesce(
+                                  FirstError.Message,
+                                  "Custom fields could not be saved."
+                              )
+                          )
+                      );
+
+                      Set(varPunchReviewFieldsSaving, false);
+
+                      If(
+                          !IsBlank(varPunchReviewFieldsError),
+                          Notify(
+                              varPunchReviewFieldsError,
+                              NotificationType.Error
+                          )
+                      )
+                  )
+              )
+            Text: =""
+            Visible: =false
+            Width: =1
+      - conPR_CustomFieldsHeader:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =varTheme_Surface
+            FillPortions: =0
+            Height: =58
+            LayoutMinHeight: =58
+            LayoutMinWidth: =280
+            Width: =Parent.Width
+          Children:
+            - lblPR_CustomFieldsTitle:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_Text
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =11
+                  Text: ="Custom Fields"
+                  Width: =150
+                  X: =14
+                  Y: =5
+            - lblPR_CustomFieldsContext:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_TextMuted
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =8
+                  Text: |-
+                    =If(
+                        IsBlank(varPunchReviewCurrentId),
+                        "No Punch selected",
+                        Coalesce(
+                            varPunchReviewCurrent.PunchCode,
+                            Text(varPunchReviewCurrentId)
+                        )
+                    )
+                  Width: =150
+                  X: =14
+                  Y: =29
+            - conPR_CustomFieldsDirtyBadge:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =If(varPunchReviewDirty, ColorValue("#F59E0B"), ColorValue("#CBD5E1"))
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =If(varPunchReviewDirty, ColorValue("#FFFBEB"), ColorValue("#F8FAFC"))
+                  Height: =24
+                  RadiusBottomLeft: =12
+                  RadiusBottomRight: =12
+                  RadiusTopLeft: =12
+                  RadiusTopRight: =12
+                  Width: =64
+                  X: =Parent.Width - 274
+                  Y: =17
+                Children:
+                  - lblPR_CustomFieldsDirty:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =If(varPunchReviewDirty, ColorValue("#92400E"), varTheme_TextMuted)
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =Parent.Height
+                        PaddingBottom: =0
+                        PaddingLeft: =2
+                        PaddingRight: =2
+                        PaddingTop: =0
+                        Size: =7
+                        Text: =If(varPunchReviewDirty, "Unsaved", "Saved")
+                        Width: =Parent.Width
+            - btnPR_CustomFieldsRefresh:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =varTheme_Border
+                  BorderThickness: =1
+                  Color: =varTheme_PulseBlueDark
+                  DisplayMode: |-
+                    =If(
+                        varPunchReviewFieldsLoading ||
+                        varPunchReviewFieldsSaving ||
+                        varPunchReviewDirty ||
+                        IsBlank(varPunchReviewCurrentId),
+                        DisplayMode.Disabled,
+                        DisplayMode.Edit
+                    )
+                  Fill: =varTheme_Surface
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =28
+                  HoverFill: =varTheme_SurfaceAlt
+                  OnSelect: =Select(btnPR_LoadCustomFields)
+                  RadiusBottomLeft: =7
+                  RadiusBottomRight: =7
+                  RadiusTopLeft: =7
+                  RadiusTopRight: =7
+                  Size: =8
+                  Text: ="↻"
+                  Width: =32
+                  X: =Parent.Width - 202
+                  Y: =15
+            - btnPR_CustomFieldsReset:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =varTheme_Border
+                  BorderThickness: =1
+                  Color: =varTheme_TextMuted
+                  DisplayMode: |-
+                    =If(
+                        varPunchReviewFieldsLoading ||
+                        varPunchReviewFieldsSaving ||
+                        !varPunchReviewDirty ||
+                        Lower(Coalesce(varUserRole, "reader")) <> "manager",
+                        DisplayMode.Disabled,
+                        DisplayMode.Edit
+                    )
+                  Fill: =varTheme_Surface
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =28
+                  HoverFill: =varTheme_SurfaceAlt
+                  OnSelect: |-
+                    =ClearCollect(
+                        colPunchReviewFieldsUI,
+                        colPunchReviewFieldsBase
+                    );
+                    Clear(colPunchReviewFieldsDirty);
+                    Set(varPunchReviewDirty, false);
+                    UpdateIf(
+                        colPunchReviewQueue,
+                        PunchIdNumber = varPunchReviewCurrentId,
+                        {IsDirty: false}
+                    );
+                    Notify(
+                        "Unsaved custom-field changes were reset.",
+                        NotificationType.Information
+                    )
+                  RadiusBottomLeft: =7
+                  RadiusBottomRight: =7
+                  RadiusTopLeft: =7
+                  RadiusTopRight: =7
+                  Size: =8
+                  Text: ="Reset"
+                  Width: =60
+                  X: =Parent.Width - 164
+                  Y: =15
+            - btnPR_CustomFieldsSave:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =varTheme_PulseBlueDark
+                  BorderThickness: =1
+                  Color: =Color.White
+                  DisplayMode: |-
+                    =If(
+                        varPunchReviewFieldsLoading ||
+                        varPunchReviewFieldsSaving ||
+                        !varPunchReviewDirty ||
+                        Lower(Coalesce(varUserRole, "reader")) <> "manager",
+                        DisplayMode.Disabled,
+                        DisplayMode.Edit
+                    )
+                  Fill: =varTheme_PulseBlueDark
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =28
+                  HoverFill: =ColorValue("#0B63CE")
+                  OnSelect: =Select(btnPR_SaveCustomFields)
+                  RadiusBottomLeft: =7
+                  RadiusBottomRight: =7
+                  RadiusTopLeft: =7
+                  RadiusTopRight: =7
+                  Size: =8
+                  Text: =If(varPunchReviewFieldsSaving, "Saving...", "Save")
+                  Width: =72
+                  X: =Parent.Width - 94
+                  Y: =15
+      - rectPR_CustomFieldsDivider:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            BorderStyle: =BorderStyle.None
+            Fill: =varTheme_Border
+            FillPortions: =0
+            Height: =1
+            Width: =Parent.Width
+      - conPR_CustomFieldsListHost:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =varTheme_Surface
+            FillPortions: =1
+            LayoutMinHeight: =160
+            LayoutMinWidth: =280
+            Width: =Parent.Width
+          Children:
+            - galPR_CustomFields:
+                Control: Gallery@2.15.0
+                Variant: Vertical
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Fill: =varTheme_Surface
+                  Height: =Parent.Height
+                  Items: |-
+                    =SortByColumns(
+                        colPunchReviewFieldsUI,
+                        "SortOrder",
+                        SortOrder.Ascending
+                    )
+                  ShowScrollbar: =true
+                  TemplateFill: =varTheme_Surface
+                  TemplatePadding: =0
+                  TemplateSize: =116
+                  Visible: |-
+                    =!varPunchReviewFieldsLoading &&
+                    IsBlank(varPunchReviewFieldsError) &&
+                    !IsBlank(varPunchReviewCurrentId) &&
+                    CountRows(colPunchReviewFieldsUI) > 0
+                  Width: =Parent.Width
+                Children:
+                  - rectPR_CustomFieldRowDivider:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        BorderStyle: =BorderStyle.None
+                        Fill: =varTheme_Border
+                        Height: =1
+                        Width: =Parent.TemplateWidth - 24
+                        X: =12
+                        Y: =Parent.TemplateHeight - 1
+                  - lblPR_CustomFieldLabel:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_Text
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =22
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =ThisItem.FieldLabel & If(ThisItem.IsRequired, " *", "")
+                        Width: =Parent.TemplateWidth - 28
+                        X: =14
+                        Y: =8
+                  - lblPR_CustomFieldMeta:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_TextMuted
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =18
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =7
+                        Text: |-
+                          =ThisItem.FieldKey &
+                          " · " &
+                          ThisItem.FieldType &
+                          If(
+                              IsBlank(ThisItem.HelpText),
+                              "",
+                              " · " & ThisItem.HelpText
+                          )
+                        Width: =Parent.TemplateWidth - 28
+                        X: =14
+                        Y: =29
+                  - txtPR_CustomFieldText:
+                      Control: ModernTextInput@1.1.1
+                      Properties:
+                        Appearance: =Appearance.Outline
+                        BorderColor: =varTheme_Border
+                        Default: =ThisItem.ValueText
+                        DisplayMode: =If(ThisItem.IsEditable, DisplayMode.Edit, DisplayMode.View)
+                        Fill: =varTheme_Surface
+                        Height: =56
+                        OnChange: |-
+                          =RemoveIf(
+                              colPunchReviewFieldsDirty,
+                              FieldKey = ThisItem.FieldKey
+                          );
+                          Collect(
+                              colPunchReviewFieldsDirty,
+                              {
+                                  FieldKey: ThisItem.FieldKey,
+                                  FieldType: ThisItem.FieldType,
+                                  ValueText: Self.Text,
+                                  ValueNumber: Blank(),
+                                  ValueDate: Blank(),
+                                  ValueBool: false,
+                                  ValueJson: ""
+                              }
+                          );
+                          Patch(
+                              colPunchReviewFieldsUI,
+                              LookUp(
+                                  colPunchReviewFieldsUI,
+                                  FieldKey = ThisItem.FieldKey
+                              ),
+                              {ValueText: Self.Text}
+                          );
+                          Set(varPunchReviewDirty, true);
+                          UpdateIf(
+                              colPunchReviewQueue,
+                              PunchIdNumber = varPunchReviewCurrentId,
+                              {IsDirty: true}
+                          )
+                        Placeholder: ="Enter value..."
+                        Type: =TextInputType.Multiline
+                        Visible: =Lower(Trim(ThisItem.FieldType)) = "text"
+                        Width: =Parent.TemplateWidth - 28
+                        X: =14
+                        Y: =50
+                  - numPR_CustomFieldNumber:
+                      Control: ModernNumberInput@1.1.1
+                      Properties:
+                        Default: =If(IsBlank(ThisItem.ValueNumber), Blank(), Text(ThisItem.ValueNumber))
+                        DisplayMode: =If(ThisItem.IsEditable, DisplayMode.Edit, DisplayMode.View)
+                        Height: =38
+                        OnChange: |-
+                          =RemoveIf(
+                              colPunchReviewFieldsDirty,
+                              FieldKey = ThisItem.FieldKey
+                          );
+                          Collect(
+                              colPunchReviewFieldsDirty,
+                              {
+                                  FieldKey: ThisItem.FieldKey,
+                                  FieldType: ThisItem.FieldType,
+                                  ValueText: "",
+                                  ValueNumber: If(IsBlank(Self.Value), Blank(), Value(Self.Value)),
+                                  ValueDate: Blank(),
+                                  ValueBool: false,
+                                  ValueJson: ""
+                              }
+                          );
+                          Patch(
+                              colPunchReviewFieldsUI,
+                              LookUp(
+                                  colPunchReviewFieldsUI,
+                                  FieldKey = ThisItem.FieldKey
+                              ),
+                              {ValueNumber: If(IsBlank(Self.Value), Blank(), Value(Self.Value))}
+                          );
+                          Set(varPunchReviewDirty, true);
+                          UpdateIf(
+                              colPunchReviewQueue,
+                              PunchIdNumber = varPunchReviewCurrentId,
+                              {IsDirty: true}
+                          )
+                        Visible: =Lower(Trim(ThisItem.FieldType)) = "number"
+                        Width: =Parent.TemplateWidth - 28
+                        X: =14
+                        Y: =56
+                  - tglPR_CustomFieldYesNo:
+                      Control: Toggle@1.1.5
+                      Properties:
+                        DisplayMode: =If(ThisItem.IsEditable, DisplayMode.Edit, DisplayMode.View)
+                        Height: =38
+                        Label: ="Yes / No"
+                        OnCheck: |-
+                          =RemoveIf(
+                              colPunchReviewFieldsDirty,
+                              FieldKey = ThisItem.FieldKey
+                          );
+                          Collect(
+                              colPunchReviewFieldsDirty,
+                              {
+                                  FieldKey: ThisItem.FieldKey,
+                                  FieldType: ThisItem.FieldType,
+                                  ValueText: "",
+                                  ValueNumber: Blank(),
+                                  ValueDate: Blank(),
+                                  ValueBool: true,
+                                  ValueJson: ""
+                              }
+                          );
+                          Patch(
+                              colPunchReviewFieldsUI,
+                              LookUp(
+                                  colPunchReviewFieldsUI,
+                                  FieldKey = ThisItem.FieldKey
+                              ),
+                              {ValueBool: true}
+                          );
+                          Set(varPunchReviewDirty, true);
+                          UpdateIf(
+                              colPunchReviewQueue,
+                              PunchIdNumber = varPunchReviewCurrentId,
+                              {IsDirty: true}
+                          )
+                        OnUncheck: |-
+                          =RemoveIf(
+                              colPunchReviewFieldsDirty,
+                              FieldKey = ThisItem.FieldKey
+                          );
+                          Collect(
+                              colPunchReviewFieldsDirty,
+                              {
+                                  FieldKey: ThisItem.FieldKey,
+                                  FieldType: ThisItem.FieldType,
+                                  ValueText: "",
+                                  ValueNumber: Blank(),
+                                  ValueDate: Blank(),
+                                  ValueBool: false,
+                                  ValueJson: ""
+                              }
+                          );
+                          Patch(
+                              colPunchReviewFieldsUI,
+                              LookUp(
+                                  colPunchReviewFieldsUI,
+                                  FieldKey = ThisItem.FieldKey
+                              ),
+                              {ValueBool: false}
+                          );
+                          Set(varPunchReviewDirty, true);
+                          UpdateIf(
+                              colPunchReviewQueue,
+                              PunchIdNumber = varPunchReviewCurrentId,
+                              {IsDirty: true}
+                          )
+                        Visible: =Lower(Trim(ThisItem.FieldType)) = "yesno"
+                        Width: =Parent.TemplateWidth - 28
+                        X: =14
+                        Y: =56
+                  - dpPR_CustomFieldDate:
+                      Control: ModernDatePicker@1.0.1
+                      Properties:
+                        Appearance: =Appearance.Outline
+                        DefaultDate: =ThisItem.ValueDate
+                        DisplayMode: =If(ThisItem.IsEditable, DisplayMode.Edit, DisplayMode.View)
+                        Height: =38
+                        OnChange: |-
+                          =RemoveIf(
+                              colPunchReviewFieldsDirty,
+                              FieldKey = ThisItem.FieldKey
+                          );
+                          Collect(
+                              colPunchReviewFieldsDirty,
+                              {
+                                  FieldKey: ThisItem.FieldKey,
+                                  FieldType: ThisItem.FieldType,
+                                  ValueText: "",
+                                  ValueNumber: Blank(),
+                                  ValueDate: Self.SelectedDate,
+                                  ValueBool: false,
+                                  ValueJson: ""
+                              }
+                          );
+                          Patch(
+                              colPunchReviewFieldsUI,
+                              LookUp(
+                                  colPunchReviewFieldsUI,
+                                  FieldKey = ThisItem.FieldKey
+                              ),
+                              {ValueDate: Self.SelectedDate}
+                          );
+                          Set(varPunchReviewDirty, true);
+                          UpdateIf(
+                              colPunchReviewQueue,
+                              PunchIdNumber = varPunchReviewCurrentId,
+                              {IsDirty: true}
+                          )
+                        Visible: =Lower(Trim(ThisItem.FieldType)) = "date"
+                        Width: =Parent.TemplateWidth - 28
+                        X: =14
+                        Y: =56
+                  - cmbPR_CustomFieldChoice:
+                      Control: Classic/ComboBox@2.4.0
+                      Properties:
+                        BorderColor: =varTheme_Border
+                        ChevronBackground: =varTheme_SurfaceAlt
+                        ChevronFill: =varTheme_TextMuted
+                        Color: =varTheme_Text
+                        DefaultSelectedItems: |-
+                          =If(
+                              Lower(Trim(ThisItem.FieldType)) = "choice",
+                              If(
+                                  IsBlank(ThisItem.ValueText),
+                                  Blank(),
+                                  Table({Value: ThisItem.ValueText})
+                              ),
+                              If(
+                                  Lower(Trim(ThisItem.FieldType)) = "multichoice",
+                                  If(
+                                      IsBlank(ThisItem.ValueJson),
+                                      Blank(),
+                                      ForAll(
+                                          Table(ParseJSON(ThisItem.ValueJson)),
+                                          {Value: Text(Value)}
+                                      )
+                                  ),
+                                  Blank()
+                              )
+                          )
+                        DisplayFields: =["Value"]
+                        DisplayMode: =If(ThisItem.IsEditable, DisplayMode.Edit, DisplayMode.View)
+                        Fill: =varTheme_Surface
+                        Font: =Font.'Segoe UI'
+                        Height: =38
+                        Items: |-
+                          =ForAll(
+                              Table(
+                                  ParseJSON(
+                                      Coalesce(
+                                          ThisItem.OptionsJson,
+                                          "[]"
+                                      )
+                                  )
+                              ),
+                              {Value: Text(Value)}
+                          )
+                        OnChange: |-
+                          =RemoveIf(
+                              colPunchReviewFieldsDirty,
+                              FieldKey = ThisItem.FieldKey
+                          );
+                          With(
+                              {
+                                  valueJson:
+                                      "[" &
+                                      Concat(
+                                          cmbPR_CustomFieldChoice.SelectedItems,
+                                          """" &
+                                          Substitute(
+                                              Value,
+                                              """",
+                                              "\"""
+                                          ) &
+                                          """",
+                                          ","
+                                      ) &
+                                      "]"
+                              },
+                              If(
+                                  Lower(Trim(ThisItem.FieldType)) = "choice",
+                                  Collect(
+                                      colPunchReviewFieldsDirty,
+                                      {
+                                          FieldKey: ThisItem.FieldKey,
+                                          FieldType: ThisItem.FieldType,
+                                          ValueText: Coalesce(cmbPR_CustomFieldChoice.Selected.Value, ""),
+                                          ValueNumber: Blank(),
+                                          ValueDate: Blank(),
+                                          ValueBool: false,
+                                          ValueJson: ""
+                                      }
+                                  );
+                                  Patch(
+                                      colPunchReviewFieldsUI,
+                                      LookUp(
+                                          colPunchReviewFieldsUI,
+                                          FieldKey = ThisItem.FieldKey
+                                      ),
+                                      {ValueText: Coalesce(cmbPR_CustomFieldChoice.Selected.Value, "")}
+                                  ),
+                                  Collect(
+                                      colPunchReviewFieldsDirty,
+                                      {
+                                          FieldKey: ThisItem.FieldKey,
+                                          FieldType: ThisItem.FieldType,
+                                          ValueText: "",
+                                          ValueNumber: Blank(),
+                                          ValueDate: Blank(),
+                                          ValueBool: false,
+                                          ValueJson: valueJson
+                                      }
+                                  );
+                                  Patch(
+                                      colPunchReviewFieldsUI,
+                                      LookUp(
+                                          colPunchReviewFieldsUI,
+                                          FieldKey = ThisItem.FieldKey
+                                      ),
+                                      {ValueJson: valueJson}
+                                  )
+                              )
+                          );
+                          Set(varPunchReviewDirty, true);
+                          UpdateIf(
+                              colPunchReviewQueue,
+                              PunchIdNumber = varPunchReviewCurrentId,
+                              {IsDirty: true}
+                          )
+                        SearchFields: =["Value"]
+                        SelectMultiple: =Lower(Trim(ThisItem.FieldType)) = "multichoice"
+                        Visible: |-
+                          =Lower(Trim(ThisItem.FieldType)) = "choice" ||
+                          Lower(Trim(ThisItem.FieldType)) = "multichoice"
+                        Width: =Parent.TemplateWidth - 28
+                        X: =14
+                        Y: =56
+            - conPR_CustomFieldsLoading:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =varTheme_Surface
+                  Height: =Parent.Height
+                  Visible: =varPunchReviewFieldsLoading || varPunchReviewFieldsSaving
+                  Width: =Parent.Width
+                Children:
+                  - spnPR_CustomFieldsLoading:
+                      Control: Spinner@1.4.6
+                      Properties:
+                        Height: =32
+                        SpinnerColor: =varTheme_PulseBlueDark
+                        Width: =32
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Max(24, (Parent.Height - 60) / 2)
+                  - lblPR_CustomFieldsLoading:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_TextMuted
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =24
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: =If(varPunchReviewFieldsSaving, "Saving custom fields...", "Loading custom fields...")
+                        Width: =Parent.Width - 40
+                        X: =20
+                        Y: =spnPR_CustomFieldsLoading.Y + 38
+            - conPR_CustomFieldsError:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =varTheme_Surface
+                  Height: =Parent.Height
+                  Visible: |-
+                    =!varPunchReviewFieldsLoading &&
+                    !varPunchReviewFieldsSaving &&
+                    !IsBlank(varPunchReviewFieldsError)
+                  Width: =Parent.Width
+                Children:
+                  - lblPR_CustomFieldsErrorTitle:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =ColorValue("#B91C1C")
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: ="Custom fields unavailable"
+                        Width: =Parent.Width - 40
+                        X: =20
+                        Y: =Max(20, Parent.Height / 2 - 42)
+                  - lblPR_CustomFieldsErrorBody:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_TextMuted
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =32
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =7
+                        Text: =varPunchReviewFieldsError
+                        Width: =Parent.Width - 40
+                        X: =20
+                        Y: =lblPR_CustomFieldsErrorTitle.Y + 24
+                  - btnPR_CustomFieldsRetry:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =varTheme_Border
+                        BorderThickness: =1
+                        Color: =varTheme_PulseBlueDark
+                        Fill: =varTheme_Surface
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =28
+                        HoverFill: =varTheme_SurfaceAlt
+                        OnSelect: =Select(btnPR_LoadCustomFields)
+                        RadiusBottomLeft: =7
+                        RadiusBottomRight: =7
+                        RadiusTopLeft: =7
+                        RadiusTopRight: =7
+                        Size: =8
+                        Text: ="Retry"
+                        Width: =74
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =lblPR_CustomFieldsErrorBody.Y + 38
+            - conPR_CustomFieldsEmpty:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =varTheme_Surface
+                  Height: =Parent.Height
+                  Visible: |-
+                    =!varPunchReviewFieldsLoading &&
+                    !varPunchReviewFieldsSaving &&
+                    IsBlank(varPunchReviewFieldsError) &&
+                    (
+                        IsBlank(varPunchReviewCurrentId) ||
+                        CountRows(colPunchReviewFieldsUI) = 0
+                    )
+                  Width: =Parent.Width
+                Children:
+                  - lblPR_CustomFieldsEmpty:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_TextMuted
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =54
+                        PaddingBottom: =0
+                        PaddingLeft: =12
+                        PaddingRight: =12
+                        PaddingTop: =0
+                        Size: =8
+                        Text: |-
+                          =If(
+                              IsBlank(varPunchReviewCurrentId),
+                              "Select a Punch to view its custom fields.",
+                              "No custom fields are configured for this Punch context."
+                          )
+                        Width: =Parent.Width - 32
+                        X: =16
+                        Y: =Max(20, (Parent.Height - Self.Height) / 2)
