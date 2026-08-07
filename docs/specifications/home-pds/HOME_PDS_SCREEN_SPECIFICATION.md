@@ -1,12 +1,13 @@
 # HOME_PDS — Especificación de Pantalla
 
-**Estado:** Proposed / Ready for Phase 0 audit  
+**Estado:** Block 00 validated / Ready for Block 01  
 **Screen name recomendado:** `scr_Home_PDS`  
 **Display title recomendado:** `Punch Control Tower`  
 **Arquetipo primario:** Operational Control Tower  
 **Patrón secundario:** Data Explorer  
 **Design System:** PULSE Design System v1  
 **Método de construcción:** Protocolo de Construcción Modular de Pantallas Power Apps Asistida por IA  
+**Fecha de validación Block 00:** 2026-08-07  
 
 ---
 
@@ -21,7 +22,7 @@ scr_Home        → referencia funcional estable / fallback
 scr_Home_PDS    → nueva implementación PDS
 ```
 
-Objetivos de esta decisión:
+Objetivos:
 
 - eliminar riesgo de regresión durante la modernización;
 - permitir comparar versión actual y versión PDS;
@@ -43,6 +44,7 @@ docs/development/PROTOCOLO_CONSTRUCCION_MODULAR_PANTALLAS_POWER_APPS.md
 docs/development/PULSE_UI_DELIVERY_FRAMEWORK.md
 docs/design-system/PULSE_DESIGN_SYSTEM.md
 docs/design-system/SAAS_INTERFACE_ARCHETYPES.md
+docs/specifications/home-pds/BLOCK_00_FOUNDATION_AUDIT.md
 ```
 
 Referencias funcionales y visuales:
@@ -52,7 +54,15 @@ scr_Home         → contratos, datos, acciones y componentes ya probados
 scr_PunchReview  → referencia de arquitectura SaaS, densidad, estados y organización por módulos
 ```
 
-Antes de construir debe inspeccionarse el YAML canónico actualizado de ambas pantallas y los componentes realmente disponibles en la solución.
+Baselines congelados por Block 00:
+
+```text
+Screens / Components:
+3b71b860ed869a970a5a1b43cc137a580118b30c
+
+SQL schema_warroom:
+17bbe86e25bbb3962df237420136600b6aca12e2
+```
 
 ---
 
@@ -60,7 +70,7 @@ Antes de construir debe inspeccionarse el YAML canónico actualizado de ambas pa
 
 Crear una Home que funcione como **Punch Control Tower** y permita pasar de la visión ejecutiva a la investigación operativa sin perder contexto.
 
-La pantalla debe responder rápidamente:
+Debe responder rápidamente:
 
 1. ¿Cuántos punches existen y cuál es su evolución?
 2. ¿Dónde se concentran los open punches?
@@ -131,7 +141,8 @@ scr_Home_PDS
         │   ├── conHPDS_HeatmapPanel
         │   │   └── Open Punch Concentration
         │   └── conHPDS_DisciplinePanel
-        │       └── Donut + interactive discipline bars
+        │       ├── Pie chart
+        │       └── Interactive discipline bars
         │
         ├── conHPDS_ActiveContext
         │   ├── Context summary / chips
@@ -148,7 +159,7 @@ scr_Home_PDS
             └── Future contextual drawers
 ```
 
-El árbol exacto debe congelarse después de la auditoría Phase 0 y antes de crear YAML productivo.
+El árbol detallado está congelado en `SCREEN_ARCHITECTURE.md` tras la validación de Block 00.
 
 ---
 
@@ -221,21 +232,44 @@ Debe mantener:
 
 ## 8.2. Discipline Distribution
 
-Un único panel coherente con:
+La composición validada del panel es:
 
-- donut proporcional;
+```text
+cmp_PieChartPro
+    +
+interactive horizontal discipline bars
+```
+
+El **pie chart** es la visualización principal de composición porque permite percibir mejor el reparto del total entre disciplinas que un aro fino. Las barras complementan la lectura permitiendo comparar con mayor precisión magnitudes y ranking.
+
+El pie y las barras **no son dos filtros independientes**. Ambos representan la misma dimensión y deben compartir una única selección.
+
+Contrato conceptual:
+
+```text
+Pie segment ─────┐
+                 ├──> Selected Discipline ──> Active Context ──> Data Explorer
+Discipline bar ──┘
+```
+
+El panel debe mostrar:
+
+- pie proporcional;
 - barras por disciplina;
 - count;
 - porcentaje;
 - color estable por disciplina;
-- selección de barra como filtro.
+- selección de pie o barra como el mismo filtro;
+- estados loading/empty/error.
 
-Al seleccionar una disciplina:
+Reglas de selección:
 
-- la barra mantiene su color de datos;
-- el contenedor usa SelectedBg/SelectedBorder PDS;
+- el segmento y la barra conservan el color de disciplina;
+- el selected container usa `SelectedBg` / `SelectedBorder` PDS;
 - Active Context se actualiza;
 - el Data Explorer se recarga o filtra con el mismo contrato funcional validado.
+
+`cmp_DonutPro` queda fuera de este caso de uso concreto. Sigue siendo válido para completion, utilization, capacity, readiness u otras métricas donde el valor central y el progreso circular sean la lectura principal.
 
 ---
 
@@ -287,9 +321,9 @@ El grid no debe ocupar un enorme espacio vacío sin un estado diseñado. Cuando 
 
 ---
 
-# 11. Reutilización permitida
+# 11. Reutilización validada
 
-La auditoría debe clasificar los elementos de Home actual en:
+Block 00 clasifica los elementos mediante:
 
 ```text
 REUSE_AS_IS
@@ -299,21 +333,22 @@ REIMPLEMENT
 DO_NOT_REUSE
 ```
 
-Candidatos esperados a inspección:
+Decisiones principales:
 
-- SidebarNav;
-- KpiCard premium;
-- Heatmap premium;
-- Donut / discipline distribution;
-- DataTable premium;
-- action/filter components;
-- current dashboard data-loading buttons;
-- collections and normalized grid contracts;
-- flow calls;
-- snapshot handling;
-- project/template selection.
+```text
+cmp_SidebarNav       → REUSE_AS_IS inicialmente
+cmp_KpiCardPro       → REUSE_WITH_PDS_INPUTS
+cmp_HeatMapPro       → REUSE_WITH_PDS_INPUTS
+cmp_PieChartPro      → REUSE_WITH_PDS_INPUTS / disciplina
+cmp_DonutPro         → no usar para Discipline Distribution
+cmp_ActionToolbarPro → REUSE_WITH_PDS_INPUTS
+cmp_DataTableProV2   → REUSE_WITH_PDS_INPUTS
+cmp_EmptyState       → REUSE_WITH_PDS_INPUTS / hardening posterior
+cmp_SkeletonLoader   → REUSE_WITH_PDS_INPUTS / hardening posterior
+cmp_DashboardSectionHeader → REIMPLEMENT como patrón PDS cuando corresponda
+```
 
-No debe asumirse el nombre exacto ni contrato de un componente hasta verificar el estado actual del repositorio/solución.
+No debe asumirse el nombre exacto ni contrato de ningún elemento adicional sin verificar el repositorio/solución.
 
 ---
 
@@ -335,61 +370,59 @@ No debe duplicarse un flow solo para alimentar la nueva pantalla si el contrato 
 
 La nueva pantalla puede tener variables de UI propias con prefijo `varHPDS_` cuando ayude a aislar el desarrollo.
 
+SQL/Flow siguen siendo autoridad de snapshot, agregación y paginación. Home_PDS no cargará toda la población de punches para reagruparla en cliente.
+
 ---
 
-# 13. Plan inicial de bloques
-
-La secuencia exacta se congela tras Phase 0. Propuesta inicial:
+# 13. Plan de bloques validado
 
 ```text
-00  Repository + compatibility audit
-01  Screen shell + isolated navigation-safe root
-02  PDS Page Header
-03  Main Control Tower layout + placeholders
-04  Typed runtime UI state
-05  KPI strip with test/local values
-06  Heatmap panel shell + existing component contract
-07  Discipline distribution panel shell + existing component contract
-08  Local selection + Active Context
-09  Action toolbar hierarchy
-10  Data Explorer shell + DataTable contract
-11  First real dashboard read integration
-12  Heatmap + discipline real data wiring
-13  Grid real data + discipline/heatmap filters
-14  Review / Punch List integration
-15  Refresh / snapshot / project-template change
-16  Loading / empty / error hardening
-17  Help modal + user guide
-18  Responsive + accessibility + visual QA
-19  Remove test scaffolding / placeholders
-20  Canonical consolidation
-21  Parallel comparison with scr_Home
-22  Navigation cutover decision
+00  Foundation audit and reuse matrix                    VALIDATED
+01  Blank screen shell + shared sidebar + content shell NEXT
+02  PDS Page Header component contract / implementation
+03  Home_PDS header integration
+04  Workspace/body structural layout + placeholders
+05  Minimum typed runtime state
+06  KPI strip with static/test presentation model
+07  Real punch-template context selector
+08  Dashboard bundle remote read service
+09  Dashboard bundle parser / presentation model
+10  KPI real-data integration
+11  Heatmap panel integration
+12  Heatmap selection and active context
+13  Discipline pie integration
+14  Discipline bars + shared discipline selection
+15  Action toolbar integration
+16  Cell-details remote read service
+17  DataTableProV2 integration + SQL-authoritative paging
+18  Search/sort/column/density/selection behavior
+19  Home → Punch Review contextual navigation
+20  Loading / empty / error hardening
+21  Help + accessibility + responsive pass
+22  Remove test scaffolding / final visual QA
+23  Canonical consolidation + user guide + cutover decision
 ```
 
-Regla: no publicar el siguiente bloque si el anterior está `failed`.
+Regla: no publicar el siguiente bloque si el anterior requerido está `failed`.
 
 ---
 
-# 14. Carpeta de construcción propuesta
+# 14. Carpeta de construcción
 
 ```text
 docs/development/screens/home-pds/
 ├── README.md
 ├── SCREEN_ARCHITECTURE.md
-├── DESIGN_DECISIONS.md
 ├── POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
 ├── blocks/
 │   ├── 01_screen_shell.pa.yaml
-│   ├── 02_page_header.children.pa.yaml
-│   ├── 03_control_tower_layout.children.pa.yaml
-│   ├── 04_runtime_state.onvisible.pa.yaml
+│   ├── 02_page_header.*
 │   └── ...
 └── user-guide/
     └── MANUAL_USUARIO_HOME_PDS.md
 ```
 
-Esta carpeta se crea al iniciar Phase 0/Bloque 01, no antes de conocer las rutas reales de la solución.
+Los bloques son artefactos de construcción y no reemplazan el source canónico hasta el gate de consolidación.
 
 ---
 
@@ -421,7 +454,9 @@ Home_PDS no podrá sustituir Home hasta cumplir:
 [ ] Project/template context correcto
 [ ] KPIs equivalentes o mejorados
 [ ] Heatmap funcional
+[ ] Pie de disciplinas proporcional y legible
 [ ] Discipline bars interactivas
+[ ] Pie + bars comparten una única selección
 [ ] Active Context coherente
 [ ] Review drill-through correcto
 [ ] Punch List drill-through correcto
@@ -440,22 +475,31 @@ Home_PDS no podrá sustituir Home hasta cumplir:
 
 ---
 
-# 17. Información necesaria antes de iniciar Phase 0
+# 17. Resultado de Phase 0 / Block 00
 
-Para trabajar con precisión debe estar actualizado en el repositorio remoto:
+La información requerida para iniciar la construcción ha sido auditada y congelada:
 
-1. YAML/source actual de `scr_Home`;
-2. YAML/source actual de `scr_PunchReview`;
-3. componentes premium actualmente usados por Home;
-4. cualquier componente candidato a reutilización;
-5. contracts/flows que alimentan el Punch dashboard.
+- YAML/source actual de `scr_Home`;
+- YAML/source actual de `scr_PunchReview`;
+- componentes premium candidatos;
+- contratos Power Apps relevantes;
+- snapshot y procedimientos SQL de `warroom`;
+- matriz de reutilización;
+- arquitectura objetivo;
+- riesgos y reglas de no invención.
 
-Si el repositorio remoto no contiene el último estado de Studio, debe sincronizarse antes de auditar. No se debe construir Home_PDS contra una versión obsoleta de Home.
+Block 00 fue aceptado explícitamente el **2026-08-07**.
 
 ---
 
 # 18. Decisión final de esta especificación
 
-La estrategia recomendada es **construcción paralela desde cero**, no refactorización destructiva de Home.
+La estrategia aprobada es **construcción paralela desde cero**, no refactorización destructiva de Home.
+
+La arquitectura inicial queda congelada y el siguiente trabajo permitido es:
+
+```text
+BLOCK 01 — BLANK SCREEN SHELL
+```
 
 Esto permite que PDS, arquetipos y protocolo modular se prueben juntos sobre un caso real de alto valor sin poner en riesgo la pantalla operativa existente.
