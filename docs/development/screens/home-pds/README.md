@@ -16,6 +16,7 @@ docs/development/PROTOCOLO_CONSTRUCCION_MODULAR_PANTALLAS_POWER_APPS.md
 docs/guides/GUIA_RECONSTRUCCION_PDS_EN_PANTALLA_PARALELA.md
 docs/design-system/PULSE_DESIGN_SYSTEM.md
 docs/design-system/SAAS_INTERFACE_ARCHETYPES.md
+docs/design-system/components/CMP_PAGE_HEADER_PRO.md
 docs/specifications/home-pds/HOME_PDS_SCREEN_SPECIFICATION.md
 docs/specifications/home-pds/BLOCK_00_FOUNDATION_AUDIT.md
 ```
@@ -67,8 +68,8 @@ The following architectural decisions are therefore frozen for the first constru
 | Block | Name | Status |
 |---:|---|---|
 | 00 | Foundation audit and reuse matrix | **validated** |
-| 01 | Blank screen shell | **integrating — visual gate passed / App Checker pending** |
-| 02 | PDS Page Header contract / implementation | planned |
+| 01 | Blank screen shell | **validated for progression — Studio visual gate accepted** |
+| 02 | PDS Page Header contract / implementation | **published — pending Studio validation** |
 | 03 | Home_PDS header integration | planned |
 | 04 | Workspace/body structural layout | planned |
 | 05 | Minimum typed runtime state | planned |
@@ -93,7 +94,7 @@ The following architectural decisions are therefore frozen for the first constru
 
 ---
 
-## Block 01 publication
+## Block 01 validation
 
 Published construction artifact:
 
@@ -101,17 +102,7 @@ Published construction artifact:
 docs/development/screens/home-pds/blocks/01_screen_shell.pa.yaml
 ```
 
-Purpose:
-
-- create `scr_Home_PDS` from Source Code;
-- establish the root horizontal AutoLayout;
-- reuse `cmp_SidebarNav` with `Home` as the active business key;
-- create an empty PDS content shell;
-- introduce no business collections, flows, charts, KPIs or production navigation changes.
-
-### Visual validation received — 2026-08-07
-
-The Studio screenshot confirms:
+The Studio screenshot received on 2026-08-07 confirmed the intended shell geometry and isolation:
 
 ```text
 PASS  scr_Home_PDS exists independently from scr_Home
@@ -124,15 +115,35 @@ PASS  content shell is intentionally empty and uses the light PDS page surface
 PASS  no Page Header, KPI, charts or Data Explorer were introduced prematurely
 ```
 
-Still required before final `validated` state:
+The user's explicit instruction to proceed to Block 02 is recorded as acceptance for progression. No separate App Checker screenshot was archived with the Block 01 evidence; if a later Studio issue is traced back to Block 01, the block must be reopened and corrected rather than silently carried forward.
+
+---
+
+## Block 02 publication
+
+Shared component specification:
 
 ```text
-[ ] Save accepted by Studio without formula errors attributable to Block 01
-[ ] App Checker shows no new PA1001 / PA2108 attributable to Block 01
-[ ] scr_Home remains operational after the new screen was added
+docs/design-system/components/CMP_PAGE_HEADER_PRO.md
 ```
 
-Block 02 must not be published until these remaining checks are confirmed.
+Published construction artifact:
+
+```text
+docs/development/screens/home-pds/blocks/02_page_header_component.pa.yaml
+```
+
+Purpose:
+
+- create reusable `cmp_PageHeaderPro`;
+- define PDS page identity hierarchy;
+- provide three generic context slots;
+- provide one neutral utility action plus Help;
+- expose interaction only through component events;
+- own no project/template/refresh business state;
+- leave `scr_Home_PDS` untouched until Block 03.
+
+Block 02 must now be created/validated in the Power Apps Components editor. It is not yet a canonical `main/components/` component until Studio accepts the Source Code implementation.
 
 ---
 
@@ -164,7 +175,7 @@ docs/development/screens/home-pds/
 ├── POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
 ├── blocks/
 │   ├── 01_screen_shell.pa.yaml
-│   ├── 02_page_header.*
+│   ├── 02_page_header_component.pa.yaml
 │   └── ...
 └── user-guide/
     └── MANUAL_USUARIO_HOME_PDS.md
