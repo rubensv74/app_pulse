@@ -16,6 +16,7 @@ docs/development/PROTOCOLO_CONSTRUCCION_MODULAR_PANTALLAS_POWER_APPS.md
 docs/guides/GUIA_RECONSTRUCCION_PDS_EN_PANTALLA_PARALELA.md
 docs/design-system/PULSE_DESIGN_SYSTEM.md
 docs/design-system/SAAS_INTERFACE_ARCHETYPES.md
+docs/design-system/POWER_APPS_VISUAL_QA_GUARDRAILS.md
 docs/design-system/components/CMP_PAGE_HEADER_PRO.md
 docs/specifications/home-pds/HOME_PDS_SCREEN_SPECIFICATION.md
 docs/specifications/home-pds/BLOCK_00_FOUNDATION_AUDIT.md
@@ -69,7 +70,7 @@ The following architectural decisions are therefore frozen for the first constru
 |---:|---|---|
 | 00 | Foundation audit and reuse matrix | **validated** |
 | 01 | Blank screen shell | **validated for progression — Studio visual gate accepted** |
-| 02 | PDS Page Header contract / implementation | **published — pending Studio validation** |
+| 02 | PDS Page Header contract / implementation | **integrated — VQA-001 corrective visual pass pending** |
 | 03 | Home_PDS header integration | planned |
 | 04 | Workspace/body structural layout | planned |
 | 05 | Minimum typed runtime state | planned |
@@ -119,7 +120,7 @@ The user's explicit instruction to proceed to Block 02 is recorded as acceptance
 
 ---
 
-## Block 02 publication
+## Block 02 publication and visual QA observation
 
 Shared component specification:
 
@@ -143,7 +144,27 @@ Purpose:
 - own no project/template/refresh business state;
 - leave `scr_Home_PDS` untouched until Block 03.
 
-Block 02 must now be created/validated in the Power Apps Components editor. It is not yet a canonical `main/components/` component until Studio accepts the Source Code implementation.
+### Studio integration result — 2026-08-07
+
+The component integrates successfully and the intended Page Header architecture is visually confirmed.
+
+A reusable visual defect was nevertheless detected during the Studio review:
+
+```text
+VQA-001 — Small fixed-height text controls can expose unintended internal scrollbars.
+```
+
+In the current Page Header this is visible in compact context labels/values. The defect is not a business-logic failure, but it is a premium-UI acceptance failure and must not become accepted visual debt.
+
+The general preventive rule has been promoted to the normative PDS visual QA document:
+
+```text
+docs/design-system/POWER_APPS_VISUAL_QA_GUARDRAILS.md
+```
+
+For the current component, compact context labels/values must use an explicit single-line sizing strategy (`Wrap = false` plus Studio-validated safe height) or an appropriate `AutoHeight` strategy when growth is permitted.
+
+Block 02 therefore remains open only for this corrective visual pass. Block 03 should not treat the visible scrollbar behavior as an accepted baseline.
 
 ---
 
@@ -161,6 +182,8 @@ scr_Home_PDS = isolated PDS implementation
 Do not change `StartScreen` or the production Home navigation before final acceptance.
 
 No dependent block advances while the current block is `failed`.
+
+Visible QA defects recorded in `POWER_APPS_VISUAL_QA_GUARDRAILS.md` must also be resolved or explicitly accepted before a dependent block treats the current visual implementation as canonical.
 
 ---
 
