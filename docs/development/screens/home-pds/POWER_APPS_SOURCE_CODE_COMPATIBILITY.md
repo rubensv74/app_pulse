@@ -119,6 +119,51 @@ New Home_PDS code must not introduce new arbitrary hardcoded colors/radii/spacin
 
 Data-visualization colors such as discipline colors are the explicit exception and must remain semantically data-bound.
 
+### PA-COMP-011 — Construction operation labels are NOT PaYaml root nodes
+
+Confirmed during HOME_PDS Block 02A on 2026-08-07.
+
+Studio error:
+
+```text
+PA1001
+YamlInvalidSyntax
+Property 'Patch' not found on type
+'Microsoft.PowerPlatform.PowerApps.Persistence.PaYaml.Models.SchemaV3.PaModule'
+```
+
+Cause:
+
+The modular construction protocol allows conceptual operations such as `PATCH`, `ADD CHILD`, `REPLACE CONTROL` and `REPLACE FORMULA`, but these operation names are **construction metadata**, not legal top-level PaYaml schema properties.
+
+Therefore a pasteable `.pa.yaml` artifact must use a real Power Apps Source Code root demonstrated by the current schema, such as:
+
+```text
+Screens:
+ComponentDefinitions:
+```
+
+and must contain a structurally complete source fragment that Studio accepts at the intended edit surface.
+
+Prohibited pasteable artifact:
+
+```yaml
+Patch:
+  cmp_X:
+    ...
+```
+
+because `Patch` is not a PaYaml `PaModule` property.
+
+Preventive rule:
+
+- If a construction block is only a human diff/instruction, store it as `.md` or another clearly non-pasteable format.
+- If the file extension is `.pa.yaml` and the user is instructed to paste it into Power Apps Source Code, it must itself be valid PaYaml for that edit surface.
+- For small component corrections where a partial source fragment is not proven valid, prefer a complete `ComponentDefinitions:` replacement for that component.
+- Never translate the protocol's operation label directly into a YAML root node unless that node is demonstrated in the Power Apps schema.
+
+Status: **confirmed**.
+
 ---
 
 ## 4. Reusable component observations
