@@ -135,9 +135,13 @@ Uses `GroupContainer@1.5.0` and `Classic/Button@2.2.0`; screen should use only d
 
 Already exposes state, selection, surface, border and accent contracts. Do not rebuild heatmap internals in the Home_PDS screen.
 
+### `cmp_PieChartPro`
+
+Selected primary composition chart for Home_PDS discipline distribution. It exposes a normalized segment table, selection outputs/events, legend/value/percentage controls and explicit ready/loading/empty/error state. The pie and horizontal discipline bars must share one external discipline-selection state.
+
 ### `cmp_DonutPro`
 
-Exposes segment table, selected segment outputs, center presentation and state. Preferred candidate for Home_PDS discipline distribution.
+Remains available for progress/completion/capacity-style visualizations where a central value is useful, but it is not the selected discipline-composition chart for Home_PDS.
 
 ### `cmp_ActionToolbarPro`
 
