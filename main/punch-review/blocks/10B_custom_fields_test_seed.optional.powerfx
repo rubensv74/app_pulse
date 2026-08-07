@@ -1,0 +1,160 @@
+// BLOCK 10B — OPTIONAL TEST DATA FOR CUSTOM FIELDS
+//
+// Use only to validate the visual/editor behaviour of Block 10 with a
+// fictional Punch from Block 05A.
+//
+// Paste this formula into the OnSelect property of a temporary button named:
+// btnPR_LoadTestCustomFields
+//
+// Prerequisite:
+// - A Punch must be selected in varPunchReviewCurrent.
+//
+// This formula does not call a flow and does not save anything.
+// The Save button still calls the real flow, so DO NOT press Save while using
+// fictional Punch IDs.
+//
+// Editing is intentionally governed by the same role rule as production:
+// Lower(varUserRole) = "manager".
+
+If(
+    IsBlank(varPunchReviewCurrentId),
+
+    Notify(
+        "Select a test Punch before loading test custom fields.",
+        NotificationType.Information
+    ),
+
+    ClearCollect(
+        colPunchReviewFieldsUI,
+        {
+            FieldKey: "area_owner",
+            FieldLabel: "Area owner",
+            FieldType: "Text",
+            HelpText: "Responsible area or owner for the punch.",
+            IsRequired: true,
+            IsPinned: true,
+            IsEditable: Lower(Coalesce(varUserRole, "reader")) = "manager",
+            SortOrder: 10,
+            OptionsJson: "",
+            ValueText: "Mechanical Completion Team",
+            ValueNumber: Blank(),
+            ValueDate: Blank(),
+            ValueBool: false,
+            ValueJson: "",
+            LastUpdatedOn: DateAdd(Now(), -2, TimeUnit.Days),
+            LastUpdatedByEmail: "reviewer@example.com"
+        },
+        {
+            FieldKey: "estimated_hours",
+            FieldLabel: "Estimated hours",
+            FieldType: "Number",
+            HelpText: "Estimated effort required to close the punch.",
+            IsRequired: false,
+            IsPinned: true,
+            IsEditable: Lower(Coalesce(varUserRole, "reader")) = "manager",
+            SortOrder: 20,
+            OptionsJson: "",
+            ValueText: "",
+            ValueNumber: 6,
+            ValueDate: Blank(),
+            ValueBool: false,
+            ValueJson: "",
+            LastUpdatedOn: DateAdd(Now(), -2, TimeUnit.Days),
+            LastUpdatedByEmail: "reviewer@example.com"
+        },
+        {
+            FieldKey: "ready_for_walkdown",
+            FieldLabel: "Ready for walkdown",
+            FieldType: "YesNo",
+            HelpText: "Indicates whether the item can be checked in the field.",
+            IsRequired: false,
+            IsPinned: true,
+            IsEditable: Lower(Coalesce(varUserRole, "reader")) = "manager",
+            SortOrder: 30,
+            OptionsJson: "",
+            ValueText: "",
+            ValueNumber: Blank(),
+            ValueDate: Blank(),
+            ValueBool: true,
+            ValueJson: "",
+            LastUpdatedOn: DateAdd(Now(), -1, TimeUnit.Days),
+            LastUpdatedByEmail: "reviewer@example.com"
+        },
+        {
+            FieldKey: "target_date",
+            FieldLabel: "Target date",
+            FieldType: "Date",
+            HelpText: "Agreed target date for the next action.",
+            IsRequired: false,
+            IsPinned: false,
+            IsEditable: Lower(Coalesce(varUserRole, "reader")) = "manager",
+            SortOrder: 40,
+            OptionsJson: "",
+            ValueText: "",
+            ValueNumber: Blank(),
+            ValueDate: DateAdd(Today(), 5, TimeUnit.Days),
+            ValueBool: false,
+            ValueJson: "",
+            LastUpdatedOn: DateAdd(Now(), -1, TimeUnit.Days),
+            LastUpdatedByEmail: "reviewer@example.com"
+        },
+        {
+            FieldKey: "closure_route",
+            FieldLabel: "Closure route",
+            FieldType: "Choice",
+            HelpText: "Primary route agreed for punch closure.",
+            IsRequired: true,
+            IsPinned: false,
+            IsEditable: Lower(Coalesce(varUserRole, "reader")) = "manager",
+            SortOrder: 50,
+            OptionsJson: "[""Field repair"",""Engineering review"",""Vendor action""]",
+            ValueText: "Engineering review",
+            ValueNumber: Blank(),
+            ValueDate: Blank(),
+            ValueBool: false,
+            ValueJson: "",
+            LastUpdatedOn: Now(),
+            LastUpdatedByEmail: User().Email
+        },
+        {
+            FieldKey: "constraints",
+            FieldLabel: "Constraints",
+            FieldType: "MultiChoice",
+            HelpText: "Constraints currently affecting resolution.",
+            IsRequired: false,
+            IsPinned: false,
+            IsEditable: Lower(Coalesce(varUserRole, "reader")) = "manager",
+            SortOrder: 60,
+            OptionsJson: "[""Material"",""Access"",""Engineering"",""Permit""]",
+            ValueText: "",
+            ValueNumber: Blank(),
+            ValueDate: Blank(),
+            ValueBool: false,
+            ValueJson: "[""Material"",""Engineering""]",
+            LastUpdatedOn: Now(),
+            LastUpdatedByEmail: User().Email
+        }
+    );
+
+    ClearCollect(
+        colPunchReviewFieldsBase,
+        colPunchReviewFieldsUI
+    );
+
+    Clear(colPunchReviewFieldsDirty);
+    Set(varPunchReviewFieldsError, "");
+    Set(varPunchReviewFieldsLoading, false);
+    Set(varPunchReviewFieldsSaving, false);
+    Set(varPunchReviewDirty, false);
+
+    UpdateIf(
+        colPunchReviewQueue,
+        PunchIdNumber = varPunchReviewCurrentId,
+        {IsDirty: false}
+    );
+
+    Notify(
+        "Six test custom fields loaded. Do not press Save with fictional Punch IDs.",
+        NotificationType.Information
+    )
+)
