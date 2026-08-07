@@ -35,12 +35,17 @@ Cada bloque indica:
 9. `08_session_activity.replace-control.pa.yaml` — validado
 10. `08A_help_trigger.add-child.pa.yaml` — validado tras eliminar `Reset(TabList)`
 11. `08B_bilingual_help_modal.add-screen-child.pa.yaml` — validado
-12. `09_comments.replace-control.pa.yaml` — pendiente de validación en Studio
-13. `09A_comments_selection_hook.replace-formula.powerfx` — integrar después de validar visualmente el panel
+12. `09_comments.replace-control.pa.yaml` — integrado; validar en Studio con Punch real
+13. `09A_comments_selection_hook.replace-formula.powerfx` — hook de selección de Comments
 14. `09B_comments_test_seed.optional.powerfx` — opcional para pruebas visuales
-15. `09C_help_comments.incremental-patch.pa.yaml` — aplicar después de validar el Bloque 09
+15. `09C_help_comments.incremental-patch.pa.yaml` — ayuda bilingüe de Comments
+16. `10_custom_fields.replace-control.pa.yaml` — integrado; pendiente de validación en Studio
+17. `10A_custom_fields_selection_hook.replace-formula.powerfx` — sustituye a 09A y carga Comments + Custom Fields; incluye bloqueo temporal de cambios sin guardar
+18. `10B_custom_fields_test_seed.optional.powerfx` — opcional para probar los seis tipos de campo sin flows
+19. `10C_yesno_initial_state.incremental-patch.pa.yaml` — parche obligatorio para vincular `Toggle.Checked` a `ValueBool`
+20. `10D_help_custom_fields.incremental-patch.pa.yaml` — aplicar después de validar el Bloque 10 con un Punch real
 
-No se debe iniciar el Bloque 10 hasta que el panel Comments, su carga real, la paginación y el alta de comentarios hayan sido validados.
+No se debe iniciar el Bloque 11 hasta que el Bloque 10 importe sin errores y se hayan comprobado carga, edición, Reset y Save con un Punch real.
 
 ## Contratos del Bloque 09
 
@@ -72,6 +77,38 @@ Warroom_AddTaskComment.Run(
 
 La validación visual con los Punches ficticios del Bloque 05A debe realizarse mediante `09B_comments_test_seed.optional.powerfx`. La validación de flows necesita un Punch real.
 
+## Contratos del Bloque 10
+
+Carga de campos personalizados:
+
+```text
+WarRoom_GetCustomBundle.Run(
+    ProjectId,
+    EntityType,
+    RecordId
+).bundlejson
+```
+
+El editor utiliza `bundlejson.merged` como fuente de definiciones y valores actuales.
+
+Guardado masivo:
+
+```text
+WarRoom_SaveCustomBulk.Run(
+    ProjectId,
+    EntityType,
+    RecordId,
+    JSON(colDirty, JSONFormat.Compact),
+    UserEmail
+)
+```
+
+El resultado de guardado se vuelve a materializar desde el `merged` devuelto por el servicio. Los tipos soportados son `Text`, `Number`, `YesNo`, `Date`, `Choice` y `MultiChoice`.
+
+La edición mantiene la misma regla de permisos que el drawer existente: `manager` puede editar, guardar y restablecer; los demás roles son de solo lectura.
+
+Hasta el Bloque 13, `10A_custom_fields_selection_hook.replace-formula.powerfx` bloquea cualquier cambio o recarga de Punch mientras existan campos personalizados sin guardar. El usuario debe usar Save o Reset antes de continuar.
+
 ## Manual de usuario
 
 El manual funcional en español se mantiene en:
@@ -80,7 +117,7 @@ El manual funcional en español se mantiene en:
 main/punch-review/user-guide/MANUAL_USUARIO_PUNCH_REVIEW.md
 ```
 
-Es un documento vivo y debe actualizarse cuando se valide una nueva función de la pantalla.
+Es un documento vivo y debe actualizarse cuando se valida una nueva función de la pantalla.
 
 La pantalla también incorpora una ayuda resumida bilingüe mediante un modal con dos pestañas modernas:
 
@@ -100,8 +137,10 @@ Reglas confirmadas:
 
 ```text
 Label@2.5.1 no admite RadiusBottomLeft, RadiusBottomRight, RadiusTopLeft ni RadiusTopRight.
+Classic/Button@2.2.0 no admite AccessibleLabel en el Source Code utilizado por PULSE.
 TabList@2.2.30 no es reseteable mediante Reset().
 Una variable numérica nueva debe recibir primero una asignación numérica inequívoca.
+Toggle moderno utiliza Checked para representar el valor Boolean inicial.
 ```
 
 Para una píldora redondeada se utiliza un `GroupContainer@1.5.0` con radios y un `Label@2.5.1` sin radios en su interior.
@@ -131,4 +170,5 @@ Las referencias visuales y funcionales se basan en:
 - `main/screens/Home/scr_Home.pa.yaml`
 - `main/screens/Punches/scr_Punches_1.pa.yaml`
 - `main/components/cmp_SidebarNav.pa.yaml`
+- `main/components/cmp_DetailDrawer_old.pa.yaml`
 - resto de componentes actualizados en `main/components/`
