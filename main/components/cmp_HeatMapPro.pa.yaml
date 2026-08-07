@@ -776,8 +776,8 @@ ComponentDefinitions:
                   BorderColor: =RGBA(0,0,0,0)
                   Height: =Parent.Height - If(cmp_HeatMapPro.ShowTotals, 142, 108)
                   Items: =cmp_HeatMapPro.Rows
-                  TemplatePadding: =2
-                  TemplateSize: =If(cmp_HeatMapPro.CompactMode, 30, 38)
+                  TemplatePadding: =0
+                  TemplateSize: =If(cmp_HeatMapPro.CompactMode, 38, 38)
                   Visible: =!cmp_HeatMapPro.IsLoading && !cmp_HeatMapPro.IsEmpty && !cmp_HeatMapPro.IsError
                   Width: =Parent.Width - 24
                   X: =12
@@ -1251,4 +1251,3 @@ ComponentDefinitions:
                         Width: =Parent.Width - 80
                         X: =40
                         Y: =(Parent.Height - Self.Height) / 2 + If(cmp_HeatMapPro.IsLoading, 26, 0)
-
