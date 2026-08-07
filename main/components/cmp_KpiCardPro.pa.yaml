@@ -214,7 +214,7 @@ ComponentDefinitions:
           Properties:
             BorderColor: =If(cmp_KpiCardPro.IsSelected, cmp_KpiCardPro.AccentColor, cmp_KpiCardPro.BorderColor)
             BorderThickness: =If(cmp_KpiCardPro.IsSelected, 2, 1)
-            DropShadow: =DropShadow.Semilight
+            DropShadow: =DropShadow.None
             Fill: =cmp_KpiCardPro.CardFill
             Height: =Parent.Height
             RadiusBottomLeft: =12
@@ -350,7 +350,7 @@ ComponentDefinitions:
                   PaddingLeft: =0
                   PaddingRight: =0
                   PaddingTop: =0
-                  Size: =7
+                  Size: =9
                   Text: |-
                     =
                     If(
@@ -551,4 +551,3 @@ ComponentDefinitions:
                   Width: =Parent.Width - 62
                   X: =46
                   Y: =36
-
