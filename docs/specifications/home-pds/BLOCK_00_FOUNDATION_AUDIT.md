@@ -1,6 +1,7 @@
 # HOME_PDS — Block 00 Foundation Audit
 
-**Status:** Published / pending architectural validation  
+**Status:** VALIDATED  
+**Validation date:** 2026-08-07  
 **Screen target:** `scr_Home_PDS`  
 **Display title target:** `Punch Control Tower`  
 **Primary archetype:** Operational Control Tower  
@@ -13,9 +14,11 @@
 
 This document is the mandatory Phase 0 / Block 00 audit before producing the first YAML block for `scr_Home_PDS`.
 
-The new screen will be built **from a blank screen in parallel with `scr_Home`**. The current Home remains the stable functional reference and rollback option. The objective of Block 00 is therefore not to redesign code yet, but to establish the real contracts, reusable assets, risks and target architecture from the current repository state.
+The new screen will be built **from a blank screen in parallel with `scr_Home`**. The current Home remains the stable functional reference and rollback option. Block 00 establishes the real contracts, reusable assets, risks and target architecture from the current repository state.
 
-No runtime code is modified by this audit.
+No runtime code was modified by this audit.
+
+Block 00 was explicitly accepted on **2026-08-07**. The architecture and build sequence defined here are therefore frozen for the first construction pass unless a later approved architecture change is documented.
 
 ---
 
@@ -227,17 +230,28 @@ Strengths:
 
 This component should remain the main **Open Punch Concentration** visualization unless Block-level validation discovers a real limitation.
 
-## 7.4 `cmp_DonutPro` / `cmp_PieChartPro`
+## 7.4 `cmp_PieChartPro` / `cmp_DonutPro`
 
-**Decision:** prefer `cmp_DonutPro` for Home_PDS discipline distribution; retain `cmp_PieChartPro` as a valid alternative/reference.
+**Validated decision:** use `cmp_PieChartPro` as the primary Home_PDS discipline-composition visualization and complement it with interactive horizontal discipline bars.
 
-Reason:
+Rationale:
 
-- current Home consumes `cmp_PieChartPro`;
-- both components expose a normalized segment contract and selection events;
-- `cmp_DonutPro` additionally provides explicit center value/label controls and compact behavior, which better fits the target Control Tower composition.
+- the core question is part-to-whole distribution across disciplines;
+- a full pie provides more visible sector area than a thin ring and therefore makes the share distribution easier to perceive;
+- the horizontal bars provide the precision view for ranking and relative magnitude;
+- the two visualizations answer complementary questions and must share one selected-discipline state;
+- current Home already proves `cmp_PieChartPro` consumption;
+- `cmp_PieChartPro` exposes normalized segment inputs, selection outputs/events, percentages, values, legend behavior and ready/loading/empty/error states.
 
-Selection must remain externally controlled by the Home_PDS context, not become an isolated chart-only state.
+Shared selection rule:
+
+```text
+Pie segment ─────┐
+                 ├──> selected discipline ──> Active Context ──> Data Explorer
+Discipline bar ──┘
+```
+
+`cmp_DonutPro` remains a reusable PDS component for cases such as completion, readiness, utilization or capacity, where a central KPI plus circular progress is the dominant reading. It is **not** the selected chart for Home_PDS discipline distribution.
 
 ## 7.5 `cmp_ActionToolbarPro`
 
@@ -484,7 +498,7 @@ Do not invent this contract in Block 01.
 
 # 11. Target Home_PDS control tree
 
-The following architecture is frozen for the first construction pass. Internal names may be refined only before their block is published.
+The following architecture is frozen for the first construction pass.
 
 ```text
 scr_Home_PDS
@@ -505,7 +519,7 @@ scr_Home_PDS
         │   │   ├── conHPDS_HeatmapPanel
         │   │   │   └── cmpHPDS_Heatmap
         │   │   └── conHPDS_DisciplinePanel
-        │   │       ├── cmpHPDS_Donut
+        │   │       ├── cmpHPDS_DisciplinePie
         │   │       └── conHPDS_DisciplineBarsHost
         │   │
         │   ├── conHPDS_ActiveContext
@@ -524,18 +538,17 @@ Architecture rules:
 - AutoLayout controls major page geometry.
 - ManualLayout is allowed inside bounded modules/components.
 - The analytics grid is not allowed to own business state.
-- the Data Explorer must preserve server paging authority.
-- the overlay layer must not alter body layout when hidden.
+- Pie and discipline bars share one selected-discipline state.
+- The Data Explorer must preserve server paging authority.
+- The overlay layer must not alter body layout when hidden.
 
 ---
 
-# 12. Planned build sequence
-
-The screen will be built incrementally. The exact numbering below becomes the Home_PDS construction contract unless Block 00 review changes it.
+# 12. Validated build sequence
 
 ```text
-00  Foundation audit and reuse matrix
-01  Blank screen shell + shared sidebar + content shell
+00  Foundation audit and reuse matrix                         VALIDATED
+01  Blank screen shell + shared sidebar + content shell      NEXT
 02  PDS Page Header component contract / implementation
 03  Home_PDS header integration
 04  Workspace/body structural layout + placeholders
@@ -547,7 +560,7 @@ The screen will be built incrementally. The exact numbering below becomes the Ho
 10  KPI real-data integration
 11  Heatmap panel integration
 12  Heatmap selection and active context
-13  Discipline donut integration
+13  Discipline pie integration
 14  Discipline bars + shared discipline selection
 15  Action toolbar integration
 16  Cell-details remote read service
@@ -638,32 +651,41 @@ The repository will continue evolving.
 
 **Mitigation:** every Home_PDS block header must state the relevant source baseline and dependencies. If the production Home contracts change materially, perform a targeted re-audit before the affected integration block.
 
+## R6 — Discipline cardinality
+
+A pie chart loses usefulness when too many small disciplines are simultaneously visible.
+
+**Mitigation:** keep horizontal bars as the precision surface and preserve a shared selection model. Any future grouping/Other rule must be implemented as an explicit approved visualization rule, not silently invented inside the chart.
+
 ---
 
 # 16. Definition of Done for Block 00
 
-Block 00 can be marked `validated` only when the following are accepted:
+The following conditions are accepted:
 
-- immutable screens/components baseline recorded;
-- immutable SQL baseline recorded;
-- current Home and Punch Review roles understood;
-- target archetype confirmed;
-- reuse decisions recorded;
-- remote contracts identified;
-- navigation constraints recorded;
-- target control tree frozen;
-- block plan frozen;
-- open risks documented;
-- do-not-invent list documented;
-- no runtime code modified.
+```text
+[x] immutable screens/components baseline recorded
+[x] immutable SQL baseline recorded
+[x] current Home and Punch Review roles understood
+[x] target archetype confirmed
+[x] reuse decisions recorded
+[x] discipline Pie + Bars decision recorded
+[x] remote contracts identified
+[x] navigation constraints recorded
+[x] target control tree frozen
+[x] block plan frozen
+[x] open risks documented
+[x] do-not-invent list documented
+[x] no runtime code modified
+```
 
-At publication time this document is **published / pending architectural validation**, not yet `validated`.
+**Block 00 status: VALIDATED.**
 
 ---
 
-# 17. Next allowed action after validation
+# 17. Next allowed action
 
-Only after Block 00 is accepted:
+Block 00 validation authorizes:
 
 ```text
 BLOCK 01 — BLANK SCREEN SHELL
@@ -680,9 +702,10 @@ Out of scope:
   - flows
   - business collections
   - heatmap
-  - donut
+  - pie chart
+  - discipline bars
   - grid
   - Punch Review navigation
 ```
 
-The objective of Block 01 will be to prove the new screen can exist safely beside `scr_Home` before any business logic is introduced.
+The objective of Block 01 is to prove the new screen can exist safely beside `scr_Home` before any business logic is introduced.
