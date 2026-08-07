@@ -1,0 +1,32 @@
+# BLOCK 10C — YES/NO INITIAL STATE
+#
+# Operation: ADD ONE PROPERTY.
+# Target control: tglPR_CustomFieldYesNo
+# Parent: galPR_CustomFields
+# Source file: 10_custom_fields.replace-control.pa.yaml
+#
+# Why this patch exists:
+# - The legacy drawer uses Toggle@1.1.5 but does not bind its initial state.
+# - A Punch Review editor must display the persisted ValueBool before the user
+#   interacts with the control.
+# - Toggle@1.1.5 supports Checked as its initial/controlled Boolean property.
+#
+# Apply this property immediately after pasting Block 10 and before functional
+# validation. Do not replace OnCheck or OnUncheck.
+#
+# Expected result:
+# - ValueBool=true renders the toggle checked.
+# - ValueBool=false renders the toggle unchecked.
+# - User changes continue to be written by OnCheck/OnUncheck.
+
+# Existing control excerpt:
+- tglPR_CustomFieldYesNo:
+    Control: Toggle@1.1.5
+    Properties:
+      Checked: =ThisItem.ValueBool
+
+# IMPORTANT:
+# The excerpt above is NOT a replacement control.
+# Add only this property to the existing Properties node:
+#
+#   Checked: =ThisItem.ValueBool
