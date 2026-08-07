@@ -1,0 +1,84 @@
+// BLOCK 10A — COMMENTS + CUSTOM FIELDS SELECTION HOOK
+//
+// Operation: REPLACE FORMULA COMPLETELY.
+// Target control: btnPR_SelectCurrent
+// Target property: OnSelect
+// Parent: conPR_QueueCard
+//
+// Dependencies:
+// - Block 09 exists because this formula selects btnPR_LoadComments.
+// - Block 10 exists because this formula selects btnPR_LoadCustomFields.
+// - This formula supersedes Block 09A. Do not append it to 09A.
+//
+// Temporary safety until Block 13:
+// - If custom-field edits are unsaved, navigation to a different Punch is blocked.
+// - Save or Reset custom fields before changing Punch.
+// - Block 13 will replace this simple lock with the full dirty-change dialog.
+
+If(
+    varPunchReviewDirty &&
+    Coalesce(
+        varPunchReviewRequestedIndex,
+        varPunchReviewCurrentIndex,
+        1
+    ) <> varPunchReviewCurrentIndex,
+
+    Set(
+        varPunchReviewRequestedIndex,
+        varPunchReviewCurrentIndex
+    );
+    Notify(
+        "Save or reset custom-field changes before changing Punch.",
+        NotificationType.Warning
+    ),
+
+    CountRows(colPunchReviewQueue) = 0,
+
+    Set(varPunchReviewCurrent, Blank());
+    Set(varPunchReviewCurrentId, Blank());
+    Set(varPunchReviewCommentsPage, 1);
+    Clear(colPunchReviewComments);
+    Set(varPunchReviewCommentsError, "");
+    Clear(colPunchReviewFieldsUI);
+    Clear(colPunchReviewFieldsBase);
+    Clear(colPunchReviewFieldsDirty);
+    Set(varPunchReviewFieldsError, "");
+    Set(varPunchReviewDirty, false),
+
+    Set(
+        varPunchReviewCurrentIndex,
+        Min(
+            Max(
+                1,
+                Coalesce(
+                    varPunchReviewRequestedIndex,
+                    varPunchReviewCurrentIndex,
+                    1
+                )
+            ),
+            CountRows(colPunchReviewQueue)
+        )
+    );
+
+    Set(
+        varPunchReviewCurrent,
+        LookUp(
+            colPunchReviewQueue,
+            ReviewOrder = varPunchReviewCurrentIndex
+        )
+    );
+
+    Set(
+        varPunchReviewCurrentId,
+        varPunchReviewCurrent.PunchIdNumber
+    );
+
+    Set(
+        varPunchReviewRequestedIndex,
+        varPunchReviewCurrentIndex
+    );
+
+    Set(varPunchReviewCommentsPage, 1);
+    Select(btnPR_LoadComments);
+    Select(btnPR_LoadCustomFields)
+)
