@@ -67,7 +67,7 @@ The following architectural decisions are therefore frozen for the first constru
 | Block | Name | Status |
 |---:|---|---|
 | 00 | Foundation audit and reuse matrix | **validated** |
-| 01 | Blank screen shell | **published — pending Studio validation** |
+| 01 | Blank screen shell | **integrating — visual gate passed / App Checker pending** |
 | 02 | PDS Page Header contract / implementation | planned |
 | 03 | Home_PDS header integration | planned |
 | 04 | Workspace/body structural layout | planned |
@@ -109,7 +109,30 @@ Purpose:
 - create an empty PDS content shell;
 - introduce no business collections, flows, charts, KPIs or production navigation changes.
 
-Block 01 must now be pasted/saved in Power Apps Studio and validated with App Checker before Block 02 is published.
+### Visual validation received — 2026-08-07
+
+The Studio screenshot confirms:
+
+```text
+PASS  scr_Home_PDS exists independently from scr_Home
+PASS  conHPDS_ScreenRoot exists
+PASS  cmpHPDS_Sidebar exists and renders at the left
+PASS  conHPDS_ContentShell exists and occupies the remaining surface
+PASS  Home is visually active in the sidebar
+PASS  current project context is preserved and displayed (70200)
+PASS  content shell is intentionally empty and uses the light PDS page surface
+PASS  no Page Header, KPI, charts or Data Explorer were introduced prematurely
+```
+
+Still required before final `validated` state:
+
+```text
+[ ] Save accepted by Studio without formula errors attributable to Block 01
+[ ] App Checker shows no new PA1001 / PA2108 attributable to Block 01
+[ ] scr_Home remains operational after the new screen was added
+```
+
+Block 02 must not be published until these remaining checks are confirmed.
 
 ---
 
