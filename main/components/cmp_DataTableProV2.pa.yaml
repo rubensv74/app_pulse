@@ -360,7 +360,7 @@ ComponentDefinitions:
           Properties:
             BorderColor: =cmp_DataTableProV2.BorderColor
             BorderThickness: =1
-            DropShadow: =DropShadow.Semilight
+            DropShadow: =DropShadow.None
             Fill: =cmp_DataTableProV2.BackgroundColor
             Height: =Parent.Height
             RadiusBottomLeft: =12
@@ -1464,13 +1464,7 @@ ComponentDefinitions:
                   BorderThickness: =1
                   DropShadow: =DropShadow.Regular
                   Fill: =cmp_DataTableProV2.BackgroundColor
-                  Height: = Min(
-                            332,
-                            Max(
-                                220,
-                                Parent.Height - 52
-                            )
-                        )
+                  Height: = Min( 332, Max( 220, Parent.Height - 52 ) )
                   RadiusBottomLeft: =12
                   RadiusBottomRight: =12
                   RadiusTopLeft: =12
@@ -1540,12 +1534,12 @@ ComponentDefinitions:
                         BorderColor: =RGBA(0,0,0,0)
                         Height: = Parent.Height - 100
                         Items: =SortByColumns(cmp_DataTableProV2.Columns, "Order", SortOrder.Ascending)
+                        ShowScrollbar: = true
                         TemplatePadding: =0
                         TemplateSize: =32
                         Width: =Parent.Width - 20
                         X: =10
                         Y: =48
-                        ShowScrollbar: = true
                       Children:
                         - btnDTP2_ColumnCheck:
                             Control: Classic/Button@2.2.0
@@ -1816,4 +1810,3 @@ ComponentDefinitions:
                         Width: =240
                         X: =(Parent.Width - Self.Width) / 2
                         Y: =Parent.Height / 2 + 18
-
