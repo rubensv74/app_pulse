@@ -280,8 +280,8 @@ ComponentDefinitions:
         DataType: Text
         Default: =""
     Properties:
-      ClickedSegment: =galPCP_Legend.Selected
-      ClickedSegmentKey: =Coalesce(Text(galPCP_Legend.Selected.SegmentKey), "")
+      ClickedSegment: =galPCP_Legend_1.Selected
+      ClickedSegmentKey: =Coalesce(galPCP_Legend_1.Selected.SegmentKey, "")
       HasSelection: =!IsBlank(cmp_PieChartPro.SelectedSegmentKey)
       Height: =240
       IsEmpty: |-
@@ -294,7 +294,7 @@ ComponentDefinitions:
         =CountRows(
             Filter(
                 cmp_PieChartPro.Items,
-                Coalesce(Value(SegmentValue), 0) > 0
+                Coalesce(SegmentValue, 0) > 0
             )
         )
       SelectedPercentage: |-
@@ -306,14 +306,14 @@ ComponentDefinitions:
       SelectedSegment: |-
         =LookUp(
             cmp_PieChartPro.Items,
-            Text(SegmentKey) = Trim(Coalesce(cmp_PieChartPro.SelectedKey, ""))
+            Coalesce(SegmentKey, "") = Trim(Coalesce(cmp_PieChartPro.SelectedKey, ""))
         )
       SelectedSegmentColor: |-
         =Coalesce(
             LookUp(
                 cmp_PieChartPro.Items,
-                Text(SegmentKey) = Trim(Coalesce(cmp_PieChartPro.SelectedKey, "")),
-                Text(SegmentColor)
+                Coalesce(SegmentKey, "") = Trim(Coalesce(cmp_PieChartPro.SelectedKey, "")),
+                SegmentColor
             ),
             ""
         )
@@ -321,8 +321,8 @@ ComponentDefinitions:
         =Coalesce(
             LookUp(
                 cmp_PieChartPro.Items,
-                Text(SegmentKey) = Trim(Coalesce(cmp_PieChartPro.SelectedKey, "")),
-                Text(SegmentKey)
+                Coalesce(SegmentKey, "") = Trim(Coalesce(cmp_PieChartPro.SelectedKey, "")),
+                SegmentKey
             ),
             ""
         )
@@ -330,8 +330,8 @@ ComponentDefinitions:
         =Coalesce(
             LookUp(
                 cmp_PieChartPro.Items,
-                Text(SegmentKey) = Trim(Coalesce(cmp_PieChartPro.SelectedKey, "")),
-                Text(SegmentLabel)
+                Coalesce(SegmentKey, "") = Trim(Coalesce(cmp_PieChartPro.SelectedKey, "")),
+                SegmentLabel
             ),
             ""
         )
@@ -339,19 +339,19 @@ ComponentDefinitions:
         =Coalesce(
             LookUp(
                 cmp_PieChartPro.Items,
-                Text(SegmentKey) = Trim(Coalesce(cmp_PieChartPro.SelectedKey, "")),
-                Value(SegmentValue)
+                Coalesce(SegmentKey, "") = Trim(Coalesce(cmp_PieChartPro.SelectedKey, "")),
+                SegmentValue
             ),
             0
         )
       TotalValue: |-
         =Sum(
             cmp_PieChartPro.Items,
-            Coalesce(Value(SegmentValue), 0)
+            Coalesce(SegmentValue, 0)
         )
       Width: =560
     Children:
-      - conPCP_Root:
+      - conPCP_Root_1:
           Control: GroupContainer@1.5.0
           Variant: ManualLayout
           Properties:
@@ -366,7 +366,7 @@ ComponentDefinitions:
             RadiusTopRight: =14
             Width: =Parent.Width
           Children:
-            - lblPCP_Title:
+            - lblPCP_Title_1:
                 Control: Label@2.5.1
                 Properties:
                   Color: =cmp_PieChartPro.TextColor
@@ -384,7 +384,7 @@ ComponentDefinitions:
                   Width: =Parent.Width - 190
                   X: =16
                   Y: =10
-            - lblPCP_Subtitle:
+            - lblPCP_Subtitle_1:
                 Control: Label@2.5.1
                 Properties:
                   Color: =cmp_PieChartPro.MutedTextColor
@@ -401,7 +401,7 @@ ComponentDefinitions:
                   Width: =Parent.Width - 190
                   X: =16
                   Y: =31
-            - lblPCP_SelectedContext:
+            - lblPCP_SelectedContext_1:
                 Control: Label@2.5.1
                 Properties:
                   Align: =Align.Right
@@ -449,7 +449,7 @@ ComponentDefinitions:
                   Width: =145
                   X: =Parent.Width - 177
                   Y: =16
-            - icoPCP_ClearSelection:
+            - icoPCP_ClearSelection_1:
                 Control: Classic/Icon@2.5.0
                 Properties:
                   BorderColor: =RGBA(0,0,0,0)
@@ -463,7 +463,7 @@ ComponentDefinitions:
                   Width: =15
                   X: =Parent.Width - 24
                   Y: =17
-            - imgPCP_Pie:
+            - imgPCP_Pie_1:
                 Control: Image@2.2.3
                 Properties:
                   BorderColor: =RGBA(0,0,0,0)
@@ -480,20 +480,34 @@ ComponentDefinitions:
                                 SortByColumns(
                                     Filter(
                                         cmp_PieChartPro.Items,
-                                        Coalesce(Value(SegmentValue), 0) > 0
+                                        Coalesce(SegmentValue, 0) > 0
                                     ),
                                     "SegmentOrder",
                                     SortOrder.Ascending
                                 ),
+
                             _total:
                                 Max(
                                     0.000001,
-                                    cmp_PieChartPro.TotalValue
+                                    Sum(
+                                        Filter(
+                                            cmp_PieChartPro.Items,
+                                            Coalesce(SegmentValue, 0) > 0
+                                        ),
+                                        Coalesce(SegmentValue, 0)
+                                    )
                                 ),
-                            _cx: 80,
-                            _cy: 80,
-                            _radius: 66
+
+                            _pieRadius: 33,
+                            _pieStrokeWidth: 66,
+                            _circumference: 2 * Pi() * 33,
+                            _separatorColor:
+                                Coalesce(
+                                    cmp_PieChartPro.SliceSeparatorColorHex,
+                                    "#FFFFFF"
+                                )
                         },
+
                         "data:image/svg+xml;utf8," &
                         EncodeUrl(
                             "<svg viewBox='0 0 160 160' " &
@@ -502,70 +516,99 @@ ComponentDefinitions:
 
                             "<circle " &
                             "cx='80' cy='80' r='66' " &
-                            "fill='" & cmp_PieChartPro.ChartBaseColorHex & "'/>" &
+                            "fill='" &
+                                _separatorColor &
+                            "'/>" &
 
                             Concat(
-                                Sequence(
-                                    CountRows(_positiveItems)
-                                ) As PCPIndex,
+                                _positiveItems As PCPSlice,
+
                                 With(
                                     {
-                                        _item:
-                                            Last(
-                                                FirstN(
-                                                    _positiveItems,
-                                                    PCPIndex.Value
-                                                )
-                                            ),
-                                        _ratio:
+                                        _sliceValue:
                                             Coalesce(
-                                                Value(
-                                                    Last(
-                                                        FirstN(
-                                                            _positiveItems,
-                                                            PCPIndex.Value
-                                                        )
-                                                    ).SegmentValue
-                                                ),
+                                                PCPSlice.SegmentValue,
                                                 0
-                                            ) / _total,
-                                        _startRatio:
+                                            ),
+
+                                        _sliceColor:
+                                            Coalesce(
+                                                PCPSlice.SegmentColor,
+                                                "#64748B"
+                                            ),
+
+                                        _startValue:
                                             Sum(
-                                                FirstN(
+                                                Filter(
                                                     _positiveItems,
-                                                    PCPIndex.Value - 1
+                                                    SegmentOrder <
+                                                        PCPSlice.SegmentOrder
                                                 ),
                                                 Coalesce(
-                                                    Value(SegmentValue),
+                                                    SegmentValue,
                                                     0
                                                 )
-                                            ) / _total,
+                                            ),
+
                                         _isSelected:
-                                            cmp_PieChartPro.SelectedSegmentKey =
-                                            Text(
-                                                Last(
-                                                    FirstN(
-                                                        _positiveItems,
-                                                        PCPIndex.Value
+                                            Upper(
+                                                Trim(
+                                                    Coalesce(
+                                                        cmp_PieChartPro.SelectedSegmentKey,
+                                                        ""
                                                     )
-                                                ).SegmentKey
+                                                )
+                                            ) =
+                                            Upper(
+                                                Trim(
+                                                    Coalesce(
+                                                        PCPSlice.SegmentKey,
+                                                        ""
+                                                    )
+                                                )
                                             )
                                     },
+
                                     With(
                                         {
-                                            _startAngle:
-                                                cmp_PieChartPro.StartAngleDegrees +
-                                                360 * _startRatio,
-                                            _endAngle:
-                                                cmp_PieChartPro.StartAngleDegrees +
-                                                360 * (_startRatio + _ratio),
+                                            _segmentLength:
+                                                _circumference *
+                                                _sliceValue /
+                                                _total,
+
+                                            _startLength:
+                                                _circumference *
+                                                _startValue /
+                                                _total,
+
                                             _midAngle:
                                                 cmp_PieChartPro.StartAngleDegrees +
-                                                360 * (_startRatio + _ratio / 2),
+                                                360 *
+                                                (
+                                                    _startValue +
+                                                    _sliceValue / 2
+                                                ) /
+                                                _total,
+
+                                            _gapLength:
+                                                Min(
+                                                    (
+                                                        _circumference *
+                                                        _sliceValue /
+                                                        _total
+                                                    ) * 0.35,
+
+                                                    Max(
+                                                        0.5,
+                                                        cmp_PieChartPro.SliceSeparatorWidth
+                                                    )
+                                                ),
+
                                             _opacity:
                                                 If(
                                                     cmp_PieChartPro.HasSelection &&
                                                     !_isSelected,
+
                                                     Max(
                                                         0.08,
                                                         Min(
@@ -573,121 +616,135 @@ ComponentDefinitions:
                                                             cmp_PieChartPro.DimUnselectedOpacity
                                                         )
                                                     ),
+
                                                     1
                                                 )
                                         },
+
                                         With(
                                             {
-                                                _startX:
-                                                    _cx +
-                                                    _radius *
-                                                    Cos(_startAngle * Pi() / 180),
-                                                _startY:
-                                                    _cy +
-                                                    _radius *
-                                                    Sin(_startAngle * Pi() / 180),
-                                                _endX:
-                                                    _cx +
-                                                    _radius *
-                                                    Cos(_endAngle * Pi() / 180),
-                                                _endY:
-                                                    _cy +
-                                                    _radius *
-                                                    Sin(_endAngle * Pi() / 180),
                                                 _offsetX:
                                                     If(
                                                         _isSelected &&
                                                         cmp_PieChartPro.ExplodeSelected &&
-                                                        CountRows(_positiveItems) > 1,
+                                                        CountRows(
+                                                            _positiveItems
+                                                        ) > 1,
+
                                                         cmp_PieChartPro.SelectedOffset *
-                                                        Cos(_midAngle * Pi() / 180),
+                                                        Cos(
+                                                            _midAngle *
+                                                            Pi() /
+                                                            180
+                                                        ),
+
                                                         0
                                                     ),
+
                                                 _offsetY:
                                                     If(
                                                         _isSelected &&
                                                         cmp_PieChartPro.ExplodeSelected &&
-                                                        CountRows(_positiveItems) > 1,
+                                                        CountRows(
+                                                            _positiveItems
+                                                        ) > 1,
+
                                                         cmp_PieChartPro.SelectedOffset *
-                                                        Sin(_midAngle * Pi() / 180),
+                                                        Sin(
+                                                            _midAngle *
+                                                            Pi() /
+                                                            180
+                                                        ),
+
                                                         0
                                                     )
                                             },
-                                            If(
-                                                CountRows(_positiveItems) = 1 ||
-                                                _ratio >= 0.999999,
 
-                                                "<circle " &
-                                                "cx='80' cy='80' r='66' " &
-                                                "fill='" &
-                                                Coalesce(
-                                                    Text(_item.SegmentColor),
-                                                    "#64748B"
-                                                ) &
-                                                "' " &
-                                                "stroke='" &
-                                                cmp_PieChartPro.SliceSeparatorColorHex &
-                                                "' " &
-                                                "stroke-width='" &
+                                            "<circle " &
+                                            "cx='80' cy='80' " &
+                                            "r='" &
                                                 Text(
-                                                    cmp_PieChartPro.SliceSeparatorWidth,
-                                                    "[$-en-US]0.##"
+                                                    _pieRadius,
+                                                    "[$-en-US]0.000000"
                                                 ) &
-                                                "' " &
-                                                "opacity='" &
+                                            "' " &
+                                            "fill='none' " &
+                                            "stroke='" &
+                                                _sliceColor &
+                                            "' " &
+                                            "stroke-width='" &
+                                                Text(
+                                                    _pieStrokeWidth,
+                                                    "[$-en-US]0.000000"
+                                                ) &
+                                            "' " &
+                                            "stroke-linecap='butt' " &
+                                            "stroke-dasharray='" &
+                                                Text(
+                                                    Max(
+                                                        0.1,
+                                                        _segmentLength -
+                                                        _gapLength
+                                                    ),
+                                                    "[$-en-US]0.000000"
+                                                ) &
+                                                " " &
+                                                Text(
+                                                    _circumference,
+                                                    "[$-en-US]0.000000"
+                                                ) &
+                                            "' " &
+                                            "stroke-dashoffset='" &
+                                                Text(
+                                                    -(
+                                                        _startLength +
+                                                        _gapLength / 2
+                                                    ),
+                                                    "[$-en-US]0.000000"
+                                                ) &
+                                            "' " &
+                                            "transform='translate(" &
+                                                Text(
+                                                    _offsetX,
+                                                    "[$-en-US]0.000000"
+                                                ) &
+                                                " " &
+                                                Text(
+                                                    _offsetY,
+                                                    "[$-en-US]0.000000"
+                                                ) &
+                                            ") rotate(" &
+                                                Text(
+                                                    cmp_PieChartPro.StartAngleDegrees,
+                                                    "[$-en-US]0.000000"
+                                                ) &
+                                                " 80 80)' " &
+                                            "opacity='" &
                                                 Text(
                                                     _opacity,
-                                                    "[$-en-US]0.##"
+                                                    "[$-en-US]0.00"
                                                 ) &
-                                                "'/>",
-
-                                                "<path " &
-                                                "d='M " &
-                                                Text(_cx, "[$-en-US]0.######") & " " &
-                                                Text(_cy, "[$-en-US]0.######") &
-                                                " L " &
-                                                Text(_startX, "[$-en-US]0.######") & " " &
-                                                Text(_startY, "[$-en-US]0.######") &
-                                                " A " &
-                                                Text(_radius, "[$-en-US]0.######") & " " &
-                                                Text(_radius, "[$-en-US]0.######") &
-                                                " 0 " &
-                                                If(_ratio > 0.5, "1", "0") &
-                                                " 1 " &
-                                                Text(_endX, "[$-en-US]0.######") & " " &
-                                                Text(_endY, "[$-en-US]0.######") &
-                                                " Z' " &
-                                                "fill='" &
-                                                Coalesce(
-                                                    Text(_item.SegmentColor),
-                                                    "#64748B"
-                                                ) &
-                                                "' " &
-                                                "stroke='" &
-                                                cmp_PieChartPro.SliceSeparatorColorHex &
-                                                "' " &
-                                                "stroke-width='" &
-                                                Text(
-                                                    cmp_PieChartPro.SliceSeparatorWidth,
-                                                    "[$-en-US]0.##"
-                                                ) &
-                                                "' " &
-                                                "stroke-linejoin='round' " &
-                                                "transform='translate(" &
-                                                Text(_offsetX, "[$-en-US]0.######") & " " &
-                                                Text(_offsetY, "[$-en-US]0.######") &
-                                                ")' " &
-                                                "opacity='" &
-                                                Text(
-                                                    _opacity,
-                                                    "[$-en-US]0.##"
-                                                ) &
-                                                "'/>"
-                                            )
+                                            "'/>"
                                         )
                                     )
                                 )
                             ) &
+
+                            "<circle " &
+                            "cx='80' cy='80' r='66' " &
+                            "fill='none' " &
+                            "stroke='" &
+                                _separatorColor &
+                            "' " &
+                            "stroke-width='" &
+                                Text(
+                                    Max(
+                                        1,
+                                        cmp_PieChartPro.SliceSeparatorWidth
+                                    ),
+                                    "[$-en-US]0.00"
+                                ) &
+                            "'/>" &
 
                             "</svg>"
                         )
@@ -725,7 +782,7 @@ ComponentDefinitions:
                     )
                   X: =12
                   Y: =If(cmp_PieChartPro.ShowHeader, 48, 6)
-            - lblPCP_FooterValue:
+            - lblPCP_FooterValue_1:
                 Control: Label@2.5.1
                 Properties:
                   Align: =Align.Center
@@ -753,10 +810,10 @@ ComponentDefinitions:
                     !cmp_PieChartPro.IsLoading &&
                     !cmp_PieChartPro.IsEmpty &&
                     !cmp_PieChartPro.IsError
-                  Width: =imgPCP_Pie.Width
-                  X: =imgPCP_Pie.X
+                  Width: =imgPCP_Pie_1.Width
+                  X: =imgPCP_Pie_1.X
                   Y: =Parent.Height - 36
-            - lblPCP_FooterLabel:
+            - lblPCP_FooterLabel_1:
                 Control: Label@2.5.1
                 Properties:
                   Align: =Align.Center
@@ -783,10 +840,10 @@ ComponentDefinitions:
                     !cmp_PieChartPro.IsLoading &&
                     !cmp_PieChartPro.IsEmpty &&
                     !cmp_PieChartPro.IsError
-                  Width: =imgPCP_Pie.Width
-                  X: =imgPCP_Pie.X
+                  Width: =imgPCP_Pie_1.Width
+                  X: =imgPCP_Pie_1.X
                   Y: =Parent.Height - 17
-            - galPCP_Legend:
+            - galPCP_Legend_1:
                 Control: Gallery@2.15.0
                 Variant: Vertical
                 Properties:
@@ -798,13 +855,13 @@ ComponentDefinitions:
                             Filter(
                                 cmp_PieChartPro.Items,
                                 cmp_PieChartPro.ShowZeroSegments ||
-                                Coalesce(Value(SegmentValue), 0) > 0
+                                Coalesce(SegmentValue, 0) > 0
                             ),
                             PCPPercentage,
                                 If(
                                     cmp_PieChartPro.TotalValue <= 0,
                                     0,
-                                    Coalesce(Value(SegmentValue), 0) /
+                                    Coalesce(SegmentValue, 0) /
                                     cmp_PieChartPro.TotalValue
                                 )
                         ),
@@ -812,7 +869,6 @@ ComponentDefinitions:
                         SortOrder.Ascending
                     )
                   OnSelect: =cmp_PieChartPro.OnSegmentSelect()
-                  ShowScrollbar: =true
                   TemplatePadding: =2
                   TemplateSize: =38
                   Visible: |-
@@ -821,18 +877,18 @@ ComponentDefinitions:
                     !cmp_PieChartPro.IsLoading &&
                     !cmp_PieChartPro.IsEmpty &&
                     !cmp_PieChartPro.IsError
-                  Width: =Parent.Width - imgPCP_Pie.Width - 34
-                  X: =imgPCP_Pie.X + imgPCP_Pie.Width + 10
+                  Width: =Parent.Width - imgPCP_Pie_1.Width - 34
+                  X: =imgPCP_Pie_1.X + imgPCP_Pie_1.Width + 10
                   Y: =If(cmp_PieChartPro.ShowHeader, 52, 6)
                 Children:
-                  - btnPCP_LegendRow:
+                  - btnPCP_LegendRow_1:
                       Control: Classic/Button@2.2.0
                       Properties:
                         BorderColor: =cmp_PieChartPro.AccentColor
                         BorderThickness: |-
                           =If(
                               cmp_PieChartPro.SelectedSegmentKey =
-                              Text(ThisItem.SegmentKey),
+                              Coalesce(ThisItem.SegmentKey, ""),
                               1,
                               0
                           )
@@ -848,7 +904,7 @@ ComponentDefinitions:
                         Fill: |-
                           =If(
                               cmp_PieChartPro.SelectedSegmentKey =
-                              Text(ThisItem.SegmentKey),
+                              Coalesce(ThisItem.SegmentKey, ""),
                               ColorFade(cmp_PieChartPro.AccentColor, 0.92),
                               Color.Transparent
                           )
@@ -866,10 +922,10 @@ ComponentDefinitions:
                         RadiusTopRight: =7
                         Text: =""
                         Tooltip: |-
-                          =Text(ThisItem.SegmentLabel) &
+                          =Coalesce(ThisItem.SegmentLabel, "") &
                           " · " &
                           Text(
-                              Coalesce(Value(ThisItem.SegmentValue), 0),
+                              Coalesce(ThisItem.SegmentValue, 0),
                               cmp_PieChartPro.ValueFormat
                           ) &
                           cmp_PieChartPro.ValueSuffix &
@@ -880,13 +936,13 @@ ComponentDefinitions:
                           )
                         Width: =Parent.TemplateWidth - 4
                         X: =2
-                  - btnPCP_ColorSwatch:
+                  - btnPCP_ColorSwatch_1:
                       Control: Classic/Button@2.2.0
                       Properties:
                         BorderColor: =Color.Transparent
                         BorderThickness: =0
                         DisplayMode: =DisplayMode.View
-                        Fill: =ColorValue(Coalesce(Text(ThisItem.SegmentColor), "#64748B"))
+                        Fill: =ColorValue(Coalesce(ThisItem.SegmentColor, "#64748B"))
                         Height: =10
                         RadiusBottomLeft: =5
                         RadiusBottomRight: =5
@@ -896,7 +952,7 @@ ComponentDefinitions:
                         Width: =10
                         X: =10
                         Y: =8
-                  - lblPCP_SegmentLabel:
+                  - lblPCP_SegmentLabel_1:
                       Control: Label@2.5.1
                       Properties:
                         Color: =cmp_PieChartPro.TextColor
@@ -910,15 +966,15 @@ ComponentDefinitions:
                         PaddingRight: =0
                         PaddingTop: =0
                         Size: =8
-                        Text: =Text(ThisItem.SegmentLabel)
-                        Tooltip: =Text(ThisItem.SegmentLabel)
+                        Text: =Coalesce(ThisItem.SegmentLabel, "")
+                        Tooltip: =Coalesce(ThisItem.SegmentLabel, "")
                         Width: |-
                           =Parent.TemplateWidth -
                           If(cmp_PieChartPro.ShowValues, 86, 24) -
                           If(cmp_PieChartPro.ShowPercentages, 62, 0)
                         X: =28
                         Y: =4
-                  - lblPCP_SegmentValue:
+                  - lblPCP_SegmentValue_1:
                       Control: Label@2.5.1
                       Properties:
                         Align: =Align.Right
@@ -935,7 +991,7 @@ ComponentDefinitions:
                         Size: =8
                         Text: |-
                           =Text(
-                              Coalesce(Value(ThisItem.SegmentValue), 0),
+                              Coalesce(ThisItem.SegmentValue, 0),
                               cmp_PieChartPro.ValueFormat
                           ) & cmp_PieChartPro.ValueSuffix
                         Visible: =cmp_PieChartPro.ShowValues
@@ -945,7 +1001,7 @@ ComponentDefinitions:
                           Self.Width -
                           If(cmp_PieChartPro.ShowPercentages, 58, 8)
                         Y: =4
-                  - lblPCP_SegmentPercentage:
+                  - lblPCP_SegmentPercentage_1:
                       Control: Label@2.5.1
                       Properties:
                         Align: =Align.Right
@@ -968,7 +1024,7 @@ ComponentDefinitions:
                         Width: =52
                         X: =Parent.TemplateWidth - Self.Width - 6
                         Y: =4
-                  - btnPCP_BarTrack:
+                  - btnPCP_BarTrack_1:
                       Control: Classic/Button@2.2.0
                       Properties:
                         BorderColor: =Color.Transparent
@@ -984,13 +1040,13 @@ ComponentDefinitions:
                         Width: =Parent.TemplateWidth - 36
                         X: =28
                         Y: =Parent.TemplateHeight - 8
-                  - btnPCP_BarFill:
+                  - btnPCP_BarFill_1:
                       Control: Classic/Button@2.2.0
                       Properties:
                         BorderColor: =Color.Transparent
                         BorderThickness: =0
                         DisplayMode: =DisplayMode.View
-                        Fill: =ColorValue(Coalesce(Text(ThisItem.SegmentColor), "#64748B"))
+                        Fill: =ColorValue(Coalesce(ThisItem.SegmentColor, "#64748B"))
                         Height: =3
                         RadiusBottomLeft: =2
                         RadiusBottomRight: =2
@@ -1000,7 +1056,7 @@ ComponentDefinitions:
                         Width: =Max(0, (Parent.TemplateWidth - 36) * ThisItem.PCPPercentage)
                         X: =28
                         Y: =Parent.TemplateHeight - 8
-            - conPCP_StateOverlay:
+            - conPCP_StateOverlay_1:
                 Control: GroupContainer@1.5.0
                 Variant: ManualLayout
                 Properties:
@@ -1012,7 +1068,7 @@ ComponentDefinitions:
                   Width: =Parent.Width
                   Y: =If(cmp_PieChartPro.ShowHeader, 46, 0)
                 Children:
-                  - spnPCP_Loading:
+                  - spnPCP_Loading_1:
                       Control: Spinner@1.4.6
                       Properties:
                         Height: =28
@@ -1021,7 +1077,7 @@ ComponentDefinitions:
                         Width: =28
                         X: =(Parent.Width - Self.Width) / 2
                         Y: =(Parent.Height - 62) / 2
-                  - lblPCP_State:
+                  - lblPCP_State_1:
                       Control: Label@2.5.1
                       Properties:
                         Align: =Align.Center
