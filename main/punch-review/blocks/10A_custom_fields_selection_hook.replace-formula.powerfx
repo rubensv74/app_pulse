@@ -11,25 +11,30 @@
 // - This formula supersedes Block 09A. Do not append it to 09A.
 //
 // Temporary safety until Block 13:
-// - If custom-field edits are unsaved, navigation to a different Punch is blocked.
-// - Save or Reset custom fields before changing Punch.
+// - Any selection/reload request is ignored while custom-field edits are unsaved.
+// - If the request targets another Punch, the user is warned and the requested
+//   index is restored to the current Punch.
+// - Save or Reset custom fields before changing Punch or reloading its services.
 // - Block 13 will replace this simple lock with the full dirty-change dialog.
 
 If(
-    varPunchReviewDirty &&
-    Coalesce(
-        varPunchReviewRequestedIndex,
-        varPunchReviewCurrentIndex,
-        1
-    ) <> varPunchReviewCurrentIndex,
+    varPunchReviewDirty,
 
-    Set(
-        varPunchReviewRequestedIndex,
-        varPunchReviewCurrentIndex
-    );
-    Notify(
-        "Save or reset custom-field changes before changing Punch.",
-        NotificationType.Warning
+    If(
+        Coalesce(
+            varPunchReviewRequestedIndex,
+            varPunchReviewCurrentIndex,
+            1
+        ) <> varPunchReviewCurrentIndex,
+
+        Set(
+            varPunchReviewRequestedIndex,
+            varPunchReviewCurrentIndex
+        );
+        Notify(
+            "Save or reset custom-field changes before changing Punch.",
+            NotificationType.Warning
+        )
     ),
 
     CountRows(colPunchReviewQueue) = 0,
