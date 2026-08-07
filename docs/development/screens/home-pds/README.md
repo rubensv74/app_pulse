@@ -40,12 +40,34 @@ If a later block depends on a contract changed after these commits, that block m
 
 ---
 
+## Block 00 validation decision
+
+Block 00 was explicitly accepted on **2026-08-07**.
+
+The following architectural decisions are therefore frozen for the first construction pass:
+
+- build `scr_Home_PDS` from a blank screen in parallel with `scr_Home`;
+- keep `scr_Home` as stable reference and rollback until final cutover;
+- primary archetype: Operational Control Tower;
+- secondary pattern: Data Explorer;
+- reuse proven backend contracts rather than recreate them;
+- reuse compatible premium components through PDS inputs;
+- use `cmp_PieChartPro` as the primary discipline-composition chart;
+- complement the pie with interactive horizontal discipline bars;
+- synchronize pie and bars through one shared discipline-selection state;
+- keep SQL/Flow snapshot and pagination authority server-side;
+- do not change `StartScreen` during construction.
+
+`cmp_DonutPro` remains a valid PDS component for progress/completion/capacity-style metrics, but it is **not** the selected chart for Home_PDS discipline distribution.
+
+---
+
 ## Block status
 
 | Block | Name | Status |
 |---:|---|---|
-| 00 | Foundation audit and reuse matrix | **published — pending validation** |
-| 01 | Blank screen shell | planned |
+| 00 | Foundation audit and reuse matrix | **validated** |
+| 01 | Blank screen shell | **next allowed block** |
 | 02 | PDS Page Header contract / implementation | planned |
 | 03 | Home_PDS header integration | planned |
 | 04 | Workspace/body structural layout | planned |
@@ -57,7 +79,7 @@ If a later block depends on a contract changed after these commits, that block m
 | 10 | KPI real-data integration | planned |
 | 11 | Heatmap integration | planned |
 | 12 | Heatmap selection + active context | planned |
-| 13 | Discipline donut integration | planned |
+| 13 | Discipline pie integration | planned |
 | 14 | Discipline bars + shared selection | planned |
 | 15 | Action toolbar | planned |
 | 16 | Cell-details remote read | planned |
@@ -73,7 +95,7 @@ If a later block depends on a contract changed after these commits, that block m
 
 ## Construction policy
 
-`Block 01` must not be published until `Block 00` is explicitly accepted.
+`Block 01` is now authorized because `Block 00` has been explicitly accepted.
 
 The new screen must be created from a blank screen. Do not duplicate `scr_Home`.
 
