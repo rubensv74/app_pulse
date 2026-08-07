@@ -1,0 +1,82 @@
+# BLOCK 10D — CUSTOM FIELDS IN BILINGUAL HELP
+#
+# Apply only after Block 10 has been validated in Studio with a real Punch.
+#
+# OPERATION 1 — ADD TWO CHILDREN
+# Parent: conPR_HelpContent
+# Exact location: after lblPR_HelpCommentsBody and before conPR_HelpWarningCard.
+#
+# OPERATION 2 — REPLACE TEXT PROPERTY
+# Control: lblPR_HelpActivityTitle
+#
+# OPERATION 3 — REPLACE TEXT PROPERTY
+# Controls: lblPR_HelpLimitationsTitle and lblPR_HelpLimitationsBody
+#
+# The language selector remains the existing TabList.
+
+# =====================================================
+# OPERATION 1 — ADD AFTER lblPR_HelpCommentsBody
+# =====================================================
+
+- lblPR_HelpCustomFieldsTitle:
+    Control: ModernText@1.0.0
+    Properties:
+      AutoHeight: =true
+      Color: =varTheme_Text
+      FontWeight: =FontWeight.Semibold
+      Height: =26
+      Size: =11
+      Text: |-
+        =If(
+            Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+            "5. Review custom fields",
+            "5. Revisa los campos personalizados"
+        )
+      Width: =Parent.Width
+- lblPR_HelpCustomFieldsBody:
+    Control: ModernText@1.0.0
+    Properties:
+      AutoHeight: =true
+      Color: =varTheme_TextMuted
+      Height: =104
+      Size: =9
+      Text: |-
+        =If(
+            Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+            "Custom fields are loaded from the real Punch service. Managers can edit Text, Number, Yes/No, Date, Choice and MultiChoice values. Save persists the current changes; Reset restores the last server-loaded values. Other roles remain read-only. While changes are unsaved, navigation is temporarily blocked to prevent accidental data loss.",
+            "Los campos personalizados se cargan desde el servicio real del Punch. Los gestores pueden editar valores de Texto, Número, Sí/No, Fecha, Selección y Selección múltiple. Save guarda los cambios y Reset restaura los últimos valores cargados del servidor. El resto de roles permanece en solo lectura. Mientras existan cambios sin guardar, la navegación se bloquea temporalmente para evitar pérdidas accidentales."
+        )
+      Width: =Parent.Width
+
+# =====================================================
+# OPERATION 2 — REPLACE lblPR_HelpActivityTitle.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "6. Read Session Activity",
+      "6. Consulta Session Activity"
+  )
+
+# =====================================================
+# OPERATION 3A — REPLACE lblPR_HelpLimitationsTitle.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "7. Current implementation status",
+      "7. Estado actual de implementación"
+  )
+
+# =====================================================
+# OPERATION 3B — REPLACE lblPR_HelpLimitationsBody.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "Progress, related Punches and the full unsaved-change decision dialog are being added in later blocks. Reviewed remains session-only. Custom-field changes are already protected by a temporary navigation lock until Save or Reset is used.",
+      "El progreso, los Punches relacionados y el diálogo completo de decisión ante cambios sin guardar se añadirán en bloques posteriores. Reviewed sigue siendo solo de sesión. Los cambios de campos personalizados ya están protegidos por un bloqueo temporal de navegación hasta utilizar Save o Reset."
+  )
