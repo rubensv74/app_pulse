@@ -1,0 +1,99 @@
+Screens:
+  scr_Home_PDS:
+    Properties:
+      Fill: =varTheme_PageBg
+      LoadingSpinnerColor: =varTheme_ActionPrimary
+      OnVisible: |-
+        =
+        If(IsBlank(varTheme_PageBg), Set(varTheme_PageBg, ColorValue("#F6F8FB")));
+        If(IsBlank(varTheme_Surface), Set(varTheme_Surface, ColorValue("#FFFFFF")));
+        If(IsBlank(varTheme_Border), Set(varTheme_Border, ColorValue("#E2E8F0")));
+        If(IsBlank(varTheme_Text), Set(varTheme_Text, ColorValue("#0F172A")));
+        If(IsBlank(varTheme_TextMuted), Set(varTheme_TextMuted, ColorValue("#64748B")));
+        If(IsBlank(varTheme_BrandDark), Set(varTheme_BrandDark, ColorValue("#07111F")));
+        If(IsBlank(varTheme_ActionPrimary), Set(varTheme_ActionPrimary, ColorValue("#1677FF")));
+        If(IsBlank(varTheme_SpaceM), Set(varTheme_SpaceM, 12));
+
+        Set(varAppView, "Home");
+        Set(varPageKey, "HOME_PDS");
+        Set(varPageTitle, "Punch Control Tower");
+        Set(varPageSubtitle, "Open punch concentration, discipline distribution and operational drill-through");
+
+    Children:
+      - conHPDS_ScreenRoot:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =varTheme_PageBg
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutGap: =0
+            Width: =Parent.Width
+
+          Children:
+            - cmpHPDS_Sidebar:
+                Control: CanvasComponent
+                ComponentName: cmp_SidebarNav
+                Properties:
+                  ActiveKey: ="Home"
+                  AppVersion: ="PULSE"
+                  EnvironmentLabel: ="ENV.PRE.TR.162"
+                  Fill: =varTheme_BrandDark
+                  Height: =Parent.Height
+                  IsCollapsed: =true
+                  Items: =colSidebarNavItems
+                  NavItems: =colSidebarNavItems
+                  ProjectCode: =Coalesce(varSelectedProject.ProjectCode, "")
+                  ProjectName: =Coalesce(varSelectedProject.ProjectName, "")
+                  UserRole: =Coalesce(varUserRole, "reader")
+                  Width: =154
+
+            - conHPDS_ContentShell:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.Stretch
+                  DropShadow: =DropShadow.None
+                  Fill: =varTheme_PageBg
+                  FillPortions: =1
+                  Height: =Parent.Height
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =varTheme_SpaceM
+                  LayoutMinHeight: =320
+                  LayoutMinWidth: =320
+                  PaddingBottom: =varTheme_SpaceM
+                  PaddingLeft: =varTheme_SpaceM
+                  PaddingRight: =varTheme_SpaceM
+                  PaddingTop: =varTheme_SpaceM
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+
+                Children:
+                  - conHPDS_PageHeaderHost:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        AlignInContainer: =AlignInContainer.Stretch
+                        DropShadow: =DropShadow.None
+                        Fill: =varTheme_Surface
+                        FillPortions: =0
+                        Height: =80
+                        LayoutMinHeight: =80
+                        LayoutMinWidth: =320
+                        RadiusBottomLeft: =0
+                        RadiusBottomRight: =0
+                        RadiusTopLeft: =0
+                        RadiusTopRight: =0
+                        Width: =Parent.Width
+
+                      Children:
+                        - cmpHPDS_PageHeader:
+                            Control: CanvasComponent
+                            ComponentName: cmp_PageHeaderPro
+                            Properties:
+                              Height: =Parent.Height
+                              Width: =Parent.Width
