@@ -1,10 +1,11 @@
 # PULSE Repository Reorganization Tracker
 
-**Status:** active — Phase 5 policy resolved  
+**Status:** completed  
 **Audit baseline:** `1b8c8dffd1185a5f775934b0fceeff3cbe642c55`  
-**Audit:** `docs/analysis/repository/REPOSITORY_AUDIT_2026-08-10.md`
+**Audit:** `docs/analysis/repository/REPOSITORY_AUDIT_2026-08-10.md`  
+**Closeout:** `docs/analysis/repository/REPOSITORY_REORGANIZATION_CLOSEOUT_2026-08-10.md`
 
-This tracker controls structural cleanup independently from runtime feature development.
+This tracker controlled structural cleanup independently from runtime feature development.
 
 | Phase | Scope | Status | Runtime risk |
 |---:|---|---|---|
@@ -16,8 +17,8 @@ This tracker controls structural cleanup independently from runtime feature deve
 | 3 | SQL/database/reference consolidation | **completed** | medium |
 | 4 | Guides/sprints/roadmap classification and archive | **completed** | low |
 | 5 | Component usage audit + physical legacy cleanup | **completed** | medium |
-| 6 | Naming normalization where safe | **in progress** | medium |
-| 7 | Link/retrieval QA and closeout | planned | none |
+| 6 | Naming normalization where safe | **completed** | medium |
+| 7 | Link/retrieval QA and closeout | **completed** | none |
 
 ## Repository lifecycle decision
 
@@ -27,19 +28,13 @@ On 2026-08-10 the repository adopted **Option A**:
 main/components = runtime dependencies + active planned/PDS component source only
 ```
 
-Additional rule:
+Additional permanent rule:
 
 > When current work needs a new reusable component, its canonical source is created under `main/components/` in the same development cycle. The component catalog is updated immediately, and reusable PDS components also receive a specification under `docs/design-system/components/`.
 
 Historical component source does not remain in the active component pool merely for possible future reuse.
 
-## Phase 5 applied
-
-Usage audit:
-
-```text
-docs/analysis/repository/COMPONENT_USAGE_AUDIT_2026-08-10.md
-```
+## Phase 5 result
 
 Confirmed live dependencies kept in `main/components/`:
 
@@ -49,30 +44,65 @@ scr_Home    → cmp_DashboardSectionHeader
 scr_Punches → cmp_DetailDrawer_old
 ```
 
-No canonical-screen usage was found for:
+Inactive components moved to history:
 
 ```text
-cmp_ExecutiveKpiCard
-cmp_ExecutiveInsightCard
+docs/archive/components/cmp_ExecutiveKpiCard.pa.yaml
+docs/archive/components/cmp_ExecutiveInsightCard.pa.yaml
 ```
 
-Under Option A they were moved from the active component pool to:
+The newly required `cmp_PageHeaderPro` was published to the active component source set at:
 
 ```text
-docs/archive/components/
+main/components/cmp_PageHeaderPro.pa.yaml
 ```
 
-Their source is retained for traceability, but they are not normal reuse candidates.
+## Phase 6 result
 
-## Current controlled phase — Phase 6
+No unsafe cosmetic runtime rename was performed.
 
-Normalize names only where doing so cannot break Power Apps/runtime contracts or active references.
+Live naming exceptions are documented at:
 
-Rules:
+```text
+docs/governance/NAMING_EXCEPTIONS.md
+```
 
-- do not rename `cmp_DetailDrawer_old` while `scr_Punches` still depends on that exact Canvas component identity;
-- do not rename canonical Power Apps screen/component identities merely to improve repository aesthetics;
-- safe documentation/path normalization may proceed;
-- if a name is misleading but live, document lifecycle status rather than performing a cosmetic runtime rename.
+In particular:
 
-Phase 6 should prefer **no rename** over a rename with uncertain runtime impact.
+```text
+scr_Punches_1.pa.yaml
+cmp_DetailDrawer_old.pa.yaml
+```
+
+remain unchanged until explicit runtime migrations make renaming safe.
+
+## Phase 7 result
+
+Post-migration stale-path searches returned no repository-code matches for:
+
+```text
+main/punch-review
+sql/schema_warroom
+database/warroom/tools
+docs/SQL
+docs/guides/EXCEL_IMPORT_ARCHITECTURE.md
+docs/guides/ROADMAP.md
+main/components/cmp_ExecutiveKpiCard.pa.yaml
+main/components/cmp_ExecutiveInsightCard.pa.yaml
+```
+
+Canonical root, `main/`, `sql/`, Punch Review workspace and archive component locations were also directly verified through repository contents.
+
+## Final state
+
+Repository reorganization is closed for the current scope.
+
+Future organization changes are governed by:
+
+```text
+docs/governance/REPOSITORY_STRUCTURE_STANDARD.md
+docs/governance/NAMING_EXCEPTIONS.md
+docs/design-system/COMPONENT_CATALOG.md
+```
+
+Structural cleanup must continue as normal governance during feature work rather than through parallel ad-hoc folder creation.
