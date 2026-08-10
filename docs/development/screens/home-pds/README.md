@@ -46,7 +46,7 @@ scr_Home_PDS
 | 00 | Foundation audit and reuse matrix | **validated** |
 | 01 | Blank screen shell | **validated** |
 | 02 | PDS Page Header contract / implementation | **validated for progression / isolated instance-safe** |
-| 03 | Home_PDS header integration | **FAILED on partial child edit surface / 03A full-screen correction pending Studio validation** |
+| 03 | Home_PDS header integration | **FAILED for host-side custom-property assignment in Source Code / 03B pending** |
 | 04 | Workspace/body structural layout | **blocked by Block 03** |
 | 05 | Minimum typed runtime state | planned |
 | 06 | KPI strip with local presentation model | planned |
@@ -92,7 +92,7 @@ power-apps/components/cmp_PageHeaderPro.pa.yaml
 
 The original instance-safety failure was corrected by comparing the complete component against `cmp_HeatMapPro` and `cmp_SidebarNav`, then rebuilding the full public contract using the proven PULSE metadata patterns.
 
-The corrected complete component was instantiated successfully in Power Apps Studio. Therefore:
+The corrected complete component was instantiated successfully in Power Apps Studio:
 
 ```text
 DEFINITION_ACCEPTED = PASS
@@ -103,30 +103,17 @@ Target-screen binding remains a separate validation surface.
 
 ## Block 03 — Header integration incident
 
-Original artifact:
+### 03 — partial child Source Code
+
+Artifact:
 
 ```text
 docs/development/screens/home-pds/blocks/03_header_integration.children.pa.yaml
 ```
 
-Studio rejected every `cmp_PageHeaderPro` custom property on the nested CanvasComponent instance with `PA2108 Unknown property`, including Text, Boolean and utility properties. Standard CanvasComponent properties such as `Height` and `Width` were not part of the reported failures.
+Studio accepted the generic `CanvasComponent` structure but returned `PA2108 Unknown property` for every `cmp_PageHeaderPro` custom property assigned by the screen.
 
-The error was produced while integrating the component through the **partial child/control Source Code edit surface**.
-
-This does not prove that the `cmp_PageHeaderPro` contract is invalid. PULSE contains a positive full-screen reference in `scr_PunchReview`, where `cmp_SidebarNav` is represented as:
-
-```yaml
-Control: CanvasComponent
-ComponentName: cmp_SidebarNav
-Properties:
-  ActiveKey: =...
-  ProjectCode: =...
-  ProjectName: =...
-```
-
-Therefore the instance-property syntax itself is already proven in a full `Screens:` source.
-
-### Block 03A corrective candidate
+### 03A — complete `Screens:` Source Code
 
 Artifact:
 
@@ -134,28 +121,56 @@ Artifact:
 docs/development/screens/home-pds/blocks/03A_header_integration.full-screen.pa.yaml
 ```
 
-Commit:
+The same PA2108 pattern was reproduced in a complete screen source. Therefore the previous edit-surface hypothesis is refuted for this incident.
+
+Confirmed differential:
 
 ```text
-e932d9e3af233cd5bea23c6b532e9c29d5ed974f
+Height / Width and generic CanvasComponent structure → recognized
+cmp_PageHeaderPro-specific custom properties         → not recognized by screen Source Code parser
 ```
 
-Corrective strategy:
+PULSE provides a positive counterexample: `scr_PunchReview` binds `cmp_SidebarNav` custom properties in screen Source Code successfully. Therefore generic `CanvasComponent + ComponentName + Properties` syntax is valid when Studio resolves the component public contract.
+
+Current interpretation is deliberately limited:
+
+> In the current app state, host-side Source Code does not resolve the `cmp_PageHeaderPro` public properties. The internal metadata reason is not claimed.
+
+## Block 03B — Studio-resolved contract integration
+
+Artifact:
 
 ```text
-failed partial ADD CHILD source
-→ preserve cmp_PageHeaderPro contract
-→ rebuild Block 01 + Block 03 as one complete Screens: source
-→ validate once
+docs/development/screens/home-pds/blocks/03B_header_integration_studio_contract.md
 ```
 
-If 03A passes, the incident is classified as an edit-surface/source-context compatibility issue and Block 03 can close.
+Strategy:
 
-If 03A returns the same PA2108 errors, the next investigation is **host-visible public-contract registration for cmp_PageHeaderPro**, not another property-by-property test.
+```text
+create host + component instance with only standard CanvasComponent properties
+→ save
+→ select cmpHPDS_PageHeader in Studio
+→ configure its public inputs through Studio property selector/formula bar
+→ save and let Studio own host-side binding representation
+```
+
+Required Block 03 overrides:
+
+```text
+Context1Interactive = false
+Context1Value       = current selected project
+Context2Interactive = false
+Context3Interactive = false
+Context3Value       = "Not loaded"
+ShowHelp            = false
+UtilityEnabled      = false
+```
+
+If those properties are visible on the selected instance, configure all seven in one pass and validate the header.
+
+If `Context1Value` and the other public properties are absent from Studio's property selector, stop. That result is a direct gate for **public-contract re-registration in Studio**; no further screen-YAML variants are justified.
 
 ## Diagnostic efficiency rule
-
-For Power Apps components in this workspace:
 
 ```text
 problem component
@@ -166,7 +181,7 @@ problem component
 → reduction only if still necessary
 ```
 
-Do not request property-by-property microtests while repository comparison can produce a concrete correction.
+A failed hypothesis must be retired immediately rather than spawning equivalent YAML variants.
 
 ## Construction policy
 
