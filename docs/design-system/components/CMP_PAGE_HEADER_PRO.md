@@ -1,6 +1,6 @@
 # cmp_PageHeaderPro — PDS Component Specification
 
-**Status:** PDS candidate / Block 02 implementation contract  
+**Status:** REVIEW_REQUIRED — Block 02 instance-safety validation pending  
 **Design System:** PULSE Design System v1  
 **Component:** `cmp_PageHeaderPro`  
 **Canonical source:** `power-apps/components/cmp_PageHeaderPro.pa.yaml`  
@@ -10,7 +10,7 @@
 
 ## 1. Purpose
 
-`cmp_PageHeaderPro` is the canonical PULSE page-header component.
+`cmp_PageHeaderPro` is the intended canonical PULSE page-header component.
 
 It provides a consistent top-level page identity and context surface without turning the header into a decorative card. It separates three responsibilities:
 
@@ -20,6 +20,12 @@ Title / subtitle   Project / template / scope    Refresh / back / help
 ```
 
 The component is reusable across SaaS archetypes and defines page-header visual grammar rather than screen-specific business logic.
+
+It is not considered ready for normal screen integration until it passes:
+
+```text
+docs/development/POWER_APPS_COMPONENT_VALIDATION_GATE.md
+```
 
 ---
 
@@ -51,7 +57,7 @@ Utility     Refresh
 Help        ?
 ```
 
-Block 02 creates/validates the reusable component. Screen binding is handled by the following integration block.
+Block 02 creates **and validates** the reusable component. Screen binding belongs to Block 03 and cannot start before `INSTANCE_SAFE`.
 
 ---
 
@@ -114,6 +120,7 @@ The consuming screen owns business state and binds it through inputs/events.
 ## 6. Visual geometry
 
 ```text
+Width              1200
 Height             80
 Horizontal padding 16
 Internal gap       12
@@ -196,16 +203,52 @@ The component renders supplied state and raises events only.
 
 ---
 
-## 10. Acceptance criteria
+## 10. Validation state
+
+Required sequence:
 
 ```text
-[ ] component is accepted by Power Apps Studio
+PASS_STATIC
+→ COMPONENT_DEFINITION_ACCEPTED
+→ INSTANCE_SAFE
+→ PUBLIC_CONTRACT_VALIDATED
+→ VISUAL_QA_VALIDATED
+→ READY_FOR_INTEGRATION
+```
+
+Observed effect on 2026-08-10:
+
+```text
+Power Apps Studio closed when an instance of cmp_PageHeaderPro was inserted into scr_Home_PDS.
+```
+
+The effect is confirmed; the technical root cause remains `UNKNOWN` until reduced diagnostic testing isolates it.
+
+Current validation report:
+
+```text
+docs/development/screens/home-pds/CMP_PAGE_HEADER_PRO_VALIDATION_REPORT_2026-08-10.md
+```
+
+---
+
+## 11. Acceptance criteria
+
+```text
+[ ] static source review passes current compatibility rules
+[ ] component definition is accepted by Power Apps Studio
+[ ] definition saves without attributable App Checker errors
+[ ] one default instance can be inserted on an isolated blank screen without Studio closing
+[ ] isolated instance saves and reopens correctly
+[ ] default geometry renders correctly
+[ ] intended desktop width variation does not corrupt authoring/layout
 [ ] title/subtitle/context hierarchy matches PDS
 [ ] context slots can be hidden independently
 [ ] interactive slots expose affordance without hiding text
 [ ] informational slots do not imply click behavior
 [ ] utility can be hidden/disabled
 [ ] help can be hidden
+[ ] public events can be exercised in isolation
 [ ] no hidden global state
 [ ] no normal-card shadow
 [ ] static ModernText uses AutoHeight=true unless a documented exception exists
@@ -215,3 +258,5 @@ The component renders supplied state and raises events only.
 [ ] App Checker introduces no PA1001/PA2108 attributable to the component
 [ ] accepted complete source is synchronized to `power-apps/components/cmp_PageHeaderPro.pa.yaml`
 ```
+
+Only after all required definition, instance, contract and QA checks pass may Block 03 bind the component to `scr_Home_PDS`.
