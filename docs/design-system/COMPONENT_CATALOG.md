@@ -54,6 +54,7 @@ ARCHIVED          retained only for history; not an active reuse candidate
 | `cmp_EmptyState` | PDS_CANDIDATE | Preferred empty/error state base; continue visual hardening |
 | `cmp_HeatMapPro` | PDS_CANDIDATE | Preferred heatmap component |
 | `cmp_KpiCardPro` | PDS_CANDIDATE | Preferred KPI card for new PDS work |
+| `cmp_PageHeaderPro` | PDS_CANDIDATE | Canonical source: `main/components/cmp_PageHeaderPro.pa.yaml`; current Home_PDS header component. PDS spec: `docs/design-system/components/CMP_PAGE_HEADER_PRO.md`. Final 02A visual revalidation remains part of the Home_PDS construction gate |
 | `cmp_PieChartPro` | PDS_CANDIDATE | Preferred composition chart for Home_PDS discipline distribution |
 | `cmp_SidebarNav` | ACTIVE | Current shared navigation component |
 | `cmp_SkeletonLoader` | PDS_CANDIDATE | Preferred loading placeholder base |
