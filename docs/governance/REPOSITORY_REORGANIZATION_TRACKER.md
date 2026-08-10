@@ -1,6 +1,6 @@
 # PULSE Repository Reorganization Tracker
 
-**Status:** active — architecture/lifecycle decision required  
+**Status:** active — Phase 5 policy resolved  
 **Audit baseline:** `1b8c8dffd1185a5f775934b0fceeff3cbe642c55`  
 **Audit:** `docs/analysis/repository/REPOSITORY_AUDIT_2026-08-10.md`
 
@@ -15,126 +15,39 @@ This tracker controls structural cleanup independently from runtime feature deve
 | 2 | Punch Review construction workspace migration | **completed** | low/medium |
 | 3 | SQL/database/reference consolidation | **completed** | medium |
 | 4 | Guides/sprints/roadmap classification and archive | **completed** | low |
-| 5 | Component usage audit + physical legacy cleanup | **blocked by lifecycle decision** | medium |
-| 6 | Naming normalization where safe | planned | medium |
+| 5 | Component usage audit + physical legacy cleanup | **completed** | medium |
+| 6 | Naming normalization where safe | **in progress** | medium |
 | 7 | Link/retrieval QA and closeout | planned | none |
 
-## Completed evidence
+## Repository lifecycle decision
 
-### Phase 0
-
-Created:
+On 2026-08-10 the repository adopted **Option A**:
 
 ```text
-README.md
-docs/README.md
-docs/governance/REPOSITORY_STRUCTURE_STANDARD.md
-docs/analysis/repository/REPOSITORY_AUDIT_2026-08-10.md
+main/components = runtime dependencies + active planned/PDS component source only
 ```
 
-### Phase 1A
+Additional rule:
 
-Historical EPIC-01 delivery artifacts were archived under:
+> When current work needs a new reusable component, its canonical source is created under `main/components/` in the same development cycle. The component catalog is updated immediately, and reusable PDS components also receive a specification under `docs/design-system/components/`.
 
-```text
-docs/archive/deliveries/2026-07-27-epic-01/
-```
+Historical component source does not remain in the active component pool merely for possible future reuse.
 
-and removed from repository root / `main/`.
+## Phase 5 applied
 
-### Phase 1B
-
-`docs/guides/DESIGN_SYSTEM.md` is a superseded compatibility stub. Canonical authority is:
-
-```text
-docs/design-system/PULSE_DESIGN_SYSTEM.md
-```
-
-### Phase 1C
-
-Created:
-
-```text
-docs/design-system/COMPONENT_CATALOG.md
-```
-
-### Phase 2
-
-Punch Review construction evidence was moved from:
-
-```text
-main/punch-review/
-```
-
-to:
-
-```text
-docs/development/screens/punch-review/
-```
-
-Canonical runtime source remains untouched at:
-
-```text
-main/screens/PunchReview/scr_PunchReview.pa.yaml
-```
-
-### Phase 3
-
-SQL assets were consolidated to:
-
-```text
-sql/export/
-sql/import/
-sql/schema/warroom/
-sql/tools/warroom-schema/
-docs/reference/sql/warroom/
-```
-
-Competing locations removed:
-
-```text
-database/
-sql/schema_warroom/
-docs/SQL/
-```
-
-No SQL file content or runtime contract was changed during the structural move.
-
-### Phase 4
-
-`docs/guides/` was reduced to material that is intentionally still discoverable as guidance/compatibility documentation.
-
-Moved to archive/reference architecture as appropriate:
-
-```text
-docs/archive/deliveries/2026-07-27-epic-01/EPIC-01_COMPONENT_INTEGRATION.md
-docs/archive/sprints/excel-import-i01/
-docs/archive/remediation/2026-08-05/
-docs/archive/remediation/home/
-docs/archive/superseded-docs/2026-07/ARCHITECTURE.md
-docs/archive/roadmaps/ROADMAP_2026-07.md
-docs/architecture/integrations/excel-import/EXCEL_IMPORT_ARCHITECTURE.md
-```
-
-The old roadmap was archived because its epic status no longer represented current PULSE delivery state.
-
-## Phase 5 evidence
-
-Created:
+Usage audit:
 
 ```text
 docs/analysis/repository/COMPONENT_USAGE_AUDIT_2026-08-10.md
 ```
 
-Confirmed current runtime dependencies:
+Confirmed live dependencies kept in `main/components/`:
 
 ```text
 scr_Home    → cmp_ExecutiveAlertBanner
 scr_Home    → cmp_DashboardSectionHeader
 scr_Punches → cmp_DetailDrawer_old
 ```
-
-Therefore none of those three components may be physically removed or moved while their canonical screens depend on them.
 
 No canonical-screen usage was found for:
 
@@ -143,22 +56,23 @@ cmp_ExecutiveKpiCard
 cmp_ExecutiveInsightCard
 ```
 
-They are classified as `ARCHIVE_CANDIDATE`, not deleted.
-
-## Current architecture/lifecycle gate
-
-Before Phase 5 can physically clean the two unreferenced Executive components, the repository needs one policy decision:
+Under Option A they were moved from the active component pool to:
 
 ```text
-OPTION A
-main/components = runtime dependencies + active planned/PDS component source only
-
-OPTION B
-main/components = runtime dependencies + active planned/PDS source + inactive reusable library
+docs/archive/components/
 ```
 
-Under Option A, unreferenced legacy components should be moved to an archive/legacy source area after a final dependency check.
+Their source is retained for traceability, but they are not normal reuse candidates.
 
-Under Option B, they may remain in `main/components/`, but inactive components require an explicit lifecycle/catalog marker and must not be selected automatically by agents.
+## Current controlled phase — Phase 6
 
-No physical component move should occur before this decision.
+Normalize names only where doing so cannot break Power Apps/runtime contracts or active references.
+
+Rules:
+
+- do not rename `cmp_DetailDrawer_old` while `scr_Punches` still depends on that exact Canvas component identity;
+- do not rename canonical Power Apps screen/component identities merely to improve repository aesthetics;
+- safe documentation/path normalization may proceed;
+- if a name is misleading but live, document lifecycle status rather than performing a cosmetic runtime rename.
+
+Phase 6 should prefer **no rename** over a rename with uncertain runtime impact.

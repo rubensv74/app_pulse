@@ -1,8 +1,9 @@
 # PULSE Repository Structure Standard
 
 **Status:** Normative  
-**Version:** 1.0  
-**Scope:** `rubensv74/app_pulse`
+**Version:** 1.1  
+**Scope:** `rubensv74/app_pulse`  
+**Last reviewed:** 2026-08-10
 
 ---
 
@@ -50,16 +51,46 @@ main/
 Rules:
 
 - full canonical screen source belongs in `main/screens/<Screen>/`;
-- reusable Canvas component source belongs in `main/components/`;
+- reusable Canvas component source that is currently required or actively planned belongs in `main/components/`;
 - contracts and mappings belong under their dedicated folders;
 - modular construction blocks, design notes and user guides do **not** belong in `main/`;
-- source filenames ending in `_old`, `_backup`, `_copy`, `_final2`, etc. are prohibited in the active source area unless temporarily required during a documented migration.
+- source filenames ending in `_old`, `_backup`, `_copy`, `_final2`, etc. are prohibited in the active source area unless temporarily required by a documented live dependency/migration.
+
+### Active component policy — Option A
+
+`main/components/` is an **active source pool**, not a historical component library.
+
+It contains only:
+
+```text
+1. components used by current canonical runtime screens;
+2. components actively planned for approved current work;
+3. components newly created/evolved for current PDS or product development.
+```
+
+Inactive historical components that no longer have a current runtime or approved planned use are moved out of the active pool after a dependency audit and may be retained under:
+
+```text
+docs/archive/components/
+```
+
+### New component creation rule
+
+When a new reusable component is required by current work:
+
+1. create its canonical Source Code file under `main/components/`;
+2. update `docs/design-system/COMPONENT_CATALOG.md` in the same development cycle;
+3. if it is a reusable PDS component, create/update its specification under `docs/design-system/components/`;
+4. validate its Source Code in Power Apps Studio before treating it as installed/usable in the active app;
+5. do not leave the only copy of a required component in chat, a modular screen block, a temporary folder or an archive.
+
+The repository definition and the Studio installation state are separate facts: existence under `main/components/` does not prove the Canvas component has already been added to the active Power Apps application.
 
 ---
 
 ## 4. `sql/` — Executable SQL and database technical assets
 
-Target model:
+Canonical model:
 
 ```text
 sql/
@@ -114,7 +145,7 @@ Repository standards, lifecycle rules, contribution conventions and documentatio
 Current application/system architecture. Historical architecture assessments belong in analysis or archive.
 
 ### `docs/design-system/`
-The only normative location for PULSE UI/UX standards, SaaS archetypes, component specifications and visual QA guardrails.
+The only normative location for PULSE UI/UX standards, SaaS archetypes, component specifications, component lifecycle catalog and visual QA guardrails.
 
 ### `docs/specifications/`
 Functional/design specifications that define what a product area or screen must do.
@@ -144,6 +175,8 @@ Only reusable step-by-step operational/developer guides. A roadmap, architecture
 
 ### `docs/archive/`
 Historical/superseded material retained for traceability but not to be used as a current source of truth.
+
+Archived component source may be retained under `docs/archive/components/`, but it is never a normal reuse candidate.
 
 ---
 
@@ -188,7 +221,7 @@ lower-kebab-case.md for domain/reference notes
 
 Do not mix case conventions for equivalent folders (`SQL` vs `sql`).
 
-Runtime screen/component identities are exempt when Power Apps compatibility requires preserving their names.
+Runtime screen/component identities are exempt when Power Apps compatibility requires preserving their names. A misleading legacy runtime name must not be renamed while a canonical screen still depends on it unless the rename is handled as an explicit runtime migration.
 
 ---
 
@@ -201,14 +234,17 @@ ACTIVE
 PDS_CANDIDATE
 LEGACY_SUPPORTED
 DEPRECATED
+REVIEW_REQUIRED
 ARCHIVED
 ```
 
 Rules:
 
-- only `ACTIVE`, `PDS_CANDIDATE` and intentionally supported legacy components remain discoverable as normal reuse candidates;
-- explicitly old/unused components must not remain unclassified in the active component pool;
-- physical moves to legacy/archive occur only after a usage audit.
+- only `ACTIVE`, `PDS_CANDIDATE` and intentionally supported legacy components remain in the normal active reuse pool;
+- `LEGACY_SUPPORTED` may remain in `main/components/` while it is a current runtime dependency;
+- inactive historical components leave `main/components/` after dependency audit under Option A;
+- a newly required component is created in `main/components/` and catalogued in the same development cycle;
+- physical moves/renames/removals occur only after a usage audit.
 
 ---
 
@@ -265,6 +301,8 @@ When an agent needs context, use this authority order:
 5. analysis
 6. archive only when history is explicitly needed
 ```
+
+For reusable Power Apps components, `main/components/` is the active source set. Do not select component source from `docs/archive/components/` for new work unless an explicit decision reactivates it.
 
 Do not infer current behavior from an archived delivery report when current source exists.
 

@@ -20,15 +20,15 @@ Do not treat a recently modified historical document as authoritative merely bec
 
 ## Governance
 
-- `governance/REPOSITORY_STRUCTURE_STANDARD.md` — canonical repository organization rules.
-- `governance/REPOSITORY_REORGANIZATION_TRACKER.md` — current structural-cleanup tracker.
+- `governance/REPOSITORY_STRUCTURE_STANDARD.md` — canonical repository organization and active-component policy.
+- `governance/REPOSITORY_REORGANIZATION_TRACKER.md` — controlled cleanup status.
 
 ## Design System
 
 - `design-system/PULSE_DESIGN_SYSTEM.md` — canonical PULSE visual/interaction system.
 - `design-system/SAAS_INTERFACE_ARCHETYPES.md` — SaaS interface archetype specification.
 - `design-system/POWER_APPS_VISUAL_QA_GUARDRAILS.md` — visual QA rules learned from Studio validation.
-- `design-system/COMPONENT_CATALOG.md` — lifecycle and reuse guidance for reusable components.
+- `design-system/COMPONENT_CATALOG.md` — lifecycle and reuse guidance for active reusable components.
 - `design-system/components/` — reusable PDS component specifications.
 
 ## Development method
@@ -49,11 +49,11 @@ Do not treat a recently modified historical document as authoritative merely bec
 
 ### Punch Review
 
-Canonical runtime source:
+Current canonical screen source:
 
 - `../main/screens/PunchReview/scr_PunchReview.pa.yaml`
 
-Active construction workspace:
+Construction workspace:
 
 - `development/screens/punch-review/README.md`
 - `development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md`
@@ -65,59 +65,60 @@ Active construction workspace:
 - `specifications/PULSE_EXECUTIVE_DASHBOARD_FDS_v1.0.md`
 - `specifications/home-pds/`
 
+## Architecture
+
+- `architecture/integrations/excel-import/EXCEL_IMPORT_ARCHITECTURE.md`
+
 ## Analysis
 
 - `analysis/punch-review-workspace/`
 - `analysis/repository/REPOSITORY_AUDIT_2026-08-10.md`
+- `analysis/repository/COMPONENT_USAGE_AUDIT_2026-08-10.md`
 
 ## SQL reference
 
-Canonical SQL reference documentation:
-
-```text
-reference/sql/warroom/
-```
-
-Canonical executable/schema/tooling locations are outside `docs/`:
+Canonical SQL technical source and reference are now separated:
 
 ```text
 ../sql/export/
 ../sql/import/
 ../sql/schema/warroom/
 ../sql/tools/warroom-schema/
+reference/sql/warroom/
 ```
 
 ## Guides
 
-`guides/` is reserved for genuinely reusable step-by-step guidance. Some historical sprint/remediation/roadmap material still requires classification and is tracked in the reorganization plan.
+`guides/` is reserved for genuine reusable step-by-step guidance or explicit compatibility redirects.
 
 `guides/DESIGN_SYSTEM.md` is retained only as a compatibility redirect and is explicitly superseded by `design-system/PULSE_DESIGN_SYSTEM.md`.
 
 ## Archive
 
-Historical deliveries are stored under:
-
-- `archive/deliveries/`
-
 Archived content is retained for traceability and must not be treated as current implementation authority.
+
+Key areas:
+
+```text
+archive/deliveries/
+archive/sprints/
+archive/remediation/
+archive/roadmaps/
+archive/superseded-docs/
+archive/components/
+```
+
+Archived component source under `archive/components/` is not a normal reuse candidate. Current reusable component source belongs under `../main/components/`.
 
 ---
 
-## Structural cleanup status
+## Active component creation rule
 
-Completed:
+When current work requires a new reusable Power Apps component:
 
-- root README and documentation index;
-- repository structure standard and audit;
-- stale EPIC-01 delivery files removed from root and archived;
-- old Design System conflict resolved;
-- component lifecycle catalog created;
-- Punch Review construction workspace moved to `development/screens/punch-review/`;
-- SQL assets consolidated into canonical `sql/` and `reference/sql/` locations.
+1. create its canonical `.pa.yaml` source under `../main/components/`;
+2. update `design-system/COMPONENT_CATALOG.md` in the same development cycle;
+3. for reusable PDS components, create/update a specification under `design-system/components/`;
+4. separately validate that the component is actually installed/accepted by Power Apps Studio.
 
-Pending:
-
-- classify remaining guide/sprint/remediation/roadmap documents;
-- component usage audit before physical legacy cleanup;
-- safe naming normalization;
-- final stale-link search and AI-retrieval QA.
+This prevents required components from existing only in chat, blocks or temporary locations.
