@@ -1,0 +1,65 @@
+# HOME_PDS — cmp_PageHeaderPro diagnostic reduction — Stage C source-model
+#
+# Artifact type: PASTEABLE DIAGNOSTIC
+# Canonical product source: NO
+# Purpose: test one Source-Code-authored Input/Text property using the exact metadata shape demonstrated by cmp_HeatMapPro / cmp_SidebarNav inputs.
+# Target diagnostic component: cmp_PageHeaderPro_DiagCSource
+#
+# This candidate adds exactly one CustomProperty:
+# - PropertyKind: Input
+# - DisplayName
+# - Description
+# - DataType: Text
+# - Default
+#
+# The title ModernText consumes that property. No Events, Boolean/Color/Table properties, hit surfaces or sibling geometry chains are included.
+
+ComponentDefinitions:
+  cmp_PageHeaderPro_DiagCSource:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      TitleText:
+        PropertyKind: Input
+        DisplayName: TitleText
+        Description: Diagnostic title text
+        DataType: Text
+        Default: ="Punch Control Tower"
+
+    Properties:
+      Width: =1200
+      Height: =80
+
+    Children:
+      - conPHDCS_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =ColorValue("#FFFFFF")
+            Height: =Parent.Height
+            Width: =Parent.Width
+          Children:
+            - lblPHDCS_Title:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =ColorValue("#0F172A")
+                  FontWeight: =FontWeight.Semibold
+                  Height: =30
+                  Size: =20
+                  Text: =cmp_PageHeaderPro_DiagCSource.TitleText
+                  Width: =Parent.Width-32
+                  Wrap: =false
+                  X: =16
+                  Y: =13
+            - lblPHDCS_Subtitle:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =ColorValue("#64748B")
+                  Height: =20
+                  Size: =10
+                  Text: ="Open punch concentration, discipline distribution and operational drill-through"
+                  Width: =Parent.Width-32
+                  Wrap: =false
+                  X: =16
+                  Y: =44
