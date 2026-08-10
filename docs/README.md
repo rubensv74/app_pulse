@@ -21,6 +21,7 @@ Do not treat a recently modified historical document as authoritative merely bec
 ## Governance
 
 - `governance/REPOSITORY_STRUCTURE_STANDARD.md` — canonical repository organization rules.
+- `governance/REPOSITORY_REORGANIZATION_TRACKER.md` — current structural-cleanup tracker.
 
 ## Design System
 
@@ -48,11 +49,16 @@ Do not treat a recently modified historical document as authoritative merely bec
 
 ### Punch Review
 
-Current canonical screen source:
+Canonical runtime source:
 
 - `../main/screens/PunchReview/scr_PunchReview.pa.yaml`
 
-Construction workspace currently remains under `../main/punch-review/` and is scheduled for migration to `development/screens/punch-review/` by the repository cleanup plan.
+Active construction workspace:
+
+- `development/screens/punch-review/README.md`
+- `development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md`
+- `development/screens/punch-review/blocks/`
+- `development/screens/punch-review/user-guide/`
 
 ## Specifications
 
@@ -66,23 +72,30 @@ Construction workspace currently remains under `../main/punch-review/` and is sc
 
 ## SQL reference
 
-Current documentation is temporarily split between:
+Canonical SQL reference documentation:
 
-- `SQL/`
-- `../sql/schema_warroom/`
-- `../database/warroom/tools/`
+```text
+reference/sql/warroom/
+```
 
-This is a known repository issue. The canonical target is documented in `governance/REPOSITORY_STRUCTURE_STANDARD.md` and the repository audit.
+Canonical executable/schema/tooling locations are outside `docs/`:
+
+```text
+../sql/export/
+../sql/import/
+../sql/schema/warroom/
+../sql/tools/warroom-schema/
+```
 
 ## Guides
 
-`guides/` currently contains both genuine guides and historical material. Until migration is completed, prefer current normative/specification documents when overlap exists.
+`guides/` is reserved for genuinely reusable step-by-step guidance. Some historical sprint/remediation/roadmap material still requires classification and is tracked in the reorganization plan.
 
 `guides/DESIGN_SYSTEM.md` is retained only as a compatibility redirect and is explicitly superseded by `design-system/PULSE_DESIGN_SYSTEM.md`.
 
 ## Archive
 
-Historical deliveries are now stored under:
+Historical deliveries are stored under:
 
 - `archive/deliveries/`
 
@@ -92,22 +105,19 @@ Archived content is retained for traceability and must not be treated as current
 
 ## Structural cleanup status
 
-Repository cleanup is being executed incrementally to avoid breaking Power Apps, SQL and documentation references.
+Completed:
 
-Completed in Phase 0 / initial cleanup:
-
-- root README created;
-- documentation index created;
-- repository structure standard published;
-- repository audit published;
+- root README and documentation index;
+- repository structure standard and audit;
 - stale EPIC-01 delivery files removed from root and archived;
-- old `guides/DESIGN_SYSTEM.md` converted to a superseded compatibility stub;
-- component lifecycle catalog created.
+- old Design System conflict resolved;
+- component lifecycle catalog created;
+- Punch Review construction workspace moved to `development/screens/punch-review/`;
+- SQL assets consolidated into canonical `sql/` and `reference/sql/` locations.
 
-Pending controlled migrations:
+Pending:
 
-- Punch Review construction workspace → `development/screens/punch-review/`;
-- SQL consolidation;
-- remaining guide/sprint/archive cleanup;
-- component usage audit before physical legacy moves;
-- final stale-link search and retrieval QA.
+- classify remaining guide/sprint/remediation/roadmap documents;
+- component usage audit before physical legacy cleanup;
+- safe naming normalization;
+- final stale-link search and AI-retrieval QA.
