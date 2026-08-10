@@ -2,20 +2,18 @@
 
 **Status:** normative  
 **Canonical:** yes  
+**Version:** 1.1  
 **Last reviewed:** 2026-08-10
 
 ## Active source rule
 
-Canonical Power Apps source lives under:
+PULSE canonical technical source is organized by runtime:
 
 ```text
-power-apps/
-├── screens/
-├── components/
-├── contracts/
-├── mappings/
-├── tests/
-└── CHANGELOG.md
+power-apps/      Canvas screens, components, Power Apps contracts/mappings/tests
+power-automate/  active flow definitions and flow interface contracts
+sql/             executable database source, schema snapshots and SQL tooling
+office-scripts/  active Office Scripts source
 ```
 
 The Git branch may be named `main`; the repository source folder must not also be called `main`.
@@ -28,9 +26,27 @@ When current work requires a new reusable Canvas component:
 2. update `docs/design-system/COMPONENT_CATALOG.md` immediately;
 3. for reusable PDS components, create or update the component specification under `docs/design-system/components/`;
 4. if the component is being developed through incremental blocks, keep those construction artifacts under `docs/development/screens/<screen>/blocks/` until Studio validation;
-5. after validation, ensure the canonical complete component source under `power-apps/components/` matches the accepted implementation.
+5. before allowing a screen to depend on it, perform the component validation gate: static source review, compatibility review, isolated Studio creation/import validation, isolated instantiation validation, and App Checker/visual checks;
+6. only after successful validation should the canonical complete component source under `power-apps/components/` be treated as ready for normal screen integration.
 
-A component must never exist only in chat, a temporary download, a construction-block folder or an archive if it is part of current product work.
+A component must never exist only in chat, a temporary download, a construction-block folder or a historical copy if it is part of current product work.
+
+## Active Power Automate source
+
+When a current Power Apps feature depends on a flow, the target repository state is:
+
+```text
+power-automate/flows/      real exported/deployable active flow definition
+power-automate/contracts/  stable caller/response contract when useful
+```
+
+Rules:
+
+- never invent a missing flow definition from `.Run(...)` calls;
+- progressively capture the real flow from the Power Automate environment;
+- the environment remains execution authority until the real definition is captured and validated;
+- when the flow changes, its repository source/contract changes in the same development cycle;
+- obsolete flow definitions are deleted from the working tree after migration and validation.
 
 ## Legacy definition
 
@@ -49,7 +65,7 @@ Such an artifact:
 - must identify its replacement target where known;
 - is deleted only after the dependent runtime is migrated and validated in the real tool.
 
-Examples at the time this policy was adopted:
+Current examples:
 
 ```text
 cmp_DashboardSectionHeader   current scr_Home dependency
@@ -70,7 +86,7 @@ audit dependency
 → define replacement
 → implement isolated increment
 → save in repository
-→ validate in Power Apps Studio / target runtime
+→ validate in target runtime
 → update canonical source
 → remove legacy dependency
 → document reusable lesson if applicable
