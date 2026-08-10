@@ -1,48 +1,33 @@
 # PULSE Component Catalog
 
 **Status:** active  
-**Purpose:** lifecycle and reuse guidance for `main/components/`  
+**Canonical:** yes  
+**Purpose:** lifecycle and reuse guidance for `power-apps/components/`  
 **Last reviewed:** 2026-08-10  
 **Usage audit:** `docs/analysis/repository/COMPONENT_USAGE_AUDIT_2026-08-10.md`
 
-This catalog prevents active, legacy and experimental components from being treated as equivalent reuse candidates.
-
 ## Canonical active-component policy
 
-PULSE uses **Option A** for component lifecycle:
-
 ```text
-main/components =
+power-apps/components =
 current runtime dependencies
-+ active planned components
++ active approved components
 + components created/evolved for current PDS/product work
 ```
 
-Inactive historical components do not remain in the active source pool merely for possible future reuse. They are preserved under `docs/archive/components/` when retention is useful.
+Historical inactive component source is not retained in the working tree merely for possible future reuse; Git history provides recovery.
 
-When a new reusable component is needed, its canonical `.pa.yaml` source must be created in:
+When a new reusable component is needed, its canonical `.pa.yaml` source must be created under `power-apps/components/` in the same development cycle. This catalog must be updated immediately. Reusable PDS components also receive/update a specification under `docs/design-system/components/`.
 
-```text
-main/components/
-```
-
-in the same development cycle in which the component is introduced. The same cycle must update this catalog. Reusable PDS components should also receive/update a specification under:
-
-```text
-docs/design-system/components/
-```
-
-A new component therefore becomes part of the active component source set because there is an explicit current need for it; it must not be left only in a chat, construction block, temporary folder or archive.
+A required component must never exist only in chat, a construction block, temporary download or obsolete path.
 
 ## Lifecycle states
 
 ```text
 ACTIVE            preferred current reuse candidate
-PDS_CANDIDATE     current component being aligned to PDS
-LEGACY_SUPPORTED  still used by current runtime or intentionally supported; not preferred for new design
-DEPRECATED        no new use; physical removal still requires dependency audit
-REVIEW_REQUIRED   usage/lifecycle not yet fully verified
-ARCHIVED          retained only for history; not an active reuse candidate
+PDS_CANDIDATE     active component being aligned to PDS
+LEGACY_SUPPORTED  live runtime dependency awaiting validated migration; do not select for new work
+REVIEW_REQUIRED   active-source candidate whose reuse contract still requires review
 ```
 
 | Component | Lifecycle | Current canonical usage / reuse guidance |
@@ -54,30 +39,28 @@ ARCHIVED          retained only for history; not an active reuse candidate
 | `cmp_EmptyState` | PDS_CANDIDATE | Preferred empty/error state base; continue visual hardening |
 | `cmp_HeatMapPro` | PDS_CANDIDATE | Preferred heatmap component |
 | `cmp_KpiCardPro` | PDS_CANDIDATE | Preferred KPI card for new PDS work |
-| `cmp_PageHeaderPro` | PDS_CANDIDATE | Canonical source: `main/components/cmp_PageHeaderPro.pa.yaml`; current Home_PDS header component. PDS spec: `docs/design-system/components/CMP_PAGE_HEADER_PRO.md`. Final 02A visual revalidation remains part of the Home_PDS construction gate |
+| `cmp_PageHeaderPro` | PDS_CANDIDATE | Canonical source: `power-apps/components/cmp_PageHeaderPro.pa.yaml`; Home_PDS header component. Spec: `docs/design-system/components/CMP_PAGE_HEADER_PRO.md` |
 | `cmp_PieChartPro` | PDS_CANDIDATE | Preferred composition chart for Home_PDS discipline distribution |
 | `cmp_SidebarNav` | ACTIVE | Current shared navigation component |
 | `cmp_SkeletonLoader` | PDS_CANDIDATE | Preferred loading placeholder base |
-| `cmp_SmartFilterBarPro` | REVIEW_REQUIRED | Existing premium filter component; reuse only after screen-specific compatibility check |
-| `cmp_DashboardSectionHeader` | LEGACY_SUPPORTED | **Used by current `scr_Home`**. New PDS work should target `cmp_PanelHeaderPro` |
-| `cmp_ExecutiveAlertBanner` | LEGACY_SUPPORTED | **Used by current `scr_Home`**. Do not remove while Home remains fallback/runtime reference |
-| `cmp_DetailDrawer_old` | LEGACY_SUPPORTED | **Used by current `scr_Punches`** as `comp_DetailDrawer_6`; filename is misleading but component is a live dependency |
-| `cmp_ExecutiveInsightCard` | ARCHIVED | No canonical-screen usage found; source retained at `docs/archive/components/cmp_ExecutiveInsightCard.pa.yaml` |
-| `cmp_ExecutiveKpiCard` | ARCHIVED | No canonical-screen usage found; source retained at `docs/archive/components/cmp_ExecutiveKpiCard.pa.yaml` |
+| `cmp_SmartFilterBarPro` | REVIEW_REQUIRED | Retain only while an approved current use/review exists; do not select automatically |
+| `cmp_DashboardSectionHeader` | LEGACY_SUPPORTED | Used by current `scr_Home`; target replacement is the PDS panel/header pattern |
+| `cmp_ExecutiveAlertBanner` | LEGACY_SUPPORTED | Used by current `scr_Home`; remove after Home_PDS cutover/stabilization if no other dependency remains |
+| `cmp_DetailDrawer_old` | LEGACY_SUPPORTED | Used by current `scr_Punches` as `comp_DetailDrawer_6`; replace through an explicit Punches migration before removal |
 
 ## Rules
 
 1. New work should prefer `ACTIVE` or `PDS_CANDIDATE` components.
-2. `LEGACY_SUPPORTED` means the component cannot be removed merely because a newer pattern exists.
-3. Historical inactive components do not remain in `main/components/` under Option A.
-4. Before physically moving/deleting any component, audit references from canonical screens and components.
-5. When a new component is required, create its canonical source under `main/components/` and update this catalog in the same development cycle.
-6. Reusable PDS component specifications belong under `docs/design-system/components/`.
-7. A suffix such as `_old` is not authoritative lifecycle metadata; this catalog is.
-8. A component file existing in GitHub does not prove it is installed in the active Power Apps app; Studio installation/validation remains a separate requirement.
+2. `LEGACY_SUPPORTED` means “currently required but scheduled for removal after a validated migration”, not “approved for reuse”.
+3. Before removing a component, audit references from canonical screens/components.
+4. When a new reusable component is required, create its canonical source under `power-apps/components/` and update this catalog in the same development cycle.
+5. Reusable PDS component specifications belong under `docs/design-system/components/`.
+6. A suffix such as `_old` is not lifecycle authority; this catalog is.
+7. GitHub source existence does not prove the component is installed in the active Power Apps application; Studio validation is separate.
+8. Once a component has no current dependency or approved active use, remove it from the working tree rather than preserving an inactive copy.
 
 ## Current migration implications
 
-The parallel Home_PDS strategy intentionally preserves `scr_Home` as fallback. Therefore Home legacy dependencies remain in `main/components/` until cutover and stabilization are complete.
+The parallel Home_PDS strategy preserves `scr_Home` as fallback during construction, so its two legacy component dependencies remain temporarily.
 
-Punches currently depends on `cmp_DetailDrawer_old`; that component cannot be moved or renamed until the Punches drawer is replaced and Studio-validated.
+Punches currently depends on `cmp_DetailDrawer_old`; it remains until a replacement is implemented and Studio-validated.
