@@ -1,86 +1,68 @@
 # PULSE Component Usage Audit — 2026-08-10
 
-**Status:** completed  
-**Scope:** current canonical screens under `main/screens/`  
-**Purpose:** prevent removal or reuse of legacy components based only on filenames
+**Status:** current evidence  
+**Scope:** canonical screens under `power-apps/screens/`  
+**Purpose:** prevent unsafe removal/reuse of components based only on filenames or age
 
 ## Canonical screens reviewed
 
 ```text
-main/screens/Home/scr_Home.pa.yaml
-main/screens/Punches/scr_Punches_1.pa.yaml
-main/screens/PunchReview/scr_PunchReview.pa.yaml
+power-apps/screens/Home/scr_Home.pa.yaml
+power-apps/screens/Punches/scr_Punches_1.pa.yaml
+power-apps/screens/PunchReview/scr_PunchReview.pa.yaml
 ```
-
-This audit answers whether the legacy/review-target components are instantiated by the current canonical screens. It does not prove that an unused component has no historical value.
-
----
 
 ## Findings
 
-| Component | Home | Punches | Punch Review | Runtime conclusion |
+| Component | Home | Punches | Punch Review | Current action |
 |---|---:|---:|---:|---|
-| `cmp_ExecutiveAlertBanner` | yes | no | no | **LEGACY_SUPPORTED — runtime dependency** |
-| `cmp_DashboardSectionHeader` | yes | no | no | **LEGACY_SUPPORTED — runtime dependency** |
-| `cmp_DetailDrawer_old` | no | yes | no | **LEGACY_SUPPORTED — runtime dependency despite `_old` name** |
-| `cmp_ExecutiveKpiCard` | no | no | no | **ARCHIVED** after Option A lifecycle decision |
-| `cmp_ExecutiveInsightCard` | no | no | no | **ARCHIVED** after Option A lifecycle decision |
+| `cmp_ExecutiveAlertBanner` | yes | no | no | `LEGACY_SUPPORTED` — keep until Home_PDS cutover removes dependency |
+| `cmp_DashboardSectionHeader` | yes | no | no | `LEGACY_SUPPORTED` — keep until Home_PDS/PDS replacement removes dependency |
+| `cmp_DetailDrawer_old` | no | yes | no | `LEGACY_SUPPORTED` — keep until Punches drawer migration is Studio-validated |
+| `cmp_ExecutiveKpiCard` | no | no | no | removed from working tree; recoverable via Git history |
+| `cmp_ExecutiveInsightCard` | no | no | no | removed from working tree; recoverable via Git history |
+| `cmp_SmartFilterBarPro` | no | no | no | removed from active source; no approved current role |
 
 ## Evidence
 
 ### Home
 
-`cmp_ExecutiveAlertBanner` is instantiated as `cmpHomeExecutiveAlert_1` in the canonical Home screen.
+`cmp_ExecutiveAlertBanner` is instantiated as `cmpHomeExecutiveAlert_1`.
 
-`cmp_DashboardSectionHeader` is instantiated as `cmpHomeKpiSectionHeader_1` in the canonical Home screen.
-
-No canonical Home instance of `cmp_ExecutiveKpiCard`, `cmp_ExecutiveInsightCard` or `cmp_DetailDrawer_old` was found in the screen source scan.
+`cmp_DashboardSectionHeader` is instantiated as `cmpHomeKpiSectionHeader_1`.
 
 ### Punches
 
-`cmp_DetailDrawer_old` is instantiated as `comp_DetailDrawer_6` in the canonical Punches screen.
+`cmp_DetailDrawer_old` is instantiated as `comp_DetailDrawer_6`.
 
 ### Punch Review
 
-No canonical Punch Review instance of the five reviewed legacy components was found in the screen source scan.
+None of the three current legacy-supported components is instantiated by Punch Review.
 
----
+### SmartFilterBar
 
-## Lifecycle decision applied
+No `cmp_SmartFilterBarPro` instance was found in the three canonical screens, and it is not part of the approved Home_PDS block plan. Under the active-source policy it was removed rather than preserved as an inactive component-library artifact.
 
-PULSE adopted repository component lifecycle **Option A**:
-
-```text
-main/components = runtime dependencies + active planned/PDS component source only
-```
-
-Therefore:
+## Lifecycle policy
 
 ```text
-KEPT in main/components because currently required:
-- cmp_ExecutiveAlertBanner
-- cmp_DashboardSectionHeader
-- cmp_DetailDrawer_old
-
-MOVED to docs/archive/components because no canonical-screen usage was found:
-- cmp_ExecutiveKpiCard
-- cmp_ExecutiveInsightCard
+power-apps/components = current runtime dependencies + approved active/PDS component source
 ```
 
-The archived files are retained for traceability and are not normal reuse candidates.
+Historical-only source is removed from the working tree after dependency audit. Git history provides recovery.
 
-## Important naming conclusion
+## Naming conclusion
 
-The `_old` suffix on `cmp_DetailDrawer_old` is misleading, but it cannot be renamed safely as a cosmetic cleanup because `scr_Punches` currently instantiates that exact Canvas component identity.
-
-The safe policy is to preserve the live name until Punches is migrated to a replacement component and Studio validation succeeds.
+The `_old` suffix on `cmp_DetailDrawer_old` is misleading, but the exact identity remains a live Punches dependency. Its rename/removal is therefore a functional migration, not housekeeping.
 
 ## New component rule
 
-If future work needs a reusable component that does not yet exist, create its canonical source immediately under:
+If current work needs a reusable component that does not exist:
 
 ```text
-main/components/
+1. create source in power-apps/components/
+2. update docs/design-system/COMPONENT_CATALOG.md
+3. add/update PDS component specification when reusable
+4. validate in Power Apps Studio
+5. consolidate accepted complete source back to power-apps/components/
 ```
-
-and update `docs/design-system/COMPONENT_CATALOG.md` in the same development cycle. A reusable PDS component should also receive a specification under `docs/design-system/components/`.
