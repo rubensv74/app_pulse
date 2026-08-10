@@ -1,0 +1,84 @@
+# BLOCK 11A — REVIEW PROGRESS IN BILINGUAL HELP
+#
+# Apply only after:
+# - Block 10D has been applied.
+# - Block 11 has been validated in Studio.
+#
+# OPERATION 1 — ADD TWO CHILDREN
+# Parent: conPR_HelpContent
+# Exact location: after lblPR_HelpCustomFieldsBody and before conPR_HelpWarningCard.
+#
+# OPERATION 2 — REPLACE TEXT PROPERTY
+# Control: lblPR_HelpActivityTitle
+#
+# OPERATION 3 — REPLACE TEXT PROPERTY
+# Controls: lblPR_HelpLimitationsTitle and lblPR_HelpLimitationsBody
+#
+# The language selector remains the existing TabList.
+
+# =====================================================
+# OPERATION 1 — ADD AFTER lblPR_HelpCustomFieldsBody
+# =====================================================
+
+- lblPR_HelpProgressTitle:
+    Control: ModernText@1.0.0
+    Properties:
+      AutoHeight: =true
+      Color: =varTheme_Text
+      FontWeight: =FontWeight.Semibold
+      Height: =26
+      Size: =11
+      Text: |-
+        =If(
+            Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+            "6. Check review progress",
+            "6. Comprueba el progreso de revisión"
+        )
+      Width: =Parent.Width
+- lblPR_HelpProgressBody:
+    Control: ModernText@1.0.0
+    Properties:
+      AutoHeight: =true
+      Color: =varTheme_TextMuted
+      Height: =90
+      Size: =9
+      Text: |-
+        =If(
+            Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+            "Review Progress shows how much of the loaded review queue has been reviewed during the current app session. The donut compares Reviewed and Remaining records and updates immediately after Mark Reviewed or Undo Review. It is not Punch closure progress and it is not persisted to SQL.",
+            "Review Progress muestra cuánto de la cola cargada se ha revisado durante la sesión actual de la aplicación. El donut compara Reviewed y Remaining y se actualiza inmediatamente con Mark Reviewed o Undo Review. No representa el progreso de cierre del Punch y no se guarda en SQL."
+        )
+      Width: =Parent.Width
+
+# =====================================================
+# OPERATION 2 — REPLACE lblPR_HelpActivityTitle.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "7. Read Session Activity",
+      "7. Consulta Session Activity"
+  )
+
+# =====================================================
+# OPERATION 3A — REPLACE lblPR_HelpLimitationsTitle.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "8. Current implementation status",
+      "8. Estado actual de implementación"
+  )
+
+# =====================================================
+# OPERATION 3B — REPLACE lblPR_HelpLimitationsBody.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "Related Punches and the full unsaved-change decision dialog are being added in later blocks. Reviewed and Review Progress remain session-only. Custom-field changes are already protected by a temporary navigation lock until Save or Reset is used.",
+      "Los Punches relacionados y el diálogo completo de decisión ante cambios sin guardar se añadirán en bloques posteriores. Reviewed y Review Progress siguen siendo solo de sesión. Los cambios de campos personalizados ya están protegidos por un bloqueo temporal de navegación hasta utilizar Save o Reset."
+  )
