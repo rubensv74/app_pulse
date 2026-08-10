@@ -39,13 +39,15 @@ Cada bloque indica:
 13. `09A_comments_selection_hook.replace-formula.powerfx` — hook de selección de Comments
 14. `09B_comments_test_seed.optional.powerfx` — opcional para pruebas visuales
 15. `09C_help_comments.incremental-patch.pa.yaml` — ayuda bilingüe de Comments
-16. `10_custom_fields.replace-control.pa.yaml` — integrado; pendiente de validación en Studio
+16. `10_custom_fields.replace-control.pa.yaml` — integrado
 17. `10A_custom_fields_selection_hook.replace-formula.powerfx` — sustituye a 09A y carga Comments + Custom Fields; incluye bloqueo temporal de cambios sin guardar
 18. `10B_custom_fields_test_seed.optional.powerfx` — opcional para probar los seis tipos de campo sin flows
-19. `10C_yesno_initial_state.incremental-patch.pa.yaml` — parche obligatorio para vincular `Toggle.Checked` a `ValueBool`
-20. `10D_help_custom_fields.incremental-patch.pa.yaml` — aplicar después de validar el Bloque 10 con un Punch real
+19. `10C_yesno_initial_state.incremental-patch.pa.yaml` — parche para vincular `Toggle.Checked` a `ValueBool`
+20. `10D_help_custom_fields.incremental-patch.pa.yaml` — ayuda bilingüe de Custom Fields
+21. `11_review_progress.replace-control.pa.yaml` — publicado; pendiente de validación en Studio
+22. `11A_help_review_progress.incremental-patch.pa.yaml` — aplicar después de validar el Bloque 11 y después de 10D
 
-No se debe iniciar el Bloque 11 hasta que el Bloque 10 importe sin errores y se hayan comprobado carga, edición, Reset y Save con un Punch real.
+No se debe iniciar el Bloque 12 hasta que Review Progress se importe sin errores y responda correctamente a Mark Reviewed / Undo Review.
 
 ## Contratos del Bloque 09
 
@@ -109,6 +111,43 @@ La edición mantiene la misma regla de permisos que el drawer existente: `manage
 
 Hasta el Bloque 13, `10A_custom_fields_selection_hook.replace-formula.powerfx` bloquea cualquier cambio o recarga de Punch mientras existan campos personalizados sin guardar. El usuario debe usar Save o Reset antes de continuar.
 
+## Contrato del Bloque 11
+
+Review Progress es un indicador exclusivamente local de la sesión y se calcula directamente sobre:
+
+```text
+colPunchReviewQueue
+```
+
+Usa:
+
+```text
+IsReviewedInSession
+```
+
+para separar:
+
+```text
+Reviewed
+Remaining
+```
+
+El porcentaje central se calcula como:
+
+```text
+Reviewed / Total queue
+```
+
+No utiliza flows, SQL ni la colección filtrada visible. Por diseño, cambiar entre `All`, `Remaining` y `Reviewed` no altera el porcentaje: el denominador sigue siendo la cola completa cargada.
+
+El panel reutiliza:
+
+```text
+main/components/cmp_DonutPro.pa.yaml
+```
+
+con selección deshabilitada. Representa progreso de **revisión de la sesión**, no progreso de cierre técnico del Punch.
+
 ## Manual de usuario
 
 El manual funcional en español se mantiene en:
@@ -171,4 +210,5 @@ Las referencias visuales y funcionales se basan en:
 - `main/screens/Punches/scr_Punches_1.pa.yaml`
 - `main/components/cmp_SidebarNav.pa.yaml`
 - `main/components/cmp_DetailDrawer_old.pa.yaml`
+- `main/components/cmp_DonutPro.pa.yaml`
 - resto de componentes actualizados en `main/components/`
