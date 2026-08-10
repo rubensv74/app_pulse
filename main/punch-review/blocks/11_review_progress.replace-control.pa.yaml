@@ -1,0 +1,148 @@
+# BLOCK 11 — REVIEW PROGRESS
+#
+# Operation: REPLACE CONTROL COMPLETELY.
+# Target control: conPR_ProgressSlot
+# Parent: conPR_RightColumn
+#
+# Replace the complete placeholder created in Block 03 with this component instance.
+# Do not keep lblPR_ProgressPlaceholder.
+#
+# Dependencies:
+# - Blocks 01–10 integrated.
+# - cmp_DonutPro exists in main/components.
+# - colPunchReviewQueue contains IsReviewedInSession.
+# - Block 07 updates IsReviewedInSession through Mark Reviewed / Undo Review.
+#
+# Scope:
+# - Shows session review completion for the complete loaded review queue.
+# - Uses the existing premium cmp_DonutPro component.
+# - Displays Reviewed vs Remaining.
+# - Shows completion percentage in the donut center.
+# - Updates immediately when Mark Reviewed / Undo Review changes the queue.
+# - No flow or SQL call is required.
+#
+# Important semantic rule:
+# - This is SESSION REVIEW PROGRESS.
+# - It does not represent Punch closure progress or project completion.
+# - It does not persist Reviewed to SQL.
+#
+# Responsive behaviour:
+# - The subtitle always shows Reviewed / Remaining / Total counts.
+# - cmp_DonutPro shows its legend when enough horizontal width is available.
+# - On narrower right columns the donut remains visible without relying on the legend.
+#
+# Compatibility:
+# - Reuses cmp_DonutPro already present in main/components.
+# - No new Power Apps control type is introduced by this block.
+#
+# Validation:
+# 1. With an empty queue, the component shows its empty state.
+# 2. With the Block 05A five-row seed, initial counts match the queue.
+# 3. Mark Reviewed increments Reviewed and decrements Remaining immediately.
+# 4. Undo Review reverses the counts immediately.
+# 5. 5 reviewed out of 5 renders 100% COMPLETE.
+# 6. Filtering the visible queue does not change progress; progress uses the complete loaded queue.
+
+- cmpPR_ReviewProgress:
+    Control: CanvasComponent
+    ComponentName: cmp_DonutPro
+    Properties:
+      AccentColor: =varTheme_PulseBlueDark
+      BackgroundColor: =varTheme_Surface
+      BorderColor: =varTheme_Border
+      CenterFillColorHex: ="#FFFFFF"
+      CenterLabel: ="COMPLETE"
+      CenterLabelColorHex: ="#64748B"
+      CenterValueColorHex: ="#0F172A"
+      CenterValueText: |-
+        =If(
+            CountRows(colPunchReviewQueue) = 0,
+            "0%",
+            Text(
+                CountIf(
+                    colPunchReviewQueue,
+                    Coalesce(IsReviewedInSession, false)
+                ) /
+                CountRows(colPunchReviewQueue),
+                "[$-en-US]0%"
+            )
+        )
+      CompactMode: =true
+      DangerColor: =ColorValue("#DC2626")
+      DonutThickness: =15
+      EmptyText: ="Load a review queue to see session progress."
+      EnableSelection: =false
+      ErrorText: ="Review progress unavailable."
+      Height: =140
+      Items: |-
+        =Table(
+            {
+                SegmentKey: "REVIEWED",
+                SegmentLabel: "Reviewed",
+                SegmentValue:
+                    CountIf(
+                        colPunchReviewQueue,
+                        Coalesce(IsReviewedInSession, false)
+                    ),
+                SegmentColor: "#16A34A",
+                SegmentOrder: 1
+            },
+            {
+                SegmentKey: "REMAINING",
+                SegmentLabel: "Remaining",
+                SegmentValue:
+                    CountIf(
+                        colPunchReviewQueue,
+                        !Coalesce(IsReviewedInSession, false)
+                    ),
+                SegmentColor: "#CBD5E1",
+                SegmentOrder: 2
+            }
+        )
+      LoadingText: ="Calculating session progress..."
+      MutedTextColor: =varTheme_TextMuted
+      PercentageFormat: ="[$-en-US]0%"
+      SegmentGapPercent: =0.7
+      ShowLegend: =true
+      ShowPercentages: =true
+      ShowValues: =true
+      ShowZeroSegments: =true
+      State: |-
+        =If(
+            CountRows(colPunchReviewQueue) = 0,
+            "empty",
+            "ready"
+        )
+      Subtitle: |-
+        =If(
+            CountRows(colPunchReviewQueue) = 0,
+            "Session-only completion",
+            Text(
+                CountIf(
+                    colPunchReviewQueue,
+                    Coalesce(IsReviewedInSession, false)
+                ),
+                "[$-en-US]#,##0"
+            ) &
+            " reviewed · " &
+            Text(
+                CountIf(
+                    colPunchReviewQueue,
+                    !Coalesce(IsReviewedInSession, false)
+                ),
+                "[$-en-US]#,##0"
+            ) &
+            " remaining · " &
+            Text(
+                CountRows(colPunchReviewQueue),
+                "[$-en-US]#,##0"
+            ) &
+            " total"
+        )
+      SurfaceAltColor: =varTheme_SurfaceAlt
+      TextColor: =varTheme_Text
+      Title: ="Review Progress"
+      TrackColorHex: ="#E2E8F0"
+      ValueFormat: ="[$-en-US]#,##0"
+      ValueSuffix: =""
+      Width: =Parent.Width
