@@ -1,11 +1,11 @@
 # cmp_PageHeaderPro Validation Report — 2026-08-10
 
-**Status:** corrected full candidate / one Studio smoke test pending  
+**Status:** `INSTANCE_SAFE = PASS` / public-contract + final visual smoke pending  
 **Component:** `cmp_PageHeaderPro`  
 **Primary instance-safe reference:** `cmp_HeatMapPro`  
 **Secondary instance-safe reference:** `cmp_SidebarNav`
 
-## Confirmed incident
+## Original incident
 
 The original full `cmp_PageHeaderPro` definition could be accepted by Power Apps Studio, but inserting an instance caused Studio to close.
 
@@ -14,13 +14,11 @@ DEFINITION_ACCEPTED = PASS
 INSTANCE_SAFE       = FAIL
 ```
 
-The technical root cause is not claimed beyond the evidence available.
+The technical cause was not proven and is not retroactively narrowed beyond the evidence.
 
-## Method correction
+## Corrective method
 
-The investigation initially moved too quickly into micro-reduction and over-generalized a separate CustomProperty experiment.
-
-That approach is replaced by the following rule:
+The component was compared structurally against PULSE components already known to be instance-safe before performing further reduction.
 
 ```text
 PROBLEM COMPONENT
@@ -36,13 +34,16 @@ one isolated smoke test
 only reduce if the corrected full component still fails
 ```
 
-`cmp_HeatMapPro` is the primary positive reference because it proves that PULSE Source Code can safely contain complex `CustomProperties:` contracts with Inputs, Outputs, Tables, Colors, Booleans, Numbers, Records and Events. `cmp_SidebarNav` is the secondary reference because it also proves Inputs/Outputs/Events plus galleries, transparent hit surfaces and event-driven navigation.
+Primary comparison references:
 
-## Structural comparison
+```text
+cmp_HeatMapPro
+cmp_SidebarNav
+```
 
-### CustomProperties
+## Principal structural delta corrected
 
-Original header Inputs used a reduced declaration such as:
+The original header used reduced Input declarations such as:
 
 ```yaml
 Title:
@@ -51,7 +52,7 @@ Title:
   Default: ="Punch Control Tower"
 ```
 
-The instance-safe references normally use the complete Input metadata shape:
+The stable PULSE references normally use the fuller Input contract shape:
 
 ```yaml
 Title:
@@ -62,9 +63,7 @@ Title:
   Default: ="Heat Map"
 ```
 
-This is the principal objective delta found across the header contract.
-
-The corrected candidate now uses:
+The corrected `cmp_PageHeaderPro` now models every Input using:
 
 ```text
 PropertyKind
@@ -74,9 +73,7 @@ DataType
 Default
 ```
 
-for every Input, following the stable PULSE reference pattern.
-
-Events now also use the complete metadata form demonstrated by `cmp_SidebarNav`:
+and Events using the complete pattern demonstrated by stable PULSE components:
 
 ```text
 PropertyKind
@@ -86,28 +83,26 @@ ReturnType
 Default
 ```
 
-This does not assert that `DisplayName` or `Description` are universally mandatory. It deliberately removes an avoidable schema delta by copying the fuller known-good contract pattern.
+This correction does **not** prove that `DisplayName` or `Description` are individually or universally mandatory. The demonstrated result is narrower: rebuilding the complete component contract from a known-good PULSE pattern removed the failing condition in this candidate.
 
-### Body comparison
+## Body comparison
 
-The remaining header constructions all have positive precedents in the stable PULSE components or have already passed reduced tests:
+The remaining constructions either have positive precedents in stable PULSE components or passed prior reduced checks:
 
 ```text
-ModernText@1.0.0                         → reduced PASS_B
 GroupContainer@1.5.0                     → reduced PASS_A
-Classic/Button@2.2.0                     → used by instance-safe PULSE components
-Event invocation from control            → used by HeatMap and Sidebar
-Transparent hit surface                  → used by Sidebar
-Component-property bindings              → extensively used by HeatMap and Sidebar
-Sibling/parent geometry formulas         → used throughout stable PULSE component layouts
-CustomProperties Text/Boolean/Color      → proven in HeatMap/Sidebar
+ModernText@1.0.0                         → reduced PASS_B
+Classic/Button@2.2.0                     → proven in stable PULSE components
+Event invocation from control            → proven in HeatMap / Sidebar
+Transparent hit surface                  → proven in Sidebar
+Component-property bindings              → proven extensively
+Sibling/parent geometry formulas         → proven pattern in PULSE layouts
+CustomProperties Text/Boolean/Color      → proven in HeatMap / Sidebar
 ```
 
-No unsupported `AccessibleLabel` is present on `Classic/Button@2.2.0` and no `Label@2.5.1 + Radius*` incompatibility exists in the candidate.
+No unsupported `AccessibleLabel` exists on `Classic/Button@2.2.0` and no `Label@2.5.1 + Radius*` incompatibility was introduced.
 
-The header is structurally simpler than `cmp_HeatMapPro`: it has no Table input, Gallery, calculated Output, `Set(...)` state or nested data projection.
-
-## Corrected full candidate
+## Corrected complete candidate
 
 Canonical source:
 
@@ -121,38 +116,47 @@ Correction commit:
 ccaccacd2de75263edc20751eed0efec3c78da83
 ```
 
-The canonical source is again self-contained and includes the complete `CustomProperties:` contract plus body.
+The source is self-contained and includes the complete `CustomProperties:` contract plus body.
 
-## Required Studio validation — one test only
+## Studio result — 2026-08-10
 
-Do not run further property-by-property diagnostics before this test.
+The user created a new instance of the corrected complete component in Power Apps Studio and reported that everything remained stable.
 
 ```text
-1. replace/create cmp_PageHeaderPro from the corrected COMPLETE Source Code
-2. save and allow formula validation
-3. review App Checker for new component-attributable errors
-4. insert one new instance on the isolated diagnostic screen
-5. save
-6. close/reopen Studio/app if insertion is stable
+COMPONENT_DEFINITION_ACCEPTED = PASS
+INSTANCE_SAFE                 = PASS
 ```
 
-Result:
+Confirmed consequence:
+
+> The corrected complete `cmp_PageHeaderPro`, modeled against the stable PULSE component contract pattern, can now be instantiated without reproducing the Studio closure.
+
+This closes the instance-safety incident. No further reduction is justified unless a later regression reproduces the failure.
+
+## Remaining gate before normal Home_PDS integration
+
+One compact public-contract/visual smoke validation remains. It should test multiple representative capabilities in one pass rather than restarting micro-diagnostics:
 
 ```text
-PASS
-→ INSTANCE_SAFE
-→ proceed to public-contract/visual smoke validation and then Block 03
+Text input change
+Boolean visibility change
+one Event invocation
+visual check for clipping / scrollbar / overlap
+```
 
-FAIL
-→ only then resume controlled reduction, guided by the remaining structural delta against the stable references
+If that combined smoke test passes:
+
+```text
+PUBLIC_CONTRACT_VALIDATED = PASS
+VISUAL_QA_VALIDATED       = PASS
+Block 02                  = VALIDATED
+Block 03                  = UNBLOCKED
 ```
 
 ## Current block consequence
 
 ```text
-Block 02  = CORRECTED / PENDING ONE INSTANCE-SAFETY SMOKE TEST
-Block 03  = BLOCKED UNTIL THAT TEST PASSES
-cmp_PageHeaderPro = REVIEW_REQUIRED
+Block 02          = INSTANCE_SAFE / FINAL COMBINED SMOKE PENDING
+Block 03          = BLOCKED ONLY BY THAT FINAL SMOKE
+cmp_PageHeaderPro = REVIEW_REQUIRED until contract + visual smoke passes
 ```
-
-No further microtest is requested unless the corrected complete component still fails.
