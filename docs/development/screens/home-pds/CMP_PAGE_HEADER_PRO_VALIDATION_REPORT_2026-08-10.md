@@ -90,12 +90,6 @@ Result reported by user on 2026-08-10:
 PASS_A
 ```
 
-Observed:
-
-```text
-instance inserts and Studio remains open
-```
-
 Conclusion:
 
 > Bare CanvasComponent + one `GroupContainer@1.5.0` is not sufficient to reproduce the closure.
@@ -114,17 +108,9 @@ Result reported by user on 2026-08-10:
 PASS_B
 ```
 
-Observed:
-
-```text
-instance inserts and Studio remains open
-```
-
 Conclusion:
 
-> Adding the current hardcoded `ModernText@1.0.0` title/subtitle pattern with `AutoHeight=true` and `Wrap=false` is not sufficient to reproduce the closure.
-
-This materially reduces the probability that the crash is caused by the bare ModernText pattern alone.
+> Adding the hardcoded `ModernText@1.0.0` title/subtitle pattern with `AutoHeight=true` and `Wrap=false` is not sufficient to reproduce the closure.
 
 ### Stage C1 — one Studio-created Input/Text property
 
@@ -134,15 +120,7 @@ Baseline artifact:
 docs/development/screens/home-pds/diagnostics/02D3_cmp_PageHeaderPro_diag_stage_C_baseline.pa.yaml
 ```
 
-Diagnostic identity:
-
-```text
-cmp_PageHeaderPro_DiagC
-```
-
-The Stage C baseline is equivalent in complexity to the PASS_B candidate and deliberately contains no `CustomProperties:` block.
-
-After baseline insertion succeeds, create exactly one public property manually in Studio:
+Studio-created property:
 
 ```text
 Property name: TitleText
@@ -151,19 +129,48 @@ Data type: Text
 Default: "Punch Control Tower"
 ```
 
-Do not bind the title to the property yet.
+Result reported by user on 2026-08-10:
+
+```text
+PASS_C1
+```
+
+Observed:
+
+```text
+property created manually in Studio
+component saved
+instance inserted
+Studio remains open
+```
+
+Confirmed consequence:
+
+> A manually Studio-created `Input/Text` public property is instance-safe in this reduced PULSE component when it is not yet consumed by the component body.
+
+This strengthens the distinction between the functional contract itself and the Source-Code authoring/serialization path. It does not yet prove that binding a child control to the property is safe.
+
+### Stage C2 — bind title to Studio-created TitleText
+
+Instructional diagnostic artifact:
+
+```text
+docs/development/screens/home-pds/diagnostics/02D4_cmp_PageHeaderPro_diag_stage_C2_binding.md
+```
+
+Exact one-line change inside `lblPHDC_Title`:
+
+```yaml
+Text: =cmp_PageHeaderPro_DiagC.TitleText
+```
+
+No `CustomProperties:` block is added. No other control/property is modified.
 
 Result semantics:
 
 ```text
-PASS_C1 = property can be created manually, component saved, and a new instance inserted without Studio closing
-FAIL_C1 = Studio closes/rejects after property creation or during instance insertion
-```
-
-Only after PASS_C1 should Stage C2 bind `lblPHDC_Title.Text` to:
-
-```powerfx
-cmp_PageHeaderPro_DiagC.TitleText
+PASS_C2 = binding resolves, title renders and Studio remains stable
+FAIL_C2 = Studio closes/rejects or binding cannot resolve
 ```
 
 ---
@@ -173,8 +180,8 @@ cmp_PageHeaderPro_DiagC.TitleText
 ```text
 A   root container only                                  PASS_A
 B   + hardcoded title/subtitle ModernText                PASS_B
-C1  + one Input/Text property created manually Studio    PENDING
-C2  + bind title to Studio-created property              NOT STARTED
+C1  + one Input/Text property created manually Studio    PASS_C1
+C2  + bind title to Studio-created property              PENDING
 D   + remaining non-event property types incrementally   NOT STARTED
 E   + public Event properties and invocation             NOT STARTED
 F   + context hit surfaces and final geometry            NOT STARTED
