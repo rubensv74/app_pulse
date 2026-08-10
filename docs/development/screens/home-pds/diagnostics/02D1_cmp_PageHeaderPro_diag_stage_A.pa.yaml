@@ -1,0 +1,46 @@
+# HOME_PDS — cmp_PageHeaderPro diagnostic reduction — Stage A
+#
+# Artifact type: PASTEABLE DIAGNOSTIC
+# Canonical product source: NO
+# Purpose: isolate Studio closure during component instance insertion
+# Target diagnostic component: cmp_PageHeaderPro_DiagA
+#
+# This candidate deliberately contains ONLY:
+# - CanvasComponent definition
+# - fixed default Width/Height
+# - one GroupContainer@1.5.0 root
+#
+# It contains NO:
+# - custom properties
+# - events
+# - ModernText
+# - buttons
+# - sibling geometry formulas
+# - transparent hit surfaces
+# - screen variables
+# - flows or data bindings
+#
+# Validation:
+# 1. Create/import this diagnostic component in Studio.
+# 2. Save and wait for formula validation.
+# 3. Insert exactly one instance on a blank diagnostic screen.
+# 4. Do not resize or bind anything.
+# 5. Record whether Studio remains open.
+#
+# PASS_A = instance inserts and Studio remains stable.
+# FAIL_A = Studio closes/rejects during definition or instance insertion.
+
+ComponentDefinitions:
+  cmp_PageHeaderPro_DiagA:
+    DefinitionType: CanvasComponent
+    Properties:
+      Width: =1200
+      Height: =80
+    Children:
+      - conPHDA_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =ColorValue("#FFFFFF")
+            Height: =Parent.Height
+            Width: =Parent.Width
