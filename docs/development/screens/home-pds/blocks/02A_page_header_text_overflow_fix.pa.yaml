@@ -8,18 +8,23 @@
 # Compatibility rule: PA-COMP-011
 #
 # IMPORTANT:
-# The previous revision used a conceptual top-level `Patch:` node. That is NOT
-# valid Power Apps PaYaml and produced PA1001 / YamlInvalidSyntax in Studio.
+# Replace the COMPLETE cmp_PageHeaderPro source with the content beginning at
+# `ComponentDefinitions:`. This file is pasteable PaYaml.
 #
-# This corrected artifact is pasteable Source Code. Replace the COMPLETE
-# cmp_PageHeaderPro source with the content beginning at `ComponentDefinitions:`.
-# Do not paste a `Patch:` section.
+# Corrective rule learned in Studio:
+# - static ModernText controls in compact PULSE components MUST use AutoHeight=true
+#   unless a validated exception proves a rigid height is safe;
+# - Wrap=false is retained for text whose UX contract is intentionally one line;
+# - Height remains as base geometry while AutoHeight can expand the rendered text box;
+# - no business/event/visual-contract change is introduced here.
 #
-# Visual correction:
-# - explicit Wrap=false for compact single-line text;
-# - explicit AutoHeight=false for the rigid Page Header contract;
-# - larger Studio-safe fixed heights for title/subtitle/context text;
-# - no business/event/visual-contract change.
+# Visual revalidation:
+# [ ] no internal scrollbar beside page title;
+# [ ] no internal scrollbar beside subtitle;
+# [ ] no internal scrollbar in Project / Template / Last refresh label/value;
+# [ ] no internal scrollbar in chevrons;
+# [ ] no clipping or overlap inside 52 px context surfaces;
+# [ ] no new App Checker error attributable to this correction.
 
 ComponentDefinitions:
   cmp_PageHeaderPro:
@@ -197,7 +202,7 @@ ComponentDefinitions:
                   - lblPH_Title:
                       Control: ModernText@1.0.0
                       Properties:
-                        AutoHeight: =false
+                        AutoHeight: =true
                         Color: =cmp_PageHeaderPro.TextColor
                         FontWeight: =FontWeight.Semibold
                         Height: =30
@@ -210,7 +215,7 @@ ComponentDefinitions:
                   - lblPH_Subtitle:
                       Control: ModernText@1.0.0
                       Properties:
-                        AutoHeight: =false
+                        AutoHeight: =true
                         Color: =cmp_PageHeaderPro.MutedTextColor
                         Height: =20
                         Size: =10
@@ -241,7 +246,7 @@ ComponentDefinitions:
                   - lblPH_Context1Label:
                       Control: ModernText@1.0.0
                       Properties:
-                        AutoHeight: =false
+                        AutoHeight: =true
                         Color: =cmp_PageHeaderPro.MutedTextColor
                         Height: =18
                         Size: =8
@@ -253,7 +258,7 @@ ComponentDefinitions:
                   - lblPH_Context1Value:
                       Control: ModernText@1.0.0
                       Properties:
-                        AutoHeight: =false
+                        AutoHeight: =true
                         Color: =cmp_PageHeaderPro.TextColor
                         FontWeight: =FontWeight.Semibold
                         Height: =22
@@ -267,7 +272,7 @@ ComponentDefinitions:
                       Control: ModernText@1.0.0
                       Properties:
                         Align: =Align.Center
-                        AutoHeight: =false
+                        AutoHeight: =true
                         Color: =cmp_PageHeaderPro.AccentColor
                         FontWeight: =FontWeight.Semibold
                         Height: =22
@@ -321,7 +326,7 @@ ComponentDefinitions:
                   - lblPH_Context2Label:
                       Control: ModernText@1.0.0
                       Properties:
-                        AutoHeight: =false
+                        AutoHeight: =true
                         Color: =cmp_PageHeaderPro.MutedTextColor
                         Height: =18
                         Size: =8
@@ -333,7 +338,7 @@ ComponentDefinitions:
                   - lblPH_Context2Value:
                       Control: ModernText@1.0.0
                       Properties:
-                        AutoHeight: =false
+                        AutoHeight: =true
                         Color: =cmp_PageHeaderPro.TextColor
                         FontWeight: =FontWeight.Semibold
                         Height: =22
@@ -347,7 +352,7 @@ ComponentDefinitions:
                       Control: ModernText@1.0.0
                       Properties:
                         Align: =Align.Center
-                        AutoHeight: =false
+                        AutoHeight: =true
                         Color: =cmp_PageHeaderPro.AccentColor
                         FontWeight: =FontWeight.Semibold
                         Height: =22
@@ -401,7 +406,7 @@ ComponentDefinitions:
                   - lblPH_Context3Label:
                       Control: ModernText@1.0.0
                       Properties:
-                        AutoHeight: =false
+                        AutoHeight: =true
                         Color: =cmp_PageHeaderPro.MutedTextColor
                         Height: =18
                         Size: =8
@@ -413,7 +418,7 @@ ComponentDefinitions:
                   - lblPH_Context3Value:
                       Control: ModernText@1.0.0
                       Properties:
-                        AutoHeight: =false
+                        AutoHeight: =true
                         Color: =cmp_PageHeaderPro.TextColor
                         FontWeight: =FontWeight.Semibold
                         Height: =22
@@ -427,7 +432,7 @@ ComponentDefinitions:
                       Control: ModernText@1.0.0
                       Properties:
                         Align: =Align.Center
-                        AutoHeight: =false
+                        AutoHeight: =true
                         Color: =cmp_PageHeaderPro.AccentColor
                         FontWeight: =FontWeight.Semibold
                         Height: =22
