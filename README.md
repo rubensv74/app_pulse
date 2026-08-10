@@ -38,7 +38,13 @@ Current tracked screen sources include:
 main/components/
 ```
 
-Component lifecycle classification is being formalized. Do not automatically select files named `_old` or older `Executive*` components as preferred implementation patterns.
+Lifecycle/reuse guidance:
+
+```text
+docs/design-system/COMPONENT_CATALOG.md
+```
+
+Do not automatically select files named `_old` or older `Executive*` components as preferred implementation patterns.
 
 ### SQL
 
@@ -71,6 +77,7 @@ docs/governance/REPOSITORY_STRUCTURE_STANDARD.md
 docs/design-system/PULSE_DESIGN_SYSTEM.md
 docs/design-system/SAAS_INTERFACE_ARCHETYPES.md
 docs/design-system/POWER_APPS_VISUAL_QA_GUARDRAILS.md
+docs/design-system/COMPONENT_CATALOG.md
 docs/development/PULSE_UI_DELIVERY_FRAMEWORK.md
 docs/development/PROTOCOLO_IMPLEMENTACION_INCREMENTAL_ASISTIDA.md
 docs/development/PROTOCOLO_CONSTRUCCION_MODULAR_PANTALLAS_POWER_APPS.md
@@ -130,15 +137,24 @@ Important authority rules:
 
 ---
 
-## Known cleanup items
+## Cleanup status
 
-The audit has identified these structural issues for migration:
+Completed:
 
-- stale root delivery manifests/reports;
-- legacy `docs/guides/DESIGN_SYSTEM.md` overlapping the current PDS;
-- Punch Review construction artifacts stored under `main/`;
+- canonical root README;
+- canonical docs index;
+- repository structure standard;
+- repository audit;
+- stale EPIC-01 delivery report/manifests removed from root and archived under `docs/archive/deliveries/`;
+- legacy `docs/guides/DESIGN_SYSTEM.md` converted to a superseded compatibility stub;
+- component lifecycle catalog created.
+
+Pending controlled migrations:
+
+- Punch Review construction artifacts currently stored under `main/`;
 - SQL assets split across `database/`, `sql/` and `docs/SQL/`;
-- active and legacy components mixed in one flat component directory;
-- inconsistent naming and document lifecycle metadata.
+- remaining sprint/remediation/roadmap documents mixed under `docs/guides/`;
+- physical separation of confirmed legacy components after usage audit;
+- stale-link and retrieval QA after moves.
 
 See the repository audit for the phased migration plan.
