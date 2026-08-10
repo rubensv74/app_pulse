@@ -1,6 +1,6 @@
 # cmp_PageHeaderPro Validation Report — 2026-08-10
 
-**Status:** `INSTANCE_SAFE = PASS` / public-contract + final visual smoke pending  
+**Status:** `BLOCK 02 = VALIDATED FOR PROGRESSION`  
 **Component:** `cmp_PageHeaderPro`  
 **Primary instance-safe reference:** `cmp_HeatMapPro`  
 **Secondary instance-safe reference:** `cmp_SidebarNav`
@@ -63,7 +63,7 @@ Title:
   Default: ="Heat Map"
 ```
 
-The corrected `cmp_PageHeaderPro` now models every Input using:
+The corrected `cmp_PageHeaderPro` models every Input using:
 
 ```text
 PropertyKind
@@ -102,7 +102,7 @@ CustomProperties Text/Boolean/Color      → proven in HeatMap / Sidebar
 
 No unsupported `AccessibleLabel` exists on `Classic/Button@2.2.0` and no `Label@2.5.1 + Radius*` incompatibility was introduced.
 
-## Corrected complete candidate
+## Corrected complete source
 
 Canonical source:
 
@@ -129,34 +129,35 @@ INSTANCE_SAFE                 = PASS
 
 Confirmed consequence:
 
-> The corrected complete `cmp_PageHeaderPro`, modeled against the stable PULSE component contract pattern, can now be instantiated without reproducing the Studio closure.
+> The corrected complete `cmp_PageHeaderPro`, modeled against the stable PULSE component contract pattern, can be instantiated without reproducing the Studio closure.
 
-This closes the instance-safety incident. No further reduction is justified unless a later regression reproduces the failure.
+No further reduction is justified unless a later regression reproduces the failure.
 
-## Remaining gate before normal Home_PDS integration
+## Acceptance for progression
 
-One compact public-contract/visual smoke validation remains. It should test multiple representative capabilities in one pass rather than restarting micro-diagnostics:
+After the instance-safe result, one compact representative contract/visual smoke was requested. The user then explicitly instructed to continue (`adelante`). This is recorded as acceptance for progression to Block 03.
 
-```text
-Text input change
-Boolean visibility change
-one Event invocation
-visual check for clipping / scrollbar / overlap
-```
-
-If that combined smoke test passes:
+No separate App Checker screenshot or per-subcheck evidence was archived with that acceptance. If Block 03 exposes a contract or visual regression attributable to the header, Block 02 must be reopened rather than silently carrying the defect forward.
 
 ```text
-PUBLIC_CONTRACT_VALIDATED = PASS
-VISUAL_QA_VALIDATED       = PASS
-Block 02                  = VALIDATED
-Block 03                  = UNBLOCKED
+SOURCE_VALID               = PASS
+DEFINITION_ACCEPTED        = PASS
+INSTANCE_SAFE              = PASS
+BLOCK_02                   = VALIDATED FOR PROGRESSION
+BLOCK_03                   = UNBLOCKED
 ```
 
-## Current block consequence
+The component remains subject to normal integration QA in `scr_Home_PDS`.
+
+## Diagnostic efficiency rule retained
 
 ```text
-Block 02          = INSTANCE_SAFE / FINAL COMBINED SMOKE PENDING
-Block 03          = BLOCKED ONLY BY THAT FINAL SMOKE
-cmp_PageHeaderPro = REVIEW_REQUIRED until contract + visual smoke passes
+problem component
+→ positive instance-safe PULSE reference
+→ full contract/body diff
+→ corrected complete component
+→ one smoke test
+→ reduction only if still failing
 ```
+
+This incident is closed unless a reproducible regression appears during integration.
