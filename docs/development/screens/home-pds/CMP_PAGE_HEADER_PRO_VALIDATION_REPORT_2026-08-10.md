@@ -50,6 +50,32 @@ PASS  no AutoHeight=false remains in the current component source
 PASS  context/action geometry is a one-direction sibling chain; no explicit circular formula was found statically
 ```
 
+### Derived geometry preflight
+
+The horizontal chain can be simplified algebraically for an instance width `W`:
+
+```text
+Actions.X  = W - 164
+Context3.X = W - 356
+Context2.X = W - 544
+Context1.X = W - 732
+Identity.X = 16
+Identity.Width = Max(250, W - 760)
+```
+
+Consequences:
+
+```text
+W >= 1010  → intended 12 px identity/context gap is preserved
+W ~= 998   → identity/context gap collapses to ~0
+W < 998    → identity/context overlap begins
+W < 732    → Context1 begins off the left edge
+```
+
+This is a **confirmed static layout limitation**, not a confirmed cause of the Studio closure.
+
+The component therefore needs an explicit supported-width contract or responsive adaptation before it can satisfy the broader PDS tablet target. For the first instance-safety smoke test, keep the component at its default `Width=1200` so geometry compression is not mixed into crash diagnosis.
+
 ### Static evidence that does NOT prove instance safety
 
 The component contains several behaviors whose authoring/runtime interaction cannot be certified from source inspection alone:
@@ -128,9 +154,10 @@ Use an isolated component-lab screen or safe/sandbox copy of the app and perform
 ```text
 Test 1 — full current 02A definition
 Test 2 — insert exactly one instance with default properties
+Test 3 — keep Width=1200 during the first smoke test
 ```
 
-If Test 2 succeeds, the prior crash may have involved integration bindings or transient Studio state, and the next step is a default-instance + resize + event smoke test.
+If Test 2 succeeds, the prior crash may have involved integration context or transient Studio state; the next step is a controlled resize/event smoke test.
 
 If Test 2 closes Studio, use diagnostic Stage A and progress until the first failing stage is identified.
 
