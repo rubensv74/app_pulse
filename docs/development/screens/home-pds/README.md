@@ -4,9 +4,7 @@
 **Target display title:** `Punch Control Tower`  
 **Primary archetype:** Operational Control Tower  
 **Secondary pattern:** Data Explorer  
-**Construction mode:** parallel rebuild from blank screen  
-
----
+**Construction mode:** parallel rebuild from blank screen
 
 ## Normative references
 
@@ -14,65 +12,41 @@
 docs/development/PULSE_UI_DELIVERY_FRAMEWORK.md
 docs/development/PROTOCOLO_CONSTRUCCION_MODULAR_PANTALLAS_POWER_APPS.md
 docs/development/POWER_APPS_COMPONENT_VALIDATION_GATE.md
-docs/guides/GUIA_RECONSTRUCCION_PDS_EN_PANTALLA_PARALELA.md
 docs/design-system/PULSE_DESIGN_SYSTEM.md
-docs/design-system/SAAS_INTERFACE_ARCHETYPES.md
 docs/design-system/POWER_APPS_VISUAL_QA_GUARDRAILS.md
 docs/design-system/components/CMP_PAGE_HEADER_PRO.md
 docs/specifications/home-pds/HOME_PDS_SCREEN_SPECIFICATION.md
-docs/specifications/home-pds/BLOCK_00_FOUNDATION_AUDIT.md
 ```
 
----
-
-## Frozen source baselines
-
-### Screens / Components
+## Frozen architecture
 
 ```text
-3b71b860ed869a970a5a1b43cc137a580118b30c
+scr_Home_PDS
+└── conHPDS_ScreenRoot
+    ├── cmpHPDS_Sidebar
+    └── conHPDS_ContentShell
+        ├── conHPDS_PageHeaderHost
+        │   └── cmpHPDS_PageHeader
+        ├── conHPDS_Body
+        │   ├── conHPDS_KpiStrip
+        │   ├── conHPDS_AnalyticsGrid
+        │   │   ├── conHPDS_HeatmapPanel
+        │   │   └── conHPDS_DisciplinePanel
+        │   ├── conHPDS_ActiveContext
+        │   └── conHPDS_DataExplorer
+        └── conHPDS_OverlayLayer
 ```
 
-### SQL warroom schema
-
-```text
-17bbe86e25bbb3962df237420136600b6aca12e2
-```
-
-If a later block depends on a contract changed after these commits, that block must perform and document a targeted re-audit.
-
----
-
-## Block 00 validation decision
-
-Block 00 was explicitly accepted on **2026-08-07**.
-
-The following architectural decisions are therefore frozen for the first construction pass:
-
-- build `scr_Home_PDS` from a blank screen in parallel with `scr_Home`;
-- keep `scr_Home` as stable reference and rollback until final cutover;
-- primary archetype: Operational Control Tower;
-- secondary pattern: Data Explorer;
-- reuse proven backend contracts rather than recreate them;
-- reuse compatible premium components through PDS inputs;
-- use `cmp_PieChartPro` as the primary discipline-composition chart;
-- complement the pie with interactive horizontal discipline bars;
-- synchronize pie and bars through one shared discipline-selection state;
-- keep SQL/Flow snapshot and pagination authority server-side;
-- do not change `StartScreen` during construction.
-
-`cmp_DonutPro` remains a valid PDS component for progress/completion/capacity-style metrics, but it is **not** the selected chart for Home_PDS discipline distribution.
-
----
+`scr_Home` remains the stable reference/rollback screen until final cutover. `StartScreen` is not changed during construction.
 
 ## Block status
 
 | Block | Name | Status |
 |---:|---|---|
 | 00 | Foundation audit and reuse matrix | **validated** |
-| 01 | Blank screen shell | **validated for progression — Studio visual gate accepted** |
-| 02 | PDS Page Header contract / implementation | **FAILED / BLOCKED — component instance-safety gate not passed** |
-| 03 | Home_PDS header integration | **blocked by Block 02** |
+| 01 | Blank screen shell | **validated** |
+| 02 | PDS Page Header contract / implementation | **corrected full candidate — one Studio smoke test pending** |
+| 03 | Home_PDS header integration | **blocked by Block 02 smoke test** |
 | 04 | Workspace/body structural layout | planned |
 | 05 | Minimum typed runtime state | planned |
 | 06 | KPI strip with local presentation model | planned |
@@ -94,168 +68,125 @@ The following architectural decisions are therefore frozen for the first constru
 | 22 | Remove scaffolding + visual QA | planned |
 | 23 | Consolidation + user guide + cutover decision | planned |
 
----
+## Block 01
 
-## Block 01 validation
-
-Published construction artifact:
+Validated shell:
 
 ```text
-docs/development/screens/home-pds/blocks/01_screen_shell.pa.yaml
+scr_Home_PDS exists independently from scr_Home
+conHPDS_ScreenRoot exists
+cmpHPDS_Sidebar renders at the left
+conHPDS_ContentShell occupies remaining surface
+Home is active in sidebar
+current project context is preserved
+no later modules introduced prematurely
 ```
 
-The Studio screenshot received on 2026-08-07 confirmed the intended shell geometry and isolation:
+## Block 02 — Page Header
 
-```text
-PASS  scr_Home_PDS exists independently from scr_Home
-PASS  conHPDS_ScreenRoot exists
-PASS  cmpHPDS_Sidebar exists and renders at the left
-PASS  conHPDS_ContentShell exists and occupies the remaining surface
-PASS  Home is visually active in the sidebar
-PASS  current project context is preserved and displayed (70200)
-PASS  content shell is intentionally empty and uses the light PDS page surface
-PASS  no Page Header, KPI, charts or Data Explorer were introduced prematurely
-```
-
-The user's explicit instruction to proceed to Block 02 is recorded as acceptance for progression. No separate App Checker screenshot was archived with the Block 01 evidence; if a later Studio issue is traced back to Block 01, the block must be reopened and corrected rather than silently carried forward.
-
----
-
-## Block 02 publication, visual QA and instance-safety incident
-
-Shared component specification:
-
-```text
-docs/design-system/components/CMP_PAGE_HEADER_PRO.md
-```
-
-Original construction artifact:
-
-```text
-docs/development/screens/home-pds/blocks/02_page_header_component.pa.yaml
-```
-
-Corrective artifact:
-
-```text
-docs/development/screens/home-pds/blocks/02A_page_header_text_overflow_fix.pa.yaml
-```
-
-Canonical component source:
+Canonical source:
 
 ```text
 power-apps/components/cmp_PageHeaderPro.pa.yaml
 ```
 
-Current validation report:
+Validation report:
 
 ```text
 docs/development/screens/home-pds/CMP_PAGE_HEADER_PRO_VALIDATION_REPORT_2026-08-10.md
 ```
 
-Purpose:
-
-- create reusable `cmp_PageHeaderPro`;
-- define PDS page identity hierarchy;
-- provide three generic context slots;
-- provide one neutral utility action plus Help;
-- expose interaction only through component events;
-- own no project/template/refresh business state;
-- leave `scr_Home_PDS` untouched until Block 03.
-
-### Visual QA observation
-
-The component architecture rendered and exposed a reusable text defect:
+Known history:
 
 ```text
-VQA-001 — Small fixed-height text controls can expose unintended internal scrollbars.
+02   initial reusable Page Header
+02A  ModernText overflow/AutoHeight correction
+     + PaYaml Patch: root incident corrected
+     + later FAIL_INSTANCE observed
 ```
 
-The preventive rule is maintained in:
+### Reference-first correction
+
+The earlier component diagnosis was changed after positive evidence from PULSE components already known to instantiate safely.
+
+Primary reference:
 
 ```text
-docs/design-system/POWER_APPS_VISUAL_QA_GUARDRAILS.md
+cmp_HeatMapPro
 ```
 
-The corrected 02A source uses `AutoHeight=true` on static `ModernText` controls.
-
-### Block 02A PaYaml incident
-
-The first 02A revision incorrectly represented the protocol-level operation as a top-level PaYaml node:
-
-```yaml
-Patch:
-```
-
-Power Apps Studio rejected that source with:
+Secondary reference:
 
 ```text
-PA1001 / YamlInvalidSyntax
-Property 'Patch' not found on type PaModule
+cmp_SidebarNav
 ```
 
-This is recorded as compatibility rule `PA-COMP-011`.
+Both demonstrate valid Source-Code `CustomProperties:` contracts. Therefore `CustomProperties:` is not treated as an incompatible category.
 
-### Instance-safety incident — current blocker
-
-A later attempt to insert an instance of `cmp_PageHeaderPro` into `scr_Home_PDS` caused Power Apps Studio to close.
-
-This proves that the previous acceptance model was incomplete:
+The full header was compared against these references. The principal structural delta was that header Inputs used a reduced metadata shape while the stable references normally use:
 
 ```text
-component source/definition exists
-        ≠
-component is safe to instantiate in a screen
+PropertyKind
+DisplayName
+Description
+DataType
+Default
 ```
 
-The exact technical root cause is not yet confirmed and must not be guessed.
+The canonical full `cmp_PageHeaderPro` has been rebuilt using that known-good Input contract shape; Events use the complete event metadata form demonstrated by `cmp_SidebarNav`.
 
-The component is therefore `REVIEW_REQUIRED`, Block 02 is `FAILED/BLOCKED`, and Block 03 must not begin until the component passes:
+Correction commit:
 
 ```text
-docs/development/POWER_APPS_COMPONENT_VALIDATION_GATE.md
+ccaccacd2de75263edc20751eed0efec3c78da83
 ```
 
-The next validation must occur on an isolated component-lab screen or safe/sandbox app context, not directly on `scr_Home_PDS`.
+This is a **corrected candidate**, not yet `INSTANCE_SAFE`.
 
----
+### Required validation
+
+Only one runtime check is requested before further diagnosis:
+
+```text
+replace/create complete cmp_PageHeaderPro source
+→ save
+→ App Checker
+→ insert one instance on isolated diagnostic screen
+→ save
+→ close/reopen
+```
+
+If this passes, Block 02 progresses to contract/visual acceptance and then Block 03 may start.
+
+If it fails, only then is controlled reduction allowed, guided by the remaining delta against the instance-safe references.
+
+## Diagnostic efficiency rule
+
+For Power Apps components in this workspace:
+
+```text
+problem component
+→ positive instance-safe PULSE reference
+→ full contract/body diff
+→ corrected complete component
+→ one smoke test
+→ reduction only if still failing
+```
+
+Do not request property-by-property microtests while repository comparison can produce a concrete complete correction.
 
 ## Construction policy
 
-The new screen must be created from a blank screen. Do not duplicate `scr_Home`.
+No dependent block advances while its dependency has a failed or unvalidated runtime gate.
 
-During construction:
-
-```text
-scr_Home     = stable reference + rollback
-scr_Home_PDS = isolated PDS implementation
-```
-
-Do not change `StartScreen` or the production Home navigation before final acceptance.
-
-No dependent block advances while the current block is `failed`.
-
-A reusable component may be used in a screen block only after its isolated definition + instance + contract + QA validation gate has passed.
-
-Visible QA defects recorded in `POWER_APPS_VISUAL_QA_GUARDRAILS.md` must also be resolved or explicitly accepted before a dependent block treats the current visual implementation as canonical.
-
----
-
-## Repository workspace
+A reusable component may be consumed by a screen only after:
 
 ```text
-docs/development/screens/home-pds/
-├── README.md
-├── SCREEN_ARCHITECTURE.md
-├── POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
-├── CMP_PAGE_HEADER_PRO_VALIDATION_REPORT_2026-08-10.md
-├── blocks/
-│   ├── 01_screen_shell.pa.yaml
-│   ├── 02_page_header_component.pa.yaml
-│   ├── 02A_page_header_text_overflow_fix.pa.yaml
-│   └── ...
-└── user-guide/
-    └── MANUAL_USUARIO_HOME_PDS.md
+SOURCE_VALID
+→ DEFINITION_ACCEPTED
+→ INSTANCE_SAFE
+→ PUBLIC_CONTRACT_VALIDATED
+→ VISUAL_QA_VALIDATED
 ```
 
-Blocks are construction artifacts and do not replace the canonical screen source until the consolidation gate.
+Power Apps Studio + App Checker remain the acceptance authority.
