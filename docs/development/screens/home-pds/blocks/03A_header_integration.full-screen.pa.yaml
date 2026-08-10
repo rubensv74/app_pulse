@@ -1,0 +1,154 @@
+# HOME_PDS — BLOCK 03A — PAGE HEADER INTEGRATION FROM FULL SCREEN SOURCE
+#
+# Status: CORRECTED — PENDING POWER APPS STUDIO VALIDATION
+# Operation: REPLACE COMPLETE SCREEN SOURCE
+# Target screen: scr_Home_PDS
+# Replaces failed artifact: 03_header_integration.children.pa.yaml
+#
+# Incident corrected:
+# - partial ADD CHILD edit surface accepted the generic CanvasComponent but returned PA2108
+#   for every cmp_PageHeaderPro custom property.
+# - canonical full-screen examples such as scr_PunchReview bind cmp_SidebarNav custom
+#   properties under the same instance Properties: node successfully.
+#
+# Corrective strategy:
+# - do not change cmp_PageHeaderPro contract yet;
+# - move the integration to the proven full Screens: edit surface;
+# - keep only the custom bindings required by Block 03;
+# - if this still returns PA2108, the remaining issue is public-contract visibility/
+#   registration for cmp_PageHeaderPro rather than child-fragment syntax.
+#
+# Validation:
+# 1. Open Source Code for the COMPLETE scr_Home_PDS screen.
+# 2. Replace the complete screen source with this artifact.
+# 3. Save and wait for formula validation.
+# 4. App Checker must show no Block03-attributable PA2108.
+# 5. Header must render above the empty body area.
+# 6. Project context must show current project when available.
+# 7. Template remains Master Punch List.
+# 8. Last refresh remains Not loaded.
+# 9. Refresh disabled; Help hidden.
+
+Screens:
+  scr_Home_PDS:
+    Properties:
+      Fill: =varTheme_PageBg
+      LoadingSpinnerColor: =varTheme_ActionPrimary
+      OnVisible: |-
+        =
+        If(IsBlank(varTheme_PageBg), Set(varTheme_PageBg, ColorValue("#F6F8FB")));
+        If(IsBlank(varTheme_Surface), Set(varTheme_Surface, ColorValue("#FFFFFF")));
+        If(IsBlank(varTheme_Border), Set(varTheme_Border, ColorValue("#E2E8F0")));
+        If(IsBlank(varTheme_Text), Set(varTheme_Text, ColorValue("#0F172A")));
+        If(IsBlank(varTheme_TextMuted), Set(varTheme_TextMuted, ColorValue("#64748B")));
+        If(IsBlank(varTheme_BrandDark), Set(varTheme_BrandDark, ColorValue("#07111F")));
+        If(IsBlank(varTheme_ActionPrimary), Set(varTheme_ActionPrimary, ColorValue("#1677FF")));
+        If(IsBlank(varTheme_SpaceM), Set(varTheme_SpaceM, 12));
+
+        Set(varAppView, "Home");
+        Set(varPageKey, "HOME_PDS");
+        Set(varPageTitle, "Punch Control Tower");
+        Set(varPageSubtitle, "Open punch concentration, discipline distribution and operational drill-through");
+
+    Children:
+      - conHPDS_ScreenRoot:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =varTheme_PageBg
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutGap: =0
+            Width: =Parent.Width
+
+          Children:
+            - cmpHPDS_Sidebar:
+                Control: CanvasComponent
+                ComponentName: cmp_SidebarNav
+                Properties:
+                  ActiveKey: ="Home"
+                  AppVersion: ="PULSE"
+                  EnvironmentLabel: ="ENV.PRE.TR.162"
+                  Fill: =varTheme_BrandDark
+                  Height: =Parent.Height
+                  IsCollapsed: =true
+                  Items: =colSidebarNavItems
+                  NavItems: =colSidebarNavItems
+                  ProjectCode: =Coalesce(varSelectedProject.ProjectCode, "")
+                  ProjectName: =Coalesce(varSelectedProject.ProjectName, "")
+                  UserRole: =Coalesce(varUserRole, "reader")
+                  Width: =154
+
+            - conHPDS_ContentShell:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.Stretch
+                  DropShadow: =DropShadow.None
+                  Fill: =varTheme_PageBg
+                  FillPortions: =1
+                  Height: =Parent.Height
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =varTheme_SpaceM
+                  LayoutMinHeight: =320
+                  LayoutMinWidth: =320
+                  PaddingBottom: =varTheme_SpaceM
+                  PaddingLeft: =varTheme_SpaceM
+                  PaddingRight: =varTheme_SpaceM
+                  PaddingTop: =varTheme_SpaceM
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+
+                Children:
+                  - conHPDS_PageHeaderHost:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        AlignInContainer: =AlignInContainer.Stretch
+                        DropShadow: =DropShadow.None
+                        Fill: =varTheme_Surface
+                        FillPortions: =0
+                        Height: =80
+                        LayoutMinHeight: =80
+                        LayoutMinWidth: =320
+                        RadiusBottomLeft: =0
+                        RadiusBottomRight: =0
+                        RadiusTopLeft: =0
+                        RadiusTopRight: =0
+                        Width: =Parent.Width
+
+                      Children:
+                        - cmpHPDS_PageHeader:
+                            Control: CanvasComponent
+                            ComponentName: cmp_PageHeaderPro
+                            Properties:
+                              Context1Interactive: =false
+                              Context1Value: |-
+                                =With(
+                                    {
+                                        _projectCode: Coalesce(varSelectedProject.ProjectCode, ""),
+                                        _projectName: Coalesce(varSelectedProject.ProjectName, "")
+                                    },
+                                    If(
+                                        IsBlank(_projectCode) && IsBlank(_projectName),
+                                        "No project selected",
+                                        _projectCode &
+                                        If(
+                                            !IsBlank(_projectCode) && !IsBlank(_projectName),
+                                            " · ",
+                                            ""
+                                        ) &
+                                        _projectName
+                                    )
+                                )
+                              Context2Interactive: =false
+                              Context3Interactive: =false
+                              Context3Value: ="Not loaded"
+                              Height: =Parent.Height
+                              ShowHelp: =false
+                              UtilityEnabled: =false
+                              Width: =Parent.Width
