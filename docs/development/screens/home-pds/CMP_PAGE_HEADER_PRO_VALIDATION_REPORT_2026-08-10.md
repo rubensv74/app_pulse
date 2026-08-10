@@ -1,83 +1,133 @@
 # cmp_PageHeaderPro Validation Report — 2026-08-10
 
-**Status:** diagnostic closed / corrective authoring path adopted  
-**Component:** `cmp_PageHeaderPro`  
-**Canonical source:** `power-apps/components/cmp_PageHeaderPro.pa.yaml`
+**Status:** diagnostic reopened / comparison against proven components active  
+**Component:** `cmp_PageHeaderPro`
 
-## Confirmed observed problem
+## Confirmed incident
 
-The full component source contained a `CustomProperties:` block authored through Source Code. An instance of the full component caused Power Apps Studio to close.
+The original full `cmp_PageHeaderPro` source could be defined, but inserting an instance caused Power Apps Studio to close.
 
-Reduced validation produced:
+```text
+FAIL_INSTANCE
+Technical root cause: UNKNOWN
+```
+
+## Correction of previous operational conclusion
+
+A previous revision closed diagnosis and adopted the rule:
+
+```text
+PUBLIC COMPONENT PROPERTIES → Studio only
+COMPONENT BODY              → Source Code only
+```
+
+That conclusion is withdrawn.
+
+PULSE already contains working, integrated components whose canonical Source Code declares `CustomProperties:` directly:
+
+```text
+cmp_HeatMapPro
+cmp_SidebarNav
+```
+
+They include Inputs, Outputs and Events and are instance-safe in PULSE. Therefore `CustomProperties:` cannot be treated as the root problem category.
+
+The correct question is:
+
+```text
+Which concrete declaration or component delta separates cmp_PageHeaderPro from the working references?
+```
+
+## Confirmed reduced results
 
 ```text
 PASS_A  CanvasComponent + root GroupContainer
 PASS_B  + hardcoded ModernText title/subtitle
-PASS_C1 + Input/Text public property created manually in Studio
+PASS_C1 + one Input/Text property created manually in Studio
 ```
 
-Cross-project evidence already available in the reusable knowledge base also demonstrates that a public property created manually in Studio can be stable while the equivalent `CustomProperties:` path authored through Source Code is not.
+These prove that the bare component shell, the current ModernText title/subtitle pattern, and Input/Text capability itself are not sufficient to reproduce the crash.
 
-## Operational conclusion
+## Highest-priority structural delta
 
-Further binary diagnosis is stopped because it is no longer proportionate to the implementation goal.
+The original failing header declared many Inputs using a reduced shape such as:
 
-For PULSE incremental component construction, the accepted operational boundary is:
+```yaml
+Title:
+  PropertyKind: Input
+  DataType: Text
+  Default: ="Punch Control Tower"
+```
+
+Working `cmp_HeatMapPro` and `cmp_SidebarNav` Inputs normally use a fuller declaration:
+
+```yaml
+Title:
+  PropertyKind: Input
+  DisplayName: Title
+  Description: Component title
+  DataType: Text
+  Default: ="Heat Map"
+```
+
+This is classified as:
 
 ```text
-PUBLIC COMPONENT PROPERTIES
-→ create/maintain in Power Apps Studio
-
-COMPONENT BODY
-→ maintain/paste through Source Code YAML
+HYPOTHESIS — PRIORITY 1
 ```
 
-Therefore:
+not confirmed cause.
 
-> The current `CustomProperties:` authoring path is not approved for pasteable reusable-component YAML in PULSE.
+`DisplayName` / `Description` are not declared universally mandatory because working Output/Event declarations show valid variants. The comparison must be made by `PropertyKind` and proven reference pattern.
 
-This conclusion is operational. It does not claim knowledge of the internal Microsoft serialization/hydration defect.
+## Next diagnostic
 
-## Corrective action for cmp_PageHeaderPro
-
-The component must be rebuilt using this order:
+Artifact:
 
 ```text
-1. create the required public properties manually in Studio
-2. save the component
-3. paste a body-only `ComponentDefinitions:` source that references those properties
-4. insert one isolated instance
-5. perform one App Checker + visual smoke test
-6. integrate into scr_Home_PDS only if stable
+docs/development/screens/home-pds/diagnostics/02D4_cmp_PageHeaderPro_diag_stage_C_source_model.pa.yaml
 ```
 
-The previous full-source version containing `CustomProperties:` must not be used for import/paste.
-
-Normative rule:
+Diagnostic component:
 
 ```text
-docs/development/POWER_APPS_COMPONENT_PUBLIC_PROPERTY_AUTHORING.md
+cmp_PageHeaderPro_DiagCSource
 ```
 
-## Diagnostic chain closure
+It contains exactly one Source-Code-authored `Input/Text` property using the metadata shape demonstrated by the working PULSE components, plus one ModernText binding to it.
+
+Result semantics:
 
 ```text
-A   root container only                                  PASS_A
-B   + hardcoded title/subtitle ModernText                PASS_B
-C1  + one Input/Text property created manually Studio    PASS_C1
-C2  binding micro-test                                    CANCELLED — no longer required
-D   property-type-by-property-type diagnostics            CANCELLED — no longer required
-E   event micro-diagnostics                               CANCELLED — no longer required
-F   full binary reconstruction                            CANCELLED — no longer required
+PASS_CSOURCE
+→ Source-Code-authored Input/Text using the proven metadata shape is instance-safe
+→ continue adding header contract deltas one at a time
+
+FAIL_CSOURCE
+→ still do not generalize to all CustomProperties because HeatMap/Sidebar remain positive counterexamples
+→ inspect environment/component-state or another declaration difference
 ```
 
-Reason for cancellation: the safe authoring boundary has been established sufficiently for implementation, and continuing micro-tests would delay delivery without proportionate value.
+## Subsequent comparison order after PASS_CSOURCE
+
+```text
+1. Boolean Input with proven metadata shape
+2. Color Input with proven metadata shape
+3. Event declaration copied from working reference
+4. event invocation from Classic/Button
+5. transparent hit surface
+6. chained sibling geometry
+7. full header contract
+```
+
+One delta per stage.
 
 ## Block consequence
 
 ```text
-Block 02 = CORRECTIVE REBUILD REQUIRED
-Block 03 = remains blocked until rebuilt header passes one isolated instance smoke test
+Block 02  = FAILED / DIAGNOSTIC COMPARISON ACTIVE
+Block 03  = MUST NOT START
+cmp_PageHeaderPro = REVIEW_REQUIRED
 ```
 
-The next deliverable is not another diagnostic component. It is the production `cmp_PageHeaderPro` rebuilt for the Studio-authored public-property workflow.
+Diagnosis remains open until the first failing delta is isolated and corrected.
