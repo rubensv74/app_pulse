@@ -45,8 +45,8 @@ scr_Home_PDS
 |---:|---|---|
 | 00 | Foundation audit and reuse matrix | **validated** |
 | 01 | Blank screen shell | **validated** |
-| 02 | PDS Page Header contract / implementation | **corrected full candidate — one Studio smoke test pending** |
-| 03 | Home_PDS header integration | **blocked by Block 02 smoke test** |
+| 02 | PDS Page Header contract / implementation | **INSTANCE_SAFE PASS — final combined contract/visual smoke pending** |
+| 03 | Home_PDS header integration | **blocked only by final Block 02 smoke** |
 | 04 | Workspace/body structural layout | planned |
 | 05 | Minimum typed runtime state | planned |
 | 06 | KPI strip with local presentation model | planned |
@@ -107,23 +107,19 @@ Known history:
 
 ### Reference-first correction
 
-The earlier component diagnosis was changed after positive evidence from PULSE components already known to instantiate safely.
-
-Primary reference:
+Primary stable reference:
 
 ```text
 cmp_HeatMapPro
 ```
 
-Secondary reference:
+Secondary stable reference:
 
 ```text
 cmp_SidebarNav
 ```
 
-Both demonstrate valid Source-Code `CustomProperties:` contracts. Therefore `CustomProperties:` is not treated as an incompatible category.
-
-The full header was compared against these references. The principal structural delta was that header Inputs used a reduced metadata shape while the stable references normally use:
+The original header was compared structurally against both. The principal objective delta was that header Inputs used a reduced metadata shape while stable PULSE references normally use:
 
 ```text
 PropertyKind
@@ -133,7 +129,7 @@ DataType
 Default
 ```
 
-The canonical full `cmp_PageHeaderPro` has been rebuilt using that known-good Input contract shape; Events use the complete event metadata form demonstrated by `cmp_SidebarNav`.
+The complete `cmp_PageHeaderPro` contract was rebuilt using the proven PULSE pattern; Events use the complete event metadata form demonstrated by stable components.
 
 Correction commit:
 
@@ -141,24 +137,36 @@ Correction commit:
 ccaccacd2de75263edc20751eed0efec3c78da83
 ```
 
-This is a **corrected candidate**, not yet `INSTANCE_SAFE`.
+### Instance-safety result
 
-### Required validation
-
-Only one runtime check is requested before further diagnosis:
+On 2026-08-10 the user created a new instance of the corrected complete component in Power Apps Studio and reported that the instance was created successfully and Studio remained stable.
 
 ```text
-replace/create complete cmp_PageHeaderPro source
-→ save
-→ App Checker
-→ insert one instance on isolated diagnostic screen
-→ save
-→ close/reopen
+DEFINITION_ACCEPTED = PASS
+INSTANCE_SAFE       = PASS
 ```
 
-If this passes, Block 02 progresses to contract/visual acceptance and then Block 03 may start.
+No further reduction is justified unless a later regression reproduces the issue.
 
-If it fails, only then is controlled reduction allowed, guided by the remaining delta against the instance-safe references.
+### Final Block 02 smoke
+
+Before Block 03, perform one combined check rather than separate microtests:
+
+```text
+1. change one representative Text input
+2. toggle one representative Boolean visibility input
+3. execute one Event with a trivial Notify() binding
+4. visually confirm no clipping, unintended scrollbar or overlap
+```
+
+If the combined test passes:
+
+```text
+PUBLIC_CONTRACT_VALIDATED = PASS
+VISUAL_QA_VALIDATED       = PASS
+Block 02                  = VALIDATED
+Block 03                  = UNBLOCKED
+```
 
 ## Diagnostic efficiency rule
 
