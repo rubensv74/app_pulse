@@ -37,7 +37,8 @@ The component follows these PDS rules:
 - utility actions do not compete visually with the page's operational primary action;
 - context may be interactive or informational;
 - all behavior is exposed through component events;
-- no hidden global state is owned by the component.
+- no hidden global state is owned by the component;
+- static `ModernText` uses `AutoHeight=true` by default to prevent internal mini-scrollbars.
 
 The page's main operational action normally belongs to the body/action context, not the Page Header. The header is for identity, global/local context and utilities.
 
@@ -128,7 +129,7 @@ OnContext3Select     Event
 UtilityText          Text
 ShowUtility          Boolean
 UtilityEnabled       Boolean
-ShowHelp             Boolean
+ShowHelp              Boolean
 OnUtility            Event
 OnHelp               Event
 ```
@@ -195,6 +196,30 @@ Utility             9 / Semibold
 ```
 
 The title/subtitle area has higher visual priority than context metadata, while utilities remain subordinate.
+
+### 7.1. Text rendering rule
+
+Studio validation of the first implementation exposed small internal scrollbars in several `ModernText@1.0.0` controls. A second attempt based on larger fixed heights plus `Wrap=false` still reproduced the defect while `AutoHeight=false` remained in place.
+
+Therefore the canonical v1 contract is:
+
+```text
+Title          AutoHeight=true + Wrap=false
+Subtitle       AutoHeight=true + Wrap=false
+Context label  AutoHeight=true + Wrap=false
+Context value  AutoHeight=true + Wrap=false
+Chevron text   AutoHeight=true + Wrap=false
+```
+
+A fixed `Height` may remain as base geometry, but `AutoHeight=true` is the default protection against internal vertical overflow.
+
+`AutoHeight=false` in a static `ModernText` is a documented exception and requires visual evidence in Studio that it produces neither scrollbar nor clipping.
+
+Normative reference:
+
+```text
+docs/design-system/POWER_APPS_VISUAL_QA_GUARDRAILS.md
+```
 
 ---
 
@@ -267,6 +292,9 @@ Block 02 is acceptable when:
 [ ] events compile through the existing CanvasComponent event pattern
 [ ] no global variable is used internally
 [ ] no normal-card shadow is present
+[ ] every static ModernText in the component uses AutoHeight=true unless a documented Studio-proven exception exists
+[ ] no unintended vertical/horizontal scrollbar appears inside static text
+[ ] no text is clipped or overlaps neighboring controls
 [ ] no unsupported AccessibleLabel is added to Classic/Button@2.2.0
 [ ] App Checker reports no new PA1001 / PA2108 attributable to the component
 ```
