@@ -19,7 +19,7 @@ This is treated as:
 FAIL_INSTANCE
 ```
 
-The user confirmed on 2026-08-10 that the requested full-component instance test cannot be completed because Studio closes. The exact authoring surface of every reproduction has not yet been reduced to a minimal candidate, so the technical root cause remains:
+The user confirmed on 2026-08-10 that the requested full-component instance test cannot be completed because Studio closes. The technical root cause remains:
 
 ```text
 UNKNOWN
@@ -48,7 +48,6 @@ PASS  no invalid protocol-level Patch: root exists
 PASS  no AccessibleLabel is declared on Classic/Button@2.2.0
 PASS  no Canvas component is nested inside a gallery
 PASS  no global var* state is used inside cmp_PageHeaderPro
-PASS  public Event property pattern matches an already used PULSE Canvas component pattern
 PASS  all inspected static ModernText controls use AutoHeight=true
 PASS  no AutoHeight=false remains in the current component source
 PASS  no explicit circular sibling geometry formula was found statically
@@ -79,18 +78,45 @@ This is a confirmed layout limitation but **not** a confirmed cause of the Studi
 
 ---
 
-## Diagnostic reduction now activated
+## Cross-project evidence that changes diagnostic priority
 
-The full component is no longer used as the next diagnostic test. Reduction starts at Stage A.
+The reusable knowledge repository contains a separately reduced Power Apps case (`LL-PA-UI-003`) where:
 
 ```text
-A  root container only
-B  + title/subtitle identity
-C  + three static context containers/text, no hit buttons/events
-D  + action buttons with no component events
-E  + public events and hit surfaces
-F  + final full geometry/content
+minimal component without CustomProperties                       PASS
+same baseline + Input/Text CustomProperty authored in YAML       FAIL_INSTANCE
+same functional Input/Text property created manually in Studio   PASS
 ```
+
+That evidence does **not** prove that `cmp_PageHeaderPro` has the same root cause, but it makes Source-Code-authored `CustomProperties` a high-priority hypothesis because the current header defines many Text/Boolean/Color/Event custom properties.
+
+The diagnostic sequence is therefore intentionally designed to separate:
+
+```text
+basic Canvas component instance safety
+→ primitive child-control safety
+→ CustomProperty authoring/serialization safety
+→ event safety
+→ full layout complexity
+```
+
+---
+
+## Diagnostic reduction now activated
+
+Do not test the full component again until the reduced chain identifies the failing surface.
+
+```text
+A   root container only; no CustomProperties
+B   + hardcoded title/subtitle ModernText; still no CustomProperties
+C1  + exactly one Input/Text CustomProperty authored in Source Code
+C2  if C1 fails: recreate the same Input/Text property manually in Studio on the B baseline
+D   + remaining non-event custom properties incrementally
+E   + public Event properties and invocation
+F   + context hit surfaces and final responsive geometry
+```
+
+This order deliberately tests the cross-project CustomProperty hypothesis before adding unrelated complexity.
 
 ### Stage A artifact
 
@@ -104,7 +130,7 @@ Diagnostic component identity:
 cmp_PageHeaderPro_DiagA
 ```
 
-Stage A contains only a Canvas component, fixed Width/Height and one `GroupContainer@1.5.0`. It deliberately contains no custom properties, events, text, buttons, sibling formulas or data bindings.
+Stage A contains only a Canvas component, fixed Width/Height and one `GroupContainer@1.5.0`. It contains no custom properties, events, text, buttons, sibling formulas or data bindings.
 
 Result semantics:
 
@@ -113,7 +139,7 @@ PASS_A = definition can be created and one instance inserted without Studio clos
 FAIL_A = Studio closes/rejects during definition creation or instance insertion
 ```
 
-The first failing stage becomes the smallest suspect surface and determines the next correction.
+If `PASS_A`, Stage B is prepared next. If `FAIL_A`, stop: the problem is below the header contract/layout layer and must be investigated at the minimal Canvas-component authoring level.
 
 ---
 
