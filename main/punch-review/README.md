@@ -54,7 +54,7 @@ No se debe trabajar de memoria. Cada nuevo error confirmado se incorpora a ese a
 18. `10B_custom_fields_test_seed.optional.powerfx` — opcional para probar los seis tipos de campo sin flows
 19. `10C_yesno_initial_state.incremental-patch.pa.yaml` — parche para vincular `Toggle.Checked` a `ValueBool`
 20. `10D_help_custom_fields.incremental-patch.pa.yaml` — ayuda bilingüe de Custom Fields
-21. `11_review_progress.replace-control.pa.yaml` — corregido tras PA2301; pendiente de revalidación en Studio
+21. `11_review_progress.replace-control.pa.yaml` — corregido para usar `cmp_DonutPro` ya instalado en la app; pendiente de revalidación en Studio
 22. `11A_help_review_progress.incremental-patch.pa.yaml` — aplicar después de validar el Bloque 11 y después de 10D
 
 No se debe iniciar el Bloque 12 hasta que Review Progress se importe sin errores y responda correctamente a Mark Reviewed / Undo Review.
@@ -150,28 +150,20 @@ Reviewed / Total queue
 
 No utiliza flows, SQL ni la colección filtrada visible. Por diseño, cambiar entre `All`, `Remaining` y `Reviewed` no altera el porcentaje: el denominador sigue siendo la cola completa cargada.
 
-### Corrección PR-SC-005
+### Resolución PR-SC-005
 
-La primera versión del Bloque 11 intentó instanciar:
+La primera versión del Bloque 11 intentó instanciar `cmp_DonutPro` antes de que el componente estuviera instalado en la app activa. Studio devolvió `PA2301`.
 
-```text
-cmp_DonutPro
+`cmp_DonutPro` ya ha sido añadido a la biblioteca de componentes de la app. Por tanto, la versión vigente de `11_review_progress.replace-control.pa.yaml` vuelve a utilizar:
+
+```yaml
+Control: CanvasComponent
+ComponentName: cmp_DonutPro
 ```
 
-como `CanvasComponent`. Power Apps Studio devolvió `PA2301` porque el componente, aunque existe como archivo en GitHub, no está instalado en la app activa.
+El bloque de pantalla ya no contiene ninguna implementación SVG propia.
 
-La versión corregida de `11_review_progress.replace-control.pa.yaml` ya no depende de ningún Canvas Component. El panel es autocontenido y usa:
-
-```text
-GroupContainer@1.5.0
-Image@2.2.3
-Label@2.5.1
-Rectangle@2.3.0
-```
-
-El donut se genera mediante SVG dentro de `Image@2.2.3`.
-
-Representa progreso de **revisión de la sesión**, no progreso de cierre técnico del Punch.
+El componente representa progreso de **revisión de la sesión**, no progreso de cierre técnico del Punch.
 
 ## Manual de usuario
 
@@ -189,7 +181,7 @@ La pantalla también incorpora una ayuda resumida bilingüe mediante un modal co
 Español | English
 ```
 
-## Registro de compatibilidad
+## Registro de compatibilidad y lecciones aprendidas
 
 Antes de crear o modificar un bloque debe revisarse:
 
@@ -206,6 +198,8 @@ TabList@2.2.30 no es reseteable mediante Reset().
 Una variable numérica nueva debe recibir primero una asignación numérica inequívoca.
 Toggle moderno utiliza Checked para representar el valor Boolean inicial.
 Un CanvasComponent debe existir realmente en la app activa; que exista en GitHub no es suficiente.
+No usar SVG inline en bloques de pantalla como sustituto de un componente visual instalado o instalable.
+cmp_DonutPro está confirmado actualmente en la app activa.
 ```
 
 Para una píldora redondeada se utiliza un `GroupContainer@1.5.0` con radios y un `Label@2.5.1` sin radios en su interior.
@@ -237,6 +231,5 @@ Las referencias visuales y funcionales se basan en:
 - `main/screens/Punches/scr_Punches_1.pa.yaml`
 - `main/components/cmp_SidebarNav.pa.yaml`
 - `main/components/cmp_DetailDrawer_old.pa.yaml`
+- `main/components/cmp_DonutPro.pa.yaml`
 - resto de componentes actualizados en `main/components/`
-
-La existencia de un componente en `main/components/` no demuestra por sí sola que esté instalado dentro de la app activa de Power Apps Studio.
