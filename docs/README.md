@@ -71,8 +71,13 @@ development/screens/punch-review/
 
 ## Specifications
 
-- `specifications/PULSE_EXECUTIVE_DASHBOARD_FDS_v1.0.md`
-- `specifications/home-pds/`
+Current Home modernization specification:
+
+```text
+specifications/home-pds/
+```
+
+The previous Executive Dashboard FDS was removed because it prescribed legacy retention and a superseded dashboard architecture that conflicts with the approved Home_PDS/PDS direction. Git history preserves it for historical recovery.
 
 ## Architecture
 
@@ -80,11 +85,12 @@ development/screens/punch-review/
 
 ## Analysis
 
-Analysis documents are point-in-time evidence, not implementation authority.
+Analysis documents are point-in-time evidence, not implementation authority. Keep only analysis still useful for a current governance/decision purpose.
 
-- `analysis/punch-review-workspace/`
 - `analysis/repository/REPOSITORY_AUDIT_2026-08-10.md`
 - `analysis/repository/COMPONENT_USAGE_AUDIT_2026-08-10.md`
+
+The older Punch Review assessment set was removed after the current canonical screen and active incremental workspace superseded it.
 
 ## SQL reference
 
