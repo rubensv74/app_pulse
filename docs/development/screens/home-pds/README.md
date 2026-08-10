@@ -46,7 +46,7 @@ scr_Home_PDS
 | 00 | Foundation audit and reuse matrix | **validated** |
 | 01 | Blank screen shell | **validated** |
 | 02 | PDS Page Header contract / implementation | **validated for progression / isolated instance-safe** |
-| 03 | Home_PDS header integration | **FAILED for host-side custom-property assignment in Source Code / 03B pending** |
+| 03 | Home_PDS header integration | **03B source-created instance not hydrated / 03C manual insertion pending** |
 | 04 | Workspace/body structural layout | **blocked by Block 03** |
 | 05 | Minimum typed runtime state | planned |
 | 06 | KPI strip with local presentation model | planned |
@@ -90,8 +90,6 @@ Canonical source:
 power-apps/components/cmp_PageHeaderPro.pa.yaml
 ```
 
-The original instance-safety failure was corrected by comparing the complete component against `cmp_HeatMapPro` and `cmp_SidebarNav`, then rebuilding the full public contract using the proven PULSE metadata patterns.
-
 The corrected complete component was instantiated successfully in Power Apps Studio:
 
 ```text
@@ -101,74 +99,62 @@ INSTANCE_SAFE       = PASS
 
 Target-screen binding remains a separate validation surface.
 
-## Block 03 — Header integration incident
+## Block 03 — Header integration evidence
 
 ### 03 — partial child Source Code
-
-Artifact:
-
-```text
-docs/development/screens/home-pds/blocks/03_header_integration.children.pa.yaml
-```
 
 Studio accepted the generic `CanvasComponent` structure but returned `PA2108 Unknown property` for every `cmp_PageHeaderPro` custom property assigned by the screen.
 
 ### 03A — complete `Screens:` Source Code
 
+The same PA2108 pattern was reproduced in a complete screen source. Therefore the partial edit-surface hypothesis was refuted.
+
+### 03B — generic Source Code instance
+
+A complete screen was then created with the header instance using only:
+
+```yaml
+Control: CanvasComponent
+ComponentName: cmp_PageHeaderPro
+Properties:
+  Height: =Parent.Height
+  Width: =Parent.Width
+```
+
+Studio accepted the screen. However, visual evidence showed that the selected `cmpHPDS_PageHeader` instance:
+
+```text
+- rendered as a blank header surface;
+- exposed generic properties such as Fill, Height, Visible, Width, X and Y;
+- exposed OnUtility;
+- did NOT expose expected public Inputs such as Context1Value, Title, Subtitle, ShowHelp, etc.
+```
+
+This means the Source Code-created instance has not hydrated the same usable contract/body demonstrated by the prior manual instance insertion.
+
+## Block 03C — manual instance hydration
+
 Artifact:
 
 ```text
-docs/development/screens/home-pds/blocks/03A_header_integration.full-screen.pa.yaml
-```
-
-The same PA2108 pattern was reproduced in a complete screen source. Therefore the previous edit-surface hypothesis is refuted for this incident.
-
-Confirmed differential:
-
-```text
-Height / Width and generic CanvasComponent structure → recognized
-cmp_PageHeaderPro-specific custom properties         → not recognized by screen Source Code parser
-```
-
-PULSE provides a positive counterexample: `scr_PunchReview` binds `cmp_SidebarNav` custom properties in screen Source Code successfully. Therefore generic `CanvasComponent + ComponentName + Properties` syntax is valid when Studio resolves the component public contract.
-
-Current interpretation is deliberately limited:
-
-> In the current app state, host-side Source Code does not resolve the `cmp_PageHeaderPro` public properties. The internal metadata reason is not claimed.
-
-## Block 03B — Studio-resolved contract integration
-
-Artifact:
-
-```text
-docs/development/screens/home-pds/blocks/03B_header_integration_studio_contract.md
+docs/development/screens/home-pds/blocks/03C_header_integration_manual_instance.md
 ```
 
 Strategy:
 
 ```text
-create host + component instance with only standard CanvasComponent properties
-→ save
-→ select cmpHPDS_PageHeader in Studio
-→ configure its public inputs through Studio property selector/formula bar
-→ save and let Studio own host-side binding representation
+keep conHPDS_PageHeaderHost
+→ delete only source-created cmpHPDS_PageHeader
+→ insert cmp_PageHeaderPro manually from Studio Custom components
+→ move it into conHPDS_PageHeaderHost
+→ rename to cmpHPDS_PageHeader
+→ set Width/Height = Parent
+→ configure Block 03 public inputs in one pass
 ```
 
-Required Block 03 overrides:
+This is not a new component diagnostic. It deliberately uses the same manual insertion path that already demonstrated `INSTANCE_SAFE = PASS`.
 
-```text
-Context1Interactive = false
-Context1Value       = current selected project
-Context2Interactive = false
-Context3Interactive = false
-Context3Value       = "Not loaded"
-ShowHelp            = false
-UtilityEnabled      = false
-```
-
-If those properties are visible on the selected instance, configure all seven in one pass and validate the header.
-
-If `Context1Value` and the other public properties are absent from Studio's property selector, stop. That result is a direct gate for **public-contract re-registration in Studio**; no further screen-YAML variants are justified.
+If the manually inserted instance exposes the expected public contract and renders normally, close Block 03 after binding/visual validation. If it does not, reopen the component public-contract definition itself; no further screen-YAML variants are justified.
 
 ## Diagnostic efficiency rule
 
