@@ -2,7 +2,7 @@
 
 **Status:** normative  
 **Canonical:** yes  
-**Version:** 1.1  
+**Version:** 1.2  
 **Last reviewed:** 2026-08-10
 
 ## Purpose
@@ -12,8 +12,7 @@ A reusable Canvas component must not be considered ready for screen integration 
 PULSE distinguishes:
 
 ```text
-BODY_SOURCE_VALID
-PUBLIC_CONTRACT_CREATED_IN_STUDIO
+SOURCE_VALID
 COMPONENT_DEFINITION_ACCEPTED
 INSTANCE_SAFE
 PUBLIC_CONTRACT_VALIDATED
@@ -21,38 +20,21 @@ VISUAL_QA_VALIDATED
 READY_FOR_INTEGRATION
 ```
 
-The public-property authoring rule is defined in:
-
-```text
-docs/development/POWER_APPS_COMPONENT_PUBLIC_PROPERTY_AUTHORING.md
-```
-
-## Mandatory authoring boundary
-
-For the current incremental PULSE workflow:
-
-```text
-Public Inputs / Outputs / Events → create in Power Apps Studio
-Component body controls/formulas → maintain in Source Code YAML
-```
-
-Do **not** inject a `CustomProperties:` block into pasteable reusable-component YAML unless that exact path has independently demonstrated `INSTANCE_SAFE` in the active app/version.
-
-The repository still documents the complete component contract, but Studio is the authoring authority for public-property metadata.
+`CustomProperties:` is allowed in canonical Source Code when its schema is derived from an instance-safe PULSE reference. Working `cmp_HeatMapPro` and `cmp_SidebarNav` prove that Source-Code-authored Inputs, Outputs and Events can be valid in the active application.
 
 ---
 
-## Gate 0 — Repository/static body validation
+## Gate 0 — Repository/static validation
 
-Before giving component body YAML to the user, verify:
+Before giving a component YAML to the user, verify:
 
 ```text
 [ ] source starts at a demonstrated PaYaml root (`ComponentDefinitions:`)
 [ ] component identity is unique and consistent
-[ ] no `CustomProperties:` block is included under the current Studio-authored-contract rule
-[ ] required Studio public contract is documented separately
-[ ] every control family/version is demonstrated in the current repository or verified
-[ ] properties are compatible with declared control versions
+[ ] every control family/version is demonstrated in the current repository or explicitly validated
+[ ] public property declarations follow a known-good PULSE component pattern
+[ ] Input metadata shape is compared with a working reference (PropertyKind / DisplayName / Description / DataType / Default)
+[ ] Output/Event declarations follow a known-good declaration of the same kind
 [ ] no protocol operation label is represented as an invalid PaYaml node
 [ ] no unsupported property already recorded in compatibility registers is present
 [ ] no hidden global variable is used as per-instance state unless explicitly audited
@@ -74,36 +56,12 @@ Static review can never produce `READY_FOR_INTEGRATION` by itself.
 
 ---
 
-## Gate 1 — Studio public contract creation
+## Gate 1 — Component-definition acceptance
 
-Before pasting body YAML that references public properties, create those properties manually in Studio from the documented contract.
-
-For each property record:
+Use the complete candidate source, including its public contract when that contract follows a proven Source Code pattern.
 
 ```text
-Name
-Property type / direction
-Data type
-Default value if applicable
-Purpose
-```
-
-Pass condition:
-
-```text
-PUBLIC_CONTRACT_CREATED_IN_STUDIO
-```
-
-If adding a Studio-created property itself destabilizes the component, stop and isolate that property type.
-
----
-
-## Gate 2 — Component-body acceptance
-
-After the public contract exists in Studio:
-
-```text
-1. paste/replace the component body Source Code
+1. create/import/replace component source
 2. save
 3. wait for formula validation
 4. review App Checker
@@ -115,11 +73,11 @@ Pass condition:
 COMPONENT_DEFINITION_ACCEPTED
 ```
 
-If Studio rejects the body or closes, stop before target-screen integration.
+If Studio rejects the definition or closes, stop and reduce the candidate.
 
 ---
 
-## Gate 3 — Isolated instantiation smoke test
+## Gate 2 — Isolated instantiation smoke test
 
 Insert exactly one instance on a blank diagnostic screen with default properties.
 
@@ -143,15 +101,15 @@ A Studio crash/forced close during insertion is an automatic `FAIL_INSTANCE`.
 
 ---
 
-## Gate 4 — Public contract smoke test
+## Gate 3 — Public contract smoke test
 
 Only after `INSTANCE_SAFE`, exercise the public contract in isolation:
 
 ```text
 [ ] text inputs
 [ ] Boolean inputs
-[ ] color inputs only when actually needed
-[ ] outputs, if any
+[ ] number/color/table inputs where applicable
+[ ] outputs
 [ ] each event independently
 [ ] multiple instances if required by the component contract
 ```
@@ -160,7 +118,7 @@ No consuming screen should reach into internal control names.
 
 ---
 
-## Gate 5 — Visual QA
+## Gate 4 — Visual QA
 
 Validate with realistic content:
 
@@ -173,11 +131,9 @@ Validate with realistic content:
 [ ] PDS tokens are respected
 ```
 
-For text controls, apply `docs/design-system/POWER_APPS_VISUAL_QA_GUARDRAILS.md`.
-
 ---
 
-## Gate 6 — Target-screen integration
+## Gate 5 — Target-screen integration
 
 Only now may a feature block insert the component into a real target screen.
 
@@ -196,20 +152,23 @@ confirm no regression in fallback/current screen
 
 ## Failure isolation
 
-Do not repeatedly retest the same full component after a confirmed authoring-path problem.
+When a component fails, compare it first with the closest **working component reference** rather than generalizing from one failed experiment.
 
-Reduce only when needed to distinguish between:
+Recommended reduction:
 
 ```text
-component shell
-primitive child controls
-Studio-created public contract
-body-to-public-property bindings
-events
-layout/geometry
+A  component shell/root
+B  primitive child controls
+C  one public Input copied structurally from a working reference
+D  binding to that Input
+E  remaining property types incrementally
+F  outputs/events
+G  final hit surfaces/layout geometry
 ```
 
-Once a safe authoring boundary is demonstrated, adopt it as the implementation rule and stop spending time trying to make the unsafe path work.
+For each failing stage, inspect the delta against `cmp_HeatMapPro`, `cmp_SidebarNav` or another proven equivalent.
+
+Manual creation of an equivalent property in Studio may be used as a comparator if a Source Code declaration fails, but that comparison does **not** prove that `CustomProperties:` is generally unsupported.
 
 ---
 
@@ -220,15 +179,16 @@ For every failed component gate record:
 ```text
 Component
 Canonical source SHA/commit
+Known-good reference component
 Studio/environment
 Action being performed
 Observed effect/error
 Session ID if available
-Public contract authoring path
+Property/control delta versus reference
 Instance insertion status
 App Checker status
-Confirmed operational cause or UNKNOWN
-Corrective authoring path
+Confirmed technical cause or UNKNOWN
+Corrective change
 Revalidation result
 ```
 
@@ -237,11 +197,10 @@ Revalidation result
 ## Lifecycle mapping
 
 ```text
-body source created                         → REVIEW_REQUIRED
-Studio public contract created              → REVIEW_REQUIRED
-component body accepted                     → REVIEW_REQUIRED
-INSTANCE_SAFE + contract + QA                → ACTIVE / PDS_CANDIDATE
-FAIL_INSTANCE                                → REVIEW_REQUIRED + dependent block stopped
+source created                              → REVIEW_REQUIRED
+component definition accepted              → REVIEW_REQUIRED
+INSTANCE_SAFE + contract + QA               → ACTIVE / PDS_CANDIDATE
+FAIL_INSTANCE                               → REVIEW_REQUIRED + dependent block stopped
 ```
 
 The component catalog must reflect this state.
