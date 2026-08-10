@@ -27,7 +27,6 @@ A required component must never exist only in chat, a construction block, tempor
 ACTIVE            preferred current reuse candidate
 PDS_CANDIDATE     active component being aligned to PDS
 LEGACY_SUPPORTED  live runtime dependency awaiting validated migration; do not select for new work
-REVIEW_REQUIRED   active-source candidate whose reuse contract still requires review
 ```
 
 | Component | Lifecycle | Current canonical usage / reuse guidance |
@@ -35,7 +34,7 @@ REVIEW_REQUIRED   active-source candidate whose reuse contract still requires re
 | `cmp_ActionToolbarPro` | PDS_CANDIDATE | Preferred action-toolbar base; screen owns action semantics |
 | `cmp_CustomFieldEditor` | ACTIVE | Domain component for custom-field editing |
 | `cmp_DataTableProV2` | PDS_CANDIDATE | Preferred Data Explorer/table component |
-| `cmp_DonutPro` | ACTIVE | Use for progress/completion/capacity-style circular metrics; not Home_PDS discipline composition |
+| `cmp_DonutPro` | ACTIVE | Session progress/completion/capacity-style circular metrics; not Home_PDS discipline composition |
 | `cmp_EmptyState` | PDS_CANDIDATE | Preferred empty/error state base; continue visual hardening |
 | `cmp_HeatMapPro` | PDS_CANDIDATE | Preferred heatmap component |
 | `cmp_KpiCardPro` | PDS_CANDIDATE | Preferred KPI card for new PDS work |
@@ -43,7 +42,6 @@ REVIEW_REQUIRED   active-source candidate whose reuse contract still requires re
 | `cmp_PieChartPro` | PDS_CANDIDATE | Preferred composition chart for Home_PDS discipline distribution |
 | `cmp_SidebarNav` | ACTIVE | Current shared navigation component |
 | `cmp_SkeletonLoader` | PDS_CANDIDATE | Preferred loading placeholder base |
-| `cmp_SmartFilterBarPro` | REVIEW_REQUIRED | Retain only while an approved current use/review exists; do not select automatically |
 | `cmp_DashboardSectionHeader` | LEGACY_SUPPORTED | Used by current `scr_Home`; target replacement is the PDS panel/header pattern |
 | `cmp_ExecutiveAlertBanner` | LEGACY_SUPPORTED | Used by current `scr_Home`; remove after Home_PDS cutover/stabilization if no other dependency remains |
 | `cmp_DetailDrawer_old` | LEGACY_SUPPORTED | Used by current `scr_Punches` as `comp_DetailDrawer_6`; replace through an explicit Punches migration before removal |
@@ -64,3 +62,5 @@ REVIEW_REQUIRED   active-source candidate whose reuse contract still requires re
 The parallel Home_PDS strategy preserves `scr_Home` as fallback during construction, so its two legacy component dependencies remain temporarily.
 
 Punches currently depends on `cmp_DetailDrawer_old`; it remains until a replacement is implemented and Studio-validated.
+
+`cmp_SmartFilterBarPro` had no canonical-screen usage and no approved active Home_PDS/Punch Review role, so it was removed from the active source pool on 2026-08-10. Its history remains available through Git.
