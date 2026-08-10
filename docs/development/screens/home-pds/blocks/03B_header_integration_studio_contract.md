@@ -44,45 +44,28 @@ Do not rewrite `cmp_PageHeaderPro` again and do not create another microtest seq
 
 Use a hybrid integration path:
 
-1. create the header host and the component instance using only standard CanvasComponent properties in Source Code;
-2. save;
-3. select the instance in Studio;
-4. configure its public properties from the Studio property selector / formula bar;
-5. save and let Studio own the host-side binding representation.
+1. replace the complete `scr_Home_PDS` Source Code with the full Block 03B base artifact;
+2. that artifact creates the header host and component instance using only standard `CanvasComponent` properties;
+3. save;
+4. select the instance in Studio;
+5. configure its public properties from the Studio property selector / formula bar;
+6. save and let Studio own the host-side binding representation.
+
+Full-screen base artifact:
+
+```text
+docs/development/screens/home-pds/blocks/03B_header_integration.base-full-screen.pa.yaml
+```
+
+Commit:
+
+```text
+2907685888ff287e54284ce3f2fafaf0c1789a56
+```
 
 If Studio exposes the expected public properties, configure all required Block 03 bindings in one pass.
 
 If Studio does **not** expose `Context1Value` (or the other public properties) on the selected instance, stop. That result means the public contract is not host-visible in Studio and the next correction is contract re-registration in Studio, not more screen YAML.
-
-## Base Source Code fragment
-
-Insert as the first child under `conHPDS_ContentShell.Children`:
-
-```yaml
-- conHPDS_PageHeaderHost:
-    Control: GroupContainer@1.5.0
-    Variant: ManualLayout
-    Properties:
-      AlignInContainer: =AlignInContainer.Stretch
-      DropShadow: =DropShadow.None
-      Fill: =varTheme_Surface
-      FillPortions: =0
-      Height: =80
-      LayoutMinHeight: =80
-      LayoutMinWidth: =320
-      RadiusBottomLeft: =0
-      RadiusBottomRight: =0
-      RadiusTopLeft: =0
-      RadiusTopRight: =0
-      Width: =Parent.Width
-    Children:
-      - cmpHPDS_PageHeader:
-          Control: CanvasComponent
-          ComponentName: cmp_PageHeaderPro
-          Properties:
-            Height: =Parent.Height
-            Width: =Parent.Width
-```
 
 ## Studio formulas — configure in one pass
 
@@ -152,7 +135,7 @@ No other custom property needs to be overridden in Block 03 because the componen
 
 ```text
 PASS
-- base instance compiles with no PA2108
+- full base screen compiles with no PA2108 from cmp_PageHeaderPro custom bindings because none are declared in Source Code
 - Studio property selector exposes Context1Value and the other public properties
 - all seven formulas can be assigned in one pass
 - header renders with current project / Master Punch List / Not loaded
