@@ -12,9 +12,9 @@ This tracker controls structural cleanup independently from runtime feature deve
 | 1A | Archive stale delivery artifacts | **completed** | none |
 | 1B | Resolve Design System authority conflict | **completed** | none |
 | 1C | Component lifecycle catalog | **completed** | none |
-| 2 | Punch Review construction workspace migration | planned | low/medium |
-| 3 | SQL/database/reference consolidation | planned | medium |
-| 4 | Guides/sprints/roadmap classification and archive | planned | low |
+| 2 | Punch Review construction workspace migration | **completed** | low/medium |
+| 3 | SQL/database/reference consolidation | **completed** | medium |
+| 4 | Guides/sprints/roadmap classification and archive | **in progress** | low |
 | 5 | Component usage audit + physical legacy cleanup | planned | medium |
 | 6 | Naming normalization where safe | planned | medium |
 | 7 | Link/retrieval QA and closeout | planned | none |
@@ -44,7 +44,7 @@ and removed from repository root / `main/`.
 
 ### Phase 1B
 
-`docs/guides/DESIGN_SYSTEM.md` is now a superseded compatibility stub. Canonical authority is:
+`docs/guides/DESIGN_SYSTEM.md` is a superseded compatibility stub. Canonical authority is:
 
 ```text
 docs/design-system/PULSE_DESIGN_SYSTEM.md
@@ -60,14 +60,60 @@ docs/design-system/COMPONENT_CATALOG.md
 
 No component source was moved or deleted in this phase.
 
-## Next controlled phase
+### Phase 2
 
-Phase 2 should migrate Punch Review construction evidence out of `main/punch-review/` and into:
+Punch Review construction evidence was moved atomically from:
+
+```text
+main/punch-review/
+```
+
+to:
 
 ```text
 docs/development/screens/punch-review/
 ```
 
-Before deleting the old location, update all repository links and classify each historical block as pasteable, instructional, optional seed or archived.
+Canonical runtime source remains untouched at:
 
-Do not mix this migration with changes to `main/screens/PunchReview/scr_PunchReview.pa.yaml`.
+```text
+main/screens/PunchReview/scr_PunchReview.pa.yaml
+```
+
+The workspace README was updated to use the new paths.
+
+### Phase 3
+
+SQL assets were consolidated to the canonical model:
+
+```text
+sql/export/
+sql/import/
+sql/schema/warroom/
+sql/tools/warroom-schema/
+docs/reference/sql/warroom/
+```
+
+Removed competing locations:
+
+```text
+database/
+sql/schema_warroom/
+docs/SQL/
+```
+
+No SQL file content or runtime contract was changed during the structural move.
+
+## Current controlled phase — Phase 4
+
+Classify `docs/guides/` by lifecycle and purpose.
+
+Rules:
+
+- genuine reusable step-by-step guidance may remain in `docs/guides/`;
+- historical sprint records move to `docs/archive/sprints/`;
+- superseded implementation/remediation evidence moves to archive;
+- architecture documents move to `docs/architecture/` only when they represent current architecture;
+- roadmap/product-planning material must receive one unambiguous canonical location before the old guide copy is removed.
+
+Phase 4 must not modify Power Apps runtime code.
