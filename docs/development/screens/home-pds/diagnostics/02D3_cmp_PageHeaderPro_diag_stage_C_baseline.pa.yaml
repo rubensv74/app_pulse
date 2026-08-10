@@ -1,0 +1,60 @@
+# HOME_PDS — cmp_PageHeaderPro diagnostic reduction — Stage C baseline
+#
+# Artifact type: PASTEABLE DIAGNOSTIC
+# Canonical product source: NO
+# Depends on: PASS_B
+# Purpose: provide a clean Stage B-equivalent component to test ONE Studio-created Input/Text property
+# Target diagnostic component: cmp_PageHeaderPro_DiagC
+#
+# IMPORTANT:
+# - This YAML deliberately contains NO CustomProperties block.
+# - After this baseline is accepted and instance-safe, create exactly one custom property manually in Studio:
+#     Property name: TitleText
+#     Direction/type: Input / Data
+#     Data type: Text
+#     Default: "Punch Control Tower"
+# - Do NOT bind lblPHDC_Title to TitleText yet. First validate that the mere Studio-created property is instance-safe.
+#
+# PASS_C1 = property can be created manually, component saved, and a new instance inserted without Studio closing.
+# FAIL_C1 = Studio closes/rejects after manual property creation or when a new instance is inserted.
+
+ComponentDefinitions:
+  cmp_PageHeaderPro_DiagC:
+    DefinitionType: CanvasComponent
+    Properties:
+      Width: =1200
+      Height: =80
+    Children:
+      - conPHDC_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =ColorValue("#FFFFFF")
+            Height: =Parent.Height
+            Width: =Parent.Width
+          Children:
+            - lblPHDC_Title:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =ColorValue("#0F172A")
+                  FontWeight: =FontWeight.Semibold
+                  Height: =30
+                  Size: =20
+                  Text: ="Punch Control Tower"
+                  Width: =Parent.Width-32
+                  Wrap: =false
+                  X: =16
+                  Y: =13
+            - lblPHDC_Subtitle:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =ColorValue("#64748B")
+                  Height: =20
+                  Size: =10
+                  Text: ="Open punch concentration, discipline distribution and operational drill-through"
+                  Width: =Parent.Width-32
+                  Wrap: =false
+                  X: =16
+                  Y: =44
