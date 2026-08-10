@@ -1,0 +1,72 @@
+# HOME_PDS — cmp_PageHeaderPro diagnostic reduction — Stage B
+#
+# Artifact type: PASTEABLE DIAGNOSTIC
+# Canonical product source: NO
+# Depends on: PASS_A
+# Purpose: test ModernText child controls without any CustomProperties or events
+# Target diagnostic component: cmp_PageHeaderPro_DiagB
+#
+# Stage B adds ONLY:
+# - hardcoded title ModernText
+# - hardcoded subtitle ModernText
+#
+# It still contains NO:
+# - custom properties
+# - events
+# - buttons
+# - sibling-to-sibling geometry formulas
+# - transparent hit surfaces
+# - screen variables
+# - flows or data bindings
+#
+# Validation:
+# 1. Create/import this diagnostic component in Studio.
+# 2. Save and wait for formula validation.
+# 3. Insert exactly one instance on a blank diagnostic screen.
+# 4. Keep Width=1200 and Height=80.
+# 5. Do not bind or resize anything.
+# 6. Record whether Studio remains open.
+#
+# PASS_B = instance inserts and Studio remains stable.
+# FAIL_B = Studio closes/rejects during definition or instance insertion.
+
+ComponentDefinitions:
+  cmp_PageHeaderPro_DiagB:
+    DefinitionType: CanvasComponent
+    Properties:
+      Width: =1200
+      Height: =80
+    Children:
+      - conPHDB_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =ColorValue("#FFFFFF")
+            Height: =Parent.Height
+            Width: =Parent.Width
+          Children:
+            - lblPHDB_Title:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =ColorValue("#0F172A")
+                  FontWeight: =FontWeight.Semibold
+                  Height: =30
+                  Size: =20
+                  Text: ="Punch Control Tower"
+                  Width: =Parent.Width-32
+                  Wrap: =false
+                  X: =16
+                  Y: =13
+            - lblPHDB_Subtitle:
+                Control: ModernText@1.0.0
+                Properties:
+                  AutoHeight: =true
+                  Color: =ColorValue("#64748B")
+                  Height: =20
+                  Size: =10
+                  Text: ="Open punch concentration, discipline distribution and operational drill-through"
+                  Width: =Parent.Width-32
+                  Wrap: =false
+                  X: =16
+                  Y: =44
