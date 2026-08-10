@@ -11,7 +11,7 @@ The canonical component and Block 02A are byte-identical at this review point.
 
 ## Observed Studio incident
 
-A prior attempt to insert an instance of `cmp_PageHeaderPro` into `scr_Home_PDS` caused Power Apps Studio to close.
+Insertion of an instance of `cmp_PageHeaderPro` causes Power Apps Studio to close before a normal instance smoke test can be completed.
 
 This is treated as:
 
@@ -19,9 +19,13 @@ This is treated as:
 FAIL_INSTANCE
 ```
 
-It is **not** treated as proof of a specific root cause. The technical cause remains `UNKNOWN` until a smaller reproducer isolates it.
+The user confirmed on 2026-08-10 that the requested full-component instance test cannot be completed because Studio closes. The exact authoring surface of every reproduction has not yet been reduced to a minimal candidate, so the technical root cause remains:
 
-Under `docs/development/POWER_APPS_COMPONENT_VALIDATION_GATE.md`, repository presence or successful component-definition creation is insufficient for screen integration.
+```text
+UNKNOWN
+```
+
+Do not attribute the closure to `ModernText`, events, transparent buttons, ManualLayout or geometry formulas without a reduced reproducer.
 
 ---
 
@@ -47,79 +51,37 @@ PASS  no global var* state is used inside cmp_PageHeaderPro
 PASS  public Event property pattern matches an already used PULSE Canvas component pattern
 PASS  all inspected static ModernText controls use AutoHeight=true
 PASS  no AutoHeight=false remains in the current component source
-PASS  context/action geometry is a one-direction sibling chain; no explicit circular formula was found statically
+PASS  no explicit circular sibling geometry formula was found statically
 ```
 
 ### Derived geometry preflight
 
-The horizontal chain can be simplified algebraically for an instance width `W`:
+For instance width `W`:
 
 ```text
 Actions.X  = W - 164
 Context3.X = W - 356
 Context2.X = W - 544
 Context1.X = W - 732
-Identity.X = 16
 Identity.Width = Max(250, W - 760)
 ```
 
-Consequences:
+Therefore:
 
 ```text
-W >= 1010  → intended 12 px identity/context gap is preserved
-W ~= 998   → identity/context gap collapses to ~0
-W < 998    → identity/context overlap begins
-W < 732    → Context1 begins off the left edge
+W >= 1010  → intended gap preserved
+W ~= 998   → identity/context gap collapses
+W < 998    → overlap begins
+W < 732    → Context1 begins off-canvas
 ```
 
-This is a **confirmed static layout limitation**, not a confirmed cause of the Studio closure.
-
-The component therefore needs an explicit supported-width contract or responsive adaptation before it can satisfy the broader PDS tablet target. For the first instance-safety smoke test, keep the component at its default `Width=1200` so geometry compression is not mixed into crash diagnosis.
-
-### Static evidence that does NOT prove instance safety
-
-The component contains several behaviors whose authoring/runtime interaction cannot be certified from source inspection alone:
-
-```text
-- multiple sibling X/Width formulas that depend on other sibling controls;
-- five public component events invoked from Classic Button controls;
-- three full-surface transparent hit buttons layered over context containers;
-- ModernText AutoHeight behavior inside fixed-height 52 px context surfaces;
-- behavior when the component instance is resized below its 1200 px default width.
-```
-
-None of these is declared the root cause. They are diagnostic surfaces to isolate if the crash reproduces.
+This is a confirmed layout limitation but **not** a confirmed cause of the Studio closure.
 
 ---
 
-## Why the current source is not marked ready
+## Diagnostic reduction now activated
 
-A valid-looking component definition can still fail when instantiated. The previous process conflated:
-
-```text
-component definition exists
-        ≠
-component instance is safe
-```
-
-The new mandatory sequence is:
-
-```text
-static validation
-→ isolated definition validation
-→ isolated instance validation
-→ public contract validation
-→ visual QA
-→ target-screen integration
-```
-
-Because `FAIL_INSTANCE` has already been observed, Block 03 must not insert `cmp_PageHeaderPro` into `scr_Home_PDS` until the isolated instance test passes.
-
----
-
-## Diagnostic reduction plan
-
-If the full 02A source closes Studio again during isolated instance insertion, reduce the component in controlled stages.
+The full component is no longer used as the next diagnostic test. Reduction starts at Stage A.
 
 ```text
 A  root container only
@@ -130,46 +92,37 @@ E  + public events and hit surfaces
 F  + final full geometry/content
 ```
 
-At each stage:
+### Stage A artifact
 
 ```text
-create/replace component
-save
-insert one instance on an isolated blank screen
-save
-App Checker
-close/reopen if stable
+docs/development/screens/home-pds/diagnostics/02D1_cmp_PageHeaderPro_diag_stage_A.pa.yaml
 ```
 
-The first stage that reproduces the Studio closure becomes the smallest suspect surface.
-
----
-
-## Immediate next test
-
-Do **not** test on `scr_Home_PDS`.
-
-Use an isolated component-lab screen or safe/sandbox copy of the app and perform:
+Diagnostic component identity:
 
 ```text
-Test 1 — full current 02A definition
-Test 2 — insert exactly one instance with default properties
-Test 3 — keep Width=1200 during the first smoke test
+cmp_PageHeaderPro_DiagA
 ```
 
-If Test 2 succeeds, the prior crash may have involved integration context or transient Studio state; the next step is a controlled resize/event smoke test.
+Stage A contains only a Canvas component, fixed Width/Height and one `GroupContainer@1.5.0`. It deliberately contains no custom properties, events, text, buttons, sibling formulas or data bindings.
 
-If Test 2 closes Studio, use diagnostic Stage A and progress until the first failing stage is identified.
+Result semantics:
+
+```text
+PASS_A = definition can be created and one instance inserted without Studio closing
+FAIL_A = Studio closes/rejects during definition creation or instance insertion
+```
+
+The first failing stage becomes the smallest suspect surface and determines the next correction.
 
 ---
 
 ## Block status consequence
 
 ```text
-Block 02  = FAILED / BLOCKED AT INSTANCE-SAFETY GATE
+Block 02  = FAILED / DIAGNOSTIC REDUCTION ACTIVE
 Block 03  = MUST NOT START
+cmp_PageHeaderPro = REVIEW_REQUIRED
 ```
 
-The component catalog has therefore been changed temporarily from `PDS_CANDIDATE` to `REVIEW_REQUIRED`.
-
-The status can return to `PDS_CANDIDATE` only after the instance-safety gate and required QA are validated in Studio.
+The component can return to `PDS_CANDIDATE` only after the instance-safety gate, contract smoke test and visual QA pass in Studio.
