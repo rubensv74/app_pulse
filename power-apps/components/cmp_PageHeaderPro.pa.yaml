@@ -1,169 +1,12 @@
-# HOME_PDS — BLOCK 02A — PAGE HEADER TEXT OVERFLOW VISUAL FIX
-#
-# Status: CORRECTED — PENDING POWER APPS STUDIO REVALIDATION
-# Operation: REPLACE COMPLETE COMPONENT SOURCE
-# Target component: cmp_PageHeaderPro
-# Depends on: Block 02
-# Visual QA rule: VQA-001
-# Compatibility rule: PA-COMP-011
-#
-# IMPORTANT:
-# Replace the COMPLETE cmp_PageHeaderPro source with the content beginning at
-# `ComponentDefinitions:`. This file is pasteable PaYaml.
-#
-# Corrective rule learned in Studio:
-# - static ModernText controls in compact PULSE components MUST use AutoHeight=true
-#   unless a validated exception proves a rigid height is safe;
-# - Wrap=false is retained for text whose UX contract is intentionally one line;
-# - Height remains as base geometry while AutoHeight can expand the rendered text box;
-# - no business/event/visual-contract change is introduced here.
-#
-# Visual revalidation:
-# [ ] no internal scrollbar beside page title;
-# [ ] no internal scrollbar beside subtitle;
-# [ ] no internal scrollbar in Project / Template / Last refresh label/value;
-# [ ] no internal scrollbar in chevrons;
-# [ ] no clipping or overlap inside 52 px context surfaces;
-# [ ] no new App Checker error attributable to this correction.
+# cmp_PageHeaderPro — production body source
+# Public component contract is created manually in Power Apps Studio.
+# DO NOT add CustomProperties: to this pasteable Source Code.
+# Required Studio properties are documented in docs/design-system/components/CMP_PAGE_HEADER_PRO.md.
+# Validation state: pending one isolated instance smoke test after Studio contract creation.
 
 ComponentDefinitions:
   cmp_PageHeaderPro:
     DefinitionType: CanvasComponent
-    CustomProperties:
-      Title:
-        PropertyKind: Input
-        DataType: Text
-        Default: ="Punch Control Tower"
-      Subtitle:
-        PropertyKind: Input
-        DataType: Text
-        Default: ="Open punch concentration, discipline distribution and operational drill-through"
-
-      Context1Label:
-        PropertyKind: Input
-        DataType: Text
-        Default: ="Project"
-      Context1Value:
-        PropertyKind: Input
-        DataType: Text
-        Default: ="70200 · Project"
-      Context1Visible:
-        PropertyKind: Input
-        DataType: Boolean
-        Default: =true
-      Context1Interactive:
-        PropertyKind: Input
-        DataType: Boolean
-        Default: =true
-      OnContext1Select:
-        PropertyKind: Event
-        ReturnType: None
-        Default: =
-
-      Context2Label:
-        PropertyKind: Input
-        DataType: Text
-        Default: ="Template"
-      Context2Value:
-        PropertyKind: Input
-        DataType: Text
-        Default: ="Master Punch List"
-      Context2Visible:
-        PropertyKind: Input
-        DataType: Boolean
-        Default: =true
-      Context2Interactive:
-        PropertyKind: Input
-        DataType: Boolean
-        Default: =true
-      OnContext2Select:
-        PropertyKind: Event
-        ReturnType: None
-        Default: =
-
-      Context3Label:
-        PropertyKind: Input
-        DataType: Text
-        Default: ="Last refresh"
-      Context3Value:
-        PropertyKind: Input
-        DataType: Text
-        Default: ="07/08/2026 16:00"
-      Context3Visible:
-        PropertyKind: Input
-        DataType: Boolean
-        Default: =true
-      Context3Interactive:
-        PropertyKind: Input
-        DataType: Boolean
-        Default: =false
-      OnContext3Select:
-        PropertyKind: Event
-        ReturnType: None
-        Default: =
-
-      UtilityText:
-        PropertyKind: Input
-        DataType: Text
-        Default: ="Refresh"
-      ShowUtility:
-        PropertyKind: Input
-        DataType: Boolean
-        Default: =true
-      UtilityEnabled:
-        PropertyKind: Input
-        DataType: Boolean
-        Default: =true
-      ShowHelp:
-        PropertyKind: Input
-        DataType: Boolean
-        Default: =true
-      OnUtility:
-        PropertyKind: Event
-        ReturnType: None
-        Default: =
-      OnHelp:
-        PropertyKind: Event
-        ReturnType: None
-        Default: =
-
-      SurfaceColor:
-        PropertyKind: Input
-        DataType: Color
-        Default: =ColorValue("#FFFFFF")
-      SurfaceAltColor:
-        PropertyKind: Input
-        DataType: Color
-        Default: =ColorValue("#F8FAFC")
-      BorderColor:
-        PropertyKind: Input
-        DataType: Color
-        Default: =ColorValue("#E2E8F0")
-      TextColor:
-        PropertyKind: Input
-        DataType: Color
-        Default: =ColorValue("#0F172A")
-      MutedTextColor:
-        PropertyKind: Input
-        DataType: Color
-        Default: =ColorValue("#64748B")
-      AccentColor:
-        PropertyKind: Input
-        DataType: Color
-        Default: =ColorValue("#1677FF")
-      AccentSoftColor:
-        PropertyKind: Input
-        DataType: Color
-        Default: =ColorValue("#EFF6FF")
-      AccentHoverOverlayColor:
-        PropertyKind: Input
-        DataType: Color
-        Default: =RGBA(22,119,255,0.06)
-      AccentPressedOverlayColor:
-        PropertyKind: Input
-        DataType: Color
-        Default: =RGBA(22,119,255,0.10)
-
     Properties:
       Width: =1200
       Height: =80
@@ -176,7 +19,7 @@ ComponentDefinitions:
             BorderColor: =RGBA(0,0,0,0)
             BorderThickness: =0
             DropShadow: =DropShadow.None
-            Fill: =cmp_PageHeaderPro.SurfaceColor
+            Fill: =ColorValue("#FFFFFF")
             Height: =Parent.Height
             RadiusBottomLeft: =0
             RadiusBottomRight: =0
@@ -203,7 +46,7 @@ ComponentDefinitions:
                       Control: ModernText@1.0.0
                       Properties:
                         AutoHeight: =true
-                        Color: =cmp_PageHeaderPro.TextColor
+                        Color: =ColorValue("#0F172A")
                         FontWeight: =FontWeight.Semibold
                         Height: =30
                         Size: =20
@@ -216,7 +59,7 @@ ComponentDefinitions:
                       Control: ModernText@1.0.0
                       Properties:
                         AutoHeight: =true
-                        Color: =cmp_PageHeaderPro.MutedTextColor
+                        Color: =ColorValue("#64748B")
                         Height: =20
                         Size: =10
                         Text: =cmp_PageHeaderPro.Subtitle
@@ -229,16 +72,15 @@ ComponentDefinitions:
                 Control: GroupContainer@1.5.0
                 Variant: ManualLayout
                 Properties:
-                  BorderColor: =cmp_PageHeaderPro.BorderColor
+                  BorderColor: =ColorValue("#E2E8F0")
                   BorderThickness: =1
                   DropShadow: =DropShadow.None
-                  Fill: =cmp_PageHeaderPro.SurfaceAltColor
+                  Fill: =ColorValue("#F8FAFC")
                   Height: =52
                   RadiusBottomLeft: =8
                   RadiusBottomRight: =8
                   RadiusTopLeft: =8
                   RadiusTopRight: =8
-                  Visible: =cmp_PageHeaderPro.Context1Visible
                   Width: =180
                   X: =conPH_Context2.X-Self.Width-8
                   Y: =13
@@ -247,10 +89,10 @@ ComponentDefinitions:
                       Control: ModernText@1.0.0
                       Properties:
                         AutoHeight: =true
-                        Color: =cmp_PageHeaderPro.MutedTextColor
+                        Color: =ColorValue("#64748B")
                         Height: =18
                         Size: =8
-                        Text: =cmp_PageHeaderPro.Context1Label
+                        Text: ="Project"
                         Width: =Parent.Width-32
                         Wrap: =false
                         X: =12
@@ -259,7 +101,7 @@ ComponentDefinitions:
                       Control: ModernText@1.0.0
                       Properties:
                         AutoHeight: =true
-                        Color: =cmp_PageHeaderPro.TextColor
+                        Color: =ColorValue("#0F172A")
                         FontWeight: =FontWeight.Semibold
                         Height: =22
                         Size: =9
@@ -273,12 +115,11 @@ ComponentDefinitions:
                       Properties:
                         Align: =Align.Center
                         AutoHeight: =true
-                        Color: =cmp_PageHeaderPro.AccentColor
+                        Color: =ColorValue("#1677FF")
                         FontWeight: =FontWeight.Semibold
                         Height: =22
                         Size: =14
                         Text: ="›"
-                        Visible: =cmp_PageHeaderPro.Context1Interactive
                         Width: =18
                         Wrap: =false
                         X: =Parent.Width-26
@@ -290,12 +131,11 @@ ComponentDefinitions:
                         BorderThickness: =0
                         Color: =Color.Transparent
                         DisabledFill: =Color.Transparent
-                        DisplayMode: =If(cmp_PageHeaderPro.Context1Interactive,DisplayMode.Edit,DisplayMode.Disabled)
                         Fill: =Color.Transparent
                         Height: =Parent.Height
-                        HoverFill: =cmp_PageHeaderPro.AccentHoverOverlayColor
+                        HoverFill: =RGBA(22,119,255,0.06)
                         OnSelect: =cmp_PageHeaderPro.OnContext1Select()
-                        PressedFill: =cmp_PageHeaderPro.AccentPressedOverlayColor
+                        PressedFill: =RGBA(22,119,255,0.10)
                         RadiusBottomLeft: =8
                         RadiusBottomRight: =8
                         RadiusTopLeft: =8
@@ -309,16 +149,15 @@ ComponentDefinitions:
                 Control: GroupContainer@1.5.0
                 Variant: ManualLayout
                 Properties:
-                  BorderColor: =cmp_PageHeaderPro.BorderColor
+                  BorderColor: =ColorValue("#E2E8F0")
                   BorderThickness: =1
                   DropShadow: =DropShadow.None
-                  Fill: =cmp_PageHeaderPro.SurfaceAltColor
+                  Fill: =ColorValue("#F8FAFC")
                   Height: =52
                   RadiusBottomLeft: =8
                   RadiusBottomRight: =8
                   RadiusTopLeft: =8
                   RadiusTopRight: =8
-                  Visible: =cmp_PageHeaderPro.Context2Visible
                   Width: =180
                   X: =conPH_Context3.X-Self.Width-8
                   Y: =13
@@ -327,10 +166,10 @@ ComponentDefinitions:
                       Control: ModernText@1.0.0
                       Properties:
                         AutoHeight: =true
-                        Color: =cmp_PageHeaderPro.MutedTextColor
+                        Color: =ColorValue("#64748B")
                         Height: =18
                         Size: =8
-                        Text: =cmp_PageHeaderPro.Context2Label
+                        Text: ="Template"
                         Width: =Parent.Width-32
                         Wrap: =false
                         X: =12
@@ -339,7 +178,7 @@ ComponentDefinitions:
                       Control: ModernText@1.0.0
                       Properties:
                         AutoHeight: =true
-                        Color: =cmp_PageHeaderPro.TextColor
+                        Color: =ColorValue("#0F172A")
                         FontWeight: =FontWeight.Semibold
                         Height: =22
                         Size: =9
@@ -353,12 +192,11 @@ ComponentDefinitions:
                       Properties:
                         Align: =Align.Center
                         AutoHeight: =true
-                        Color: =cmp_PageHeaderPro.AccentColor
+                        Color: =ColorValue("#1677FF")
                         FontWeight: =FontWeight.Semibold
                         Height: =22
                         Size: =14
                         Text: ="›"
-                        Visible: =cmp_PageHeaderPro.Context2Interactive
                         Width: =18
                         Wrap: =false
                         X: =Parent.Width-26
@@ -370,12 +208,11 @@ ComponentDefinitions:
                         BorderThickness: =0
                         Color: =Color.Transparent
                         DisabledFill: =Color.Transparent
-                        DisplayMode: =If(cmp_PageHeaderPro.Context2Interactive,DisplayMode.Edit,DisplayMode.Disabled)
                         Fill: =Color.Transparent
                         Height: =Parent.Height
-                        HoverFill: =cmp_PageHeaderPro.AccentHoverOverlayColor
+                        HoverFill: =RGBA(22,119,255,0.06)
                         OnSelect: =cmp_PageHeaderPro.OnContext2Select()
-                        PressedFill: =cmp_PageHeaderPro.AccentPressedOverlayColor
+                        PressedFill: =RGBA(22,119,255,0.10)
                         RadiusBottomLeft: =8
                         RadiusBottomRight: =8
                         RadiusTopLeft: =8
@@ -389,16 +226,15 @@ ComponentDefinitions:
                 Control: GroupContainer@1.5.0
                 Variant: ManualLayout
                 Properties:
-                  BorderColor: =cmp_PageHeaderPro.BorderColor
+                  BorderColor: =ColorValue("#E2E8F0")
                   BorderThickness: =1
                   DropShadow: =DropShadow.None
-                  Fill: =cmp_PageHeaderPro.SurfaceAltColor
+                  Fill: =ColorValue("#F8FAFC")
                   Height: =52
                   RadiusBottomLeft: =8
                   RadiusBottomRight: =8
                   RadiusTopLeft: =8
                   RadiusTopRight: =8
-                  Visible: =cmp_PageHeaderPro.Context3Visible
                   Width: =180
                   X: =conPH_Actions.X-Self.Width-12
                   Y: =13
@@ -407,11 +243,11 @@ ComponentDefinitions:
                       Control: ModernText@1.0.0
                       Properties:
                         AutoHeight: =true
-                        Color: =cmp_PageHeaderPro.MutedTextColor
+                        Color: =ColorValue("#64748B")
                         Height: =18
                         Size: =8
-                        Text: =cmp_PageHeaderPro.Context3Label
-                        Width: =Parent.Width-32
+                        Text: ="Last refresh"
+                        Width: =Parent.Width-24
                         Wrap: =false
                         X: =12
                         Y: =5
@@ -419,51 +255,15 @@ ComponentDefinitions:
                       Control: ModernText@1.0.0
                       Properties:
                         AutoHeight: =true
-                        Color: =cmp_PageHeaderPro.TextColor
+                        Color: =ColorValue("#0F172A")
                         FontWeight: =FontWeight.Semibold
                         Height: =22
                         Size: =9
                         Text: =cmp_PageHeaderPro.Context3Value
-                        Width: =Parent.Width-36
+                        Width: =Parent.Width-24
                         Wrap: =false
                         X: =12
                         Y: =24
-                  - lblPH_Context3Chevron:
-                      Control: ModernText@1.0.0
-                      Properties:
-                        Align: =Align.Center
-                        AutoHeight: =true
-                        Color: =cmp_PageHeaderPro.AccentColor
-                        FontWeight: =FontWeight.Semibold
-                        Height: =22
-                        Size: =14
-                        Text: ="›"
-                        Visible: =cmp_PageHeaderPro.Context3Interactive
-                        Width: =18
-                        Wrap: =false
-                        X: =Parent.Width-26
-                        Y: =23
-                  - btnPH_Context3Hit:
-                      Control: Classic/Button@2.2.0
-                      Properties:
-                        BorderStyle: =BorderStyle.None
-                        BorderThickness: =0
-                        Color: =Color.Transparent
-                        DisabledFill: =Color.Transparent
-                        DisplayMode: =If(cmp_PageHeaderPro.Context3Interactive,DisplayMode.Edit,DisplayMode.Disabled)
-                        Fill: =Color.Transparent
-                        Height: =Parent.Height
-                        HoverFill: =cmp_PageHeaderPro.AccentHoverOverlayColor
-                        OnSelect: =cmp_PageHeaderPro.OnContext3Select()
-                        PressedFill: =cmp_PageHeaderPro.AccentPressedOverlayColor
-                        RadiusBottomLeft: =8
-                        RadiusBottomRight: =8
-                        RadiusTopLeft: =8
-                        RadiusTopRight: =8
-                        Text: =""
-                        Width: =Parent.Width
-                        X: =0
-                        Y: =0
 
             - conPH_Actions:
                 Control: GroupContainer@1.5.0
@@ -476,7 +276,6 @@ ComponentDefinitions:
                   RadiusBottomRight: =0
                   RadiusTopLeft: =0
                   RadiusTopRight: =0
-                  Visible: =cmp_PageHeaderPro.ShowUtility || cmp_PageHeaderPro.ShowHelp
                   Width: =148
                   X: =Parent.Width-Self.Width-16
                   Y: =21
@@ -484,60 +283,58 @@ ComponentDefinitions:
                   - btnPH_Utility:
                       Control: Classic/Button@2.2.0
                       Properties:
-                        BorderColor: =cmp_PageHeaderPro.BorderColor
+                        BorderColor: =ColorValue("#E2E8F0")
                         BorderStyle: =BorderStyle.Solid
                         BorderThickness: =1
-                        Color: =cmp_PageHeaderPro.AccentColor
-                        DisabledColor: =cmp_PageHeaderPro.MutedTextColor
-                        DisabledFill: =cmp_PageHeaderPro.SurfaceAltColor
+                        Color: =ColorValue("#1677FF")
+                        DisabledColor: =ColorValue("#64748B")
+                        DisabledFill: =ColorValue("#F8FAFC")
                         DisplayMode: =If(cmp_PageHeaderPro.UtilityEnabled,DisplayMode.Edit,DisplayMode.Disabled)
-                        Fill: =cmp_PageHeaderPro.SurfaceColor
+                        Fill: =ColorValue("#FFFFFF")
                         Font: =Font.'Segoe UI'
                         FontWeight: =FontWeight.Semibold
                         Height: =36
-                        HoverFill: =cmp_PageHeaderPro.AccentSoftColor
+                        HoverFill: =ColorValue("#EFF6FF")
                         OnSelect: =cmp_PageHeaderPro.OnUtility()
-                        PressedFill: =cmp_PageHeaderPro.AccentSoftColor
+                        PressedFill: =ColorValue("#EFF6FF")
                         RadiusBottomLeft: =8
                         RadiusBottomRight: =8
                         RadiusTopLeft: =8
                         RadiusTopRight: =8
                         Size: =9
-                        Text: =cmp_PageHeaderPro.UtilityText
-                        Visible: =cmp_PageHeaderPro.ShowUtility
+                        Text: ="Refresh"
                         Width: =104
                         X: =0
                         Y: =0
                   - btnPH_Help:
                       Control: Classic/Button@2.2.0
                       Properties:
-                        BorderColor: =cmp_PageHeaderPro.BorderColor
+                        BorderColor: =ColorValue("#E2E8F0")
                         BorderStyle: =BorderStyle.Solid
                         BorderThickness: =1
-                        Color: =cmp_PageHeaderPro.TextColor
-                        Fill: =cmp_PageHeaderPro.SurfaceColor
+                        Color: =ColorValue("#0F172A")
+                        Fill: =ColorValue("#FFFFFF")
                         Font: =Font.'Segoe UI'
                         FontWeight: =FontWeight.Semibold
                         Height: =36
-                        HoverFill: =cmp_PageHeaderPro.AccentSoftColor
+                        HoverFill: =ColorValue("#EFF6FF")
                         OnSelect: =cmp_PageHeaderPro.OnHelp()
-                        PressedFill: =cmp_PageHeaderPro.AccentSoftColor
+                        PressedFill: =ColorValue("#EFF6FF")
                         RadiusBottomLeft: =8
                         RadiusBottomRight: =8
                         RadiusTopLeft: =8
                         RadiusTopRight: =8
                         Size: =11
                         Text: ="?"
-                        Visible: =cmp_PageHeaderPro.ShowHelp
                         Width: =36
-                        X: =If(cmp_PageHeaderPro.ShowUtility,112,0)
+                        X: =112
                         Y: =0
 
             - recPH_Divider:
                 Control: Rectangle@2.3.0
                 Properties:
                   BorderColor: =RGBA(0,0,0,0)
-                  Fill: =cmp_PageHeaderPro.BorderColor
+                  Fill: =ColorValue("#E2E8F0")
                   Height: =1
                   Width: =Parent.Width
                   X: =0
