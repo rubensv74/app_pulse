@@ -10,12 +10,13 @@ This README is the canonical entry point for the repository.
 /
 ├── README.md
 ├── power-apps/      Canonical Canvas app source, reusable components, contracts, mappings and tests
+├── power-automate/  Canonical active flow definitions and flow contracts
 ├── sql/             Executable SQL, schema snapshots and SQL tooling
 ├── office-scripts/  Canonical Office Scripts source
 └── docs/            Governance, architecture, Design System, specifications, development and reference
 ```
 
-The repository deliberately has **no `main/` source folder**. `main` is the Git branch; Power Apps source belongs under `power-apps/`.
+The repository deliberately has **no `main/` source folder**. `main` is the Git branch; runtime source is organized by technology.
 
 Repository authority and lifecycle rules are defined in:
 
@@ -58,6 +59,8 @@ docs/design-system/COMPONENT_CATALOG.md
 
 When a new reusable component is required, its canonical source is created under `power-apps/components/` in the same development cycle, the component catalog is updated, and reusable PDS components receive a specification under `docs/design-system/components/`.
 
+A component is not considered screen-integration-ready merely because its source exists in Git. It must pass the component validation gate in Power Apps Studio before a screen is allowed to depend on it.
+
 ### Contracts, mappings and tests
 
 ```text
@@ -65,6 +68,28 @@ power-apps/contracts/
 power-apps/mappings/
 power-apps/tests/
 ```
+
+---
+
+## Power Automate
+
+```text
+power-automate/
+├── flows/
+└── contracts/
+```
+
+The target state is to version the **real definitions of currently active flows** progressively from the Power Automate environment.
+
+Rules:
+
+- never infer missing flow internals from Power Apps callers;
+- capture real exported/deployable definitions;
+- keep interface contracts when useful;
+- validate changes in the real Power Automate environment;
+- remove superseded-only flow source after migration; Git history preserves recovery.
+
+Until a real definition has been captured, the Power Automate environment remains the execution authority for that flow.
 
 ---
 
