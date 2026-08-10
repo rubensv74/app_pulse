@@ -1,0 +1,99 @@
+# HOME_PDS — BLOCK 03 — PAGE HEADER INTEGRATION
+#
+# Status: PUBLISHED — PENDING POWER APPS STUDIO VALIDATION
+# Operation: ADD CHILD
+# Target parent: conHPDS_ContentShell
+# Exact location: first child under conHPDS_ContentShell.Children
+# Dependencies: Block 01 validated; Block 02 accepted for progression after corrected cmp_PageHeaderPro instance-safe validation.
+#
+# Primary responsibility:
+# - add the frozen conHPDS_PageHeaderHost branch;
+# - insert cmpHPDS_PageHeader as an instance of cmp_PageHeaderPro;
+# - bind page identity and current project context;
+# - keep future selectors/remote refresh/help disabled until their dedicated blocks.
+#
+# Explicitly OUT OF SCOPE:
+# - body/workspace layout (Block 04);
+# - typed Home_PDS state (Block 05);
+# - real punch-template selector (Block 07);
+# - dashboard bundle read / refresh orchestration (Block 08);
+# - Help modal (Block 21);
+# - StartScreen or production navigation changes.
+#
+# IMPORTANT:
+# This is a CHILDREN fragment for the Source Code edit surface.
+# Insert the whole control beginning at `- conHPDS_PageHeaderHost:` as the FIRST child
+# under `conHPDS_ContentShell.Children:`.
+# Do not replace cmpHPDS_Sidebar or conHPDS_ContentShell.
+#
+# Validation:
+# 1. Save and wait for formula validation.
+# 2. Open scr_Home_PDS.
+# 3. Header renders once, above the empty content area.
+# 4. Title/subtitle render without internal scrollbars.
+# 5. Project context shows the current selected project when available.
+# 6. Template shows the deliberate temporary presentation value `Master Punch List`.
+# 7. Last refresh shows `Not loaded` (no fake timestamp).
+# 8. Project/template hit areas are non-interactive in this block.
+# 9. Refresh is visible but disabled until Block 08.
+# 10. Help is hidden until Block 21.
+# 11. No new App Checker error attributable to Block 03.
+
+- conHPDS_PageHeaderHost:
+    Control: GroupContainer@1.5.0
+    Variant: ManualLayout
+    Properties:
+      AlignInContainer: =AlignInContainer.Stretch
+      DropShadow: =DropShadow.None
+      Fill: =varTheme_Surface
+      FillPortions: =0
+      Height: =80
+      LayoutMinHeight: =80
+      LayoutMinWidth: =320
+      RadiusBottomLeft: =0
+      RadiusBottomRight: =0
+      RadiusTopLeft: =0
+      RadiusTopRight: =0
+      Width: =Parent.Width
+    Children:
+      - cmpHPDS_PageHeader:
+          Control: CanvasComponent
+          ComponentName: cmp_PageHeaderPro
+          Properties:
+            Context1Interactive: =false
+            Context1Label: ="Project"
+            Context1Value: |-
+              =With(
+                  {
+                      _projectCode: Coalesce(varSelectedProject.ProjectCode, ""),
+                      _projectName: Coalesce(varSelectedProject.ProjectName, "")
+                  },
+                  If(
+                      IsBlank(_projectCode) && IsBlank(_projectName),
+                      "No project selected",
+                      _projectCode &
+                      If(
+                          !IsBlank(_projectCode) && !IsBlank(_projectName),
+                          " · ",
+                          ""
+                      ) &
+                      _projectName
+                  )
+              )
+            Context1Visible: =true
+            Context2Interactive: =false
+            Context2Label: ="Template"
+            Context2Value: ="Master Punch List"
+            Context2Visible: =true
+            Context3Interactive: =false
+            Context3Label: ="Last refresh"
+            Context3Value: ="Not loaded"
+            Context3Visible: =true
+            Height: =Parent.Height
+            ShowHelp: =false
+            ShowUtility: =true
+            Subtitle: =varPageSubtitle
+            Title: =varPageTitle
+            UtilityEnabled: =false
+            UtilityText: ="Refresh"
+            Width: =Parent.Width
