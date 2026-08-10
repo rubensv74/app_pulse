@@ -1,6 +1,6 @@
 # PULSE Repository Reorganization Tracker
 
-**Status:** active  
+**Status:** active — architecture/lifecycle decision required  
 **Audit baseline:** `1b8c8dffd1185a5f775934b0fceeff3cbe642c55`  
 **Audit:** `docs/analysis/repository/REPOSITORY_AUDIT_2026-08-10.md`
 
@@ -14,8 +14,8 @@ This tracker controls structural cleanup independently from runtime feature deve
 | 1C | Component lifecycle catalog | **completed** | none |
 | 2 | Punch Review construction workspace migration | **completed** | low/medium |
 | 3 | SQL/database/reference consolidation | **completed** | medium |
-| 4 | Guides/sprints/roadmap classification and archive | **in progress** | low |
-| 5 | Component usage audit + physical legacy cleanup | planned | medium |
+| 4 | Guides/sprints/roadmap classification and archive | **completed** | low |
+| 5 | Component usage audit + physical legacy cleanup | **blocked by lifecycle decision** | medium |
 | 6 | Naming normalization where safe | planned | medium |
 | 7 | Link/retrieval QA and closeout | planned | none |
 
@@ -58,11 +58,9 @@ Created:
 docs/design-system/COMPONENT_CATALOG.md
 ```
 
-No component source was moved or deleted in this phase.
-
 ### Phase 2
 
-Punch Review construction evidence was moved atomically from:
+Punch Review construction evidence was moved from:
 
 ```text
 main/punch-review/
@@ -80,11 +78,9 @@ Canonical runtime source remains untouched at:
 main/screens/PunchReview/scr_PunchReview.pa.yaml
 ```
 
-The workspace README was updated to use the new paths.
-
 ### Phase 3
 
-SQL assets were consolidated to the canonical model:
+SQL assets were consolidated to:
 
 ```text
 sql/export/
@@ -94,7 +90,7 @@ sql/tools/warroom-schema/
 docs/reference/sql/warroom/
 ```
 
-Removed competing locations:
+Competing locations removed:
 
 ```text
 database/
@@ -104,16 +100,65 @@ docs/SQL/
 
 No SQL file content or runtime contract was changed during the structural move.
 
-## Current controlled phase — Phase 4
+### Phase 4
 
-Classify `docs/guides/` by lifecycle and purpose.
+`docs/guides/` was reduced to material that is intentionally still discoverable as guidance/compatibility documentation.
 
-Rules:
+Moved to archive/reference architecture as appropriate:
 
-- genuine reusable step-by-step guidance may remain in `docs/guides/`;
-- historical sprint records move to `docs/archive/sprints/`;
-- superseded implementation/remediation evidence moves to archive;
-- architecture documents move to `docs/architecture/` only when they represent current architecture;
-- roadmap/product-planning material must receive one unambiguous canonical location before the old guide copy is removed.
+```text
+docs/archive/deliveries/2026-07-27-epic-01/EPIC-01_COMPONENT_INTEGRATION.md
+docs/archive/sprints/excel-import-i01/
+docs/archive/remediation/2026-08-05/
+docs/archive/remediation/home/
+docs/archive/superseded-docs/2026-07/ARCHITECTURE.md
+docs/archive/roadmaps/ROADMAP_2026-07.md
+docs/architecture/integrations/excel-import/EXCEL_IMPORT_ARCHITECTURE.md
+```
 
-Phase 4 must not modify Power Apps runtime code.
+The old roadmap was archived because its epic status no longer represented current PULSE delivery state.
+
+## Phase 5 evidence
+
+Created:
+
+```text
+docs/analysis/repository/COMPONENT_USAGE_AUDIT_2026-08-10.md
+```
+
+Confirmed current runtime dependencies:
+
+```text
+scr_Home    → cmp_ExecutiveAlertBanner
+scr_Home    → cmp_DashboardSectionHeader
+scr_Punches → cmp_DetailDrawer_old
+```
+
+Therefore none of those three components may be physically removed or moved while their canonical screens depend on them.
+
+No canonical-screen usage was found for:
+
+```text
+cmp_ExecutiveKpiCard
+cmp_ExecutiveInsightCard
+```
+
+They are classified as `ARCHIVE_CANDIDATE`, not deleted.
+
+## Current architecture/lifecycle gate
+
+Before Phase 5 can physically clean the two unreferenced Executive components, the repository needs one policy decision:
+
+```text
+OPTION A
+main/components = runtime dependencies + active planned/PDS component source only
+
+OPTION B
+main/components = runtime dependencies + active planned/PDS source + inactive reusable library
+```
+
+Under Option A, unreferenced legacy components should be moved to an archive/legacy source area after a final dependency check.
+
+Under Option B, they may remain in `main/components/`, but inactive components require an explicit lifecycle/catalog marker and must not be selected automatically by agents.
+
+No physical component move should occur before this decision.
