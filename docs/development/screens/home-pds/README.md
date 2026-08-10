@@ -45,9 +45,9 @@ scr_Home_PDS
 |---:|---|---|
 | 00 | Foundation audit and reuse matrix | **validated** |
 | 01 | Blank screen shell | **validated** |
-| 02 | PDS Page Header contract / implementation | **validated for progression** |
-| 03 | Home_PDS header integration | **published — pending Studio validation** |
-| 04 | Workspace/body structural layout | planned |
+| 02 | PDS Page Header contract / implementation | **validated for progression / isolated instance-safe** |
+| 03 | Home_PDS header integration | **FAILED on partial child edit surface / 03A full-screen correction pending Studio validation** |
+| 04 | Workspace/body structural layout | **blocked by Block 03** |
 | 05 | Minimum typed runtime state | planned |
 | 06 | KPI strip with local presentation model | planned |
 | 07 | Punch-template context selector | planned |
@@ -90,51 +90,68 @@ Canonical source:
 power-apps/components/cmp_PageHeaderPro.pa.yaml
 ```
 
-Validation report:
-
-```text
-docs/development/screens/home-pds/CMP_PAGE_HEADER_PRO_VALIDATION_REPORT_2026-08-10.md
-```
-
 The original instance-safety failure was corrected by comparing the complete component against `cmp_HeatMapPro` and `cmp_SidebarNav`, then rebuilding the full public contract using the proven PULSE metadata patterns.
 
-The corrected full component was instantiated successfully in Power Apps Studio. The user subsequently instructed progression to the next block. Block 02 is therefore accepted for progression; if Block 03 exposes a header-attributable contract or visual regression, Block 02 must be reopened.
+The corrected complete component was instantiated successfully in Power Apps Studio. Therefore:
 
-## Block 03 — Header integration
+```text
+DEFINITION_ACCEPTED = PASS
+INSTANCE_SAFE       = PASS
+```
 
-Published artifact:
+Target-screen binding remains a separate validation surface.
+
+## Block 03 — Header integration incident
+
+Original artifact:
 
 ```text
 docs/development/screens/home-pds/blocks/03_header_integration.children.pa.yaml
 ```
 
+Studio rejected every `cmp_PageHeaderPro` custom property on the nested CanvasComponent instance with `PA2108 Unknown property`, including Text, Boolean and utility properties. Standard CanvasComponent properties such as `Height` and `Width` were not part of the reported failures.
+
+The error was produced while integrating the component through the **partial child/control Source Code edit surface**.
+
+This does not prove that the `cmp_PageHeaderPro` contract is invalid. PULSE contains a positive full-screen reference in `scr_PunchReview`, where `cmp_SidebarNav` is represented as:
+
+```yaml
+Control: CanvasComponent
+ComponentName: cmp_SidebarNav
+Properties:
+  ActiveKey: =...
+  ProjectCode: =...
+  ProjectName: =...
+```
+
+Therefore the instance-property syntax itself is already proven in a full `Screens:` source.
+
+### Block 03A corrective candidate
+
+Artifact:
+
+```text
+docs/development/screens/home-pds/blocks/03A_header_integration.full-screen.pa.yaml
+```
+
 Commit:
 
 ```text
-76b5ab999437d97bd6307eb713429617781e2213
+e932d9e3af233cd5bea23c6b532e9c29d5ed974f
 ```
 
-Responsibilities:
+Corrective strategy:
 
 ```text
-conHPDS_PageHeaderHost
-└── cmpHPDS_PageHeader (cmp_PageHeaderPro)
+failed partial ADD CHILD source
+→ preserve cmp_PageHeaderPro contract
+→ rebuild Block 01 + Block 03 as one complete Screens: source
+→ validate once
 ```
 
-Current bindings:
+If 03A passes, the incident is classified as an edit-surface/source-context compatibility issue and Block 03 can close.
 
-```text
-Title / Subtitle       → varPageTitle / varPageSubtitle
-Project                → current varSelectedProject context
-Template               → temporary presentation value `Master Punch List`
-Last refresh            → `Not loaded` until remote read exists
-Project interaction     → disabled in this block
-Template interaction    → disabled until Block 07
-Refresh                 → visible but disabled until Block 08
-Help                    → hidden until Block 21
-```
-
-This prevents the header from presenting interactions or timestamps that are not implemented yet.
+If 03A returns the same PA2108 errors, the next investigation is **host-visible public-contract registration for cmp_PageHeaderPro**, not another property-by-property test.
 
 ## Diagnostic efficiency rule
 
@@ -144,12 +161,12 @@ For Power Apps components in this workspace:
 problem component
 → positive instance-safe PULSE reference
 → full contract/body diff
-→ corrected complete component
-→ one smoke test
-→ reduction only if still failing
+→ corrected complete candidate
+→ one consequential Studio test
+→ reduction only if still necessary
 ```
 
-Do not request property-by-property microtests while repository comparison can produce a concrete complete correction.
+Do not request property-by-property microtests while repository comparison can produce a concrete correction.
 
 ## Construction policy
 
