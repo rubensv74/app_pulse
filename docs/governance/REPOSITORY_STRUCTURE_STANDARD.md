@@ -2,7 +2,7 @@
 
 **Status:** normative  
 **Canonical:** yes  
-**Version:** 2.0  
+**Version:** 2.1  
 **Scope:** `rubensv74/app_pulse`  
 **Last reviewed:** 2026-08-10
 
@@ -24,6 +24,7 @@ Historical recovery belongs to Git history. The working tree should not retain d
 /
 ├── README.md
 ├── power-apps/
+├── power-automate/
 ├── sql/
 ├── office-scripts/
 └── docs/
@@ -49,7 +50,7 @@ Rules:
 
 - canonical full screen source belongs in `power-apps/screens/<Screen>/`;
 - reusable Canvas component source required by current runtime or approved active work belongs in `power-apps/components/`;
-- contracts and mappings belong under their dedicated folders;
+- Power Apps-specific contracts and mappings belong under their dedicated folders;
 - tests belong in `power-apps/tests/`;
 - modular construction blocks, design notes and user guides do **not** belong in `power-apps/`;
 - new source must not use `_old`, `_backup`, `_copy`, `_final2`, etc.; a pre-existing live identity may keep such a name only as a documented `LEGACY_SUPPORTED` exception until migrated.
@@ -74,9 +75,43 @@ When a new reusable component is required:
 4. validate it in Power Apps Studio before treating it as installed/usable;
 5. after block validation, ensure the canonical complete source reflects the accepted implementation.
 
+A component source file existing in Git is not sufficient evidence that the component can be safely imported or instantiated in Studio. Reusable component acceptance requires the component validation gate defined by the incremental protocol and its compatibility/QA rules.
+
 ---
 
-## 4. `sql/` — executable database source
+## 4. `power-automate/` — canonical flow source and contracts
+
+```text
+power-automate/
+├── README.md
+├── flows/
+└── contracts/
+```
+
+Rules:
+
+- real exported/deployable definitions of currently active flows belong in `power-automate/flows/`;
+- stable flow interface contracts belong in `power-automate/contracts/` when useful independently from the definition;
+- never reconstruct or invent a flow definition from a Power Apps `.Run(...)` call;
+- when a flow definition has not yet been captured, the real Power Automate environment remains the execution authority;
+- missing definitions are coverage gaps and must be closed progressively from the real environment;
+- superseded-only definitions leave the working tree after migration; Git history provides recovery;
+- flow changes require validation in the real Power Automate environment, not only static JSON inspection.
+
+Progressive capture follows:
+
+```text
+identify active caller
+→ verify real flow
+→ export/read real definition
+→ save under power-automate/flows/
+→ document/update contract if useful
+→ validate caller/flow compatibility
+```
+
+---
+
+## 5. `sql/` — executable database source
 
 ```text
 sql/
@@ -92,13 +127,13 @@ Executable SQL belongs here. Stable explanatory reference belongs under `docs/re
 
 ---
 
-## 5. `office-scripts/`
+## 6. `office-scripts/`
 
 Canonical Office Scripts source used by flows/export/import automation.
 
 ---
 
-## 6. `docs/` — current engineering knowledge
+## 7. `docs/` — current engineering knowledge
 
 ```text
 docs/
@@ -152,7 +187,7 @@ There is no permanent `docs/archive/` area. Superseded-only artifacts are remove
 
 ---
 
-## 7. Legacy policy
+## 8. Legacy policy
 
 An artifact is `LEGACY` when it is superseded and is not required by current runtime, current contracts, current specifications, current validation evidence or reusable learned knowledge.
 
@@ -164,7 +199,7 @@ Reusable lessons are not deleted: they are consolidated into current compatibili
 
 ---
 
-## 8. Naming rules
+## 9. Naming rules
 
 Directories:
 
@@ -180,7 +215,7 @@ Runtime screen/component identities are exempt when changing the name could brea
 
 ---
 
-## 9. Component lifecycle
+## 10. Component lifecycle
 
 Catalog states:
 
@@ -195,7 +230,7 @@ REVIEW_REQUIRED
 
 ---
 
-## 10. Construction artifacts
+## 11. Construction artifacts
 
 Every incremental artifact must declare whether it is:
 
@@ -216,7 +251,7 @@ Conceptual operations such as `PATCH`, `ADD CHILD` or `REPLACE CONTROL` belong i
 
 ---
 
-## 11. Root cleanliness
+## 12. Root cleanliness
 
 Allowed at repository root:
 
@@ -224,6 +259,7 @@ Allowed at repository root:
 - `.gitignore`;
 - essential repository-level configuration;
 - `power-apps/`;
+- `power-automate/`;
 - `sql/`;
 - `office-scripts/`;
 - `docs/`.
@@ -232,23 +268,23 @@ No delivery manifests, temporary exports, sprint reports or superseded implement
 
 ---
 
-## 12. AI retrieval rule
+## 13. AI retrieval rule
 
 Use this authority order:
 
 ```text
-1. canonical runtime source (`power-apps/`, `sql/`, `office-scripts/`)
+1. canonical runtime/source (`power-apps/`, `power-automate/`, `sql/`, `office-scripts/`)
 2. normative docs (`docs/governance`, `docs/design-system`, `docs/architecture`)
 3. active specifications/development workspaces
 4. reference
 5. analysis
 ```
 
-Do not use point-in-time analysis to override current source.
+Do not use point-in-time analysis to override current source. Do not infer missing Power Automate internals from caller code.
 
 ---
 
-## 13. Incremental change policy
+## 14. Incremental change policy
 
 Repository or runtime migration follows the same incremental discipline as application work:
 
