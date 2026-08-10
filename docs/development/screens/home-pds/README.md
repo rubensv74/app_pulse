@@ -13,6 +13,7 @@
 ```text
 docs/development/PULSE_UI_DELIVERY_FRAMEWORK.md
 docs/development/PROTOCOLO_CONSTRUCCION_MODULAR_PANTALLAS_POWER_APPS.md
+docs/development/POWER_APPS_COMPONENT_VALIDATION_GATE.md
 docs/guides/GUIA_RECONSTRUCCION_PDS_EN_PANTALLA_PARALELA.md
 docs/design-system/PULSE_DESIGN_SYSTEM.md
 docs/design-system/SAAS_INTERFACE_ARCHETYPES.md
@@ -70,8 +71,8 @@ The following architectural decisions are therefore frozen for the first constru
 |---:|---|---|
 | 00 | Foundation audit and reuse matrix | **validated** |
 | 01 | Blank screen shell | **validated for progression — Studio visual gate accepted** |
-| 02 | PDS Page Header contract / implementation | **corrected — Block 02A pending Studio revalidation** |
-| 03 | Home_PDS header integration | planned |
+| 02 | PDS Page Header contract / implementation | **FAILED / BLOCKED — component instance-safety gate not passed** |
+| 03 | Home_PDS header integration | **blocked by Block 02** |
 | 04 | Workspace/body structural layout | planned |
 | 05 | Minimum typed runtime state | planned |
 | 06 | KPI strip with local presentation model | planned |
@@ -120,7 +121,7 @@ The user's explicit instruction to proceed to Block 02 is recorded as acceptance
 
 ---
 
-## Block 02 publication and visual QA observation
+## Block 02 publication, visual QA and instance-safety incident
 
 Shared component specification:
 
@@ -140,6 +141,18 @@ Corrective artifact:
 docs/development/screens/home-pds/blocks/02A_page_header_text_overflow_fix.pa.yaml
 ```
 
+Canonical component source:
+
+```text
+power-apps/components/cmp_PageHeaderPro.pa.yaml
+```
+
+Current validation report:
+
+```text
+docs/development/screens/home-pds/CMP_PAGE_HEADER_PRO_VALIDATION_REPORT_2026-08-10.md
+```
+
 Purpose:
 
 - create reusable `cmp_PageHeaderPro`;
@@ -150,23 +163,23 @@ Purpose:
 - own no project/template/refresh business state;
 - leave `scr_Home_PDS` untouched until Block 03.
 
-### Studio integration result — 2026-08-07
+### Visual QA observation
 
-The original component integrates successfully and the intended Page Header architecture is visually confirmed.
-
-A reusable visual defect was detected during the Studio review:
+The component architecture rendered and exposed a reusable text defect:
 
 ```text
 VQA-001 — Small fixed-height text controls can expose unintended internal scrollbars.
 ```
 
-The general preventive rule has been promoted to:
+The preventive rule is maintained in:
 
 ```text
 docs/design-system/POWER_APPS_VISUAL_QA_GUARDRAILS.md
 ```
 
-### Block 02A compatibility incident
+The corrected 02A source uses `AutoHeight=true` on static `ModernText` controls.
+
+### Block 02A PaYaml incident
 
 The first 02A revision incorrectly represented the protocol-level operation as a top-level PaYaml node:
 
@@ -181,15 +194,29 @@ PA1001 / YamlInvalidSyntax
 Property 'Patch' not found on type PaModule
 ```
 
-This is now recorded as compatibility rule `PA-COMP-011` in:
+This is recorded as compatibility rule `PA-COMP-011`.
+
+### Instance-safety incident — current blocker
+
+A later attempt to insert an instance of `cmp_PageHeaderPro` into `scr_Home_PDS` caused Power Apps Studio to close.
+
+This proves that the previous acceptance model was incomplete:
 
 ```text
-docs/development/screens/home-pds/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
+component source/definition exists
+        ≠
+component is safe to instantiate in a screen
 ```
 
-The corrected `02A_page_header_text_overflow_fix.pa.yaml` is now a complete pasteable `ComponentDefinitions:` replacement for `cmp_PageHeaderPro`. The protocol concepts `PATCH`, `ADD CHILD`, `REPLACE CONTROL`, etc. remain valid construction-operation labels, but they must never be invented as PaYaml root properties.
+The exact technical root cause is not yet confirmed and must not be guessed.
 
-Block 02 remains open until the corrected 02A component is accepted by Studio and the unintended static-text scrollbars are visually removed.
+The component is therefore `REVIEW_REQUIRED`, Block 02 is `FAILED/BLOCKED`, and Block 03 must not begin until the component passes:
+
+```text
+docs/development/POWER_APPS_COMPONENT_VALIDATION_GATE.md
+```
+
+The next validation must occur on an isolated component-lab screen or safe/sandbox app context, not directly on `scr_Home_PDS`.
 
 ---
 
@@ -208,19 +235,20 @@ Do not change `StartScreen` or the production Home navigation before final accep
 
 No dependent block advances while the current block is `failed`.
 
+A reusable component may be used in a screen block only after its isolated definition + instance + contract + QA validation gate has passed.
+
 Visible QA defects recorded in `POWER_APPS_VISUAL_QA_GUARDRAILS.md` must also be resolved or explicitly accepted before a dependent block treats the current visual implementation as canonical.
 
 ---
 
 ## Repository workspace
 
-Expected structure as blocks are published:
-
 ```text
 docs/development/screens/home-pds/
 ├── README.md
 ├── SCREEN_ARCHITECTURE.md
 ├── POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
+├── CMP_PAGE_HEADER_PRO_VALIDATION_REPORT_2026-08-10.md
 ├── blocks/
 │   ├── 01_screen_shell.pa.yaml
 │   ├── 02_page_header_component.pa.yaml
