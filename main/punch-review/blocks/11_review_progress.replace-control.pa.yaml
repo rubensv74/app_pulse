@@ -4,145 +4,309 @@
 # Target control: conPR_ProgressSlot
 # Parent: conPR_RightColumn
 #
-# Replace the complete placeholder created in Block 03 with this component instance.
+# Replace the complete placeholder created in Block 03 with this card.
 # Do not keep lblPR_ProgressPlaceholder.
+#
+# IMPORTANT — PRE-YAML GATE APPLIED
+# The current POWER_APPS_SOURCE_CODE_COMPATIBILITY.md was consulted before
+# drafting this corrected YAML.
+#
+# Correction after PR-SC-005 / PA2301:
+# - The previous version instantiated cmp_DonutPro as CanvasComponent.
+# - The component exists in GitHub but is not installed in the active app.
+# - This corrected block is fully self-contained and uses native controls only.
 #
 # Dependencies:
 # - Blocks 01–10 integrated.
-# - cmp_DonutPro exists in main/components.
 # - colPunchReviewQueue contains IsReviewedInSession.
 # - Block 07 updates IsReviewedInSession through Mark Reviewed / Undo Review.
 #
 # Scope:
 # - Shows session review completion for the complete loaded review queue.
-# - Uses the existing premium cmp_DonutPro component.
-# - Displays Reviewed vs Remaining.
-# - Shows completion percentage in the donut center.
+# - Displays a native SVG donut using Image@2.2.3.
+# - Displays Reviewed, Remaining and Total counts.
 # - Updates immediately when Mark Reviewed / Undo Review changes the queue.
-# - No flow or SQL call is required.
+# - No component dependency, flow or SQL call is required.
 #
 # Important semantic rule:
 # - This is SESSION REVIEW PROGRESS.
 # - It does not represent Punch closure progress or project completion.
 # - It does not persist Reviewed to SQL.
 #
-# Responsive behaviour:
-# - The subtitle always shows Reviewed / Remaining / Total counts.
-# - cmp_DonutPro shows its legend when enough horizontal width is available.
-# - On narrower right columns the donut remains visible without relying on the legend.
-#
 # Compatibility:
-# - Reuses cmp_DonutPro already present in main/components.
-# - No new Power Apps control type is introduced by this block.
+# - GroupContainer@1.5.0 handles the rounded card.
+# - Label@2.5.1 contains no Radius* properties.
+# - Rectangle@2.3.0 is used only for simple color swatches/dividers.
+# - Image@2.2.3 renders the SVG donut and does not depend on CanvasComponent.
 #
 # Validation:
-# 1. With an empty queue, the component shows its empty state.
-# 2. With the Block 05A five-row seed, initial counts match the queue.
-# 3. Mark Reviewed increments Reviewed and decrements Remaining immediately.
-# 4. Undo Review reverses the counts immediately.
-# 5. 5 reviewed out of 5 renders 100% COMPLETE.
-# 6. Filtering the visible queue does not change progress; progress uses the complete loaded queue.
+# 1. The block imports without PA2301.
+# 2. With an empty queue, the card shows its deliberate empty state.
+# 3. With the Block 05A five-row seed, initial counts match the queue.
+# 4. Mark Reviewed increments Reviewed and decrements Remaining immediately.
+# 5. Undo Review reverses the counts immediately.
+# 6. 5 reviewed out of 5 renders 100% COMPLETE.
+# 7. Filtering the visible queue does not change progress; progress uses the full queue.
 
-- cmpPR_ReviewProgress:
-    Control: CanvasComponent
-    ComponentName: cmp_DonutPro
+- conPR_ReviewProgressCard:
+    Control: GroupContainer@1.5.0
+    Variant: ManualLayout
     Properties:
-      AccentColor: =varTheme_PulseBlueDark
-      BackgroundColor: =varTheme_Surface
       BorderColor: =varTheme_Border
-      CenterFillColorHex: ="#FFFFFF"
-      CenterLabel: ="COMPLETE"
-      CenterLabelColorHex: ="#64748B"
-      CenterValueColorHex: ="#0F172A"
-      CenterValueText: |-
-        =If(
-            CountRows(colPunchReviewQueue) = 0,
-            "0%",
-            Text(
-                CountIf(
-                    colPunchReviewQueue,
-                    Coalesce(IsReviewedInSession, false)
-                ) /
-                CountRows(colPunchReviewQueue),
-                "[$-en-US]0%"
-            )
-        )
-      CompactMode: =true
-      DangerColor: =ColorValue("#DC2626")
-      DonutThickness: =15
-      EmptyText: ="Load a review queue to see session progress."
-      EnableSelection: =false
-      ErrorText: ="Review progress unavailable."
+      BorderThickness: =1
+      DropShadow: =DropShadow.Semilight
+      Fill: =varTheme_Surface
+      FillPortions: =0
       Height: =140
-      Items: |-
-        =Table(
-            {
-                SegmentKey: "REVIEWED",
-                SegmentLabel: "Reviewed",
-                SegmentValue:
-                    CountIf(
-                        colPunchReviewQueue,
-                        Coalesce(IsReviewedInSession, false)
-                    ),
-                SegmentColor: "#16A34A",
-                SegmentOrder: 1
-            },
-            {
-                SegmentKey: "REMAINING",
-                SegmentLabel: "Remaining",
-                SegmentValue:
-                    CountIf(
-                        colPunchReviewQueue,
-                        !Coalesce(IsReviewedInSession, false)
-                    ),
-                SegmentColor: "#CBD5E1",
-                SegmentOrder: 2
-            }
-        )
-      LoadingText: ="Calculating session progress..."
-      MutedTextColor: =varTheme_TextMuted
-      PercentageFormat: ="[$-en-US]0%"
-      SegmentGapPercent: =0.7
-      ShowLegend: =true
-      ShowPercentages: =true
-      ShowValues: =true
-      ShowZeroSegments: =true
-      State: |-
-        =If(
-            CountRows(colPunchReviewQueue) = 0,
-            "empty",
-            "ready"
-        )
-      Subtitle: |-
-        =If(
-            CountRows(colPunchReviewQueue) = 0,
-            "Session-only completion",
-            Text(
-                CountIf(
-                    colPunchReviewQueue,
-                    Coalesce(IsReviewedInSession, false)
-                ),
-                "[$-en-US]#,##0"
-            ) &
-            " reviewed · " &
-            Text(
-                CountIf(
-                    colPunchReviewQueue,
-                    !Coalesce(IsReviewedInSession, false)
-                ),
-                "[$-en-US]#,##0"
-            ) &
-            " remaining · " &
-            Text(
-                CountRows(colPunchReviewQueue),
-                "[$-en-US]#,##0"
-            ) &
-            " total"
-        )
-      SurfaceAltColor: =varTheme_SurfaceAlt
-      TextColor: =varTheme_Text
-      Title: ="Review Progress"
-      TrackColorHex: ="#E2E8F0"
-      ValueFormat: ="[$-en-US]#,##0"
-      ValueSuffix: =""
+      LayoutMinHeight: =130
+      LayoutMinWidth: =300
+      RadiusBottomLeft: =12
+      RadiusBottomRight: =12
+      RadiusTopLeft: =12
+      RadiusTopRight: =12
       Width: =Parent.Width
+    Children:
+      - lblPR_ProgressTitle:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_Text
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =11
+            Text: ="Review Progress"
+            Width: =160
+            X: =14
+            Y: =8
+      - lblPR_ProgressSubtitle:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_TextMuted
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =18
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =8
+            Text: |-
+              =If(
+                  CountRows(colPunchReviewQueue) = 0,
+                  "Session-only completion",
+                  Text(
+                      CountIf(
+                          colPunchReviewQueue,
+                          Coalesce(IsReviewedInSession, false)
+                      ),
+                      "[$-en-US]#,##0"
+                  ) &
+                  " reviewed · " &
+                  Text(
+                      CountIf(
+                          colPunchReviewQueue,
+                          !Coalesce(IsReviewedInSession, false)
+                      ),
+                      "[$-en-US]#,##0"
+                  ) &
+                  " remaining"
+              )
+            Width: =Parent.Width - 28
+            X: =14
+            Y: =29
+      - imgPR_ProgressDonut:
+          Control: Image@2.2.3
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =0
+            Fill: =Color.Transparent
+            Height: =82
+            Image: |-
+              =With(
+                  {
+                      prTotal: CountRows(colPunchReviewQueue),
+                      prReviewed:
+                          CountIf(
+                              colPunchReviewQueue,
+                              Coalesce(IsReviewedInSession, false)
+                          )
+                  },
+                  With(
+                      {
+                          prPct:
+                              If(
+                                  prTotal = 0,
+                                  0,
+                                  prReviewed / prTotal
+                              ),
+                          prDash:
+                              If(
+                                  prTotal = 0,
+                                  0,
+                                  100 * prReviewed / prTotal
+                              )
+                      },
+                      "data:image/svg+xml;utf8," &
+                      EncodeUrl(
+                          "<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'>" &
+                          "<circle cx='50' cy='50' r='36' pathLength='100' fill='none' stroke='#E2E8F0' stroke-width='12'/>" &
+                          "<circle cx='50' cy='50' r='36' pathLength='100' fill='none' stroke='#16A34A' stroke-width='12' stroke-dasharray='" &
+                          Text(prDash, "[$-en-US]0.##") &
+                          " " &
+                          Text(100 - prDash, "[$-en-US]0.##") &
+                          "' stroke-linecap='round' transform='rotate(-90 50 50)'/>" &
+                          "<text x='50' y='47' text-anchor='middle' dominant-baseline='middle' font-family='Segoe UI,Arial,sans-serif' font-size='17' font-weight='700' fill='#0F172A'>" &
+                          Text(prPct, "[$-en-US]0%") &
+                          "</text>" &
+                          "<text x='50' y='64' text-anchor='middle' dominant-baseline='middle' font-family='Segoe UI,Arial,sans-serif' font-size='7' font-weight='600' letter-spacing='0.5' fill='#64748B'>COMPLETE</text>" &
+                          "</svg>"
+                      )
+                  )
+              )
+            ImagePosition: =ImagePosition.Fit
+            Visible: =CountRows(colPunchReviewQueue) > 0
+            Width: =82
+            X: =14
+            Y: =49
+      - rectPR_ProgressReviewedSwatch:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            BorderStyle: =BorderStyle.None
+            Fill: =ColorValue("#16A34A")
+            Height: =8
+            Visible: =CountRows(colPunchReviewQueue) > 0
+            Width: =8
+            X: =110
+            Y: =59
+      - lblPR_ProgressReviewed:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_Text
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =20
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =8
+            Text: |-
+              ="Reviewed  " &
+              Text(
+                  CountIf(
+                      colPunchReviewQueue,
+                      Coalesce(IsReviewedInSession, false)
+                  ),
+                  "[$-en-US]#,##0"
+              )
+            Visible: =CountRows(colPunchReviewQueue) > 0
+            Width: =Parent.Width - 132
+            X: =126
+            Y: =52
+      - rectPR_ProgressRemainingSwatch:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            BorderStyle: =BorderStyle.None
+            Fill: =ColorValue("#CBD5E1")
+            Height: =8
+            Visible: =CountRows(colPunchReviewQueue) > 0
+            Width: =8
+            X: =110
+            Y: =82
+      - lblPR_ProgressRemaining:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_Text
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =20
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =8
+            Text: |-
+              ="Remaining  " &
+              Text(
+                  CountIf(
+                      colPunchReviewQueue,
+                      !Coalesce(IsReviewedInSession, false)
+                  ),
+                  "[$-en-US]#,##0"
+              )
+            Visible: =CountRows(colPunchReviewQueue) > 0
+            Width: =Parent.Width - 132
+            X: =126
+            Y: =75
+      - lblPR_ProgressTotal:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_TextMuted
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =20
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =8
+            Text: |-
+              ="Total queue  " &
+              Text(
+                  CountRows(colPunchReviewQueue),
+                  "[$-en-US]#,##0"
+              )
+            Visible: =CountRows(colPunchReviewQueue) > 0
+            Width: =Parent.Width - 116
+            X: =110
+            Y: =98
+      - lblPR_ProgressSessionNote:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_TextMuted
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =16
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =7
+            Text: ="Session only · does not change Punch status"
+            Visible: =CountRows(colPunchReviewQueue) > 0
+            Width: =Parent.Width - 116
+            X: =110
+            Y: =119
+      - lblPR_ProgressEmpty:
+          Control: Label@2.5.1
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_TextMuted
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =48
+            PaddingBottom: =0
+            PaddingLeft: =12
+            PaddingRight: =12
+            PaddingTop: =0
+            Size: =8
+            Text: ="Load a review queue to see session progress."
+            Visible: =CountRows(colPunchReviewQueue) = 0
+            Width: =Parent.Width - 28
+            X: =14
+            Y: =61
