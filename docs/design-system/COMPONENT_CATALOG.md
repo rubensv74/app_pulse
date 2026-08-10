@@ -25,8 +25,8 @@ A required component must never exist only in chat, a construction block, tempor
 
 ```text
 ACTIVE            preferred current reuse candidate; instance-safe validation completed
-PDS_CANDIDATE     active PDS-aligned component whose required integration validation has passed for current use
-REVIEW_REQUIRED   source exists but compatibility/definition/instance-safety/contract validation is incomplete or has failed
+PDS_CANDIDATE     active PDS-aligned component accepted for current PDS integration; target-screen QA remains part of its consuming block
+REVIEW_REQUIRED   source exists but compatibility/definition/instance-safety validation is incomplete or has failed
 LEGACY_SUPPORTED  live runtime dependency awaiting validated migration; do not select for new work
 ```
 
@@ -39,7 +39,7 @@ LEGACY_SUPPORTED  live runtime dependency awaiting validated migration; do not s
 | `cmp_EmptyState` | PDS_CANDIDATE | Preferred empty/error state base; continue visual hardening |
 | `cmp_HeatMapPro` | PDS_CANDIDATE | Preferred heatmap component |
 | `cmp_KpiCardPro` | PDS_CANDIDATE | Preferred KPI card for new PDS work |
-| `cmp_PageHeaderPro` | REVIEW_REQUIRED | Corrected complete Source Code now passes isolated instantiation (`INSTANCE_SAFE = PASS`). One compact public-contract + visual smoke test remains before promotion to `PDS_CANDIDATE` and Home_PDS integration. Spec: `docs/design-system/components/CMP_PAGE_HEADER_PRO.md` |
+| `cmp_PageHeaderPro` | PDS_CANDIDATE | Corrected complete Source Code passes isolated instantiation and has been accepted for progression into Home_PDS Block 03. Target-screen contract/visual QA remains mandatory during integration. Spec: `docs/design-system/components/CMP_PAGE_HEADER_PRO.md` |
 | `cmp_PieChartPro` | PDS_CANDIDATE | Preferred composition chart for Home_PDS discipline distribution |
 | `cmp_SidebarNav` | ACTIVE | Current shared navigation component |
 | `cmp_SkeletonLoader` | PDS_CANDIDATE | Preferred loading placeholder base |
@@ -49,7 +49,7 @@ LEGACY_SUPPORTED  live runtime dependency awaiting validated migration; do not s
 
 ## Rules
 
-1. New work should normally prefer `ACTIVE` or a `PDS_CANDIDATE` whose required validation gate has passed.
+1. New work should normally prefer `ACTIVE` or a `PDS_CANDIDATE` whose relevant validation gate has passed for the intended use.
 2. `REVIEW_REQUIRED` blocks normal screen integration until `docs/development/POWER_APPS_COMPONENT_VALIDATION_GATE.md` is satisfied.
 3. `LEGACY_SUPPORTED` means “currently required but scheduled for removal after a validated migration”, not “approved for reuse”.
 4. Before removing a component, audit references from canonical screens/components.
@@ -57,7 +57,8 @@ LEGACY_SUPPORTED  live runtime dependency awaiting validated migration; do not s
 6. Reusable PDS component specifications belong under `docs/design-system/components/`.
 7. A suffix such as `_old` is not lifecycle authority; this catalog is.
 8. GitHub source existence does not prove the component is installed or safe to instantiate in the active Power Apps application; Studio validation is separate.
-9. Once a component has no current dependency or approved active use, remove it from the working tree rather than preserving an inactive copy.
+9. Target-screen integration remains its own validation surface even after isolated instance safety passes.
+10. Once a component has no current dependency or approved active use, remove it from the working tree rather than preserving an inactive copy.
 
 ## Current migration implications
 
@@ -65,4 +66,4 @@ The parallel Home_PDS strategy preserves `scr_Home` as fallback during construct
 
 Punches currently depends on `cmp_DetailDrawer_old`; it remains until a replacement is implemented and Studio-validated.
 
-`cmp_PageHeaderPro` remains canonical active work. The original instance-safety failure is closed after the corrected full component could be instantiated successfully. Its lifecycle stays `REVIEW_REQUIRED` only until the final combined public-contract/visual smoke test passes.
+`cmp_PageHeaderPro` is now approved for controlled Home_PDS integration. Any regression found in Block 03 must be attributed and corrected before Block 04 advances.
