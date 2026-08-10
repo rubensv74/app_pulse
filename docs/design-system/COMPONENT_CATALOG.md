@@ -26,7 +26,7 @@ A required component must never exist only in chat, a construction block, tempor
 ```text
 ACTIVE            preferred current reuse candidate; instance-safe validation completed
 PDS_CANDIDATE     active PDS-aligned component whose required integration validation has passed for current use
-REVIEW_REQUIRED   source exists but compatibility/definition/instance-safety validation is incomplete or has failed
+REVIEW_REQUIRED   source exists but compatibility/definition/instance-safety/contract validation is incomplete or has failed
 LEGACY_SUPPORTED  live runtime dependency awaiting validated migration; do not select for new work
 ```
 
@@ -39,7 +39,7 @@ LEGACY_SUPPORTED  live runtime dependency awaiting validated migration; do not s
 | `cmp_EmptyState` | PDS_CANDIDATE | Preferred empty/error state base; continue visual hardening |
 | `cmp_HeatMapPro` | PDS_CANDIDATE | Preferred heatmap component |
 | `cmp_KpiCardPro` | PDS_CANDIDATE | Preferred KPI card for new PDS work |
-| `cmp_PageHeaderPro` | REVIEW_REQUIRED | Canonical source exists at `power-apps/components/cmp_PageHeaderPro.pa.yaml`, but Studio previously closed when an instance was inserted into `scr_Home_PDS`. Static review is required and isolated instance validation must pass before normal screen integration. Spec: `docs/design-system/components/CMP_PAGE_HEADER_PRO.md` |
+| `cmp_PageHeaderPro` | REVIEW_REQUIRED | Corrected complete Source Code now passes isolated instantiation (`INSTANCE_SAFE = PASS`). One compact public-contract + visual smoke test remains before promotion to `PDS_CANDIDATE` and Home_PDS integration. Spec: `docs/design-system/components/CMP_PAGE_HEADER_PRO.md` |
 | `cmp_PieChartPro` | PDS_CANDIDATE | Preferred composition chart for Home_PDS discipline distribution |
 | `cmp_SidebarNav` | ACTIVE | Current shared navigation component |
 | `cmp_SkeletonLoader` | PDS_CANDIDATE | Preferred loading placeholder base |
@@ -65,4 +65,4 @@ The parallel Home_PDS strategy preserves `scr_Home` as fallback during construct
 
 Punches currently depends on `cmp_DetailDrawer_old`; it remains until a replacement is implemented and Studio-validated.
 
-`cmp_PageHeaderPro` remains canonical source because it is approved active work, but its lifecycle is temporarily `REVIEW_REQUIRED` until the instance-safety incident is isolated and the component validation gate passes.
+`cmp_PageHeaderPro` remains canonical active work. The original instance-safety failure is closed after the corrected full component could be instantiated successfully. Its lifecycle stays `REVIEW_REQUIRED` only until the final combined public-contract/visual smoke test passes.
