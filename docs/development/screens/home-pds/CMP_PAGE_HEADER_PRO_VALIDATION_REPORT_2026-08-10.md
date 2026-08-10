@@ -1,56 +1,48 @@
 # cmp_PageHeaderPro Validation Report — 2026-08-10
 
-**Status:** diagnostic reopened / comparison against proven components active  
-**Component:** `cmp_PageHeaderPro`
+**Status:** corrected full candidate / one Studio smoke test pending  
+**Component:** `cmp_PageHeaderPro`  
+**Primary instance-safe reference:** `cmp_HeatMapPro`  
+**Secondary instance-safe reference:** `cmp_SidebarNav`
 
 ## Confirmed incident
 
-The original full `cmp_PageHeaderPro` source could be defined, but inserting an instance caused Power Apps Studio to close.
+The original full `cmp_PageHeaderPro` definition could be accepted by Power Apps Studio, but inserting an instance caused Studio to close.
 
 ```text
-FAIL_INSTANCE
-Technical root cause: UNKNOWN
+DEFINITION_ACCEPTED = PASS
+INSTANCE_SAFE       = FAIL
 ```
 
-## Correction of previous operational conclusion
+The technical root cause is not claimed beyond the evidence available.
 
-A previous revision closed diagnosis and adopted the rule:
+## Method correction
+
+The investigation initially moved too quickly into micro-reduction and over-generalized a separate CustomProperty experiment.
+
+That approach is replaced by the following rule:
 
 ```text
-PUBLIC COMPONENT PROPERTIES → Studio only
-COMPONENT BODY              → Source Code only
+PROBLEM COMPONENT
+      ↓
+find comparable PULSE INSTANCE_SAFE component
+      ↓
+full contract + body structural diff
+      ↓
+correct COMPLETE component
+      ↓
+one isolated smoke test
+      ↓
+only reduce if the corrected full component still fails
 ```
 
-That conclusion is withdrawn.
+`cmp_HeatMapPro` is the primary positive reference because it proves that PULSE Source Code can safely contain complex `CustomProperties:` contracts with Inputs, Outputs, Tables, Colors, Booleans, Numbers, Records and Events. `cmp_SidebarNav` is the secondary reference because it also proves Inputs/Outputs/Events plus galleries, transparent hit surfaces and event-driven navigation.
 
-PULSE already contains working, integrated components whose canonical Source Code declares `CustomProperties:` directly:
+## Structural comparison
 
-```text
-cmp_HeatMapPro
-cmp_SidebarNav
-```
+### CustomProperties
 
-They include Inputs, Outputs and Events and are instance-safe in PULSE. Therefore `CustomProperties:` cannot be treated as the root problem category.
-
-The correct question is:
-
-```text
-Which concrete declaration or component delta separates cmp_PageHeaderPro from the working references?
-```
-
-## Confirmed reduced results
-
-```text
-PASS_A  CanvasComponent + root GroupContainer
-PASS_B  + hardcoded ModernText title/subtitle
-PASS_C1 + one Input/Text property created manually in Studio
-```
-
-These prove that the bare component shell, the current ModernText title/subtitle pattern, and Input/Text capability itself are not sufficient to reproduce the crash.
-
-## Highest-priority structural delta
-
-The original failing header declared many Inputs using a reduced shape such as:
+Original header Inputs used a reduced declaration such as:
 
 ```yaml
 Title:
@@ -59,7 +51,7 @@ Title:
   Default: ="Punch Control Tower"
 ```
 
-Working `cmp_HeatMapPro` and `cmp_SidebarNav` Inputs normally use a fuller declaration:
+The instance-safe references normally use the complete Input metadata shape:
 
 ```yaml
 Title:
@@ -70,64 +62,97 @@ Title:
   Default: ="Heat Map"
 ```
 
-This is classified as:
+This is the principal objective delta found across the header contract.
+
+The corrected candidate now uses:
 
 ```text
-HYPOTHESIS — PRIORITY 1
+PropertyKind
+DisplayName
+Description
+DataType
+Default
 ```
 
-not confirmed cause.
+for every Input, following the stable PULSE reference pattern.
 
-`DisplayName` / `Description` are not declared universally mandatory because working Output/Event declarations show valid variants. The comparison must be made by `PropertyKind` and proven reference pattern.
-
-## Next diagnostic
-
-Artifact:
+Events now also use the complete metadata form demonstrated by `cmp_SidebarNav`:
 
 ```text
-docs/development/screens/home-pds/diagnostics/02D4_cmp_PageHeaderPro_diag_stage_C_source_model.pa.yaml
+PropertyKind
+DisplayName
+Description
+ReturnType
+Default
 ```
 
-Diagnostic component:
+This does not assert that `DisplayName` or `Description` are universally mandatory. It deliberately removes an avoidable schema delta by copying the fuller known-good contract pattern.
+
+### Body comparison
+
+The remaining header constructions all have positive precedents in the stable PULSE components or have already passed reduced tests:
 
 ```text
-cmp_PageHeaderPro_DiagCSource
+ModernText@1.0.0                         → reduced PASS_B
+GroupContainer@1.5.0                     → reduced PASS_A
+Classic/Button@2.2.0                     → used by instance-safe PULSE components
+Event invocation from control            → used by HeatMap and Sidebar
+Transparent hit surface                  → used by Sidebar
+Component-property bindings              → extensively used by HeatMap and Sidebar
+Sibling/parent geometry formulas         → used throughout stable PULSE component layouts
+CustomProperties Text/Boolean/Color      → proven in HeatMap/Sidebar
 ```
 
-It contains exactly one Source-Code-authored `Input/Text` property using the metadata shape demonstrated by the working PULSE components, plus one ModernText binding to it.
+No unsupported `AccessibleLabel` is present on `Classic/Button@2.2.0` and no `Label@2.5.1 + Radius*` incompatibility exists in the candidate.
 
-Result semantics:
+The header is structurally simpler than `cmp_HeatMapPro`: it has no Table input, Gallery, calculated Output, `Set(...)` state or nested data projection.
+
+## Corrected full candidate
+
+Canonical source:
 
 ```text
-PASS_CSOURCE
-→ Source-Code-authored Input/Text using the proven metadata shape is instance-safe
-→ continue adding header contract deltas one at a time
-
-FAIL_CSOURCE
-→ still do not generalize to all CustomProperties because HeatMap/Sidebar remain positive counterexamples
-→ inspect environment/component-state or another declaration difference
+power-apps/components/cmp_PageHeaderPro.pa.yaml
 ```
 
-## Subsequent comparison order after PASS_CSOURCE
+Correction commit:
 
 ```text
-1. Boolean Input with proven metadata shape
-2. Color Input with proven metadata shape
-3. Event declaration copied from working reference
-4. event invocation from Classic/Button
-5. transparent hit surface
-6. chained sibling geometry
-7. full header contract
+ccaccacd2de75263edc20751eed0efec3c78da83
 ```
 
-One delta per stage.
+The canonical source is again self-contained and includes the complete `CustomProperties:` contract plus body.
 
-## Block consequence
+## Required Studio validation — one test only
+
+Do not run further property-by-property diagnostics before this test.
 
 ```text
-Block 02  = FAILED / DIAGNOSTIC COMPARISON ACTIVE
-Block 03  = MUST NOT START
+1. replace/create cmp_PageHeaderPro from the corrected COMPLETE Source Code
+2. save and allow formula validation
+3. review App Checker for new component-attributable errors
+4. insert one new instance on the isolated diagnostic screen
+5. save
+6. close/reopen Studio/app if insertion is stable
+```
+
+Result:
+
+```text
+PASS
+→ INSTANCE_SAFE
+→ proceed to public-contract/visual smoke validation and then Block 03
+
+FAIL
+→ only then resume controlled reduction, guided by the remaining structural delta against the stable references
+```
+
+## Current block consequence
+
+```text
+Block 02  = CORRECTED / PENDING ONE INSTANCE-SAFETY SMOKE TEST
+Block 03  = BLOCKED UNTIL THAT TEST PASSES
 cmp_PageHeaderPro = REVIEW_REQUIRED
 ```
 
-Diagnosis remains open until the first failing delta is isolated and corrected.
+No further microtest is requested unless the corrected complete component still fails.
