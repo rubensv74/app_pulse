@@ -45,8 +45,8 @@ scr_Home_PDS
 |---:|---|---|
 | 00 | Foundation audit and reuse matrix | **validated** |
 | 01 | Blank screen shell | **validated** |
-| 02 | PDS Page Header contract / implementation | **INSTANCE_SAFE PASS — final combined contract/visual smoke pending** |
-| 03 | Home_PDS header integration | **blocked only by final Block 02 smoke** |
+| 02 | PDS Page Header contract / implementation | **validated for progression** |
+| 03 | Home_PDS header integration | **published — pending Studio validation** |
 | 04 | Workspace/body structural layout | planned |
 | 05 | Minimum typed runtime state | planned |
 | 06 | KPI strip with local presentation model | planned |
@@ -96,77 +96,45 @@ Validation report:
 docs/development/screens/home-pds/CMP_PAGE_HEADER_PRO_VALIDATION_REPORT_2026-08-10.md
 ```
 
-Known history:
+The original instance-safety failure was corrected by comparing the complete component against `cmp_HeatMapPro` and `cmp_SidebarNav`, then rebuilding the full public contract using the proven PULSE metadata patterns.
+
+The corrected full component was instantiated successfully in Power Apps Studio. The user subsequently instructed progression to the next block. Block 02 is therefore accepted for progression; if Block 03 exposes a header-attributable contract or visual regression, Block 02 must be reopened.
+
+## Block 03 — Header integration
+
+Published artifact:
 
 ```text
-02   initial reusable Page Header
-02A  ModernText overflow/AutoHeight correction
-     + PaYaml Patch: root incident corrected
-     + later FAIL_INSTANCE observed
+docs/development/screens/home-pds/blocks/03_header_integration.children.pa.yaml
 ```
 
-### Reference-first correction
-
-Primary stable reference:
+Commit:
 
 ```text
-cmp_HeatMapPro
+76b5ab999437d97bd6307eb713429617781e2213
 ```
 
-Secondary stable reference:
+Responsibilities:
 
 ```text
-cmp_SidebarNav
+conHPDS_PageHeaderHost
+└── cmpHPDS_PageHeader (cmp_PageHeaderPro)
 ```
 
-The original header was compared structurally against both. The principal objective delta was that header Inputs used a reduced metadata shape while stable PULSE references normally use:
+Current bindings:
 
 ```text
-PropertyKind
-DisplayName
-Description
-DataType
-Default
+Title / Subtitle       → varPageTitle / varPageSubtitle
+Project                → current varSelectedProject context
+Template               → temporary presentation value `Master Punch List`
+Last refresh            → `Not loaded` until remote read exists
+Project interaction     → disabled in this block
+Template interaction    → disabled until Block 07
+Refresh                 → visible but disabled until Block 08
+Help                    → hidden until Block 21
 ```
 
-The complete `cmp_PageHeaderPro` contract was rebuilt using the proven PULSE pattern; Events use the complete event metadata form demonstrated by stable components.
-
-Correction commit:
-
-```text
-ccaccacd2de75263edc20751eed0efec3c78da83
-```
-
-### Instance-safety result
-
-On 2026-08-10 the user created a new instance of the corrected complete component in Power Apps Studio and reported that the instance was created successfully and Studio remained stable.
-
-```text
-DEFINITION_ACCEPTED = PASS
-INSTANCE_SAFE       = PASS
-```
-
-No further reduction is justified unless a later regression reproduces the issue.
-
-### Final Block 02 smoke
-
-Before Block 03, perform one combined check rather than separate microtests:
-
-```text
-1. change one representative Text input
-2. toggle one representative Boolean visibility input
-3. execute one Event with a trivial Notify() binding
-4. visually confirm no clipping, unintended scrollbar or overlap
-```
-
-If the combined test passes:
-
-```text
-PUBLIC_CONTRACT_VALIDATED = PASS
-VISUAL_QA_VALIDATED       = PASS
-Block 02                  = VALIDATED
-Block 03                  = UNBLOCKED
-```
+This prevents the header from presenting interactions or timestamps that are not implemented yet.
 
 ## Diagnostic efficiency rule
 
@@ -186,15 +154,5 @@ Do not request property-by-property microtests while repository comparison can p
 ## Construction policy
 
 No dependent block advances while its dependency has a failed or unvalidated runtime gate.
-
-A reusable component may be consumed by a screen only after:
-
-```text
-SOURCE_VALID
-→ DEFINITION_ACCEPTED
-→ INSTANCE_SAFE
-→ PUBLIC_CONTRACT_VALIDATED
-→ VISUAL_QA_VALIDATED
-```
 
 Power Apps Studio + App Checker remain the acceptance authority.
