@@ -14,6 +14,14 @@ Static repository review can confirm patterns and existing control versions, but
 
 No block may be reported as compiled merely because its YAML looks structurally valid.
 
+Reusable components have an additional validation dimension: a component definition can be accepted while inserting an instance still fails or destabilizes Studio. Therefore component source validation and instance-safety validation are separate gates.
+
+Normative gate:
+
+```text
+docs/development/POWER_APPS_COMPONENT_VALIDATION_GATE.md
+```
+
 ---
 
 ## 2. Confirmed control families in the audited baseline
@@ -164,6 +172,66 @@ Preventive rule:
 
 Status: **confirmed**.
 
+### PA-COMP-012 — Component definition acceptance does NOT prove instance safety
+
+Confirmed as a process/compatibility rule during HOME_PDS Block 02 on 2026-08-10.
+
+Observed effect:
+
+```text
+Power Apps Studio closed when an instance of cmp_PageHeaderPro was inserted into scr_Home_PDS.
+```
+
+Important distinction:
+
+```text
+component source exists
+        ≠
+component definition can be created/saved
+        ≠
+component instance can be inserted safely
+        ≠
+component is ready for target-screen integration
+```
+
+Confirmed cause:
+
+```text
+UNKNOWN — not yet isolated.
+```
+
+Do not assign the crash to `ModernText`, event properties, ManualLayout, sibling geometry or any other specific pattern until a reduced reproducer proves it.
+
+Preventive rule:
+
+Every reusable component must pass the separate validation sequence:
+
+```text
+static source review
+→ isolated component-definition validation
+→ isolated default-instance insertion
+→ public contract smoke test
+→ visual/App Checker validation
+→ target-screen integration
+```
+
+If Studio closes during isolated instance insertion:
+
+- mark the component `REVIEW_REQUIRED`;
+- mark the dependent feature block `failed`/`blocked`;
+- do not insert the component into the target screen again;
+- reduce the component incrementally until the smallest crashing surface is isolated;
+- record Session ID / exact action / environment when available;
+- only restore normal reuse status after instance-safety revalidation.
+
+Normative reference:
+
+```text
+docs/development/POWER_APPS_COMPONENT_VALIDATION_GATE.md
+```
+
+Status: **confirmed effect and preventive rule; technical root cause pending isolation**.
+
 ---
 
 ## 4. Reusable component observations
@@ -196,6 +264,18 @@ Consumes a table of action definitions. Home_PDS must provide its own action sem
 
 Exposes external rows/pagination/sorting/selection contracts. Backend/page orchestration belongs to Home_PDS services, not the component.
 
+### `cmp_PageHeaderPro`
+
+Current status: `REVIEW_REQUIRED`.
+
+Static source review found no already-known schema violation, but instance insertion previously closed Studio. Do not use it in Block 03 until the instance-safety gate is validated.
+
+Validation report:
+
+```text
+docs/development/screens/home-pds/CMP_PAGE_HEADER_PRO_VALIDATION_REPORT_2026-08-10.md
+```
+
 ---
 
 ## 5. New-rule template
@@ -207,11 +287,11 @@ ID: PA-COMP-NNN
 Block: NN
 Control/version:
 Property/pattern:
-Studio error:
-Confirmed cause:
-Compatible replacement:
+Studio error/effect:
+Confirmed cause or UNKNOWN:
+Compatible replacement / diagnostic action:
 Commit fixing issue:
-Status: confirmed
+Status: confirmed | effect confirmed / cause pending
 ```
 
 A new compatibility error blocks the next dependent functional block until corrected and revalidated.
