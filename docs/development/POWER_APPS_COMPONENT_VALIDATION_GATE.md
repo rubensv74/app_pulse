@@ -2,7 +2,7 @@
 
 **Status:** normative  
 **Canonical:** yes  
-**Version:** 1.2  
+**Version:** 1.3  
 **Last reviewed:** 2026-08-10
 
 ## Purpose
@@ -20,7 +20,9 @@ VISUAL_QA_VALIDATED
 READY_FOR_INTEGRATION
 ```
 
-`CustomProperties:` is allowed in canonical Source Code when its schema is derived from an instance-safe PULSE reference. Working `cmp_HeatMapPro` and `cmp_SidebarNav` prove that Source-Code-authored Inputs, Outputs and Events can be valid in the active application.
+`DEFINITION_ACCEPTED` never implies `INSTANCE_SAFE`.
+
+`CustomProperties:` is allowed in canonical Source Code when its structure follows patterns already demonstrated by instance-safe PULSE components. `cmp_HeatMapPro` and `cmp_SidebarNav` prove that Source-Code-authored Inputs, Outputs, Tables and Events can be valid in the active application.
 
 ---
 
@@ -32,9 +34,11 @@ Before giving a component YAML to the user, verify:
 [ ] source starts at a demonstrated PaYaml root (`ComponentDefinitions:`)
 [ ] component identity is unique and consistent
 [ ] every control family/version is demonstrated in the current repository or explicitly validated
-[ ] public property declarations follow a known-good PULSE component pattern
-[ ] Input metadata shape is compared with a working reference (PropertyKind / DisplayName / Description / DataType / Default)
+[ ] closest INSTANCE_SAFE PULSE reference component has been identified
+[ ] public property declarations are compared structurally with that reference
+[ ] Input metadata shape is checked field by field (PropertyKind / DisplayName / Description / DataType / Default)
 [ ] Output/Event declarations follow a known-good declaration of the same kind
+[ ] body formulas and control patterns are compared with positive references where possible
 [ ] no protocol operation label is represented as an invalid PaYaml node
 [ ] no unsupported property already recorded in compatibility registers is present
 [ ] no hidden global variable is used as per-instance state unless explicitly audited
@@ -73,7 +77,7 @@ Pass condition:
 COMPONENT_DEFINITION_ACCEPTED
 ```
 
-If Studio rejects the definition or closes, stop and reduce the candidate.
+If Studio rejects the definition or closes, stop before screen integration.
 
 ---
 
@@ -150,25 +154,109 @@ confirm no regression in fallback/current screen
 
 ---
 
-## Failure isolation
+## Failure strategy — positive reference first
 
-When a component fails, compare it first with the closest **working component reference** rather than generalizing from one failed experiment.
+When a full component reaches `FAIL_INSTANCE`, **do not begin with a property-by-property microtest chain** while a comparable PULSE component already works.
 
-Recommended reduction:
+Mandatory order:
 
 ```text
-A  component shell/root
-B  primitive child controls
-C  one public Input copied structurally from a working reference
-D  binding to that Input
-E  remaining property types incrementally
-F  outputs/events
-G  final hit surfaces/layout geometry
+PROBLEM COMPONENT
+        ↓
+find closest PULSE INSTANCE_SAFE component(s)
+        ↓
+full structural diff
+        ↓
+identify objective deltas
+        ↓
+correct COMPLETE component using known-good patterns
+        ↓
+ONE isolated smoke test
+        ↓
+PASS → continue development
+FAIL → controlled reduction
 ```
 
-For each failing stage, inspect the delta against `cmp_HeatMapPro`, `cmp_SidebarNav` or another proven equivalent.
+### Full structural diff must cover
 
-Manual creation of an equivalent property in Studio may be used as a comparator if a Source Code declaration fails, but that comparison does **not** prove that `CustomProperties:` is generally unsupported.
+Public contract:
+
+```text
+Inputs:  PropertyKind / DisplayName / Description / DataType / Default
+Outputs: PropertyKind / DataType and proven metadata variant
+Events:  PropertyKind / ReturnType / Default and proven metadata variant
+```
+
+Component body:
+
+```text
+component-property bindings
+calculated outputs
+OnReset / Set(...)
+Gallery Items / Table schemas
+ThisItem / Selected
+LookUp / AddColumns / SortByColumns
+Event invocation
+transparent hit surfaces
+control families and versions
+unsupported properties
+parent/sibling geometry dependencies
+```
+
+### Positive-counterexample rule
+
+Before promoting a theory such as:
+
+```text
+CustomProperties are incompatible
+Events are incompatible
+ModernText is incompatible
+Gallery inside this component is incompatible
+```
+
+search the current PULSE component set for an `INSTANCE_SAFE` component already using the same construction.
+
+If such a component exists, the construction cannot be declared generally incompatible. Investigate the delta between the working and failing components.
+
+### When reduction is allowed
+
+Reduction begins only if the corrected complete component still fails, or if no sufficiently comparable positive reference exists.
+
+Reduction must follow the differential found against the working reference rather than an arbitrary academic sequence.
+
+Example:
+
+```text
+working reference
+vs
+problem component
+      ↓
+remaining structural delta
+      ↓
+remove/replace ONE delta
+      ↓
+smoke test
+```
+
+Manual creation of an equivalent property in Studio may be used as a comparator when necessary, but it must not be generalized beyond the specific evidence obtained.
+
+---
+
+## Efficiency rule
+
+Runtime checks requested from the user must have a clear decision consequence.
+
+Do not ask for repeated microtests if repository comparison can eliminate or correct the suspected delta first.
+
+Preferred diagnostic outcome:
+
+```text
+1 comparative audit
+1 corrected full candidate
+1 smoke test
+```
+
+Only expand the test sequence after that smoke test fails.
 
 ---
 
@@ -179,16 +267,16 @@ For every failed component gate record:
 ```text
 Component
 Canonical source SHA/commit
-Known-good reference component
+Known-good reference component(s)
 Studio/environment
 Action being performed
 Observed effect/error
 Session ID if available
-Property/control delta versus reference
+Full structural delta versus reference
+Corrective full-component change
 Instance insertion status
 App Checker status
 Confirmed technical cause or UNKNOWN
-Corrective change
 Revalidation result
 ```
 
