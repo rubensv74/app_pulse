@@ -27,6 +27,7 @@ Do not treat a recently modified historical document as authoritative merely bec
 - `design-system/PULSE_DESIGN_SYSTEM.md` — canonical PULSE visual/interaction system.
 - `design-system/SAAS_INTERFACE_ARCHETYPES.md` — SaaS interface archetype specification.
 - `design-system/POWER_APPS_VISUAL_QA_GUARDRAILS.md` — visual QA rules learned from Studio validation.
+- `design-system/COMPONENT_CATALOG.md` — lifecycle and reuse guidance for reusable components.
 - `design-system/components/` — reusable PDS component specifications.
 
 ## Development method
@@ -77,9 +78,15 @@ This is a known repository issue. The canonical target is documented in `governa
 
 `guides/` currently contains both genuine guides and historical material. Until migration is completed, prefer current normative/specification documents when overlap exists.
 
-In particular:
+`guides/DESIGN_SYSTEM.md` is retained only as a compatibility redirect and is explicitly superseded by `design-system/PULSE_DESIGN_SYSTEM.md`.
 
-- `guides/DESIGN_SYSTEM.md` is **not** the canonical PDS document; use `design-system/PULSE_DESIGN_SYSTEM.md`.
+## Archive
+
+Historical deliveries are now stored under:
+
+- `archive/deliveries/`
+
+Archived content is retained for traceability and must not be treated as current implementation authority.
 
 ---
 
@@ -87,10 +94,20 @@ In particular:
 
 Repository cleanup is being executed incrementally to avoid breaking Power Apps, SQL and documentation references.
 
-Current audit:
+Completed in Phase 0 / initial cleanup:
 
-- `analysis/repository/REPOSITORY_AUDIT_2026-08-10.md`
+- root README created;
+- documentation index created;
+- repository structure standard published;
+- repository audit published;
+- stale EPIC-01 delivery files removed from root and archived;
+- old `guides/DESIGN_SYSTEM.md` converted to a superseded compatibility stub;
+- component lifecycle catalog created.
 
-Current organization standard:
+Pending controlled migrations:
 
-- `governance/REPOSITORY_STRUCTURE_STANDARD.md`
+- Punch Review construction workspace → `development/screens/punch-review/`;
+- SQL consolidation;
+- remaining guide/sprint/archive cleanup;
+- component usage audit before physical legacy moves;
+- final stale-link search and retrieval QA.
