@@ -1,7 +1,7 @@
 # Power Apps Visual QA Guardrails
 
 **Status:** Normative  
-**Version:** 1.0  
+**Version:** 1.1  
 **Scope:** PULSE Canvas Power Apps screens and reusable components  
 **Applies to:** humans, ChatGPT, Codex and other agents producing Power Apps Source Code / Power Fx
 
@@ -11,9 +11,9 @@
 
 This document records recurring **visible UI defects** found during real Power Apps Studio validation and converts them into reusable implementation and acceptance rules.
 
-The goal is not to document isolated cosmetic incidents. The goal is to prevent small implementation details from degrading the perceived quality of otherwise well-designed SaaS interfaces.
+A block can be functionally correct and still fail its visual gate.
 
-Every new or modified PULSE screen/component must use this document as a visual QA reference together with:
+Use this document together with:
 
 ```text
 docs/design-system/PULSE_DESIGN_SYSTEM.md
@@ -21,241 +21,238 @@ docs/design-system/SAAS_INTERFACE_ARCHETYPES.md
 docs/development/PROTOCOLO_CONSTRUCCION_MODULAR_PANTALLAS_POWER_APPS.md
 ```
 
-A block can be functionally correct and still fail its visual gate.
-
 ---
 
-# 2. Non-negotiable principle
+## 2. Non-negotiable principle
 
 > **Static UI text must never display an unintended scrollbar.**
 
-Scrollbars are valid only when scrolling is an intentional part of the interaction model: scroll containers, long editable text, lists, galleries, tables or other explicitly scrollable regions.
+Scrollbars are valid only where scrolling is an intentional interaction: scroll containers, long editable text, lists, galleries, tables or explicit scroll regions.
 
-A scrollbar inside a title, label, metadata line, field value, badge, KPI caption, context selector or other static text surface is a visual defect.
+A scrollbar inside a title, subtitle, metadata line, field label/value, badge, KPI caption, context selector or other static text surface is a visible defect.
 
 ---
 
-# 3. VQA-001 — Small text control shows internal scrollbar
+## 3. VQA-001 — Static ModernText shows an internal mini-scrollbar
 
-## Origin
+### Origin
 
-First formally recorded during Studio validation of:
+First formally detected during Studio validation of:
 
 ```text
-Screen construction: HOME_PDS
-Block: 02 — PDS Page Header
+HOME_PDS
+Block 02 / 02A
 Component: cmp_PageHeaderPro
-Date: 2026-08-07
 ```
 
-## Observed symptom
+### Evidence
 
-Compact `ModernText` controls used for context labels and values displayed very small vertical scrollbars.
+Two successive Studio validations showed the same visual defect:
 
-The component layout, colors and spacing were otherwise correct, but the scrollbars produced an obvious visual-quality defect.
+1. compact `ModernText` with small fixed heights produced internal scrollbars;
+2. increasing the fixed height and setting `Wrap=false` while keeping `AutoHeight=false` did **not** reliably remove them.
 
-This type of defect is easy to miss in Source Code review and immediately visible in Studio.
+Therefore the previous assumption —that a sufficiently large fixed height was an adequate default for compact `ModernText`— is rejected for new PULSE UI.
 
-## Typical cause
+### Confirmed preventive rule
 
-The risk appears when a text control combines:
+For **static `ModernText@1.0.0`** controls in reusable PULSE components/screens:
 
 ```text
-small font
-+ fixed Height
-+ wrapping/overflow behavior
-+ insufficient vertical room for the rendered line box
+AutoHeight = true
 ```
 
-The numeric font size alone is not sufficient to determine a safe control height. Rendering, line metrics, browser scaling and control implementation can make a seemingly adequate fixed height too small.
+is the **default**.
 
-Microsoft documents `AutoHeight` for the modern Text control specifically to let the control increase its height when its content exceeds the visible area.
-
-Reference:
+If the visual contract is intentionally one line, combine it with:
 
 ```text
-https://learn.microsoft.com/power-apps/maker/canvas-apps/controls/modern-controls/modern-control-text
+AutoHeight = true
+Wrap       = false
 ```
 
-Microsoft also records improvements related to AutoHeight and unintended scrollbars in the modern Text control. This reinforces the rule that text sizing must be explicit rather than assumed.
+A fixed `Height` may remain as base/minimum geometry, but it must not be relied upon as the only overflow protection.
+
+### Exception
+
+`AutoHeight=false` is allowed only when all of the following are true:
+
+```text
+- the rigid height is functionally necessary;
+- the exact control/version has been validated in Power Apps Studio;
+- no vertical or horizontal scrollbar appears;
+- no clipping appears at normal zoom and agreed zoom checks;
+- the exception is documented when used in a reusable component.
+```
+
+The burden of proof is therefore on the fixed-height exception, not on AutoHeight.
 
 ---
 
-# 4. Mandatory text sizing strategy
+## 4. Text strategies
 
-Every static text control must deliberately use one of the following two modes.
+Every static text control must have an explicit overflow strategy.
 
-## MODE A — CONTENT_DRIVEN
+### A. CONTENT_DRIVEN
 
-Use when the complete text must remain visible and vertical growth is acceptable.
+Use when full content should remain visible and vertical growth is acceptable.
+
+```text
+AutoHeight = true
+Wrap       = true
+```
 
 Typical uses:
 
-- page subtitle;
-- panel explanatory text;
 - descriptions;
+- explanations;
 - validation messages;
-- empty/error-state explanations;
-- comments or read-only narrative content;
-- labels whose content can legitimately wrap.
+- empty/error-state copy;
+- comments/read-only narrative;
+- subtitles that may legitimately wrap.
 
-Preferred pattern when supported by the control:
+The parent layout must be able to accommodate growth.
 
-```yaml
-AutoHeight: =true
-Wrap: =true
+### B. SINGLE_LINE_AUTOHEIGHT
+
+**Preferred PULSE pattern for compact static ModernText.**
+
+```text
+AutoHeight = true
+Wrap       = false
 ```
-
-The parent layout must also be capable of accommodating the resulting height.
-
-Do not enable AutoHeight inside a rigid container without checking the effect on sibling controls and the parent height.
-
----
-
-## MODE B — SINGLE_LINE_CONSTRAINED
-
-Use when the UI contract requires one compact line.
 
 Typical uses:
 
+- page titles designed as one line;
 - context-selector labels;
 - context-selector values;
 - metadata;
-- table headers;
 - compact field labels;
 - KPI captions;
-- pills/badges where applicable;
-- toolbar labels.
+- toolbar labels;
+- textual chevrons/compact static glyphs when ModernText is used.
 
-Pattern:
+Width overflow must have an intentional strategy: wider control, truncation/clipping where supported, tooltip/detail surface, or different layout.
 
-```yaml
-AutoHeight: =false
-Wrap: =false
-Height: =[validated safe height]
+### C. FIXED_HEIGHT_EXCEPTION
+
+```text
+AutoHeight = false
+Wrap       = false
+Height     = Studio-validated value
 ```
 
-The fixed height must be validated in Studio. It must not be chosen only from the font-size number.
-
-If meaningful dynamic text may exceed the available width, the design must define the intended behavior explicitly: wider control, clipping/truncation, tooltip/detail surface or a different layout. It must not accidentally become an internal scroll region.
+Use only as a documented exception after Studio validation.
 
 ---
 
-# 5. Prohibited pattern
+## 5. Prohibited risk pattern
 
-The following combination is a visual-risk pattern and must not be introduced without explicit Studio validation:
+Do not introduce this pattern as a default:
 
 ```text
 ModernText
-+ small font (especially 8–10)
-+ small fixed Height
-+ Wrap/default overflow behavior
++ small font
++ fixed Height
++ AutoHeight=false
 ```
 
-A reusable component containing this pattern cannot pass visual QA merely because formulas are valid.
+Adding `Wrap=false` or a few pixels of extra height does not by itself make this safe.
 
 ---
 
-# 6. PULSE default guidance for compact text
+## 6. Guidance for compact PDS text
 
-These values are **starting geometry**, not substitutes for Studio validation.
+The following numbers are geometry starting points, not validation substitutes.
 
-| PDS text role | Font size | Recommended strategy | Initial safe-height target |
-|---|---:|---|---:|
-| Page title | 20 | CONTENT_DRIVEN or validated fixed | 28–32 |
-| Page subtitle | 10 | CONTENT_DRIVEN | 20–24 |
-| Section title | 12 | SINGLE_LINE or CONTENT_DRIVEN | 22–24 |
-| Panel subtitle | 9 | CONTENT_DRIVEN | 18–22 |
-| Body/value | 9 | Depends on contract | 20–24 |
-| Label/metadata | 8 | SINGLE_LINE or CONTENT_DRIVEN | 18–20 |
-| Badge | 8 | SINGLE_LINE_CONSTRAINED | container-driven |
-| KPI label | 10 | SINGLE_LINE or CONTENT_DRIVEN | 20–24 |
+| PDS role | Font | Default strategy |
+|---|---:|---|
+| Page title | 20 | SINGLE_LINE_AUTOHEIGHT or CONTENT_DRIVEN |
+| Page subtitle | 10 | SINGLE_LINE_AUTOHEIGHT or CONTENT_DRIVEN |
+| Section title | 12 | SINGLE_LINE_AUTOHEIGHT |
+| Panel subtitle | 9 | CONTENT_DRIVEN when wrapping is possible |
+| Body/value | 9 | CONTENT_DRIVEN or SINGLE_LINE_AUTOHEIGHT according to contract |
+| Label/metadata | 8 | SINGLE_LINE_AUTOHEIGHT |
+| KPI label | 10 | SINGLE_LINE_AUTOHEIGHT |
 
-If a tested component needs more height than this table suggests, the tested value wins.
-
-The PDS typography floor remains unchanged: new reusable UI text must not use sizes below 8 unless a documented exception exists.
+The PDS typography floor remains unchanged: new reusable UI text should not use sizes below 8 without a documented exception.
 
 ---
 
-# 7. Current Page Header application
+## 7. Page Header application
 
-For `cmp_PageHeaderPro`, the intended contract is:
+For `cmp_PageHeaderPro` the intended text contract is now:
 
 ```text
-Title                  CONTENT_DRIVEN / adequate fixed height
-Subtitle               CONTENT_DRIVEN / adequate fixed height
-Context labels         SINGLE_LINE_CONSTRAINED
-Context values         SINGLE_LINE_CONSTRAINED
-Chevron                 fixed icon/text geometry
-Utility buttons         fixed control geometry
+Title          AutoHeight=true + Wrap=false
+Subtitle       AutoHeight=true + Wrap=false
+Context label  AutoHeight=true + Wrap=false
+Context value  AutoHeight=true + Wrap=false
+Chevron text   AutoHeight=true + Wrap=false
 ```
 
-For the compact context labels/values, explicitly disable wrapping and allocate a Studio-validated safe height.
-
-Recommended correction starting point for the current component:
-
-```text
-Context label:  Size 8, Height 18, Wrap false
-Context value:  Size 9, Height 22, Wrap false
-```
-
-Reposition the value if required so both lines remain vertically balanced inside the 52 px context surface.
-
-Do not consider these numbers validated until the actual component is checked in Studio.
+This rule is implemented in HOME_PDS Block `02A_page_header_text_overflow_fix.pa.yaml` and must be visually revalidated in Studio before Block 02 closes.
 
 ---
 
-# 8. Visual QA gate for text controls
+## 8. Mandatory visual QA gate for text
 
-Every component/screen visual gate must include the following checks:
+Every component/screen visual gate must include:
 
 ```text
 [ ] No unintended vertical scrollbar inside static text.
 [ ] No unintended horizontal scrollbar inside static text.
-[ ] No text is clipped vertically at normal browser zoom.
-[ ] Text remains legible at 125% browser zoom.
-[ ] Critical/static text remains usable at 150% browser zoom where feasible.
-[ ] Dynamic values have an explicit overflow strategy.
-[ ] Long realistic content has been tested where the field is data-driven.
-[ ] Blank/null content does not collapse or distort the layout unexpectedly.
-[ ] AutoHeight controls do not overlap siblings or escape their parent layout.
-[ ] Fixed-height text controls have been visually validated in Studio.
+[ ] No text clipped vertically at normal zoom.
+[ ] Static ModernText uses AutoHeight=true by default.
+[ ] Any AutoHeight=false exception has explicit Studio evidence.
+[ ] Dynamic values have an explicit width-overflow strategy.
+[ ] Long realistic content has been tested where data-driven.
+[ ] Blank/null content does not distort the layout.
+[ ] AutoHeight growth does not overlap siblings or escape the parent.
+[ ] Layout remains legible at 125% zoom.
+[ ] Critical content is checked at 150% when feasible.
 ```
 
-The absence of App Checker errors does **not** satisfy these visual checks.
+App Checker success does not satisfy this gate.
 
 ---
 
-# 9. Agent implementation rule
+## 9. Agent implementation rule
 
-Before publishing any reusable Power Apps component or screen block, the implementing agent must inspect every text-bearing control and classify it as:
+Before publishing a reusable Power Apps component or screen block, the implementing agent must inspect **every text-bearing control**.
+
+For `ModernText@1.0.0`, the default generation rule is:
 
 ```text
-CONTENT_DRIVEN
-or
-SINGLE_LINE_CONSTRAINED
+static text → AutoHeight=true
 ```
 
-The agent must not rely on an implicit/default text-overflow behavior.
+Then choose deliberately:
 
-When reviewing existing Source Code, a text control with a small fixed `Height` and no explicit sizing/overflow strategy must be treated as a visual QA risk.
+```text
+Wrap=true   → content may grow to multiple lines
+Wrap=false  → one-line visual contract
+```
 
-If Studio evidence reveals an unintended scrollbar, the current block remains `corrected` / `pending revalidation`; the defect must not be carried into the next dependent block as accepted behavior.
+An agent must not generate `AutoHeight=false` for static ModernText merely to keep a compact layout unless that pattern is already proven safe for that exact control in Studio.
 
----
-
-# 10. Lessons-learned register
-
-| ID | Date | Origin | Lesson | Preventive rule |
-|---|---|---|---|---|
-| VQA-001 | 2026-08-07 | HOME_PDS Block 02 / `cmp_PageHeaderPro` | Small fixed-height text controls can expose internal scrollbars even when the layout otherwise appears correct | Every static text control must use an explicit content-driven or single-line sizing strategy and pass the no-scrollbar Studio gate |
-
-Future recurring visual defects should be added to this register and expanded into a dedicated rule when they can affect more than one screen/component.
+If Studio shows an internal scrollbar, the block remains open and the defect must be corrected before dependent blocks treat the implementation as canonical.
 
 ---
 
-# 11. Acceptance statement
+## 10. Lessons-learned register
 
-A PULSE screen is not visually complete when it merely has correct colors, fonts, spacing and component placement.
+| ID | Origin | Lesson | Preventive rule |
+|---|---|---|---|
+| VQA-001 | HOME_PDS Block 02/02A · `cmp_PageHeaderPro` | Fixed-height ModernText can show mini-scrollbars; increasing Height + `Wrap=false` is not a reliable cure | Static ModernText defaults to `AutoHeight=true`; fixed-height usage is an exception requiring Studio proof |
 
-It must also be free of implementation artifacts such as unintended scrollbars, clipping, overlap, hidden focus states, accidental wrapping, inconsistent alignment and other small defects that materially reduce perceived SaaS quality.
+Future recurring defects must be added here and promoted into a dedicated rule when reusable across screens/components.
+
+---
+
+## 11. Acceptance statement
+
+A PULSE interface is not visually complete merely because its formulas, colors, fonts and component placement are correct.
+
+It must also be free of implementation artifacts such as unintended scrollbars, clipping, overlap, accidental wrapping, hidden focus states and inconsistent alignment that reduce perceived enterprise SaaS quality.
