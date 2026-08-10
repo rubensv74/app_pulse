@@ -24,8 +24,9 @@ A required component must never exist only in chat, a construction block, tempor
 ## Lifecycle states
 
 ```text
-ACTIVE            preferred current reuse candidate
-PDS_CANDIDATE     active component being aligned to PDS
+ACTIVE            preferred current reuse candidate; instance-safe validation completed
+PDS_CANDIDATE     active PDS-aligned component whose required integration validation has passed for current use
+REVIEW_REQUIRED   source exists but compatibility/definition/instance-safety validation is incomplete or has failed
 LEGACY_SUPPORTED  live runtime dependency awaiting validated migration; do not select for new work
 ```
 
@@ -38,7 +39,7 @@ LEGACY_SUPPORTED  live runtime dependency awaiting validated migration; do not s
 | `cmp_EmptyState` | PDS_CANDIDATE | Preferred empty/error state base; continue visual hardening |
 | `cmp_HeatMapPro` | PDS_CANDIDATE | Preferred heatmap component |
 | `cmp_KpiCardPro` | PDS_CANDIDATE | Preferred KPI card for new PDS work |
-| `cmp_PageHeaderPro` | PDS_CANDIDATE | Canonical source: `power-apps/components/cmp_PageHeaderPro.pa.yaml`; Home_PDS header component. Spec: `docs/design-system/components/CMP_PAGE_HEADER_PRO.md` |
+| `cmp_PageHeaderPro` | REVIEW_REQUIRED | Canonical source exists at `power-apps/components/cmp_PageHeaderPro.pa.yaml`, but Studio previously closed when an instance was inserted into `scr_Home_PDS`. Static review is required and isolated instance validation must pass before normal screen integration. Spec: `docs/design-system/components/CMP_PAGE_HEADER_PRO.md` |
 | `cmp_PieChartPro` | PDS_CANDIDATE | Preferred composition chart for Home_PDS discipline distribution |
 | `cmp_SidebarNav` | ACTIVE | Current shared navigation component |
 | `cmp_SkeletonLoader` | PDS_CANDIDATE | Preferred loading placeholder base |
@@ -48,14 +49,15 @@ LEGACY_SUPPORTED  live runtime dependency awaiting validated migration; do not s
 
 ## Rules
 
-1. New work should prefer `ACTIVE` or `PDS_CANDIDATE` components.
-2. `LEGACY_SUPPORTED` means “currently required but scheduled for removal after a validated migration”, not “approved for reuse”.
-3. Before removing a component, audit references from canonical screens/components.
-4. When a new reusable component is required, create its canonical source under `power-apps/components/` and update this catalog in the same development cycle.
-5. Reusable PDS component specifications belong under `docs/design-system/components/`.
-6. A suffix such as `_old` is not lifecycle authority; this catalog is.
-7. GitHub source existence does not prove the component is installed in the active Power Apps application; Studio validation is separate.
-8. Once a component has no current dependency or approved active use, remove it from the working tree rather than preserving an inactive copy.
+1. New work should normally prefer `ACTIVE` or a `PDS_CANDIDATE` whose required validation gate has passed.
+2. `REVIEW_REQUIRED` blocks normal screen integration until `docs/development/POWER_APPS_COMPONENT_VALIDATION_GATE.md` is satisfied.
+3. `LEGACY_SUPPORTED` means “currently required but scheduled for removal after a validated migration”, not “approved for reuse”.
+4. Before removing a component, audit references from canonical screens/components.
+5. When a new reusable component is required, create its canonical source under `power-apps/components/` and update this catalog in the same development cycle.
+6. Reusable PDS component specifications belong under `docs/design-system/components/`.
+7. A suffix such as `_old` is not lifecycle authority; this catalog is.
+8. GitHub source existence does not prove the component is installed or safe to instantiate in the active Power Apps application; Studio validation is separate.
+9. Once a component has no current dependency or approved active use, remove it from the working tree rather than preserving an inactive copy.
 
 ## Current migration implications
 
@@ -63,4 +65,4 @@ The parallel Home_PDS strategy preserves `scr_Home` as fallback during construct
 
 Punches currently depends on `cmp_DetailDrawer_old`; it remains until a replacement is implemented and Studio-validated.
 
-`cmp_SmartFilterBarPro` had no canonical-screen usage and no approved active Home_PDS/Punch Review role, so it was removed from the active source pool on 2026-08-10. Its history remains available through Git.
+`cmp_PageHeaderPro` remains canonical source because it is approved active work, but its lifecycle is temporarily `REVIEW_REQUIRED` until the instance-safety incident is isolated and the component validation gate passes.
