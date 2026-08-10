@@ -1,20 +1,22 @@
 # Fase 7 — Punch Review Workspace
 
+**Status:** active development workspace  
+**Canonical runtime screen:** `main/screens/PunchReview/scr_PunchReview.pa.yaml`  
+**Construction workspace:** `docs/development/screens/punch-review/`
+
 Esta carpeta contiene los bloques incrementales para construir `scr_PunchReview` en Power Apps Studio sin pegar una pantalla monolítica.
 
-## Rama de publicación
+## Ubicación canónica
 
-Los bloques listos para utilizar se publican directamente en `main`:
+Los bloques listos para utilizar se publican en:
 
 ```text
-main/punch-review/blocks/
+docs/development/screens/punch-review/blocks/
 ```
-
-## Regla de uso
 
 Los archivos de `blocks/` no sustituyen automáticamente los YAML canónicos de `main/screens`. Son bloques controlados para copiar en Studio o incorporar al archivo canónico después de validar cada incremento.
 
-Cada bloque indica:
+Cada bloque debe indicar:
 
 - archivo y control afectados;
 - operación exacta: crear, añadir como hijo o sustituir propiedad/control;
@@ -27,7 +29,7 @@ Cada bloque indica:
 Antes de redactar, corregir o publicar cualquier archivo `.pa.yaml` debe consultarse primero la versión actual de:
 
 ```text
-main/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
+docs/development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
 ```
 
 No se debe trabajar de memoria. Cada nuevo error confirmado se incorpora a ese archivo y se convierte en una regla preventiva para los siguientes bloques.
@@ -129,24 +131,7 @@ Review Progress es un indicador exclusivamente local de la sesión y se calcula 
 colPunchReviewQueue
 ```
 
-Usa:
-
-```text
-IsReviewedInSession
-```
-
-para separar:
-
-```text
-Reviewed
-Remaining
-```
-
-El porcentaje central se calcula como:
-
-```text
-Reviewed / Total queue
-```
+Usa `IsReviewedInSession` para separar `Reviewed` y `Remaining`. El porcentaje central se calcula como `Reviewed / Total queue`.
 
 No utiliza flows, SQL ni la colección filtrada visible. Por diseño, cambiar entre `All`, `Remaining` y `Reviewed` no altera el porcentaje: el denominador sigue siendo la cola completa cargada.
 
@@ -154,23 +139,21 @@ No utiliza flows, SQL ni la colección filtrada visible. Por diseño, cambiar en
 
 La primera versión del Bloque 11 intentó instanciar `cmp_DonutPro` antes de que el componente estuviera instalado en la app activa. Studio devolvió `PA2301`.
 
-`cmp_DonutPro` ya ha sido añadido a la biblioteca de componentes de la app. Por tanto, la versión vigente de `11_review_progress.replace-control.pa.yaml` vuelve a utilizar:
+`cmp_DonutPro` ya ha sido añadido a la biblioteca de componentes de la app. La versión vigente de `11_review_progress.replace-control.pa.yaml` puede utilizar:
 
 ```yaml
 Control: CanvasComponent
 ComponentName: cmp_DonutPro
 ```
 
-El bloque de pantalla ya no contiene ninguna implementación SVG propia.
-
-El componente representa progreso de **revisión de la sesión**, no progreso de cierre técnico del Punch.
+El bloque de pantalla no contiene una implementación SVG propia. El componente representa progreso de **revisión de la sesión**, no progreso de cierre técnico del Punch.
 
 ## Manual de usuario
 
 El manual funcional en español se mantiene en:
 
 ```text
-main/punch-review/user-guide/MANUAL_USUARIO_PUNCH_REVIEW.md
+docs/development/screens/punch-review/user-guide/MANUAL_USUARIO_PUNCH_REVIEW.md
 ```
 
 Es un documento vivo y debe actualizarse cuando se valida una nueva función de la pantalla.
@@ -186,7 +169,7 @@ Español | English
 Antes de crear o modificar un bloque debe revisarse:
 
 ```text
-main/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
+docs/development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
 ```
 
 Reglas confirmadas:
@@ -227,9 +210,11 @@ Para una píldora redondeada se utiliza un `GroupContainer@1.5.0` con radios y u
 
 Las referencias visuales y funcionales se basan en:
 
+- `main/screens/PunchReview/scr_PunchReview.pa.yaml` — fuente canónica de la pantalla.
 - `main/screens/Home/scr_Home.pa.yaml`
 - `main/screens/Punches/scr_Punches_1.pa.yaml`
 - `main/components/cmp_SidebarNav.pa.yaml`
-- `main/components/cmp_DetailDrawer_old.pa.yaml`
 - `main/components/cmp_DonutPro.pa.yaml`
-- resto de componentes actualizados en `main/components/`
+- resto de componentes actualizados en `main/components/`.
+
+Los bloques de esta carpeta son artefactos de construcción, no sustitutos de la fuente canónica completa de `main/screens/PunchReview/`.
