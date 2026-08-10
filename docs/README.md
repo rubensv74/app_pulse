@@ -6,7 +6,7 @@ This file is the canonical entry point for repository documentation.
 
 When several files appear to cover the same topic, use this order:
 
-1. **Canonical runtime/source** — `power-apps/`, `sql/`, `office-scripts/`
+1. **Canonical runtime/source** — `power-apps/`, `power-automate/`, `sql/`, `office-scripts/`
 2. **Governance / normative standards**
 3. **Current architecture / Design System**
 4. **Active specifications**
@@ -69,6 +69,18 @@ Construction workspace:
 development/screens/punch-review/
 ```
 
+## Power Automate source
+
+Canonical active source area:
+
+```text
+../power-automate/
+├── flows/
+└── contracts/
+```
+
+Real active flow definitions are captured progressively from the Power Automate environment. Missing definitions are explicit coverage gaps; do not infer flow internals from Power Apps `.Run(...)` calls.
+
 ## Specifications
 
 Current Home modernization specification:
@@ -89,6 +101,7 @@ Analysis documents are point-in-time evidence, not implementation authority. Kee
 
 - `analysis/repository/REPOSITORY_AUDIT_2026-08-10.md`
 - `analysis/repository/COMPONENT_USAGE_AUDIT_2026-08-10.md`
+- `analysis/repository/POWER_AUTOMATE_SOURCE_GAP_DECISION_2026-08-10.md`
 
 The older Punch Review assessment set was removed after the current canonical screen and active incremental workspace superseded it.
 
@@ -108,13 +121,17 @@ reference/sql/warroom/
 
 ---
 
-## Active component creation rule
+## Active component creation and validation rule
 
 When current work requires a new reusable Power Apps component:
 
 1. create its canonical `.pa.yaml` source under `../power-apps/components/`;
 2. update `design-system/COMPONENT_CATALOG.md` in the same development cycle;
 3. for reusable PDS components, create/update a specification under `design-system/components/`;
-4. separately validate that the component is installed/accepted by Power Apps Studio.
+4. perform static compatibility review against proven repository Source Code patterns;
+5. create/import the component in isolation in Power Apps Studio;
+6. instantiate it in an isolated test screen before allowing an active screen to depend on it;
+7. run App Checker and visual QA;
+8. only then mark it ready for normal screen integration.
 
-A required component must not exist only in chat, a construction block or a temporary file.
+A required component must not exist only in chat, a construction block or a temporary file, and repository presence alone does not prove Studio readiness.
