@@ -1,69 +1,15 @@
 # cmp_PageHeaderPro Validation Report — 2026-08-10
 
-**Status:** `BLOCK 02 = VALIDATED FOR PROGRESSION`  
+**Status:** isolated component stable / host Source Code custom-property binding unresolved  
 **Component:** `cmp_PageHeaderPro`  
-**Primary instance-safe reference:** `cmp_HeatMapPro`  
-**Secondary instance-safe reference:** `cmp_SidebarNav`
+**Primary reference:** `cmp_HeatMapPro`  
+**Secondary reference:** `cmp_SidebarNav`
 
-## Original incident
+## 1. Original instance-safety incident
 
-The original full `cmp_PageHeaderPro` definition could be accepted by Power Apps Studio, but inserting an instance caused Studio to close.
+The original full component definition could be accepted, but inserting an instance closed Power Apps Studio.
 
-```text
-DEFINITION_ACCEPTED = PASS
-INSTANCE_SAFE       = FAIL
-```
-
-The technical cause was not proven and is not retroactively narrowed beyond the evidence.
-
-## Corrective method
-
-The component was compared structurally against PULSE components already known to be instance-safe before performing further reduction.
-
-```text
-PROBLEM COMPONENT
-      ↓
-find comparable PULSE INSTANCE_SAFE component
-      ↓
-full contract + body structural diff
-      ↓
-correct COMPLETE component
-      ↓
-one isolated smoke test
-      ↓
-only reduce if the corrected full component still fails
-```
-
-Primary comparison references:
-
-```text
-cmp_HeatMapPro
-cmp_SidebarNav
-```
-
-## Principal structural delta corrected
-
-The original header used reduced Input declarations such as:
-
-```yaml
-Title:
-  PropertyKind: Input
-  DataType: Text
-  Default: ="Punch Control Tower"
-```
-
-The stable PULSE references normally use the fuller Input contract shape:
-
-```yaml
-Title:
-  PropertyKind: Input
-  DisplayName: Title
-  Description: Component title
-  DataType: Text
-  Default: ="Heat Map"
-```
-
-The corrected `cmp_PageHeaderPro` models every Input using:
+After comparison against stable PULSE components, the public Input contract was normalized to the proven complete pattern:
 
 ```text
 PropertyKind
@@ -73,91 +19,99 @@ DataType
 Default
 ```
 
-and Events using the complete pattern demonstrated by stable PULSE components:
+Events were normalized to the complete stable event form.
 
-```text
-PropertyKind
-DisplayName
-Description
-ReturnType
-Default
-```
-
-This correction does **not** prove that `DisplayName` or `Description` are individually or universally mandatory. The demonstrated result is narrower: rebuilding the complete component contract from a known-good PULSE pattern removed the failing condition in this candidate.
-
-## Body comparison
-
-The remaining constructions either have positive precedents in stable PULSE components or passed prior reduced checks:
-
-```text
-GroupContainer@1.5.0                     → reduced PASS_A
-ModernText@1.0.0                         → reduced PASS_B
-Classic/Button@2.2.0                     → proven in stable PULSE components
-Event invocation from control            → proven in HeatMap / Sidebar
-Transparent hit surface                  → proven in Sidebar
-Component-property bindings              → proven extensively
-Sibling/parent geometry formulas         → proven pattern in PULSE layouts
-CustomProperties Text/Boolean/Color      → proven in HeatMap / Sidebar
-```
-
-No unsupported `AccessibleLabel` exists on `Classic/Button@2.2.0` and no `Label@2.5.1 + Radius*` incompatibility was introduced.
-
-## Corrected complete source
-
-Canonical source:
-
-```text
-power-apps/components/cmp_PageHeaderPro.pa.yaml
-```
-
-Correction commit:
-
-```text
-ccaccacd2de75263edc20751eed0efec3c78da83
-```
-
-The source is self-contained and includes the complete `CustomProperties:` contract plus body.
-
-## Studio result — 2026-08-10
-
-The user created a new instance of the corrected complete component in Power Apps Studio and reported that everything remained stable.
+The corrected complete component was then inserted successfully:
 
 ```text
 COMPONENT_DEFINITION_ACCEPTED = PASS
 INSTANCE_SAFE                 = PASS
 ```
 
-Confirmed consequence:
+The original crash cause is not retroactively narrowed beyond that evidence.
 
-> The corrected complete `cmp_PageHeaderPro`, modeled against the stable PULSE component contract pattern, can be instantiated without reproducing the Studio closure.
+## 2. Block 03 host integration incident
 
-No further reduction is justified unless a later regression reproduces the failure.
+Block 03 attempted to assign `cmp_PageHeaderPro` custom properties from screen Source Code.
 
-## Acceptance for progression
+Studio returned `PA2108 Unknown property` for all component-specific properties tested while accepting the generic `CanvasComponent` structure and standard properties such as `Height` / `Width`.
 
-After the instance-safe result, one compact representative contract/visual smoke was requested. The user then explicitly instructed to continue (`adelante`). This is recorded as acceptance for progression to Block 03.
-
-No separate App Checker screenshot or per-subcheck evidence was archived with that acceptance. If Block 03 exposes a contract or visual regression attributable to the header, Block 02 must be reopened rather than silently carrying the defect forward.
+Representative failures:
 
 ```text
-SOURCE_VALID               = PASS
-DEFINITION_ACCEPTED        = PASS
-INSTANCE_SAFE              = PASS
-BLOCK_02                   = VALIDATED FOR PROGRESSION
-BLOCK_03                   = UNBLOCKED
+Context1Interactive
+Context1Value
+Context2Interactive
+Context3Interactive
+Context3Value
+ShowHelp
+UtilityEnabled
 ```
 
-The component remains subject to normal integration QA in `scr_Home_PDS`.
+## 3. Edit-surface hypothesis refuted
 
-## Diagnostic efficiency rule retained
+The first failure occurred in a partial child/control Source Code edit surface. A second candidate, Block 03A, rebuilt the complete `scr_Home_PDS` under a full `Screens:` root.
+
+03A produced the same PA2108 pattern.
+
+Therefore:
 
 ```text
-problem component
-→ positive instance-safe PULSE reference
-→ full contract/body diff
-→ corrected complete component
-→ one smoke test
-→ reduction only if still failing
+partial edit surface is NOT sufficient to explain the failure
 ```
 
-This incident is closed unless a reproducible regression appears during integration.
+## 4. Positive PULSE reference
+
+`cmp_SidebarNav` demonstrates that PULSE can serialize custom component instance properties from screen Source Code. `scr_PunchReview` contains working assignments to `ActiveKey`, `ProjectCode`, `ProjectName`, `UserRole`, and other component properties.
+
+Thus the generic syntax is valid when the host resolves the component public contract.
+
+## 5. Current evidence model
+
+```text
+SOURCE_VALID                            PASS
+COMPONENT_DEFINITION_ACCEPTED           PASS
+INSTANCE_SAFE                           PASS
+HOST_SOURCE_CUSTOM_PROPERTY_RESOLUTION  FAIL / PA2108
+PUBLIC_CONTRACT_HOST_BINDING            NOT YET VALIDATED
+```
+
+Interpretation:
+
+> In the current app state, screen Source Code resolves `cmp_PageHeaderPro` as a generic CanvasComponent for host-side assignment but does not resolve its component-specific public properties.
+
+This does not prove the internal metadata/registration mechanism responsible.
+
+## 6. Block 03B corrective path
+
+Do not rewrite the component again and do not continue producing equivalent screen YAML variants.
+
+Use:
+
+```text
+base instance with only standard CanvasComponent properties
+→ save
+→ select the instance in Power Apps Studio
+→ configure the seven required public inputs through Studio property selector / formula bar
+→ save and let Studio own the host-side binding representation
+```
+
+Artifact:
+
+```text
+docs/development/screens/home-pds/blocks/03B_header_integration_studio_contract.md
+```
+
+If Studio exposes `Context1Value` and the remaining public properties on the instance, configure them in one pass and validate Block 03.
+
+If Studio does not expose them, that is the decisive gate for **public-contract re-registration in Studio**.
+
+## 7. Block consequence
+
+```text
+Block 02 = isolated component instance-safe
+Block 03 = blocked until host-visible contract is validated
+Block 04 = blocked by Block 03
+```
+
+No further micro-reduction is justified by the current evidence.
