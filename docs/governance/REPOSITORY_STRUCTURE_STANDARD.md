@@ -1,7 +1,8 @@
 # PULSE Repository Structure Standard
 
-**Status:** Normative  
-**Version:** 1.1  
+**Status:** normative  
+**Canonical:** yes  
+**Version:** 2.0  
 **Scope:** `rubensv74/app_pulse`  
 **Last reviewed:** 2026-08-10
 
@@ -9,37 +10,33 @@
 
 ## 1. Purpose
 
-This standard defines where each type of PULSE artifact belongs so that humans and AI agents can locate the authoritative source without guessing.
-
-The governing rule is simple:
+This standard defines one canonical location for every PULSE artifact so humans and AI agents can find the current source without guessing.
 
 > **One content type, one canonical home.**
 
-A second copy may exist only as an explicitly marked archive, generated projection or compatibility redirect.
+Historical recovery belongs to Git history. The working tree should not retain duplicate legacy copies merely for caution.
 
 ---
 
-## 2. Canonical top-level areas
+## 2. Canonical top-level structure
 
 ```text
 /
 ├── README.md
-├── main/
+├── power-apps/
 ├── sql/
 ├── office-scripts/
 └── docs/
 ```
 
-The repository root must remain minimal. Historical delivery reports, temporary exports and sprint-specific evidence do not belong at root.
+The Git branch may be named `main`; there is deliberately no repository source folder named `main`.
 
 ---
 
-## 3. `main/` — Canonical application source
-
-Purpose: Power Apps and application-level source artifacts.
+## 3. `power-apps/` — canonical Canvas application source
 
 ```text
-main/
+power-apps/
 ├── screens/
 ├── components/
 ├── contracts/
@@ -50,47 +47,36 @@ main/
 
 Rules:
 
-- full canonical screen source belongs in `main/screens/<Screen>/`;
-- reusable Canvas component source that is currently required or actively planned belongs in `main/components/`;
+- canonical full screen source belongs in `power-apps/screens/<Screen>/`;
+- reusable Canvas component source required by current runtime or approved active work belongs in `power-apps/components/`;
 - contracts and mappings belong under their dedicated folders;
-- modular construction blocks, design notes and user guides do **not** belong in `main/`;
-- source filenames ending in `_old`, `_backup`, `_copy`, `_final2`, etc. are prohibited in the active source area unless temporarily required by a documented live dependency/migration.
+- tests belong in `power-apps/tests/`;
+- modular construction blocks, design notes and user guides do **not** belong in `power-apps/`;
+- new source must not use `_old`, `_backup`, `_copy`, `_final2`, etc.; a pre-existing live identity may keep such a name only as a documented `LEGACY_SUPPORTED` exception until migrated.
 
-### Active component policy — Option A
+### Active component policy
 
-`main/components/` is an **active source pool**, not a historical component library.
+`power-apps/components/` is an active source pool, not a historical library.
 
-It contains only:
+It contains:
 
 ```text
 1. components used by current canonical runtime screens;
-2. components actively planned for approved current work;
-3. components newly created/evolved for current PDS or product development.
+2. components actively required by approved current work;
+3. components newly created/evolved for current PDS/product development.
 ```
 
-Inactive historical components that no longer have a current runtime or approved planned use are moved out of the active pool after a dependency audit and may be retained under:
+When a new reusable component is required:
 
-```text
-docs/archive/components/
-```
-
-### New component creation rule
-
-When a new reusable component is required by current work:
-
-1. create its canonical Source Code file under `main/components/`;
-2. update `docs/design-system/COMPONENT_CATALOG.md` in the same development cycle;
-3. if it is a reusable PDS component, create/update its specification under `docs/design-system/components/`;
-4. validate its Source Code in Power Apps Studio before treating it as installed/usable in the active app;
-5. do not leave the only copy of a required component in chat, a modular screen block, a temporary folder or an archive.
-
-The repository definition and the Studio installation state are separate facts: existence under `main/components/` does not prove the Canvas component has already been added to the active Power Apps application.
+1. create its canonical source under `power-apps/components/` in the same development cycle;
+2. update `docs/design-system/COMPONENT_CATALOG.md`;
+3. if reusable/PDS, create or update its specification under `docs/design-system/components/`;
+4. validate it in Power Apps Studio before treating it as installed/usable;
+5. after block validation, ensure the canonical complete source reflects the accepted implementation.
 
 ---
 
-## 4. `sql/` — Executable SQL and database technical assets
-
-Canonical model:
+## 4. `sql/` — executable database source
 
 ```text
 sql/
@@ -102,27 +88,17 @@ sql/
     └── warroom-schema/
 ```
 
-Rules:
-
-- executable SQL belongs here;
-- schema snapshots belong under `sql/schema/<schema>/`;
-- extraction/generation SQL tooling belongs under `sql/tools/`;
-- explanatory documentation belongs in `docs/reference/sql/`, not mixed with executable SQL unless the README is local and operationally necessary;
-- do not maintain both `database/` and `sql/` as competing database roots.
+Executable SQL belongs here. Stable explanatory reference belongs under `docs/reference/sql/`.
 
 ---
 
 ## 5. `office-scripts/`
 
-Purpose: canonical Office Scripts source used by flows or export/import automation.
-
-This area stays separate because TypeScript Office Scripts have a distinct runtime and lifecycle from Canvas Power Apps and SQL.
+Canonical Office Scripts source used by flows/export/import automation.
 
 ---
 
-## 6. `docs/` — Product and engineering knowledge
-
-Canonical model:
+## 6. `docs/` — current engineering knowledge
 
 ```text
 docs/
@@ -134,26 +110,25 @@ docs/
 ├── development/
 ├── reference/
 ├── analysis/
-├── guides/
-└── archive/
+└── guides/
 ```
 
 ### `docs/governance/`
-Repository standards, lifecycle rules, contribution conventions and documentation authority.
+Normative repository, lifecycle and naming rules.
 
 ### `docs/architecture/`
-Current application/system architecture. Historical architecture assessments belong in analysis or archive.
+Current system/integration architecture.
 
 ### `docs/design-system/`
-The only normative location for PULSE UI/UX standards, SaaS archetypes, component specifications, component lifecycle catalog and visual QA guardrails.
+The only normative PULSE UI/UX location: PDS, archetypes, visual QA, component catalog and component specs.
 
 ### `docs/specifications/`
-Functional/design specifications that define what a product area or screen must do.
+Current functional/design specifications.
 
 ### `docs/development/`
-Implementation method, protocols, templates and active construction workspaces.
+Implementation protocols, templates and active incremental workspaces.
 
-Target pattern for screen construction:
+Screen workspace pattern:
 
 ```text
 docs/development/screens/<screen-key>/
@@ -165,39 +140,27 @@ docs/development/screens/<screen-key>/
 ```
 
 ### `docs/reference/`
-Stable technical reference documentation, including SQL object documentation.
+Stable technical reference.
 
 ### `docs/analysis/`
-Audits, assessments and decision briefs that describe an observed state at a point in time.
+Point-in-time audits and decision briefs. Analysis is evidence, not current implementation authority.
 
 ### `docs/guides/`
-Only reusable step-by-step operational/developer guides. A roadmap, architecture spec, design standard or sprint report is not a guide merely because it is Markdown.
+Only current reusable step-by-step guidance.
 
-### `docs/archive/`
-Historical/superseded material retained for traceability but not to be used as a current source of truth.
-
-Archived component source may be retained under `docs/archive/components/`, but it is never a normal reuse candidate.
+There is no permanent `docs/archive/` area. Superseded-only artifacts are removed from the working tree after safe migration; Git history provides recovery.
 
 ---
 
-## 7. Document lifecycle metadata
+## 7. Legacy policy
 
-Every normative or potentially overlapping document should declare at least:
+An artifact is `LEGACY` when it is superseded and is not required by current runtime, current contracts, current specifications, current validation evidence or reusable learned knowledge.
 
-```text
-Status: normative | active | draft | superseded | archived
-Canonical: yes | no
-Last reviewed: YYYY-MM-DD
-```
+Legacy artifacts are deleted from the working tree once safe to do so.
 
-When applicable:
+A `LEGACY_SUPPORTED` artifact may remain temporarily only because current runtime still depends on it. Its removal must be handled as an explicit incremental migration and validated in the target tool.
 
-```text
-Supersedes: <path>
-Superseded by: <path>
-```
-
-An AI agent must prefer `normative` and `active` documents over `superseded` or `archived` documents regardless of file modification date.
+Reusable lessons are not deleted: they are consolidated into current compatibility, QA or knowledge documents before obsolete evidence is removed.
 
 ---
 
@@ -211,57 +174,38 @@ kebab-case preferred
 no spaces
 ```
 
-Documentation filenames:
+Major normative documents may use `UPPER_SNAKE_CASE.md`; domain/reference notes may use `lower-kebab-case.md`.
 
-```text
-UPPER_SNAKE_CASE.md for major normative project documents
-or
-lower-kebab-case.md for domain/reference notes
-```
-
-Do not mix case conventions for equivalent folders (`SQL` vs `sql`).
-
-Runtime screen/component identities are exempt when Power Apps compatibility requires preserving their names. A misleading legacy runtime name must not be renamed while a canonical screen still depends on it unless the rename is handled as an explicit runtime migration.
+Runtime screen/component identities are exempt when changing the name could break Power Apps. Such exceptions belong in `docs/governance/NAMING_EXCEPTIONS.md` and must have an exit condition.
 
 ---
 
 ## 9. Component lifecycle
 
-Every reusable component should be catalogued as one of:
+Catalog states:
 
 ```text
 ACTIVE
 PDS_CANDIDATE
 LEGACY_SUPPORTED
-DEPRECATED
 REVIEW_REQUIRED
-ARCHIVED
 ```
 
-Rules:
-
-- only `ACTIVE`, `PDS_CANDIDATE` and intentionally supported legacy components remain in the normal active reuse pool;
-- `LEGACY_SUPPORTED` may remain in `main/components/` while it is a current runtime dependency;
-- inactive historical components leave `main/components/` after dependency audit under Option A;
-- a newly required component is created in `main/components/` and catalogued in the same development cycle;
-- physical moves/renames/removals occur only after a usage audit.
+`DEPRECATED`/`ARCHIVED` are not long-lived source states under this policy: once dependency audit confirms safe removal, the source leaves the working tree.
 
 ---
 
 ## 10. Construction artifacts
 
-Every modular block must declare whether it is:
+Every incremental artifact must declare whether it is:
 
 ```text
 PASTEABLE
 INSTRUCTIONAL
 OPTIONAL_SEED
-ARCHIVED
 ```
 
-A `.pa.yaml` extension must not imply pasteability if the file contains conceptual pseudo-operations.
-
-Pasteable Power Apps Source Code must begin with a schema-valid root such as:
+Pasteable Power Apps Source Code must use a schema-valid root such as:
 
 ```text
 Screens:
@@ -278,45 +222,44 @@ Allowed at repository root:
 
 - `README.md`;
 - `.gitignore`;
-- essential repository-level config files;
-- canonical top-level directories.
+- essential repository-level configuration;
+- `power-apps/`;
+- `sql/`;
+- `office-scripts/`;
+- `docs/`.
 
-Historical delivery reports/manifests must live under:
-
-```text
-docs/archive/deliveries/<date-or-epic>/
-```
+No delivery manifests, temporary exports, sprint reports or superseded implementation files belong at root.
 
 ---
 
 ## 12. AI retrieval rule
 
-When an agent needs context, use this authority order:
+Use this authority order:
 
 ```text
-1. canonical runtime source (`main/`, `sql/`, `office-scripts/`)
+1. canonical runtime source (`power-apps/`, `sql/`, `office-scripts/`)
 2. normative docs (`docs/governance`, `docs/design-system`, `docs/architecture`)
 3. active specifications/development workspaces
 4. reference
 5. analysis
-6. archive only when history is explicitly needed
 ```
 
-For reusable Power Apps components, `main/components/` is the active source set. Do not select component source from `docs/archive/components/` for new work unless an explicit decision reactivates it.
-
-Do not infer current behavior from an archived delivery report when current source exists.
+Do not use point-in-time analysis to override current source.
 
 ---
 
-## 13. Change policy
+## 13. Incremental change policy
 
-Repository reorganization must be incremental:
+Repository or runtime migration follows the same incremental discipline as application work:
 
-1. establish target path;
-2. copy/move artifact;
-3. update internal links/references;
-4. verify repository search for old path;
-5. remove/redirect old path;
-6. commit the batch with a migration message.
+1. audit current dependency/source;
+2. define target and scope;
+3. perform one structural/functional responsibility per increment;
+4. save/version the change;
+5. repair references;
+6. validate the target environment when runtime is affected;
+7. remove legacy only after the dependency is proven gone;
+8. consolidate reusable learning;
+9. close the increment before continuing.
 
-Do not mix structural cleanup with unrelated runtime behavior changes in the same commit.
+Do not mix repository restructuring with unrelated runtime behavior changes.
