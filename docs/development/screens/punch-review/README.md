@@ -1,69 +1,67 @@
-# Fase 7 — Punch Review Workspace
+# Punch Review Workspace — Incremental Construction
 
 **Status:** active development workspace  
-**Canonical runtime screen:** `main/screens/PunchReview/scr_PunchReview.pa.yaml`  
+**Canonical runtime screen:** `power-apps/screens/PunchReview/scr_PunchReview.pa.yaml`  
 **Construction workspace:** `docs/development/screens/punch-review/`
 
-Esta carpeta contiene los bloques incrementales para construir `scr_PunchReview` en Power Apps Studio sin pegar una pantalla monolítica.
+This workspace contains incremental blocks for building and evolving `scr_PunchReview` in Power Apps Studio without replacing the complete screen blindly.
 
-## Ubicación canónica
+## Canonical-source rule
 
-Los bloques listos para utilizar se publican en:
+```text
+power-apps/screens/PunchReview/scr_PunchReview.pa.yaml
+```
+
+is the canonical complete screen source.
+
+Files under:
 
 ```text
 docs/development/screens/punch-review/blocks/
 ```
 
-Los archivos de `blocks/` no sustituyen automáticamente los YAML canónicos de `main/screens`. Son bloques controlados para copiar en Studio o incorporar al archivo canónico después de validar cada incremento.
+are controlled construction artifacts. They do not replace the canonical screen source until the relevant increment has been validated and consolidated.
 
-Cada bloque debe indicar:
+## Mandatory compatibility gate
 
-- archivo y control afectados;
-- operación exacta: crear, añadir como hijo o sustituir propiedad/control;
-- dependencias previas;
-- prueba mínima;
-- criterio de aceptación.
-
-## Gate obligatorio antes de cualquier YAML
-
-Antes de redactar, corregir o publicar cualquier archivo `.pa.yaml` debe consultarse primero la versión actual de:
+Before drafting, correcting or publishing any `.pa.yaml`, consult:
 
 ```text
 docs/development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
 ```
 
-No se debe trabajar de memoria. Cada nuevo error confirmado se incorpora a ese archivo y se convierte en una regla preventiva para los siguientes bloques.
+Do not work from memory. Every confirmed Studio incompatibility must become a preventive rule before dependent blocks continue.
 
-## Orden obligatorio y estado
+## Current block sequence
 
-1. `01_screen_shell.pa.yaml` — validado
-2. `02_header_premium.children.pa.yaml` — validado
-3. `03_workspace_layout.children.pa.yaml` — validado
-4. `04_runtime_state.onvisible.pa.yaml` — validado tras corrección tipada
-5. `05_review_queue.replace-control.pa.yaml` — validado
-6. `05A_review_queue_test_seed.optional.powerfx` — opcional para pruebas
-7. `06_punch_overview.replace-control.pa.yaml` — validado
-8. `07_review_actions.replace-control.pa.yaml` — validado
-9. `08_session_activity.replace-control.pa.yaml` — validado
-10. `08A_help_trigger.add-child.pa.yaml` — validado tras eliminar `Reset(TabList)`
-11. `08B_bilingual_help_modal.add-screen-child.pa.yaml` — validado
-12. `09_comments.replace-control.pa.yaml` — integrado; validar en Studio con Punch real
-13. `09A_comments_selection_hook.replace-formula.powerfx` — hook de selección de Comments
-14. `09B_comments_test_seed.optional.powerfx` — opcional para pruebas visuales
-15. `09C_help_comments.incremental-patch.pa.yaml` — ayuda bilingüe de Comments
-16. `10_custom_fields.replace-control.pa.yaml` — integrado
-17. `10A_custom_fields_selection_hook.replace-formula.powerfx` — sustituye a 09A y carga Comments + Custom Fields; incluye bloqueo temporal de cambios sin guardar
-18. `10B_custom_fields_test_seed.optional.powerfx` — opcional para probar los seis tipos de campo sin flows
-19. `10C_yesno_initial_state.incremental-patch.pa.yaml` — parche para vincular `Toggle.Checked` a `ValueBool`
-20. `10D_help_custom_fields.incremental-patch.pa.yaml` — ayuda bilingüe de Custom Fields
-21. `11_review_progress.replace-control.pa.yaml` — corregido para usar `cmp_DonutPro` ya instalado en la app; pendiente de revalidación en Studio
-22. `11A_help_review_progress.incremental-patch.pa.yaml` — aplicar después de validar el Bloque 11 y después de 10D
+1. `01_screen_shell.pa.yaml` — validated
+2. `02_header_premium.children.pa.yaml` — validated
+3. `03_workspace_layout.children.pa.yaml` — validated
+4. `04_runtime_state.onvisible.pa.yaml` — validated after typed correction
+5. `05_review_queue.replace-control.pa.yaml` — validated
+6. `05A_review_queue_test_seed.optional.powerfx` — optional test seed
+7. `06_punch_overview.replace-control.pa.yaml` — validated
+8. `07_review_actions.replace-control.pa.yaml` — validated
+9. `08_session_activity.replace-control.pa.yaml` — validated
+10. `08A_help_trigger.add-child.pa.yaml` — validated after removing `Reset(TabList)`
+11. `08B_bilingual_help_modal.add-screen-child.pa.yaml` — validated
+12. `09_comments.replace-control.pa.yaml` — integrated; real-Punch flow validation required
+13. `09A_comments_selection_hook.replace-formula.powerfx` — comments selection hook
+14. `09B_comments_test_seed.optional.powerfx` — optional visual test seed
+15. `09C_help_comments.incremental-patch.pa.yaml` — comments help
+16. `10_custom_fields.replace-control.pa.yaml` — integrated
+17. `10A_custom_fields_selection_hook.replace-formula.powerfx` — comments + custom-fields selection hook
+18. `10B_custom_fields_test_seed.optional.powerfx` — optional field-type seed
+19. `10C_yesno_initial_state.incremental-patch.pa.yaml` — Toggle `Checked` binding correction
+20. `10D_help_custom_fields.incremental-patch.pa.yaml` — custom-fields help
+21. `11_review_progress.replace-control.pa.yaml` — corrected to use installed `cmp_DonutPro`; pending Studio revalidation
+22. `11A_help_review_progress.incremental-patch.pa.yaml` — dependent on Block 11 validation
 
-No se debe iniciar el Bloque 12 hasta que Review Progress se importe sin errores y responda correctamente a Mark Reviewed / Undo Review.
+Do not begin Block 12 until Review Progress imports without errors and responds correctly to Mark Reviewed / Undo Review.
 
-## Contratos del Bloque 09
+## Confirmed service contracts
 
-Carga confirmada desde la pantalla Punches:
+### Comments read
 
 ```text
 Warroom_GetTaskCommentsPaged.Run(
@@ -75,7 +73,7 @@ Warroom_GetTaskCommentsPaged.Run(
 )
 ```
 
-Alta utilizada por la arquitectura de comentarios:
+### Comment create
 
 ```text
 Warroom_AddTaskComment.Run(
@@ -89,11 +87,7 @@ Warroom_AddTaskComment.Run(
 )
 ```
 
-La validación visual con los Punches ficticios del Bloque 05A debe realizarse mediante `09B_comments_test_seed.optional.powerfx`. La validación de flows necesita un Punch real.
-
-## Contratos del Bloque 10
-
-Carga de campos personalizados:
+### Custom fields read
 
 ```text
 WarRoom_GetCustomBundle.Run(
@@ -103,9 +97,7 @@ WarRoom_GetCustomBundle.Run(
 ).bundlejson
 ```
 
-El editor utiliza `bundlejson.merged` como fuente de definiciones y valores actuales.
-
-Guardado masivo:
+### Custom fields save
 
 ```text
 WarRoom_SaveCustomBulk.Run(
@@ -117,104 +109,80 @@ WarRoom_SaveCustomBulk.Run(
 )
 ```
 
-El resultado de guardado se vuelve a materializar desde el `merged` devuelto por el servicio. Los tipos soportados son `Text`, `Number`, `YesNo`, `Date`, `Choice` y `MultiChoice`.
+The backend-returned merged state remains authoritative after save.
 
-La edición mantiene la misma regla de permisos que el drawer existente: `manager` puede editar, guardar y restablecer; los demás roles son de solo lectura.
+## Review Progress contract
 
-Hasta el Bloque 13, `10A_custom_fields_selection_hook.replace-formula.powerfx` bloquea cualquier cambio o recarga de Punch mientras existan campos personalizados sin guardar. El usuario debe usar Save o Reset antes de continuar.
-
-## Contrato del Bloque 11
-
-Review Progress es un indicador exclusivamente local de la sesión y se calcula directamente sobre:
+Review Progress is session-local and is calculated over:
 
 ```text
 colPunchReviewQueue
 ```
 
-Usa `IsReviewedInSession` para separar `Reviewed` y `Remaining`. El porcentaje central se calcula como `Reviewed / Total queue`.
+using `IsReviewedInSession` to separate Reviewed and Remaining. It does not use SQL or a flow.
 
-No utiliza flows, SQL ni la colección filtrada visible. Por diseño, cambiar entre `All`, `Remaining` y `Reviewed` no altera el porcentaje: el denominador sigue siendo la cola completa cargada.
+`cmp_DonutPro` is confirmed as the installed component used for this session-progress indicator. It is not a substitute for the Home_PDS discipline-composition pie chart.
 
-### Resolución PR-SC-005
+## Manual and compatibility knowledge
 
-La primera versión del Bloque 11 intentó instanciar `cmp_DonutPro` antes de que el componente estuviera instalado en la app activa. Studio devolvió `PA2301`.
-
-`cmp_DonutPro` ya ha sido añadido a la biblioteca de componentes de la app. La versión vigente de `11_review_progress.replace-control.pa.yaml` puede utilizar:
-
-```yaml
-Control: CanvasComponent
-ComponentName: cmp_DonutPro
-```
-
-El bloque de pantalla no contiene una implementación SVG propia. El componente representa progreso de **revisión de la sesión**, no progreso de cierre técnico del Punch.
-
-## Manual de usuario
-
-El manual funcional en español se mantiene en:
+User guide:
 
 ```text
 docs/development/screens/punch-review/user-guide/MANUAL_USUARIO_PUNCH_REVIEW.md
 ```
 
-Es un documento vivo y debe actualizarse cuando se valida una nueva función de la pantalla.
-
-La pantalla también incorpora una ayuda resumida bilingüe mediante un modal con dos pestañas modernas:
-
-```text
-Español | English
-```
-
-## Registro de compatibilidad y lecciones aprendidas
-
-Antes de crear o modificar un bloque debe revisarse:
+Compatibility register:
 
 ```text
 docs/development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
 ```
 
-Reglas confirmadas:
+Confirmed reusable rules include:
+
+- `Label@2.5.1` does not support corner-radius properties used on containers;
+- `Classic/Button@2.2.0` does not support the previously attempted `AccessibleLabel` Source Code pattern;
+- `TabList@2.2.30` is not reset with `Reset()`;
+- new numeric variables require an unequivocal numeric initialization;
+- modern Toggle uses `Checked` for the initial Boolean state;
+- a Canvas component must exist in the active app; a GitHub file alone is insufficient;
+- do not use inline SVG as a substitute for an installed/maintainable visual component when the PULSE component pattern is available.
+
+## Naming
 
 ```text
-Label@2.5.1 no admite RadiusBottomLeft, RadiusBottomRight, RadiusTopLeft ni RadiusTopRight.
-Classic/Button@2.2.0 no admite AccessibleLabel en el Source Code utilizado por PULSE.
-TabList@2.2.30 no es reseteable mediante Reset().
-Una variable numérica nueva debe recibir primero una asignación numérica inequívoca.
-Toggle moderno utiliza Checked para representar el valor Boolean inicial.
-Un CanvasComponent debe existir realmente en la app activa; que exista en GitHub no es suficiente.
-No usar SVG inline en bloques de pantalla como sustituto de un componente visual instalado o instalable.
-cmp_DonutPro está confirmado actualmente en la app activa.
+Screen       scr_PunchReview
+Controls     PR prefix
+Collections  colPunchReview prefix
+Variables    varPunchReview prefix
+Service      btnPR_ prefix
 ```
 
-Para una píldora redondeada se utiliza un `GroupContainer@1.5.0` con radios y un `Label@2.5.1` sin radios en su interior.
+## Validation minimum
 
-## Convención de nombres
+1. review the compatibility register;
+2. work from current repository `main` branch state;
+3. save the block in Studio;
+4. wait for formula validation;
+5. check App Checker;
+6. navigate to the screen;
+7. confirm no overlaps, visible defects or broken references;
+8. stop on new PA1001, PA2108, PA2301, unsupported property or type error;
+9. correct the repository artifact and record reusable learning before continuing.
 
-- Pantalla: `scr_PunchReview`
-- Controles: prefijo `PR`
-- Colecciones: prefijo `colPunchReview`
-- Variables: prefijo `varPunchReview`
-- Controles internos de servicio: prefijo `btnPR_`
+## Current source references
 
-## Validación mínima por bloque
+```text
+power-apps/screens/PunchReview/scr_PunchReview.pa.yaml
+power-apps/screens/Home/scr_Home.pa.yaml
+power-apps/screens/Punches/scr_Punches_1.pa.yaml
+power-apps/components/cmp_SidebarNav.pa.yaml
+power-apps/components/cmp_DonutPro.pa.yaml
+power-apps/components/
+```
 
-1. Consultar `POWER_APPS_SOURCE_CODE_COMPATIBILITY.md` antes de redactar o corregir YAML.
-2. Ejecutar `git pull origin main`.
-3. Guardar el bloque en Studio.
-4. Esperar a que termine la validación de fórmulas.
-5. Abrir App Checker.
-6. Navegar a la pantalla.
-7. Confirmar que no existen solapamientos ni referencias rotas.
-8. No continuar si aparece PA1001, PA2108, PA2301, una propiedad no soportada o un error de tipo.
+The repository structure and legacy policy are governed by:
 
-## Fuente de verdad
-
-Las referencias visuales y funcionales se basan en:
-
-- `main/screens/PunchReview/scr_PunchReview.pa.yaml` — fuente canónica de la pantalla.
-- `main/screens/Home/scr_Home.pa.yaml`
-- `main/screens/Punches/scr_Punches_1.pa.yaml`
-- `main/components/cmp_SidebarNav.pa.yaml`
-- `main/components/cmp_DonutPro.pa.yaml`
-- resto de componentes actualizados en `main/components/`.
-
-Los bloques de esta carpeta son artefactos de construcción, no sustitutos de la fuente canónica completa de `main/screens/PunchReview/`.
+```text
+docs/governance/REPOSITORY_STRUCTURE_STANDARD.md
+docs/governance/ACTIVE_SOURCE_POLICY.md
+```
