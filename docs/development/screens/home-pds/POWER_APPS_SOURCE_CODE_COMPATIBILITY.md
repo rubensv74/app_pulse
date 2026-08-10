@@ -100,13 +100,6 @@ Avoid arbitrary new UI tokens when PDS already defines them.
 
 `PATCH`, `ADD CHILD`, `REPLACE CONTROL`, etc. are construction metadata, not legal Source Code roots. A pasteable full module uses actual roots such as `Screens:` or `ComponentDefinitions:`.
 
-Confirmed prior error:
-
-```text
-PA1001 / YamlInvalidSyntax
-Property 'Patch' not found on type PaModule
-```
-
 ### PA-COMP-012 — Definition acceptance does NOT prove instance safety
 
 Confirmed during Home_PDS Block 02.
@@ -121,74 +114,67 @@ instance safe
 ready for target-screen integration
 ```
 
-The corrected `cmp_PageHeaderPro` later passed isolated instantiation. The original technical crash cause remains narrower than a universal rule and must not be guessed.
+### PA-COMP-013 — Instance safety does NOT prove host-source custom-property resolution
 
-### PA-COMP-013 — Component definition/instance safety does NOT prove host-source custom-property resolution
-
-Confirmed during Home_PDS Block 03 on 2026-08-10.
+Confirmed during Home_PDS Block 03.
 
 Observed sequence:
 
 ```text
 cmp_PageHeaderPro definition accepted          PASS
-corrected default instance inserted            PASS
+corrected default instance inserted manually   PASS
 screen Source Code binds custom properties     PA2108
 ```
 
-The same PA2108 pattern occurred in two different screen edit contexts:
+The same PA2108 pattern occurred in both a partial child edit and a complete `Screens:` replacement. Therefore the partial edit-surface hypothesis was refuted.
 
-```text
-03  partial child/control Source Code
-03A complete Screens: Source Code
-```
+Positive counterexample: `cmp_SidebarNav` custom properties are serialized successfully by `scr_PunchReview`.
 
-Rejected properties included:
+### PA-COMP-014 — Source-created custom component instance may not hydrate the same contract/body as a Studio-inserted instance
 
-```text
-Context1Interactive
-Context1Value
-Context2Interactive
-Context3Interactive
-Context3Value
-ShowHelp
-UtilityEnabled
-```
+Confirmed as an observed effect during Home_PDS Block 03B on 2026-08-10.
 
-Standard instance properties such as `Height` and `Width` were not among the reported failures.
-
-Therefore the earlier edit-surface hypothesis is **refuted for this incident**.
-
-Positive counterexample:
-
-`cmp_SidebarNav` is declared with `CustomProperties:` and `scr_PunchReview` successfully serializes host assignments such as:
+A screen Source Code candidate created:
 
 ```yaml
 Control: CanvasComponent
-ComponentName: cmp_SidebarNav
+ComponentName: cmp_PageHeaderPro
 Properties:
-  ActiveKey: =...
-  ProjectCode: =...
-  ProjectName: =...
+  Height: =Parent.Height
+  Width: =Parent.Width
 ```
 
-Interpretation supported by evidence:
+Studio accepted the screen. The resulting selected instance showed:
 
-> A component can be definition-valid and instance-safe while the current screen Source Code parser still does not resolve its component-specific properties for host-side assignment.
+```text
+visible generic properties: ChildTabPriority, ContentLanguage, EnableChildFocus,
+Fill, Height, Visible, Width, X, Y
+custom property visible: OnUtility
+expected public Inputs absent: Context1Value, Title, Subtitle, ShowHelp, etc.
+visual body: blank header surface
+```
 
-Do **not** infer an undocumented internal metadata mechanism as confirmed cause.
+The same component had previously rendered safely when inserted manually in Studio.
+
+Supported conclusion:
+
+> For this component/app state, creating the host instance from Source Code is not equivalent to inserting the component manually in Studio. The Source Code-created instance did not hydrate the usable public contract/body expected from the manually inserted instance.
+
+Do not generalize this to every CanvasComponent. Existing canonical screens prove that already-hydrated custom component instances can serialize correctly in screen Source Code.
 
 Corrective pattern:
 
 ```text
-base instance using only standard CanvasComponent properties
-→ save
-→ configure custom inputs on the selected instance through Studio property selector/formula bar
-→ save and let Studio own host-side binding representation
+keep layout host from Source Code
+→ delete only the generic/source-created component instance
+→ insert the existing custom component manually through Studio
+→ place/rename/bind it
+→ after validation, capture the Studio-generated screen representation for future reuse
 ```
 
-If the public properties are not visible in Studio's instance property selector, the next action is **public-contract re-registration in Studio**, not more screen YAML variants.
+Do **not** re-register dozens of public properties merely because a Source Code-created instance is generic while the manually inserted component is already known to be instance-safe.
 
-Status: **effect confirmed; internal metadata cause unknown; operational workaround defined**.
+Status: **effect confirmed; exact internal hydration mechanism unknown; manual insertion is the evidence-based corrective path**.
 
 ## 4. Reusable component observations
 
@@ -205,12 +191,13 @@ Positive reference proving complex `CustomProperties:` contracts, outputs/events
 Current evidence:
 
 ```text
-DEFINITION_ACCEPTED = PASS
-INSTANCE_SAFE       = PASS
-HOST_SOURCE_CUSTOM_PROPERTY_BINDING = FAIL (PA2108)
+DEFINITION_ACCEPTED                      = PASS
+MANUAL_INSTANCE_SAFE                    = PASS
+HOST_SOURCE_CUSTOM_PROPERTY_BINDING     = FAIL (PA2108)
+SOURCE_CREATED_INSTANCE_CONTRACT/BODY    = NOT HYDRATED AS EXPECTED
 ```
 
-Use Block 03B Studio-resolved host integration until the binding representation is captured and validated.
+Use Block 03C manual insertion for target-screen integration.
 
 ## 5. New-rule template
 
