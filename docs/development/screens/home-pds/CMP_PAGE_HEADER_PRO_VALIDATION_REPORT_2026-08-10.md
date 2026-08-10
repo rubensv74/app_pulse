@@ -88,14 +88,20 @@ same baseline + Input/Text CustomProperty authored in YAML       FAIL_INSTANCE
 same functional Input/Text property created manually in Studio   PASS
 ```
 
-That evidence does **not** prove that `cmp_PageHeaderPro` has the same root cause, but it makes Source-Code-authored `CustomProperties` a high-priority hypothesis because the current header defines many Text/Boolean/Color/Event custom properties.
+The same knowledge record also establishes a preventive working rule for the current incremental authoring path:
 
-The diagnostic sequence deliberately separates:
+> Do not inject `CustomProperties:` into pasteable component YAML while that authoring surface has not demonstrated `INSTANCE_SAFE`; create the public contract in Studio first and then test bindings from the component body.
+
+That evidence does **not** prove that `cmp_PageHeaderPro` has the same root cause, but it is strong enough to avoid deliberately repeating a known crash-prone authoring path during diagnosis.
+
+The diagnostic sequence therefore separates:
 
 ```text
 basic Canvas component instance safety
 → primitive child-control safety
-→ CustomProperty authoring/serialization safety
+→ Studio-created public property safety
+→ binding to Studio-created property
+→ additional public contract types
 → event safety
 → full layout complexity
 ```
@@ -189,9 +195,14 @@ PASS_B = definition can be created and one instance inserted without Studio clos
 FAIL_B = Studio closes/rejects during definition creation or instance insertion
 ```
 
-If `PASS_B`, the next diagnostic is Stage C1: exactly one `Input/Text` CustomProperty authored in Source Code.
+If `PASS_B`, do **not** inject an `Input/Text` property through YAML. Instead, use the proven safer path:
 
-If `FAIL_B`, `ModernText`/its authoring combination becomes the first reduced failing surface and CustomProperties are not tested yet.
+```text
+C1  create one Input/Text property manually in Studio on the B baseline
+C2  bind the title ModernText to that Studio-created property using Source Code
+```
+
+If `FAIL_B`, `ModernText`/its authoring combination becomes the first reduced failing surface and public properties are not tested yet.
 
 ---
 
@@ -200,12 +211,14 @@ If `FAIL_B`, `ModernText`/its authoring combination becomes the first reduced fa
 ```text
 A   root container only                                  PASS_A
 B   + hardcoded title/subtitle ModernText                PENDING
-C1  + exactly one Input/Text CustomProperty in YAML      NOT STARTED
-C2  if C1 fails: same property created manually Studio   NOT STARTED
-D   + remaining non-event custom properties              NOT STARTED
-E   + public Event properties and invocation              NOT STARTED
-F   + context hit surfaces and final geometry             NOT STARTED
+C1  + one Input/Text property created manually Studio    NOT STARTED
+C2  + Source Code binding to Studio-created property     NOT STARTED
+D   + remaining non-event property types incrementally   NOT STARTED
+E   + public Event properties and invocation             NOT STARTED
+F   + context hit surfaces and final geometry            NOT STARTED
 ```
+
+A deliberate Source-Code-authored `CustomProperties:` crash test is omitted because a separate reduced case has already demonstrated that path as unsafe in the current incremental authoring workflow. Repeating it would add risk without adding proportionate diagnostic value.
 
 ---
 
