@@ -1,200 +1,83 @@
 # cmp_PageHeaderPro Validation Report — 2026-08-10
 
-**Status:** blocked at instance-safety gate / diagnostic reduction active  
+**Status:** diagnostic closed / corrective authoring path adopted  
 **Component:** `cmp_PageHeaderPro`  
-**Canonical source:** `power-apps/components/cmp_PageHeaderPro.pa.yaml`  
-**Canonical blob SHA:** `3e72cc319dac876cbc1257284a6ec45029cc6639`  
-**Construction artifact:** `docs/development/screens/home-pds/blocks/02A_page_header_text_overflow_fix.pa.yaml`  
-**Construction artifact blob SHA:** `3e72cc319dac876cbc1257284a6ec45029cc6639`
+**Canonical source:** `power-apps/components/cmp_PageHeaderPro.pa.yaml`
 
-## Observed Studio incident
+## Confirmed observed problem
 
-Insertion of an instance of the full `cmp_PageHeaderPro` causes Power Apps Studio to close.
+The full component source contained a `CustomProperties:` block authored through Source Code. An instance of the full component caused Power Apps Studio to close.
 
-```text
-FAIL_INSTANCE
-Technical root cause: UNKNOWN
-```
-
-Do not attribute the closure to `ModernText`, events, transparent buttons, ManualLayout, custom properties or geometry formulas until the reduced chain isolates the first failing stage.
-
----
-
-## Static validation result
+Reduced validation produced:
 
 ```text
-PASS_WITH_RUNTIME_RISK
+PASS_A  CanvasComponent + root GroupContainer
+PASS_B  + hardcoded ModernText title/subtitle
+PASS_C1 + Input/Text public property created manually in Studio
 ```
 
-Confirmed statically:
+Cross-project evidence already available in the reusable knowledge base also demonstrates that a public property created manually in Studio can be stable while the equivalent `CustomProperties:` path authored through Source Code is not.
+
+## Operational conclusion
+
+Further binary diagnosis is stopped because it is no longer proportionate to the implementation goal.
+
+For PULSE incremental component construction, the accepted operational boundary is:
 
 ```text
-PASS  ComponentDefinitions root
-PASS  demonstrated control families/versions
-PASS  no Patch: root
-PASS  no AccessibleLabel on Classic/Button@2.2.0
-PASS  no Canvas component nested in gallery
-PASS  no global var* state inside component
-PASS  static ModernText uses AutoHeight=true
-PASS  no explicit circular sibling geometry formula found
+PUBLIC COMPONENT PROPERTIES
+→ create/maintain in Power Apps Studio
+
+COMPONENT BODY
+→ maintain/paste through Source Code YAML
 ```
 
-Confirmed layout limitation for instance width `W`:
+Therefore:
+
+> The current `CustomProperties:` authoring path is not approved for pasteable reusable-component YAML in PULSE.
+
+This conclusion is operational. It does not claim knowledge of the internal Microsoft serialization/hydration defect.
+
+## Corrective action for cmp_PageHeaderPro
+
+The component must be rebuilt using this order:
 
 ```text
-Actions.X  = W - 164
-Context3.X = W - 356
-Context2.X = W - 544
-Context1.X = W - 732
-Identity.Width = Max(250, W - 760)
-
-W >= 1010  → intended gap preserved
-W ~= 998   → gap collapses
-W < 998    → overlap begins
-W < 732    → Context1 begins off-canvas
+1. create the required public properties manually in Studio
+2. save the component
+3. paste a body-only `ComponentDefinitions:` source that references those properties
+4. insert one isolated instance
+5. perform one App Checker + visual smoke test
+6. integrate into scr_Home_PDS only if stable
 ```
 
-This limitation is not a confirmed cause of the Studio closure.
+The previous full-source version containing `CustomProperties:` must not be used for import/paste.
 
----
-
-## Diagnostic strategy
-
-Cross-project evidence in the knowledge repository shows that a Source-Code-authored `CustomProperties:` path can be unsafe even when the same functional property created manually in Studio is stable. Therefore the diagnostic sequence avoids deliberately injecting a custom property through YAML and instead tests the Studio-created contract path.
+Normative rule:
 
 ```text
-A   root container only
-B   + hardcoded title/subtitle ModernText
-C1  + one Input/Text property created manually in Studio
-C2  + bind title ModernText to the Studio-created property
-D   + remaining non-event public properties incrementally
-E   + public Event properties and invocation
-F   + context hit surfaces and final geometry
+docs/development/POWER_APPS_COMPONENT_PUBLIC_PROPERTY_AUTHORING.md
 ```
 
----
-
-## Diagnostic results
-
-### Stage A — root container only
-
-Artifact:
-
-```text
-docs/development/screens/home-pds/diagnostics/02D1_cmp_PageHeaderPro_diag_stage_A.pa.yaml
-```
-
-Result reported by user on 2026-08-10:
-
-```text
-PASS_A
-```
-
-Conclusion:
-
-> Bare CanvasComponent + one `GroupContainer@1.5.0` is not sufficient to reproduce the closure.
-
-### Stage B — hardcoded ModernText, no CustomProperties
-
-Artifact:
-
-```text
-docs/development/screens/home-pds/diagnostics/02D2_cmp_PageHeaderPro_diag_stage_B.pa.yaml
-```
-
-Result reported by user on 2026-08-10:
-
-```text
-PASS_B
-```
-
-Conclusion:
-
-> Adding the hardcoded `ModernText@1.0.0` title/subtitle pattern with `AutoHeight=true` and `Wrap=false` is not sufficient to reproduce the closure.
-
-### Stage C1 — one Studio-created Input/Text property
-
-Baseline artifact:
-
-```text
-docs/development/screens/home-pds/diagnostics/02D3_cmp_PageHeaderPro_diag_stage_C_baseline.pa.yaml
-```
-
-Studio-created property:
-
-```text
-Property name: TitleText
-Property kind/direction: Data / Input
-Data type: Text
-Default: "Punch Control Tower"
-```
-
-Result reported by user on 2026-08-10:
-
-```text
-PASS_C1
-```
-
-Observed:
-
-```text
-property created manually in Studio
-component saved
-instance inserted
-Studio remains open
-```
-
-Confirmed consequence:
-
-> A manually Studio-created `Input/Text` public property is instance-safe in this reduced PULSE component when it is not yet consumed by the component body.
-
-This strengthens the distinction between the functional contract itself and the Source-Code authoring/serialization path. It does not yet prove that binding a child control to the property is safe.
-
-### Stage C2 — bind title to Studio-created TitleText
-
-Instructional diagnostic artifact:
-
-```text
-docs/development/screens/home-pds/diagnostics/02D4_cmp_PageHeaderPro_diag_stage_C2_binding.md
-```
-
-Exact one-line change inside `lblPHDC_Title`:
-
-```yaml
-Text: =cmp_PageHeaderPro_DiagC.TitleText
-```
-
-No `CustomProperties:` block is added. No other control/property is modified.
-
-Result semantics:
-
-```text
-PASS_C2 = binding resolves, title renders and Studio remains stable
-FAIL_C2 = Studio closes/rejects or binding cannot resolve
-```
-
----
-
-## Current diagnostic chain
+## Diagnostic chain closure
 
 ```text
 A   root container only                                  PASS_A
 B   + hardcoded title/subtitle ModernText                PASS_B
 C1  + one Input/Text property created manually Studio    PASS_C1
-C2  + bind title to Studio-created property              PENDING
-D   + remaining non-event property types incrementally   NOT STARTED
-E   + public Event properties and invocation             NOT STARTED
-F   + context hit surfaces and final geometry            NOT STARTED
+C2  binding micro-test                                    CANCELLED — no longer required
+D   property-type-by-property-type diagnostics            CANCELLED — no longer required
+E   event micro-diagnostics                               CANCELLED — no longer required
+F   full binary reconstruction                            CANCELLED — no longer required
 ```
 
----
+Reason for cancellation: the safe authoring boundary has been established sufficiently for implementation, and continuing micro-tests would delay delivery without proportionate value.
 
 ## Block consequence
 
 ```text
-Block 02  = FAILED / DIAGNOSTIC REDUCTION ACTIVE
-Block 03  = MUST NOT START
-cmp_PageHeaderPro = REVIEW_REQUIRED
+Block 02 = CORRECTIVE REBUILD REQUIRED
+Block 03 = remains blocked until rebuilt header passes one isolated instance smoke test
 ```
 
-The component can return to `PDS_CANDIDATE` only after the instance-safety gate, public-contract smoke test and visual QA pass in Studio.
+The next deliverable is not another diagnostic component. It is the production `cmp_PageHeaderPro` rebuilt for the Studio-authored public-property workflow.
