@@ -1,6 +1,6 @@
 # cmp_PageHeaderPro Validation Report — 2026-08-10
 
-**Status:** blocked at instance-safety gate  
+**Status:** blocked at instance-safety gate / diagnostic reduction active  
 **Component:** `cmp_PageHeaderPro`  
 **Canonical source:** `power-apps/components/cmp_PageHeaderPro.pa.yaml`  
 **Canonical blob SHA:** `3e72cc319dac876cbc1257284a6ec45029cc6639`  
@@ -11,21 +11,21 @@ The canonical component and Block 02A are byte-identical at this review point.
 
 ## Observed Studio incident
 
-Insertion of an instance of `cmp_PageHeaderPro` causes Power Apps Studio to close before a normal instance smoke test can be completed.
+Insertion of an instance of the full `cmp_PageHeaderPro` causes Power Apps Studio to close before a normal instance smoke test can be completed.
 
-This is treated as:
+This remains:
 
 ```text
 FAIL_INSTANCE
 ```
 
-The user confirmed on 2026-08-10 that the requested full-component instance test cannot be completed because Studio closes. The technical root cause remains:
+The technical root cause remains:
 
 ```text
 UNKNOWN
 ```
 
-Do not attribute the closure to `ModernText`, events, transparent buttons, ManualLayout or geometry formulas without a reduced reproducer.
+Do not attribute the closure to `ModernText`, events, transparent buttons, ManualLayout, custom properties or geometry formulas until the reduced chain isolates the first failing stage.
 
 ---
 
@@ -90,7 +90,7 @@ same functional Input/Text property created manually in Studio   PASS
 
 That evidence does **not** prove that `cmp_PageHeaderPro` has the same root cause, but it makes Source-Code-authored `CustomProperties` a high-priority hypothesis because the current header defines many Text/Boolean/Color/Event custom properties.
 
-The diagnostic sequence is therefore intentionally designed to separate:
+The diagnostic sequence deliberately separates:
 
 ```text
 basic Canvas component instance safety
@@ -102,44 +102,110 @@ basic Canvas component instance safety
 
 ---
 
-## Diagnostic reduction now activated
+## Diagnostic reduction results
 
-Do not test the full component again until the reduced chain identifies the failing surface.
+### Stage A — root container only
 
-```text
-A   root container only; no CustomProperties
-B   + hardcoded title/subtitle ModernText; still no CustomProperties
-C1  + exactly one Input/Text CustomProperty authored in Source Code
-C2  if C1 fails: recreate the same Input/Text property manually in Studio on the B baseline
-D   + remaining non-event custom properties incrementally
-E   + public Event properties and invocation
-F   + context hit surfaces and final responsive geometry
-```
-
-This order deliberately tests the cross-project CustomProperty hypothesis before adding unrelated complexity.
-
-### Stage A artifact
+Artifact:
 
 ```text
 docs/development/screens/home-pds/diagnostics/02D1_cmp_PageHeaderPro_diag_stage_A.pa.yaml
 ```
 
-Diagnostic component identity:
+Diagnostic identity:
 
 ```text
 cmp_PageHeaderPro_DiagA
 ```
 
-Stage A contains only a Canvas component, fixed Width/Height and one `GroupContainer@1.5.0`. It contains no custom properties, events, text, buttons, sibling formulas or data bindings.
+Content:
+
+```text
+CanvasComponent
++ fixed Width/Height
++ one GroupContainer@1.5.0
+```
+
+Excluded:
+
+```text
+CustomProperties
+Events
+ModernText
+Buttons
+Sibling geometry formulas
+Transparent hit surfaces
+Screen variables
+Flows/data bindings
+```
+
+Studio result reported by the user on 2026-08-10:
+
+```text
+PASS_A
+```
+
+Observed effect:
+
+```text
+The instance inserts and Power Apps Studio remains open.
+```
+
+Confirmed consequence:
+
+> The minimal Canvas component shell and a single `GroupContainer@1.5.0` are **not sufficient to reproduce the Studio closure**.
+
+This does not prove those primitives can never participate in a later interaction, but it removes the bare component/root-container layer as the current smallest reproducer.
+
+### Stage B — hardcoded ModernText, no CustomProperties
+
+Artifact:
+
+```text
+docs/development/screens/home-pds/diagnostics/02D2_cmp_PageHeaderPro_diag_stage_B.pa.yaml
+```
+
+Diagnostic identity:
+
+```text
+cmp_PageHeaderPro_DiagB
+```
+
+Stage B adds only:
+
+```text
+hardcoded title ModernText@1.0.0
+hardcoded subtitle ModernText@1.0.0
+AutoHeight=true
+Wrap=false
+```
+
+It still contains no custom properties, events, buttons, sibling-to-sibling geometry formulas or external bindings.
 
 Result semantics:
 
 ```text
-PASS_A = definition can be created and one instance inserted without Studio closing
-FAIL_A = Studio closes/rejects during definition creation or instance insertion
+PASS_B = definition can be created and one instance inserted without Studio closing
+FAIL_B = Studio closes/rejects during definition creation or instance insertion
 ```
 
-If `PASS_A`, Stage B is prepared next. If `FAIL_A`, stop: the problem is below the header contract/layout layer and must be investigated at the minimal Canvas-component authoring level.
+If `PASS_B`, the next diagnostic is Stage C1: exactly one `Input/Text` CustomProperty authored in Source Code.
+
+If `FAIL_B`, `ModernText`/its authoring combination becomes the first reduced failing surface and CustomProperties are not tested yet.
+
+---
+
+## Current diagnostic chain
+
+```text
+A   root container only                                  PASS_A
+B   + hardcoded title/subtitle ModernText                PENDING
+C1  + exactly one Input/Text CustomProperty in YAML      NOT STARTED
+C2  if C1 fails: same property created manually Studio   NOT STARTED
+D   + remaining non-event custom properties              NOT STARTED
+E   + public Event properties and invocation              NOT STARTED
+F   + context hit surfaces and final geometry             NOT STARTED
+```
 
 ---
 
