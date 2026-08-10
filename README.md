@@ -8,13 +8,13 @@ This README is the canonical entry point for the repository.
 
 ```text
 /
-├── main/            Power Apps source, reusable components, contracts and mappings
-├── sql/             Executable SQL, import/export SQL and schema snapshots
-├── office-scripts/  Office Scripts source
-└── docs/            Architecture, Design System, specifications, development workspaces and analysis
+├── main/            Canonical Power Apps source, components, contracts, mappings and tests
+├── sql/             Executable SQL, schema snapshots and SQL tooling
+├── office-scripts/  Canonical Office Scripts source
+└── docs/            Governance, architecture, Design System, specifications, development and reference
 ```
 
-The repository is currently being reorganized incrementally. Do not infer authority from folder age or file modification date; use the rules below.
+Repository authority is defined in `docs/governance/REPOSITORY_STRUCTURE_STANDARD.md`.
 
 ---
 
@@ -50,9 +50,17 @@ Do not automatically select files named `_old` or older `Executive*` components 
 
 ```text
 sql/
+├── export/
+├── import/
+├── schema/warroom/
+└── tools/warroom-schema/
 ```
 
-The current repository still contains related tooling under `database/warroom/tools/`; this is scheduled for consolidation into `sql/tools/`.
+Stored-procedure reference documentation is under:
+
+```text
+docs/reference/sql/warroom/
+```
 
 ### Office Scripts
 
@@ -89,13 +97,15 @@ docs/development/PROTOCOLO_CONSTRUCCION_MODULAR_PANTALLAS_POWER_APPS.md
 
 ### Home_PDS
 
-PULSE is building a parallel replacement of the current Home screen rather than modifying the stable screen destructively.
+Stable runtime screen:
 
 ```text
-Stable screen:
 main/screens/Home/scr_Home.pa.yaml
+```
 
-Construction workspace:
+Parallel construction workspace:
+
+```text
 docs/development/screens/home-pds/
 ```
 
@@ -109,23 +119,17 @@ Canonical runtime source:
 main/screens/PunchReview/scr_PunchReview.pa.yaml
 ```
 
-Historical/incremental construction blocks currently remain under `main/punch-review/` and are scheduled to move into the documentation development workspace during repository cleanup.
+Incremental construction workspace:
+
+```text
+docs/development/screens/punch-review/
+```
+
+Construction blocks are not canonical full-screen source.
 
 ---
 
 ## Repository organization rules
-
-Canonical structure standard:
-
-```text
-docs/governance/REPOSITORY_STRUCTURE_STANDARD.md
-```
-
-Current audit:
-
-```text
-docs/analysis/repository/REPOSITORY_AUDIT_2026-08-10.md
-```
 
 Important authority rules:
 
@@ -135,26 +139,35 @@ Important authority rules:
 4. Archived or superseded documents must not be used as current implementation authority.
 5. Repository cleanup is performed in controlled batches without mixing structural migration and runtime behavior changes.
 
+Current audit:
+
+```text
+docs/analysis/repository/REPOSITORY_AUDIT_2026-08-10.md
+```
+
+Current cleanup tracker:
+
+```text
+docs/governance/REPOSITORY_REORGANIZATION_TRACKER.md
+```
+
 ---
 
 ## Cleanup status
 
 Completed:
 
-- canonical root README;
-- canonical docs index;
-- repository structure standard;
-- repository audit;
-- stale EPIC-01 delivery report/manifests removed from root and archived under `docs/archive/deliveries/`;
-- legacy `docs/guides/DESIGN_SYSTEM.md` converted to a superseded compatibility stub;
-- component lifecycle catalog created.
+- canonical root README and documentation index;
+- repository structure standard and audit;
+- stale EPIC-01 delivery artifacts archived;
+- legacy Design System conflict resolved;
+- component lifecycle catalog created;
+- Punch Review construction workspace moved out of `main/`;
+- SQL schema, extraction tooling and SQL reference documentation consolidated under canonical locations.
 
-Pending controlled migrations:
+Pending controlled cleanup:
 
-- Punch Review construction artifacts currently stored under `main/`;
-- SQL assets split across `database/`, `sql/` and `docs/SQL/`;
-- remaining sprint/remediation/roadmap documents mixed under `docs/guides/`;
-- physical separation of confirmed legacy components after usage audit;
-- stale-link and retrieval QA after moves.
-
-See the repository audit for the phased migration plan.
+- classify remaining sprint/remediation/roadmap material under `docs/guides/`;
+- complete component usage audit before any physical legacy-component move;
+- normalize safe filenames/folders where useful;
+- final stale-link and AI-retrieval QA.
