@@ -1,59 +1,26 @@
-# PULSE — Design System
+# PULSE — Design System (Superseded)
 
-## Visual intent
+**Status:** superseded  
+**Canonical:** no  
+**Superseded by:** `../design-system/PULSE_DESIGN_SYSTEM.md`  
+**Last reviewed:** 2026-08-10
 
-PULSE uses a restrained enterprise visual language focused on operational clarity, dense information and predictable interaction.
+This path is retained temporarily as a compatibility redirect because older delivery documents and links may still reference it.
 
-## Core palette
+Do **not** use the palette, radius model, typography or component guidance previously stored here as current PULSE design authority.
 
-| Token | Value | Use |
-|---|---|---|
-| Navigation | `#07111F` | Main navigation and dark shell surfaces |
-| Navigation secondary | `#0F172A` | Secondary dark surfaces and primary text |
-| Surface | `#FFFFFF` | Cards and working surfaces |
-| Background | `#F6F8FB` | Application background |
-| Border | `#E2E8F0` | Card, panel and table boundaries |
-| Text | `#0F172A` | Primary content |
-| Muted text | `#64748B` | Supporting content |
-| Pulse blue | `#1677FF` | Primary action and information |
-| Pulse purple | `#6B2C7A` | Brand accent |
-| Success | `#16A34A` | Completed and healthy states |
-| Warning | `#D97706` | Attention and emerging risk |
-| Danger | `#DC2626` | Failure and critical risk |
+The canonical PULSE Design System is:
 
-## Spacing
+```text
+docs/design-system/PULSE_DESIGN_SYSTEM.md
+```
 
-Use a four-pixel base grid.
+Related current documents:
 
-- 4 px: micro spacing.
-- 8 px: internal compact spacing.
-- 12 px: related-control spacing.
-- 16 px: standard card padding.
-- 24 px: section separation.
-- 32 px: major page separation.
+```text
+docs/design-system/SAAS_INTERFACE_ARCHETYPES.md
+docs/design-system/POWER_APPS_VISUAL_QA_GUARDRAILS.md
+docs/design-system/components/
+```
 
-## Radius
-
-- 9–10 px: buttons and compact controls.
-- 12–14 px: alerts and KPI cards.
-- 16–18 px: dashboard panels.
-
-Do not add radius properties to controls that do not support them. Prefer `GroupContainer@1.5.0` or `Classic/Button@2.2.0` when exact radius control is required.
-
-## Typography
-
-- Screen title: 22–24 px, semibold.
-- Section title: 16–18 px, semibold.
-- Card title: 11–14 px, semibold.
-- KPI value: 20–24 px, bold.
-- Body: 9–11 px.
-- Metadata: 8–9 px.
-
-## Component behavior
-
-- Cards use a one-pixel border and no heavy shadow.
-- Clickable cards use a transparent classic button overlay.
-- Status is communicated with both color and text.
-- Empty states always provide a concrete next action when recovery is possible.
-- Loading states should replace content without shifting the page layout.
-- Responsive behavior is controlled by parent width rather than fixed screen resolution.
+This compatibility file may be removed after repository link migration is complete.
