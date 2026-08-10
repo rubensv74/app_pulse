@@ -2,47 +2,64 @@
 
 **Status:** normative  
 **Canonical:** yes  
-**Version:** 1.0  
+**Version:** 1.1  
 **Last reviewed:** 2026-08-10
 
 ## Purpose
 
 A reusable Canvas component must not be considered ready for screen integration merely because its `.pa.yaml` exists in Git or because the component definition can be created in Studio.
 
-PULSE distinguishes three different facts:
+PULSE distinguishes:
 
 ```text
-SOURCE_VALID
+BODY_SOURCE_VALID
+PUBLIC_CONTRACT_CREATED_IN_STUDIO
 COMPONENT_DEFINITION_ACCEPTED
 INSTANCE_SAFE
+PUBLIC_CONTRACT_VALIDATED
+VISUAL_QA_VALIDATED
+READY_FOR_INTEGRATION
 ```
 
-Only after all three, plus App Checker/visual QA, may the component be marked `READY_FOR_INTEGRATION`.
+The public-property authoring rule is defined in:
 
-This gate was formalized after `cmp_PageHeaderPro` could exist as a component source but Power Apps Studio closed when an instance was inserted into `scr_Home_PDS`.
+```text
+docs/development/POWER_APPS_COMPONENT_PUBLIC_PROPERTY_AUTHORING.md
+```
 
-The Studio closure is a confirmed **effect**. Its technical root cause is not yet confirmed and must not be guessed.
+## Mandatory authoring boundary
+
+For the current incremental PULSE workflow:
+
+```text
+Public Inputs / Outputs / Events → create in Power Apps Studio
+Component body controls/formulas → maintain in Source Code YAML
+```
+
+Do **not** inject a `CustomProperties:` block into pasteable reusable-component YAML unless that exact path has independently demonstrated `INSTANCE_SAFE` in the active app/version.
+
+The repository still documents the complete component contract, but Studio is the authoring authority for public-property metadata.
 
 ---
 
-## Gate 0 — Repository/static validation
+## Gate 0 — Repository/static body validation
 
-Before asking the user to import/create the component, verify:
+Before giving component body YAML to the user, verify:
 
 ```text
 [ ] source starts at a demonstrated PaYaml root (`ComponentDefinitions:`)
 [ ] component identity is unique and consistent
-[ ] every control family/version is demonstrated in the current repository or verified against current platform documentation
-[ ] properties are compatible with the declared control versions
+[ ] no `CustomProperties:` block is included under the current Studio-authored-contract rule
+[ ] required Studio public contract is documented separately
+[ ] every control family/version is demonstrated in the current repository or verified
+[ ] properties are compatible with declared control versions
 [ ] no protocol operation label is represented as an invalid PaYaml node
 [ ] no unsupported property already recorded in compatibility registers is present
-[ ] event definitions/invocations follow a proven component pattern
 [ ] no hidden global variable is used as per-instance state unless explicitly audited
-[ ] no component is nested inside a gallery when prohibited by current compatibility rules
+[ ] no prohibited component nesting pattern is introduced
 [ ] sibling/parent formulas have no circular dependency
 [ ] geometry formulas have a defined safe range
 [ ] static ModernText follows the current AutoHeight/Wrap QA rule
-[ ] canonical component source and validated construction artifact are synchronized
 ```
 
 Static result values:
@@ -57,19 +74,39 @@ Static review can never produce `READY_FOR_INTEGRATION` by itself.
 
 ---
 
-## Gate 1 — Isolated component-definition validation
+## Gate 1 — Studio public contract creation
 
-Use Power Apps Studio in an isolated authoring context before touching the target screen.
+Before pasting body YAML that references public properties, create those properties manually in Studio from the documented contract.
 
-Recommended order:
+For each property record:
 
 ```text
-1. open a safe/sandbox copy or isolated test surface in the same Power Apps environment
-2. create/import the reusable component from the complete canonical source
-3. save
-4. wait for formula validation
-5. review App Checker
-6. close/reopen Studio if useful to prove persistence
+Name
+Property type / direction
+Data type
+Default value if applicable
+Purpose
+```
+
+Pass condition:
+
+```text
+PUBLIC_CONTRACT_CREATED_IN_STUDIO
+```
+
+If adding a Studio-created property itself destabilizes the component, stop and isolate that property type.
+
+---
+
+## Gate 2 — Component-body acceptance
+
+After the public contract exists in Studio:
+
+```text
+1. paste/replace the component body Source Code
+2. save
+3. wait for formula validation
+4. review App Checker
 ```
 
 Pass condition:
@@ -78,24 +115,19 @@ Pass condition:
 COMPONENT_DEFINITION_ACCEPTED
 ```
 
-If Studio rejects the source or closes, stop. Do not continue to instance validation.
+If Studio rejects the body or closes, stop before target-screen integration.
 
 ---
 
-## Gate 2 — Isolated instantiation smoke test
+## Gate 3 — Isolated instantiation smoke test
 
-A component definition can be accepted while an instance still triggers an authoring/runtime problem.
-
-Therefore create a blank isolated test screen and insert exactly one instance with default properties only.
-
-Do not bind project variables, collections, flows or navigation yet.
+Insert exactly one instance on a blank diagnostic screen with default properties.
 
 Validate:
 
 ```text
-[ ] instance can be inserted without Studio closing
+[ ] instance inserts without Studio closing
 [ ] component renders at its default size
-[ ] resize narrower/wider within intended range does not corrupt authoring
 [ ] save succeeds
 [ ] reopen succeeds
 [ ] App Checker shows no new component-attributable error
@@ -107,30 +139,30 @@ Pass condition:
 INSTANCE_SAFE
 ```
 
-A Studio crash/forced close during insertion is an automatic **FAIL_INSTANCE**.
+A Studio crash/forced close during insertion is an automatic `FAIL_INSTANCE`.
 
 ---
 
-## Gate 3 — Public contract smoke test
+## Gate 4 — Public contract smoke test
 
-Only after `INSTANCE_SAFE`, exercise the public component contract in isolation:
+Only after `INSTANCE_SAFE`, exercise the public contract in isolation:
 
 ```text
 [ ] text inputs
-[ ] Boolean visibility/enabled inputs
-[ ] color/theme inputs
+[ ] Boolean inputs
+[ ] color inputs only when actually needed
 [ ] outputs, if any
 [ ] each event independently
-[ ] multiple instances if the component is intended to support them
+[ ] multiple instances if required by the component contract
 ```
 
 No consuming screen should reach into internal control names.
 
 ---
 
-## Gate 4 — Visual QA
+## Gate 5 — Visual QA
 
-Validate with realistic text/content:
+Validate with realistic content:
 
 ```text
 [ ] no unintended scrollbar
@@ -139,50 +171,45 @@ Validate with realistic text/content:
 [ ] no negative/off-canvas geometry in supported width range
 [ ] hover/pressed/disabled states render correctly
 [ ] PDS tokens are respected
-[ ] zoom/authoring view does not expose obvious layout corruption
 ```
 
 For text controls, apply `docs/design-system/POWER_APPS_VISUAL_QA_GUARDRAILS.md`.
 
 ---
 
-## Gate 5 — Target-screen integration
+## Gate 6 — Target-screen integration
 
 Only now may a feature block insert the component into a real target screen.
 
-Integration block responsibilities:
+Integration responsibilities:
 
 ```text
 bind real inputs
 bind events
 bind context/navigation
-validate the target screen
+validate target screen
 run App Checker
 confirm no regression in fallback/current screen
 ```
 
-A component that has not reached `INSTANCE_SAFE` must never be introduced into an active screen block.
-
 ---
 
-## Failure isolation / binary reduction
+## Failure isolation
 
-When definition import succeeds but instance insertion crashes Studio, do not immediately rewrite the entire component.
+Do not repeatedly retest the same full component after a confirmed authoring-path problem.
 
-Create controlled reduced candidates and add responsibilities incrementally:
+Reduce only when needed to distinguish between:
 
 ```text
-A. root container only
-B. identity/text only
-C. static context containers
-D. actions without events
-E. public events / transparent hit surfaces
-F. full geometry and responsive formulas
+component shell
+primitive child controls
+Studio-created public contract
+body-to-public-property bindings
+events
+layout/geometry
 ```
 
-The first stage that reproduces the crash identifies the smallest suspect surface.
-
-Each reduced candidate is a diagnostic artifact, not canonical product source.
+Once a safe authoring boundary is demonstrated, adopt it as the implementation rule and stop spending time trying to make the unsafe path work.
 
 ---
 
@@ -197,27 +224,24 @@ Studio/environment
 Action being performed
 Observed effect/error
 Session ID if available
-Definition import status
+Public contract authoring path
 Instance insertion status
 App Checker status
-Smallest reproducing candidate
-Confirmed cause or UNKNOWN
-Corrective change
+Confirmed operational cause or UNKNOWN
+Corrective authoring path
 Revalidation result
 ```
-
-Never convert correlation into a confirmed root cause without a reproducer.
 
 ---
 
 ## Lifecycle mapping
 
 ```text
-source created                    → REVIEW_REQUIRED
-PASS_STATIC                       → REVIEW_REQUIRED
-COMPONENT_DEFINITION_ACCEPTED     → REVIEW_REQUIRED
-INSTANCE_SAFE + contract + QA     → ACTIVE / PDS_CANDIDATE as appropriate
-FAIL_INSTANCE                     → REVIEW_REQUIRED + dependent block stopped
+body source created                         → REVIEW_REQUIRED
+Studio public contract created              → REVIEW_REQUIRED
+component body accepted                     → REVIEW_REQUIRED
+INSTANCE_SAFE + contract + QA                → ACTIVE / PDS_CANDIDATE
+FAIL_INSTANCE                                → REVIEW_REQUIRED + dependent block stopped
 ```
 
 The component catalog must reflect this state.
