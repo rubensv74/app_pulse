@@ -1,0 +1,86 @@
+# BLOCK 13E — UNSAVED CHANGES GUARD IN BILINGUAL HELP
+#
+# Apply only after:
+# - Block 12A has been applied.
+# - Block 13 has been validated in Studio.
+#
+# PRE-YAML GATE APPLIED:
+# docs/development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
+# was consulted immediately before drafting this YAML.
+#
+# OPERATION 1 — ADD TWO CHILDREN
+# Parent: conPR_HelpContent
+# Exact location: after lblPR_HelpRelatedBody and before conPR_HelpWarningCard.
+#
+# OPERATION 2 — REPLACE TEXT PROPERTY
+# Control: lblPR_HelpActivityTitle
+#
+# OPERATION 3 — REPLACE TEXT PROPERTY
+# Controls: lblPR_HelpLimitationsTitle and lblPR_HelpLimitationsBody
+
+# =====================================================
+# OPERATION 1 — ADD AFTER lblPR_HelpRelatedBody
+# =====================================================
+
+- lblPR_HelpDirtyGuardTitle:
+    Control: ModernText@1.0.0
+    Properties:
+      AutoHeight: =true
+      Color: =varTheme_Text
+      FontWeight: =FontWeight.Semibold
+      Height: =26
+      Size: =11
+      Text: |-
+        =If(
+            Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+            "8. Protect unsaved changes",
+            "8. Protege los cambios sin guardar"
+        )
+      Width: =Parent.Width
+- lblPR_HelpDirtyGuardBody:
+    Control: ModernText@1.0.0
+    Properties:
+      AutoHeight: =true
+      Color: =varTheme_TextMuted
+      Height: =116
+      Size: =9
+      Text: |-
+        =If(
+            Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+            "When Custom Fields contain unsaved changes and you try to move to another Punch, go back, or open Punch List, the workspace asks what to do. Save and continue persists the fields before navigation. Discard and continue restores the last server-loaded values and then navigates. Cancel keeps the current Punch and all local edits. If saving fails, navigation does not continue.",
+            "Cuando Custom Fields contiene cambios sin guardar e intentas cambiar de Punch, volver atrás o abrir Punch List, el workspace pregunta qué hacer. Save and continue guarda los campos antes de navegar. Discard and continue restaura los últimos valores cargados del servidor y después navega. Cancel mantiene el Punch actual y todos los cambios locales. Si el guardado falla, la navegación no continúa."
+        )
+      Width: =Parent.Width
+
+# =====================================================
+# OPERATION 2 — REPLACE lblPR_HelpActivityTitle.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "9. Read Session Activity",
+      "9. Consulta Session Activity"
+  )
+
+# =====================================================
+# OPERATION 3A — REPLACE lblPR_HelpLimitationsTitle.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "10. Current implementation status",
+      "10. Estado actual de implementación"
+  )
+
+# =====================================================
+# OPERATION 3B — REPLACE lblPR_HelpLimitationsBody.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "Reviewed and Review Progress remain session-only. Related in Queue remains contextual to the loaded queue. Source-screen integrations and final production cleanup are handled in subsequent blocks.",
+      "Reviewed y Review Progress siguen siendo solo de sesión. Related in Queue continúa siendo un contexto derivado de la cola cargada. Las integraciones desde las pantallas de origen y la limpieza final de producción se completan en los bloques posteriores."
+  )
