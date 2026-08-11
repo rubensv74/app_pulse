@@ -27,6 +27,7 @@ No es un registro histórico pasivo. Cada error confirmado debe convertirse en u
 13. Tras cada error de importación, corregir el archivo fuente del repositorio; no limitarse a dar una corrección manual en Studio.
 14. Registrar mensaje de error, causa, corrección, Session ID y regla preventiva.
 15. Todo control o componente nuevo debe considerarse pendiente de validación hasta que Power Apps Studio lo acepte.
+16. Para construir JSON desde valores Power Fx, evitar secuencias manuales de escape con barras invertidas y comillas. Preferir `JSON(valor, JSONFormat.Compact)` y componer estructuras mayores a partir de esos fragmentos serializados.
 
 ---
 
@@ -43,6 +44,7 @@ No es un registro histórico pasivo. Cada error confirmado debe convertirse en u
 | Variable numérica nueva | Primera asignación solo con `Blank()` | Nombre/tipo no establecido | Inicializar con valor numérico, por ejemplo `0` |
 | `CanvasComponent` | Componente presente solo en GitHub, no en la app | `PA2301` | Instalar el componente primero o no instanciarlo |
 | SVG inline en bloque de pantalla | Renderizado visual poco fiable en este caso | Problema visual | Preferir componente premium instalado y validado |
+| Construcción manual de JSON con `\"`/barras invertidas en Power Fx | El parser puede interpretar mal las comillas y romper la aridad de funciones | `Invalid number of arguments` | Serializar cada valor con `JSON(..., JSONFormat.Compact)` |
 
 ---
 
@@ -192,6 +194,73 @@ RESUELTO — cmp_DonutPro confirmado en la app activa.
 
 ---
 
+## Incidente PR-SC-006 — Escape manual de JSON rompe la fórmula MultiChoice
+
+**Fecha:** 2026-08-11  
+**Bloque afectado:** `docs/development/components/custom-field-editor-pro/blocks/03_field_renderers.pa.yaml`  
+**Control:** `cmbCFEPro_Choice`  
+**Propiedad:** `OnChange`  
+**Session ID:** no facilitado; error confirmado mediante captura de Power Apps Studio.
+
+### Error
+
+```text
+Invalid number of arguments: received 1, expected 2.
+```
+
+Studio marcó la expresión usada para construir manualmente el JSON de `MultiChoice`, concretamente la combinación de `Concat` con cadenas de comillas y `Substitute` expresadas mediante secuencias con barras invertidas.
+
+### Causa
+
+Power Fx no debe tratarse como JavaScript/C# para escapar cadenas. La construcción manual con patrones del tipo `\"` dentro de YAML puede acabar alterando cómo el parser interpreta los delimitadores de texto y, como consecuencia, la aridad aparente de `Concat`, `Substitute` u otras funciones cercanas.
+
+### Corrección
+
+El bloque CF-03 deja de escapar las comillas manualmente. Cada valor seleccionado se serializa con:
+
+```powerfx
+JSON(Value, JSONFormat.Compact)
+```
+
+y `Concat` une esos fragmentos dentro de los corchetes del array.
+
+Conceptualmente:
+
+```powerfx
+"[" &
+Concat(
+    Self.SelectedItems,
+    JSON(Value, JSONFormat.Compact),
+    ","
+) &
+"]"
+```
+
+Así, valores como `Material` y `Engineering` producen el contrato esperado:
+
+```json
+["Material","Engineering"]
+```
+
+sin gestionar manualmente las comillas ni caracteres de escape.
+
+### Regla preventiva
+
+Para cualquier YAML/Power Fx futuro:
+
+- no trasladar sintaxis de escape de JavaScript, C#, JSON textual o lenguajes similares a una fórmula Power Fx;
+- cuando el objetivo sea serializar un valor a JSON, usar la función `JSON` de Power Fx;
+- construir manualmente solo la estructura mínima que `JSON` no proporcione en el contrato requerido;
+- validar específicamente Choice/MultiChoice cuando exista serialización de colecciones.
+
+### Estado
+
+```text
+CORREGIDO EN REPOSITORIO — pendiente de revalidación en Studio.
+```
+
+---
+
 ## Lección PR-UX-001 — Evitar SVG inline en bloques de pantalla
 
 **Fecha:** 2026-08-10  
@@ -336,6 +405,7 @@ Antes de guardar cualquier `.pa.yaml`:
 - [ ] Cada propiedad compleja aparece en un control equivalente ya validado o en el contrato fuente del componente.
 - [ ] Toda instancia `CanvasComponent` corresponde a un componente confirmado dentro de la app activa.
 - [ ] No se introduce SVG inline como sustituto de un componente visual instalado o instalable.
+- [ ] La serialización JSON no usa cadenas de escape manuales cuando `JSON(..., JSONFormat.Compact)` resuelve el contrato.
 - [ ] La operación de inserción o sustitución está documentada al principio del archivo.
 - [ ] Existen prueba mínima y resultado esperado.
 
