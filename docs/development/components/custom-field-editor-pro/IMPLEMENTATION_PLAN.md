@@ -9,8 +9,9 @@ Se aplica el Protocolo de Implementación Incremental Asistida y el gate PRE-YAM
 ## Estado actual
 
 - `CF-01` — component shell publicado; continuación autorizada.
-- `CF-02` — working buffer + dirty tracking publicado; pendiente de validación en Power Apps Studio.
-- `CF-03` y siguientes — bloqueados hasta validar CF-02.
+- `CF-02` — working buffer + dirty tracking publicado; continuación autorizada.
+- `CF-03` — renderizadores premium multitype publicados; pendiente de validación en Power Apps Studio.
+- `CF-04` y siguientes — bloqueados hasta validar CF-03.
 
 ## Secuencia
 
@@ -56,7 +57,7 @@ No se conectan flows.
 
 ### CF-03 — Renderizado por FieldType
 
-**Objetivo:** sustituir el placeholder por Gallery premium con los seis editores reales.
+**Objetivo:** sustituir el placeholder/debug body por una Gallery premium con los seis editores reales.
 
 Tipos:
 
@@ -70,13 +71,18 @@ Tipos:
 Incluye:
 
 - label;
-- technical key opcional;
-- help text opcional;
+- technical key y help text en metadata secundaria;
 - required marker;
+- type pill;
 - modified marker;
-- control específico por tipo.
+- control específico por tipo;
+- working values conservados en `colCFEPro_Working`;
+- dirty payload único por `FieldKey`;
+- estados visuales Loading / Error / Empty dentro del body.
 
-**Gate:** todos los tipos se renderizan correctamente con un seed local y conservan sus valores al hacer scroll.
+No se conectan flows y todavía no se emite `OnChange` hacia el host.
+
+**Gate:** todos los tipos se renderizan correctamente, sus valores se conservan al hacer scroll, los cambios generan un único dirty item por `FieldKey`, el indicador Modified coincide con los dirty rows y Reset restaura el input vigente.
 
 ---
 
