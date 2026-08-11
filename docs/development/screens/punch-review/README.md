@@ -64,11 +64,13 @@ Do not work from memory. Every confirmed Studio incompatibility must become a pr
 28. `13C_dirty_guard_back.replace-formula.powerfx` — protects Back navigation
 29. `13D_dirty_guard_review_actions.replace-formula.powerfx` — protects Open Punch List
 30. `13E_help_dirty_guard.incremental-patch.pa.yaml` — dirty-guard help
-31. `14_punches_entry.add-child.pa.yaml` — published; pending Studio validation
+31. `14_punches_entry.add-child.pa.yaml` — Punch List entry route
 32. `14A_punches_return_to_review.replace-formula.powerfx` — Punch List return route
 33. `14B_punchreview_initial_selection.append-onvisible.powerfx` — loads initial Comments + Custom Fields on workspace entry
+34. `15_home_entry.replace-formula.powerfx` — published; pending Studio validation
+35. `15A_help_source_integrations.incremental-patch.pa.yaml` — apply only after Blocks 14 and 15 validate
 
-Do not begin Block 15 until Block 14 is validated end-to-end from a real loaded Punch List page and the return path back to Punch Review preserves the review session.
+Do not begin Block 16 until the Home Review action has been validated from a real loaded Home Punch grid, including selected-row scope and return navigation.
 
 ## Confirmed service contracts
 
@@ -166,13 +168,43 @@ If `varSelectedTaskId` belongs to the loaded page, that Punch becomes the initia
 
 `14B_punchreview_initial_selection.append-onvisible.powerfx` routes the initial active record through `btnPR_SelectCurrent`, ensuring Comments and Custom Fields use the same loading pipeline as later queue navigation.
 
-When Punch Review uses `Open Punch List`, the existing action sets:
+When Punch Review uses `Open Punch List`, the existing action sets `varPunches_ReturnView = "PunchReview"`. `14A_punches_return_to_review.replace-formula.powerfx` makes that route functional without rebuilding the queue, so Reviewed state and Session Activity remain part of the current review session.
+
+## Home integration contract
+
+Block 15 activates the existing `REVIEW` action in:
 
 ```text
-varPunches_ReturnView = "PunchReview"
+cmpHomePunchActionToolbar
 ```
 
-`14A_punches_return_to_review.replace-formula.powerfx` makes that route functional without rebuilding the queue, so Reviewed state and Session Activity remain part of the current review session.
+Source screen:
+
+```text
+scr_Home
+```
+
+Source data:
+
+```text
+colPunchExecutiveGridFiltered
+colHomePunchGridView
+colHomePunchGridSelectedKeys
+```
+
+Home uses a deliberately local queue contract:
+
+- if checked rows exist, only those loaded rows enter Punch Review and queue scope is `SELECTED`;
+- otherwise, the current loaded Home grid view enters Punch Review and queue scope is `HOME_CONTEXT`;
+- no unloaded SQL rows are simulated or claimed to exist in the review queue;
+- `varHomePunchGridSelectedKey` becomes the initial Punch when it belongs to the queue, otherwise row 1 is used;
+- the review source is `HOME` and Back naturally returns to the Home screen.
+
+The current Home cell-details response contains the numeric Punch identity and operational context required to open real Comments and Custom Fields. It does not currently materialize AreaCode, UnitCode, SystemCode, ElementCode, CommentCount or LastCommentOn into `colPunchExecutiveGridFiltered`; Block 15 therefore leaves those queue projection fields empty/zero rather than inventing values. Real Comments and Custom Fields are still loaded through the existing services after entry.
+
+`15_home_entry.replace-formula.powerfx` replaces the complete `cmpHomePunchActionToolbar.OnAction` formula while preserving the existing non-Review actions.
+
+`15A_help_source_integrations.incremental-patch.pa.yaml` documents both Punch List and Home entry semantics in the bilingual help modal after validation.
 
 ## Manual and compatibility knowledge
 
