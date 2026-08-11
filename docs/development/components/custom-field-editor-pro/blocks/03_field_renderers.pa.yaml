@@ -8,7 +8,7 @@
 # PRE-YAML GATE APPLIED
 # docs/development/screens/punch-review/
 # POWER_APPS_SOURCE_CODE_COMPATIBILITY.md was read immediately before
-# drafting this YAML.
+# drafting and correcting this YAML.
 #
 # Purpose:
 # - replace the CF-02 preview/debug body with the production-style field list;
@@ -46,6 +46,8 @@
 # - no Reset() assumptions;
 # - Choice/MultiChoice OptionsJson contract matches the already used drawer
 #   and Punch Review implementation.
+# - JSON strings for MultiChoice are produced with JSON(..., JSONFormat.Compact)
+#   rather than hand-escaped quote/backslash literals.
 #
 # Important:
 # - CF-03 does not call flows.
@@ -55,7 +57,7 @@
 #
 # Validation gate:
 # 1. Replace only conCFEPro_Body from CF-02 with this complete control.
-# 2. Studio accepts the component without PA1001 / PA2108 / PA2301.
+# 2. Studio accepts the component without PA1001 / PA2108 / PA2301 or formula errors.
 # 3. Test Items must include all six supported FieldTypes.
 # 4. Text, Number, Date, YesNo, Choice and MultiChoice render correctly.
 # 5. Changing a field makes the header state Unsaved and DirtyCount=1.
@@ -64,7 +66,8 @@
 # 8. Modified badge appears only for dirty FieldKeys.
 # 9. Reset restores the current Items input and removes Modified badges.
 # 10. Scrolling away and back preserves working values.
-# 11. Do not proceed to CF-04 until Studio validates this block.
+# 11. MultiChoice produces a JSON array of strings such as ["A","B"].
+# 12. Do not proceed to CF-04 until Studio validates this corrected block.
 
 - conCFEPro_Body:
     Control: GroupContainer@1.5.0
@@ -534,7 +537,7 @@
                                           "[" &
                                           Concat(
                                               Self.SelectedItems,
-                                              "\"" & Substitute(Value, "\"", "\\\"") & "\"",
+                                              JSON(Value, JSONFormat.Compact),
                                               ","
                                           ) &
                                           "]"
