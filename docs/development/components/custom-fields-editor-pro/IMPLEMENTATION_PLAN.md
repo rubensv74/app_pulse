@@ -4,8 +4,9 @@
 
 - `DF-01` — published; continuation explicitly authorized by the user, while Studio validation remains authoritative.
 - `DF-02` — published; continuation to DF-03 explicitly authorized by the user.
-- `DF-03` — published with mandatory DF-03A draft-initialization property guide; pending Power Apps Studio validation.
-- `DF-04` and later — blocked until DF-03 + DF-03A are accepted in Studio or any reported issue is corrected.
+- `DF-03` — published with mandatory DF-03A draft-initialization property guide; continuation to DF-04 explicitly authorized by the user.
+- `DF-04` — published with mandatory DF-04A options-state property guide; pending Power Apps Studio validation.
+- `DF-05` and later — blocked until DF-04 + DF-04A are accepted in Studio or any reported issue is corrected.
 
 ## DF-01 — Definition editor shell
 
@@ -121,16 +122,43 @@ Gate DF-03:
 
 ## DF-04 — Choice / MultiChoice options editor
 
-Objective: maintain `OptionsJson` without making users edit raw JSON.
+Artifacts:
 
-Includes:
+- `blocks/04_choice_options_editor.replace-control.pa.yaml`
+- `blocks/04A_choice_options_state.property-guide.md`
 
-- list of options;
-- add/remove option;
-- reorder if safely implementable;
-- serialization to the existing `OptionsJson` string-array contract using Power Fx `JSON(...)` patterns rather than manual quote escaping.
+Objective: maintain the existing `OptionsJson` contract without exposing raw JSON to the user.
 
-Gate: generated OptionsJson round-trips through existing data without parser errors.
+Implementation:
+
+- DF-04A converts the stored JSON string array into a human-readable one-option-per-line local state when a definition is selected;
+- new Choice/MultiChoice definitions start with an empty options list;
+- switching a new definition between Choice and MultiChoice preserves its option lines;
+- switching a new definition to a non-choice type clears options and normalizes `OptionsJson` to `[]`;
+- DF-04 replaces the informational DF-03 notice with a compact multiline options editor;
+- one line represents one option, so add/remove/reorder are performed by adding/removing/moving lines;
+- blank lines are ignored during serialization;
+- each option is serialized with `JSON(Trim(Value), JSONFormat.Compact)` and concatenated into the existing JSON string-array contract;
+- no raw JSON is displayed or edited;
+- no backend flow is called.
+
+Why the line-based editor is used in v1:
+
+- it supports add/remove/reorder with control types already validated in PULSE;
+- it avoids introducing an unvalidated horizontal-gallery pattern or secondary modal;
+- it directly eliminates the manual JSON-editing UX from the legacy drawer;
+- it preserves option order explicitly through line order.
+
+Gate DF-04:
+
+- apply DF-04A before the control replacement;
+- Studio accepts `conCFDEPro_OptionsNotice` -> `conCFDEPro_OptionsEditor` without Source Code/formula errors;
+- seeded Choice/MultiChoice definitions round-trip from OptionsJson into visible lines;
+- non-choice fields hide the editor;
+- add/remove/reorder lines changes local draft state and serialized order;
+- blank lines do not generate empty JSON entries;
+- quotes/special characters do not break serialization because `JSON()` performs escaping;
+- no backend service is invoked.
 
 ## DF-05 — Backend host integration
 
