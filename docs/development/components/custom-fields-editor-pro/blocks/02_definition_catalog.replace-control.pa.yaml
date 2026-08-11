@@ -1,0 +1,535 @@
+# DF-02 — cmp_CustomFieldsEditorPro DEFINITION CATALOG
+#
+# Operation: REPLACE CONTROL COMPLETELY.
+# Target control: conCFDEPro_Catalog
+# Parent: cmp_CustomFieldsEditorPro > conCFDEPro_Root > conCFDEPro_Body
+# Required base: DF-01 component shell.
+#
+# PRE-YAML GATE APPLIED
+# docs/development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
+# was read immediately before drafting this YAML.
+#
+# Purpose:
+# - replace the DF-01 catalog placeholder with a real local definition catalog;
+# - search by Label or FieldKey;
+# - switch between active-only and all definitions;
+# - sort by SortOrder;
+# - select one definition locally without a backend call;
+# - prepare Edit/Add local state for DF-03;
+# - preserve host ownership of flows.
+#
+# State introduced with Set() inside the component:
+# - varCFDEPro_SelectedFieldKey : Text
+# - varCFDEPro_EditMode        : Text (EDIT / ADD)
+#
+# Canvas-component note:
+# Set() is intentionally used instead of UpdateContext(). Component-scoped Set
+# variables remain local to the component when app scope is not enabled.
+#
+# This block intentionally does NOT:
+# - call WarRoom_ListCustomFieldDefs;
+# - edit definition properties;
+# - save or activate/deactivate definitions;
+# - serialize OptionsJson;
+# - modify the center editor or right preview;
+# - integrate into Punch Review.
+#
+# Compatibility rules applied:
+# - valid list-of-controls root for control replacement;
+# - no SVG;
+# - no nested CanvasComponent dependency;
+# - no Radius* on Label@2.5.1;
+# - no AccessibleLabel on Classic/Button@2.2.0;
+# - no Reset() assumptions;
+# - Gallery@2.15.0, ModernTextInput@1.1.1 and Classic/Toggle@2.1.0
+#   already exist in current PULSE sources.
+#
+# Validation gate:
+# 1. Replace only conCFDEPro_Catalog from DF-01 with this control.
+# 2. Studio accepts it without PA1001 / PA2108 / formula errors.
+# 3. With DF-01A seed, six definitions appear when Show inactive is enabled.
+# 4. Active-only hides the inactive Target Date definition.
+# 5. Search by label and key filters immediately.
+# 6. Definitions remain sorted by SortOrder.
+# 7. Clicking a row highlights exactly one definition.
+# 8. Selected row remains visually distinct after search when still visible.
+# 9. + Add field sets local ADD mode and raises OnAddRequested.
+# 10. No flow is called by this block.
+# 11. Do not begin DF-03 until Studio validates DF-02.
+
+- conCFDEPro_Catalog:
+    Control: GroupContainer@1.5.0
+    Variant: ManualLayout
+    Properties:
+      BorderColor: =cmp_CustomFieldsEditorPro.BorderColor
+      BorderThickness: =1
+      DropShadow: =DropShadow.None
+      Fill: =cmp_CustomFieldsEditorPro.BackgroundColor
+      Height: =Parent.Height - 32
+      RadiusBottomLeft: =14
+      RadiusBottomRight: =14
+      RadiusTopLeft: =14
+      RadiusTopRight: =14
+      Width: =Max(240, Min(292, Parent.Width * 0.25))
+      X: =16
+      Y: =16
+    Children:
+      - lblCFDEPro_CatalogTitle:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =cmp_CustomFieldsEditorPro.TextColor
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =24
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =10
+            Text: ="Field catalog"
+            Width: =Parent.Width - 108
+            X: =14
+            Y: =12
+      - lblCFDEPro_CatalogCount:
+          Control: Label@2.5.1
+          Properties:
+            Align: =Align.Right
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =cmp_CustomFieldsEditorPro.MutedTextColor
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =20
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =7
+            Text: |-
+              =Text(CountRows(galCFDEPro_Definitions.AllItems)) &
+              " / " &
+              Text(cmp_CustomFieldsEditorPro.DefinitionCount)
+            Width: =76
+            X: =Parent.Width - 90
+            Y: =14
+      - btnCFDEPro_AddField:
+          Control: Classic/Button@2.2.0
+          Properties:
+            BorderColor: =cmp_CustomFieldsEditorPro.AccentColor
+            BorderThickness: =1
+            Color: =Color.White
+            DisplayMode: |-
+              =If(
+                  !cmp_CustomFieldsEditorPro.CanManage ||
+                  cmp_CustomFieldsEditorPro.IsLoading ||
+                  cmp_CustomFieldsEditorPro.IsSaving,
+                  DisplayMode.Disabled,
+                  DisplayMode.Edit
+              )
+            Fill: =cmp_CustomFieldsEditorPro.AccentColor
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =34
+            HoverFill: =ColorFade(cmp_CustomFieldsEditorPro.AccentColor, -12%)
+            OnSelect: |-
+              =Set(varCFDEPro_EditMode, "ADD");
+              Set(varCFDEPro_SelectedFieldKey, "");
+              cmp_CustomFieldsEditorPro.OnAddRequested()
+            RadiusBottomLeft: =8
+            RadiusBottomRight: =8
+            RadiusTopLeft: =8
+            RadiusTopRight: =8
+            Size: =8
+            Text: ="+ Add field"
+            Width: =Parent.Width - 28
+            X: =14
+            Y: =46
+      - txtCFDEPro_Search:
+          Control: ModernTextInput@1.1.1
+          Properties:
+            Appearance: =Appearance.Outline
+            Default: =""
+            Height: =34
+            Placeholder: ="Search label or key"
+            Width: =Parent.Width - 28
+            X: =14
+            Y: =92
+      - tglCFDEPro_ShowInactive:
+          Control: Classic/Toggle@2.1.0
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            BorderStyle: =BorderStyle.None
+            Color: =cmp_CustomFieldsEditorPro.TextColor
+            Default: =false
+            FalseText: ="Active only"
+            Font: =Font.'Segoe UI'
+            Height: =32
+            TrueText: ="Show inactive"
+            Width: =Parent.Width - 28
+            X: =14
+            Y: =132
+      - rectCFDEPro_CatalogDivider:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            BorderStyle: =BorderStyle.None
+            Fill: =cmp_CustomFieldsEditorPro.BorderColor
+            Height: =1
+            Width: =Parent.Width - 28
+            X: =14
+            Y: =174
+      - galCFDEPro_Definitions:
+          Control: Gallery@2.15.0
+          Variant: Vertical
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Fill: =Color.Transparent
+            Height: =Parent.Height - 190
+            Items: |-
+              =With(
+                  {
+                      src:
+                          If(
+                              tglCFDEPro_ShowInactive.Value,
+                              cmp_CustomFieldsEditorPro.Definitions,
+                              Filter(
+                                  cmp_CustomFieldsEditorPro.Definitions,
+                                  Coalesce(IsActive, false)
+                              )
+                          ),
+                      searchText:
+                          Lower(
+                              Trim(
+                                  Coalesce(txtCFDEPro_Search.Text, "")
+                              )
+                          )
+                  },
+                  SortByColumns(
+                      If(
+                          IsBlank(searchText),
+                          src,
+                          Filter(
+                              src,
+                              searchText in Lower(Coalesce(Label, "")) ||
+                              searchText in Lower(Coalesce(FieldKey, ""))
+                          )
+                      ),
+                      "SortOrder",
+                      SortOrder.Ascending
+                  )
+              )
+            ShowNavigation: =false
+            ShowScrollbar: =true
+            TemplateFill: =Color.Transparent
+            TemplatePadding: =5
+            TemplateSize: =84
+            Visible: |-
+              =!cmp_CustomFieldsEditorPro.IsLoading &&
+              IsBlank(cmp_CustomFieldsEditorPro.ErrorText)
+            Width: =Parent.Width
+            Y: =182
+          Children:
+            - conCFDEPro_DefinitionRow:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: |-
+                    =If(
+                        ThisItem.FieldKey = varCFDEPro_SelectedFieldKey,
+                        cmp_CustomFieldsEditorPro.AccentColor,
+                        cmp_CustomFieldsEditorPro.BorderColor
+                    )
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: |-
+                    =If(
+                        ThisItem.FieldKey = varCFDEPro_SelectedFieldKey,
+                        ColorFade(cmp_CustomFieldsEditorPro.AccentColor, 94%),
+                        cmp_CustomFieldsEditorPro.BackgroundColor
+                    )
+                  Height: =Parent.TemplateHeight - 6
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Width: =Parent.TemplateWidth - 10
+                  X: =5
+                  Y: =1
+                Children:
+                  - btnCFDEPro_RowSelect:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderThickness: =0
+                        Color: =Color.Transparent
+                        Fill: =Color.Transparent
+                        Height: =Parent.Height
+                        HoverFill: =ColorFade(cmp_CustomFieldsEditorPro.AccentColor, 96%)
+                        OnSelect: |-
+                          =Set(varCFDEPro_SelectedFieldKey, ThisItem.FieldKey);
+                          Set(varCFDEPro_EditMode, "EDIT")
+                        PressedFill: =ColorFade(cmp_CustomFieldsEditorPro.AccentColor, 92%)
+                        Text: =""
+                        Width: =Parent.Width
+                  - lblCFDEPro_DefLabel:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_CustomFieldsEditorPro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =20
+                        OnSelect: |-
+                          =Set(varCFDEPro_SelectedFieldKey, ThisItem.FieldKey);
+                          Set(varCFDEPro_EditMode, "EDIT")
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: =Coalesce(ThisItem.Label, ThisItem.FieldKey)
+                        Width: =Parent.Width - 72
+                        Wrap: =false
+                        X: =10
+                        Y: =7
+                  - lblCFDEPro_DefKey:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_CustomFieldsEditorPro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =17
+                        OnSelect: |-
+                          =Set(varCFDEPro_SelectedFieldKey, ThisItem.FieldKey);
+                          Set(varCFDEPro_EditMode, "EDIT")
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =6
+                        Text: =Coalesce(ThisItem.FieldKey, "")
+                        Width: =Parent.Width - 72
+                        Wrap: =false
+                        X: =10
+                        Y: =28
+                  - lblCFDEPro_DefMeta:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_CustomFieldsEditorPro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =18
+                        OnSelect: |-
+                          =Set(varCFDEPro_SelectedFieldKey, ThisItem.FieldKey);
+                          Set(varCFDEPro_EditMode, "EDIT")
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =6
+                        Text: |-
+                          =Coalesce(ThisItem.FieldType, "Text") &
+                          If(ThisItem.IsRequired, "  ·  Required", "") &
+                          If(ThisItem.IsPinned, "  ·  Pinned", "")
+                        Width: =Parent.Width - 72
+                        Wrap: =false
+                        X: =10
+                        Y: =48
+                  - conCFDEPro_DefStatus:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: |-
+                          =If(
+                              ThisItem.IsActive,
+                              ColorValue("#BBF7D0"),
+                              ColorValue("#E2E8F0")
+                          )
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: |-
+                          =If(
+                              ThisItem.IsActive,
+                              ColorValue("#F0FDF4"),
+                              ColorValue("#F8FAFC")
+                          )
+                        Height: =20
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                        Width: =54
+                        X: =Parent.Width - 64
+                        Y: =9
+                      Children:
+                        - lblCFDEPro_DefStatus:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: |-
+                                =If(
+                                    ThisItem.IsActive,
+                                    ColorValue("#166534"),
+                                    cmp_CustomFieldsEditorPro.MutedTextColor
+                                )
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =Parent.Height
+                              OnSelect: |-
+                                =Set(varCFDEPro_SelectedFieldKey, ThisItem.FieldKey);
+                                Set(varCFDEPro_EditMode, "EDIT")
+                              PaddingBottom: =0
+                              PaddingLeft: =2
+                              PaddingRight: =2
+                              PaddingTop: =0
+                              Size: =5
+                              Text: =If(ThisItem.IsActive, "Active", "Inactive")
+                              Width: =Parent.Width
+      - conCFDEPro_CatalogEmpty:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =cmp_CustomFieldsEditorPro.BackgroundColor
+            Height: =Parent.Height - 190
+            Visible: |-
+              =!cmp_CustomFieldsEditorPro.IsLoading &&
+              IsBlank(cmp_CustomFieldsEditorPro.ErrorText) &&
+              CountRows(galCFDEPro_Definitions.AllItems) = 0
+            Width: =Parent.Width - 2
+            X: =1
+            Y: =182
+          Children:
+            - lblCFDEPro_CatalogEmptyTitle:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_CustomFieldsEditorPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =12
+                  PaddingRight: =12
+                  PaddingTop: =0
+                  Size: =8
+                  Text: |-
+                    =If(
+                        IsBlank(Trim(Coalesce(txtCFDEPro_Search.Text, ""))),
+                        "No field definitions",
+                        "No matching fields"
+                    )
+                  Width: =Parent.Width - 28
+                  X: =14
+                  Y: =36
+            - lblCFDEPro_CatalogEmptyBody:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_CustomFieldsEditorPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =40
+                  PaddingBottom: =0
+                  PaddingLeft: =16
+                  PaddingRight: =16
+                  PaddingTop: =0
+                  Size: =7
+                  Text: |-
+                    =If(
+                        IsBlank(Trim(Coalesce(txtCFDEPro_Search.Text, ""))),
+                        "Add the first Custom Field or refresh the project definitions.",
+                        "Try a different label or internal key."
+                    )
+                  VerticalAlign: =VerticalAlign.Top
+                  Width: =Parent.Width - 28
+                  X: =14
+                  Y: =64
+      - conCFDEPro_CatalogLoading:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =cmp_CustomFieldsEditorPro.BackgroundColor
+            Height: =Parent.Height - 190
+            Visible: =cmp_CustomFieldsEditorPro.IsLoading
+            Width: =Parent.Width - 2
+            X: =1
+            Y: =182
+          Children:
+            - lblCFDEPro_CatalogLoading:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_CustomFieldsEditorPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =28
+                  PaddingBottom: =0
+                  PaddingLeft: =10
+                  PaddingRight: =10
+                  PaddingTop: =0
+                  Size: =8
+                  Text: ="Loading field definitions..."
+                  Width: =Parent.Width - 28
+                  X: =14
+                  Y: =48
+      - conCFDEPro_CatalogError:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =cmp_CustomFieldsEditorPro.BackgroundColor
+            Height: =Parent.Height - 190
+            Visible: =!cmp_CustomFieldsEditorPro.IsLoading && !IsBlank(cmp_CustomFieldsEditorPro.ErrorText)
+            Width: =Parent.Width - 2
+            X: =1
+            Y: =182
+          Children:
+            - lblCFDEPro_CatalogErrorTitle:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_CustomFieldsEditorPro.DangerColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =10
+                  PaddingRight: =10
+                  PaddingTop: =0
+                  Size: =8
+                  Text: ="Definitions unavailable"
+                  Width: =Parent.Width - 28
+                  X: =14
+                  Y: =36
+            - lblCFDEPro_CatalogErrorBody:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_CustomFieldsEditorPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =54
+                  PaddingBottom: =0
+                  PaddingLeft: =14
+                  PaddingRight: =14
+                  PaddingTop: =0
+                  Size: =7
+                  Text: =cmp_CustomFieldsEditorPro.ErrorText
+                  VerticalAlign: =VerticalAlign.Top
+                  Width: =Parent.Width - 28
+                  X: =14
+                  Y: =64
