@@ -1,0 +1,18 @@
+// BLOCK 13C — BACK NAVIGATION DIRTY GUARD
+//
+// Operation: REPLACE FORMULA COMPLETELY.
+// Target control: btnPR_Back
+// Target property: OnSelect
+//
+// Clean state: Back() immediately.
+// Dirty state: open decision modal and defer Back().
+
+If(
+    varPunchReviewDirty,
+
+    Set(varPunchReviewPendingAction, "BACK");
+    Set(varPunchReviewPendingIndex, 0);
+    Set(varPunchReviewShowDirtyDialog, true),
+
+    Back()
+)
