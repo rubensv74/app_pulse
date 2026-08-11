@@ -1,0 +1,226 @@
+// BLOCK 13D — REVIEW ACTIONS DIRTY-GUARD INTEGRATION
+//
+// Operation: REPLACE FORMULA COMPLETELY.
+// Target control: cmpPR_Actions
+// Target property: OnAction
+//
+// Changes from Block 07:
+// - Mark/Undo preserve the queue row IsDirty value while Custom Fields are dirty.
+// - OPEN_PUNCHES opens the Block 13 decision modal instead of navigating away
+//   when local Custom Field changes exist.
+// - Clean navigation behavior remains unchanged.
+
+Switch(
+    cmpPR_Actions.SelectedActionKey,
+
+    "MARK_REVIEWED",
+
+        If(
+            IsBlank(varPunchReviewCurrentId),
+
+            Notify(
+                "Select a Punch before marking it as reviewed.",
+                NotificationType.Information
+            ),
+
+            With(
+                {
+                    currentOrder: varPunchReviewCurrent.ReviewOrder,
+                    currentPunchId: varPunchReviewCurrentId,
+                    currentPunchCode:
+                        Coalesce(
+                            varPunchReviewCurrent.PunchCode,
+                            Text(varPunchReviewCurrentId)
+                        )
+                },
+
+                Patch(
+                    colPunchReviewQueue,
+                    LookUp(
+                        colPunchReviewQueue,
+                        PunchIdNumber = currentPunchId
+                    ),
+                    {
+                        IsReviewedInSession: true,
+                        IsDirty: varPunchReviewDirty
+                    }
+                );
+
+                Set(
+                    varPunchReviewCurrent,
+                    LookUp(
+                        colPunchReviewQueue,
+                        PunchIdNumber = currentPunchId
+                    )
+                );
+
+                Collect(
+                    colPunchReviewSessionEvents,
+                    {
+                        EventKey: Text(GUID()),
+                        PunchIdNumber: currentPunchId,
+                        EventLabel:
+                            currentPunchCode &
+                            " marked as reviewed in this session",
+                        EventOn: Now(),
+                        EventBy: User().FullName,
+                        EventType: "REVIEWED"
+                    }
+                );
+
+                Select(btnPR_RebuildQueue);
+
+                If(
+                    varPunchReviewQuickFilter = "REMAINING" &&
+                    CountRows(colPunchReviewQueueView) > 0,
+
+                    Set(
+                        varPunchReviewRequestedIndex,
+                        Coalesce(
+                            Min(
+                                Filter(
+                                    colPunchReviewQueueView,
+                                    ReviewOrder > currentOrder
+                                ),
+                                ReviewOrder
+                            ),
+                            Min(
+                                colPunchReviewQueueView,
+                                ReviewOrder
+                            )
+                        )
+                    );
+
+                    Select(btnPR_SelectCurrent),
+
+                    varPunchReviewQuickFilter = "REMAINING" &&
+                    CountRows(colPunchReviewQueueView) = 0,
+
+                    Notify(
+                        "All punches in the current queue are reviewed.",
+                        NotificationType.Success
+                    )
+                )
+            )
+        ),
+
+    "UNMARK_REVIEWED",
+
+        If(
+            IsBlank(varPunchReviewCurrentId),
+
+            Notify(
+                "Select a Punch before changing its review state.",
+                NotificationType.Information
+            ),
+
+            With(
+                {
+                    currentOrder: varPunchReviewCurrent.ReviewOrder,
+                    currentPunchId: varPunchReviewCurrentId,
+                    currentPunchCode:
+                        Coalesce(
+                            varPunchReviewCurrent.PunchCode,
+                            Text(varPunchReviewCurrentId)
+                        )
+                },
+
+                Patch(
+                    colPunchReviewQueue,
+                    LookUp(
+                        colPunchReviewQueue,
+                        PunchIdNumber = currentPunchId
+                    ),
+                    {
+                        IsReviewedInSession: false,
+                        IsDirty: varPunchReviewDirty
+                    }
+                );
+
+                Set(
+                    varPunchReviewCurrent,
+                    LookUp(
+                        colPunchReviewQueue,
+                        PunchIdNumber = currentPunchId
+                    )
+                );
+
+                Collect(
+                    colPunchReviewSessionEvents,
+                    {
+                        EventKey: Text(GUID()),
+                        PunchIdNumber: currentPunchId,
+                        EventLabel:
+                            currentPunchCode &
+                            " review mark removed",
+                        EventOn: Now(),
+                        EventBy: User().FullName,
+                        EventType: "REVIEW_UNDONE"
+                    }
+                );
+
+                Select(btnPR_RebuildQueue);
+
+                If(
+                    varPunchReviewQuickFilter = "REVIEWED" &&
+                    CountRows(colPunchReviewQueueView) > 0,
+
+                    Set(
+                        varPunchReviewRequestedIndex,
+                        Coalesce(
+                            Min(
+                                Filter(
+                                    colPunchReviewQueueView,
+                                    ReviewOrder > currentOrder
+                                ),
+                                ReviewOrder
+                            ),
+                            Min(
+                                colPunchReviewQueueView,
+                                ReviewOrder
+                            )
+                        )
+                    );
+
+                    Select(btnPR_SelectCurrent),
+
+                    varPunchReviewQuickFilter = "REVIEWED" &&
+                    CountRows(colPunchReviewQueueView) = 0,
+
+                    Notify(
+                        "There are no reviewed punches in the current queue.",
+                        NotificationType.Information
+                    )
+                )
+            )
+        ),
+
+    "OPEN_PUNCHES",
+
+        If(
+            IsBlank(varPunchReviewCurrentId),
+
+            Notify(
+                "Select a Punch before opening the Punch List.",
+                NotificationType.Information
+            ),
+
+            If(
+                varPunchReviewDirty,
+
+                Set(varPunchReviewPendingAction, "OPEN_PUNCHES");
+                Set(varPunchReviewPendingIndex, 0);
+                Set(varPunchReviewShowDirtyDialog, true),
+
+                Set(varPunches_ReturnView, "PunchReview");
+                Set(varSelectedTaskId, varPunchReviewCurrentId);
+                Set(varDrawerRecordId, varPunchReviewCurrentId);
+                Set(varAppView, "Punches");
+
+                Navigate(
+                    scr_Punches,
+                    ScreenTransition.None
+                )
+            )
+        )
+)
