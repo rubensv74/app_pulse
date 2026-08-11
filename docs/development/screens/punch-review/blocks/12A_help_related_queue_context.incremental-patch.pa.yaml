@@ -1,0 +1,84 @@
+# BLOCK 12A — RELATED QUEUE CONTEXT IN BILINGUAL HELP
+#
+# Apply only after:
+# - Block 11A has been applied.
+# - Block 12 has been validated in Studio.
+#
+# OPERATION 1 — ADD TWO CHILDREN
+# Parent: conPR_HelpContent
+# Exact location: after lblPR_HelpProgressBody and before conPR_HelpWarningCard.
+#
+# OPERATION 2 — REPLACE TEXT PROPERTY
+# Control: lblPR_HelpActivityTitle
+#
+# OPERATION 3 — REPLACE TEXT PROPERTY
+# Controls: lblPR_HelpLimitationsTitle and lblPR_HelpLimitationsBody
+#
+# The language selector remains the existing TabList.
+
+# =====================================================
+# OPERATION 1 — ADD AFTER lblPR_HelpProgressBody
+# =====================================================
+
+- lblPR_HelpRelatedTitle:
+    Control: ModernText@1.0.0
+    Properties:
+      AutoHeight: =true
+      Color: =varTheme_Text
+      FontWeight: =FontWeight.Semibold
+      Height: =26
+      Size: =11
+      Text: |-
+        =If(
+            Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+            "7. Use related queue context",
+            "7. Usa el contexto relacionado de la cola"
+        )
+      Width: =Parent.Width
+- lblPR_HelpRelatedBody:
+    Control: ModernText@1.0.0
+    Properties:
+      AutoHeight: =true
+      Color: =varTheme_TextMuted
+      Height: =110
+      Size: =9
+      Text: |-
+        =If(
+            Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+            "Related in Queue shows other Punches from the currently loaded review queue that share the same subsystem or discipline as the selected Punch. This is contextual navigation, not a formal SQL relationship. Use Review to jump to one of those records. Search and quick filters return to All so the selected record remains visible. Unsaved custom-field changes still block navigation.",
+            "Related in Queue muestra otros Punches de la cola de revisión cargada que comparten subsistema o disciplina con el Punch seleccionado. Es una ayuda de navegación contextual, no una relación formal almacenada en SQL. Usa Review para saltar a uno de esos registros. La búsqueda y los filtros rápidos vuelven a All para que el registro seleccionado siga visible. Los cambios de campos personalizados sin guardar siguen bloqueando la navegación."
+        )
+      Width: =Parent.Width
+
+# =====================================================
+# OPERATION 2 — REPLACE lblPR_HelpActivityTitle.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "8. Read Session Activity",
+      "8. Consulta Session Activity"
+  )
+
+# =====================================================
+# OPERATION 3A — REPLACE lblPR_HelpLimitationsTitle.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "9. Current implementation status",
+      "9. Estado actual de implementación"
+  )
+
+# =====================================================
+# OPERATION 3B — REPLACE lblPR_HelpLimitationsBody.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "The full unsaved-change decision dialog is still pending. Reviewed and Review Progress remain session-only. Related in Queue is derived only from the loaded review queue and does not create or read formal Punch-to-Punch relationships in SQL.",
+      "Todavía está pendiente el diálogo completo de decisión ante cambios sin guardar. Reviewed y Review Progress siguen siendo solo de sesión. Related in Queue se deriva únicamente de la cola cargada y no crea ni consulta relaciones formales Punch-a-Punch en SQL."
+  )
