@@ -1,0 +1,178 @@
+# BLOCK 14 — PUNCH LIST ENTRY INTO PUNCH REVIEW
+#
+# Operation: ADD CHILD CONTROL.
+# Target screen: scr_Punches
+# Parent control: conPunches_FilterBar_2
+# Recommended location: immediately after backPunchesBackToOperations_2 and
+# before btnPunchApplyFilters_2.
+#
+# PRE-YAML GATE APPLIED
+# The current docs/development/screens/punch-review/
+# POWER_APPS_SOURCE_CODE_COMPATIBILITY.md was consulted immediately before
+# drafting this YAML.
+#
+# Dependencies:
+# - Punch Review Blocks 01–13 integrated.
+# - scr_Punches current page is loaded into colPunches.
+# - scr_PunchReview exists in the active app.
+#
+# Scope:
+# - Adds a compact "Review page" action to Punch List.
+# - Builds a fresh Punch Review queue from the CURRENT LOADED Punches page.
+# - Uses only fields already present in colPunches.
+# - Starts on the currently selected Punch when varSelectedTaskId belongs to
+#   the loaded page; otherwise starts on the first row.
+# - Resets session-local review state, comments/custom-field UI state and
+#   session activity before starting a new review session.
+# - Navigates to scr_PunchReview with source=PUNCHES and scope=CURRENT_PAGE.
+#
+# Important semantic rule:
+# - This queue represents only the rows currently loaded in colPunches.
+# - With the current Punch List paging contract that is normally one page,
+#   not the entire filtered SQL result set.
+# - A later server-side snapshot may extend this scope; this block does not
+#   invent or simulate that backend capability.
+#
+# Compatibility:
+# - Uses ModernButton@1.0.0 already present in conPunches_FilterBar_2.
+# - No CanvasComponent introduced.
+# - No inline SVG.
+# - No unsupported Label radius or Classic Button AccessibleLabel pattern.
+#
+# Validation:
+# 1. Button imports without PA1001/PA2108/PA2301.
+# 2. Button is disabled when colPunches is empty or Punches are loading.
+# 3. A loaded page creates exactly CountRows(colPunches) queue rows.
+# 4. Current selected Punch becomes first active review context when present.
+# 5. ReviewOrder is sequential from 1..CountRows(colPunches).
+# 6. Punch Review opens with source PUNCHES and scope CURRENT_PAGE.
+# 7. Initial Comments and Custom Fields load after Block 14B is applied.
+
+- btnPunches_OpenPunchReview_2:
+    Control: ModernButton@1.0.0
+    Properties:
+      Appearance: =ButtonAppearance.Secondary
+      BasePaletteColor: =varTheme_PulseBlueDark
+      DisplayMode: |-
+        =If(
+            varPunches_IsLoading ||
+            !varPunchesLoaded ||
+            CountRows(colPunches) = 0,
+            DisplayMode.Disabled,
+            DisplayMode.Edit
+        )
+      Height: =40
+      LayoutMinHeight: =16
+      LayoutMinWidth: =16
+      OnSelect: |-
+        =If(
+            CountRows(colPunches) = 0,
+
+            Notify(
+                "Load a Punch page before starting Review Workspace.",
+                NotificationType.Information
+            ),
+
+            ClearCollect(
+                colPunchReviewQueue,
+                ForAll(
+                    Sequence(CountRows(colPunches)),
+                    With(
+                        {
+                            prOrder: Value,
+                            p: Last(FirstN(colPunches, Value))
+                        },
+                        {
+                            ReviewOrder: prOrder,
+                            RowKey: Text(p.PunchId),
+                            PunchIdNumber: Value(p.PunchId),
+                            PunchCode: Coalesce(Text(p.PunchCode), Text(p.PunchId)),
+                            Description: Coalesce(Text(p.PunchDescription), ""),
+                            AreaCode: Coalesce(Text(p.AreaCode), ""),
+                            UnitCode: Coalesce(Text(p.UnitCode), ""),
+                            SystemCode: Coalesce(Text(p.SystemCode), ""),
+                            SubsystemCode: Coalesce(Text(p.SubsystemCode), ""),
+                            ElementCode: Coalesce(Text(p.ElementCode), ""),
+                            Discipline: Coalesce(Text(p.PunchDiscipline), ""),
+                            Category: Coalesce(Text(p.CategoryCode), Text(p.Category), ""),
+                            StatusCode: Coalesce(Text(p.StatusCode), ""),
+                            StatusLabel: Coalesce(Text(p.PunchStatus), Text(p.StatusCode), ""),
+                            ResponsibleParty:
+                                Coalesce(
+                                    Text(p.SubcontractorName),
+                                    Text(p.PunchCoordinator),
+                                    ""
+                                ),
+                            InspectionName: Coalesce(Text(p.InspectionName), ""),
+                            Originator: Coalesce(Text(p.Originator), ""),
+                            CommentCount: Coalesce(Value(p.CommentCount), 0),
+                            LastCommentOn: p.LastCommentOn,
+                            IsReviewedInSession: false,
+                            IsDirty: false
+                        }
+                    )
+                )
+            );
+
+            Clear(colPunchReviewQueueView);
+            Clear(colPunchReviewComments);
+            Clear(colPunchReviewFieldsUI);
+            Clear(colPunchReviewFieldsBase);
+            Clear(colPunchReviewFieldsDirty);
+            Clear(colPunchReviewSessionEvents);
+
+            Set(varPunchReviewSearch, "");
+            Set(varPunchReviewQuickFilter, "ALL");
+            Set(varPunchReviewSource, "PUNCHES");
+            Set(varPunchReviewReturnScreen, "PUNCHES");
+            Set(varPunchReviewQueueScope, "CURRENT_PAGE");
+            Set(varPunchReviewTemplateId, varFilter_PunchTemplateId);
+            Set(varPunchReviewDirty, false);
+            Set(varPunchReviewIsLoading, false);
+            Set(varPunchReviewError, "");
+            Set(varPunchReviewCommentsPage, 1);
+            Set(varPunchReviewCommentsError, "");
+            Set(varPunchReviewFieldsError, "");
+            Set(varPunchReviewShowDirtyDialog, false);
+            Set(varPunchReviewPendingAction, "");
+            Set(varPunchReviewPendingIndex, 0);
+
+            Set(
+                varPunchReviewCurrentIndex,
+                Coalesce(
+                    LookUp(
+                        colPunchReviewQueue,
+                        PunchIdNumber = varSelectedTaskId,
+                        ReviewOrder
+                    ),
+                    1
+                )
+            );
+
+            Set(
+                varPunchReviewRequestedIndex,
+                varPunchReviewCurrentIndex
+            );
+
+            Set(
+                varPunchReviewCurrent,
+                LookUp(
+                    colPunchReviewQueue,
+                    ReviewOrder = varPunchReviewCurrentIndex
+                )
+            );
+
+            Set(
+                varPunchReviewCurrentId,
+                varPunchReviewCurrent.PunchIdNumber
+            );
+
+            Set(varAppView, "PunchReview");
+
+            Navigate(
+                scr_PunchReview,
+                ScreenTransition.None
+            )
+        )
+      Text: ="Review page"
+      Width: =108
