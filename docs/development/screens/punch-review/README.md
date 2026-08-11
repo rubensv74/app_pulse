@@ -67,10 +67,36 @@ Do not work from memory. Every confirmed Studio incompatibility must become a pr
 31. `14_punches_entry.add-child.pa.yaml` — Punch List entry route
 32. `14A_punches_return_to_review.replace-formula.powerfx` — Punch List return route
 33. `14B_punchreview_initial_selection.append-onvisible.powerfx` — loads initial Comments + Custom Fields on workspace entry
-34. `15_home_entry.replace-formula.powerfx` — published; pending Studio validation
-35. `15A_help_source_integrations.incremental-patch.pa.yaml` — apply only after Blocks 14 and 15 validate
+34. `15_home_entry.replace-formula.powerfx` — validated in Studio / runtime
+35. `15A_help_source_integrations.incremental-patch.pa.yaml` — source-integration help
 
-Do not begin Block 16 until the Home Review action has been validated from a real loaded Home Punch grid, including selected-row scope and return navigation.
+## Pre-Block 16 refactor — Premium Custom Fields
+
+Block 16 is intentionally paused while the current Custom Fields panel is refactored into a reusable premium component.
+
+Approved architecture:
+
+```text
+Opción A — reusable core + first implementation focused on Punch Review
+```
+
+Component workspace:
+
+```text
+docs/development/components/custom-field-editor-pro/
+```
+
+Target component:
+
+```text
+cmp_CustomFieldEditorPro
+```
+
+The refactor is incremental and must validate CF-01 through CF-07 before Block 16 resumes.
+
+The component owns presentation, editor rendering and local edit state. Punch Review continues to own backend flows, dirty-guard routing, session activity and authoritative reload after save.
+
+Do not begin Block 16 until the premium Custom Fields refactor has been integrated and validated with a real Punch.
 
 ## Confirmed service contracts
 
