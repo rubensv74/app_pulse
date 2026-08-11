@@ -1,0 +1,29 @@
+# VF-03A — MANDATORY CANCEL CORRECTION
+#
+# Apply immediately after VF-03 and before Studio validation.
+#
+# PRE-YAML GATE
+# The compatibility register prohibits Reset() assumptions on controls that
+# have not been explicitly validated as resettable.
+#
+# Operation: REPLACE ONLY btnCFVPro_Cancel.OnSelect.
+# Do not change any other btnCFVPro_Cancel property.
+#
+# Reason:
+# The first VF-03 draft ended Cancel with Reset(galCFVPro_Values). Gallery
+# reset semantics have not been validated for this use and the call is not
+# necessary for the state contract. Cancel restores colCFVPro_Working from
+# colCFVPro_Base; the editor defaults remain bound to the working records.
+#
+# Validation:
+# - Cancel clears DirtyItems / IsDirty.
+# - working values return to baseline;
+# - verify visually that all six editors rebind to baseline values;
+# - if a specific editor does not rebind, stop and document that exact control
+#   rather than introducing an unverified generic Reset().
+
+OnSelect: |-
+  =ClearCollect(colCFVPro_Working, colCFVPro_Base);
+  Clear(colCFVPro_Dirty);
+  Set(varCFVPro_LastChangedFieldKey, "");
+  cmp_CustomFieldValuesPro.OnCancelRequested()
