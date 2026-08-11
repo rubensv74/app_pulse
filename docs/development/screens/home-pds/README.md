@@ -4,7 +4,24 @@
 **Target display title:** `Punch Control Tower`  
 **Primary archetype:** Operational Control Tower  
 **Secondary pattern:** Data Explorer  
-**Construction mode:** parallel rebuild from blank screen
+**Construction mode:** parallel rebuild from blank screen  
+**Current Studio baseline:** `scr_Home_PDS` intentionally empty as of 2026-08-11
+
+## Current restart authority
+
+Implementation has been reset from an empty `scr_Home_PDS` without discarding prior architectural or diagnostic knowledge.
+
+Start here:
+
+```text
+docs/development/screens/home-pds/RESTART_BASELINE_2026-08-11.md
+```
+
+Immediate executable artifact:
+
+```text
+docs/development/screens/home-pds/blocks/01_screen_shell.pa.yaml
+```
 
 ## Normative references
 
@@ -39,14 +56,14 @@ scr_Home_PDS
 
 `scr_Home` remains the stable reference/rollback screen until final cutover. `StartScreen` is not changed during construction.
 
-## Block status
+## Current block status after restart
 
-| Block | Name | Status |
+| Block | Name | Current status |
 |---:|---|---|
-| 00 | Foundation audit and reuse matrix | **validated** |
-| 01 | Blank screen shell | **validated** |
-| 02 | PDS Page Header contract / implementation | **validated for progression / isolated instance-safe** |
-| 03 | Home_PDS header integration | **03B source-created instance not hydrated / 03C manual insertion pending** |
+| 00 | Foundation audit and reuse matrix | **retained / validated architecture** |
+| 01 | Blank screen shell | **NEXT — reapply to empty screen** |
+| 02 | PDS Page Header contract / implementation | **retained component evidence; `INSTANCE_SAFE = PASS`** |
+| 03 | Home_PDS header integration | **pending after Block 01; use manual Studio insertion path** |
 | 04 | Workspace/body structural layout | **blocked by Block 03** |
 | 05 | Minimum typed runtime state | planned |
 | 06 | KPI strip with local presentation model | planned |
@@ -68,109 +85,59 @@ scr_Home_PDS
 | 22 | Remove scaffolding + visual QA | planned |
 | 23 | Consolidation + user guide + cutover decision | planned |
 
-## Block 01
+## Historical evidence retained
 
-Validated shell:
+Before the 2026-08-11 reset, implementation had reached Block 03.
 
-```text
-scr_Home_PDS exists independently from scr_Home
-conHPDS_ScreenRoot exists
-cmpHPDS_Sidebar renders at the left
-conHPDS_ContentShell occupies remaining surface
-Home is active in sidebar
-current project context is preserved
-no later modules introduced prematurely
-```
-
-## Block 02 — Page Header
-
-Canonical source:
-
-```text
-power-apps/components/cmp_PageHeaderPro.pa.yaml
-```
-
-The corrected complete component was instantiated successfully in Power Apps Studio:
+`cmp_PageHeaderPro` had already demonstrated:
 
 ```text
 DEFINITION_ACCEPTED = PASS
 INSTANCE_SAFE       = PASS
 ```
 
-Target-screen binding remains a separate validation surface.
+However, Block 03 showed that a PageHeader instance created from screen Source Code did not hydrate the same usable public contract/body as the manually inserted instance. Host-side custom-property assignments produced `PA2108`, and a later generic Source Code-created instance rendered blank and lacked expected public Inputs.
 
-## Block 03 — Header integration evidence
-
-### 03 — partial child Source Code
-
-Studio accepted the generic `CanvasComponent` structure but returned `PA2108 Unknown property` for every `cmp_PageHeaderPro` custom property assigned by the screen.
-
-### 03A — complete `Screens:` Source Code
-
-The same PA2108 pattern was reproduced in a complete screen source. Therefore the partial edit-surface hypothesis was refuted.
-
-### 03B — generic Source Code instance
-
-A complete screen was then created with the header instance using only:
-
-```yaml
-Control: CanvasComponent
-ComponentName: cmp_PageHeaderPro
-Properties:
-  Height: =Parent.Height
-  Width: =Parent.Width
-```
-
-Studio accepted the screen. However, visual evidence showed that the selected `cmpHPDS_PageHeader` instance:
+Retained evidence:
 
 ```text
-- rendered as a blank header surface;
-- exposed generic properties such as Fill, Height, Visible, Width, X and Y;
-- exposed OnUtility;
-- did NOT expose expected public Inputs such as Context1Value, Title, Subtitle, ShowHelp, etc.
-```
-
-This means the Source Code-created instance has not hydrated the same usable contract/body demonstrated by the prior manual instance insertion.
-
-## Block 03C — manual instance hydration
-
-Artifact:
-
-```text
+docs/development/screens/home-pds/CMP_PAGE_HEADER_PRO_VALIDATION_REPORT_2026-08-10.md
+docs/development/screens/home-pds/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
 docs/development/screens/home-pds/blocks/03C_header_integration_manual_instance.md
 ```
 
-Strategy:
+Therefore, after Block 01 is revalidated, PageHeader integration must use the proven route:
 
 ```text
-keep conHPDS_PageHeaderHost
-→ delete only source-created cmpHPDS_PageHeader
-→ insert cmp_PageHeaderPro manually from Studio Custom components
-→ move it into conHPDS_PageHeaderHost
-→ rename to cmpHPDS_PageHeader
-→ set Width/Height = Parent
-→ configure Block 03 public inputs in one pass
+create host
+→ insert cmp_PageHeaderPro manually in Studio
+→ configure public inputs in Studio
+→ integration smoke test
 ```
 
-This is not a new component diagnostic. It deliberately uses the same manual insertion path that already demonstrated `INSTANCE_SAFE = PASS`.
+Do not generate further equivalent screen-YAML variants for the header unless new evidence requires it.
 
-If the manually inserted instance exposes the expected public contract and renders normally, close Block 03 after binding/visual validation. If it does not, reopen the component public-contract definition itself; no further screen-YAML variants are justified.
-
-## Diagnostic efficiency rule
+## Immediate Block 01 acceptance
 
 ```text
-problem component
-→ positive instance-safe PULSE reference
-→ full contract/body diff
-→ corrected complete candidate
-→ one consequential Studio test
-→ reduction only if still necessary
+scr_Home_PDS opens normally
+cmpHPDS_Sidebar renders at left
+Home is active
+current project is preserved
+conHPDS_ContentShell fills remaining area
+content shell intentionally empty
+scr_Home remains unchanged
+no new PA1001 / PA2108 attributable to Block 01
 ```
-
-A failed hypothesis must be retired immediately rather than spawning equivalent YAML variants.
 
 ## Construction policy
 
-No dependent block advances while its dependency has a failed or unvalidated runtime gate.
+```text
+repository artifact
+→ implement in Studio
+→ one meaningful validation
+→ record result
+→ advance only if dependency gate passes
+```
 
 Power Apps Studio + App Checker remain the acceptance authority.
