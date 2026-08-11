@@ -1,0 +1,34 @@
+// BLOCK 14B — INITIAL PUNCH SERVICE LOAD ON WORKSPACE ENTRY
+//
+// Operation: APPEND FORMULA.
+// Target screen: scr_PunchReview
+// Target property: OnVisible
+// Exact location: append after the existing queue projection/current-record logic.
+//
+// Dependencies:
+// - btnPR_SelectCurrent uses the latest Block 13B formula.
+// - btnPR_LoadComments and btnPR_LoadCustomFields exist.
+//
+// Purpose:
+// - When a queue has already been prepared by Punch List (or another source),
+//   run the same centralized selection pipeline used inside Punch Review.
+// - This causes initial Comments and Custom Fields to load for the active Punch.
+// - It also makes return from Punch List refresh the active Punch services.
+//
+// Validation:
+// 1. Enter from Punch List with a real loaded page.
+// 2. The selected/first Punch is active immediately.
+// 3. Comments load without clicking another queue row.
+// 4. Custom Fields load without clicking another queue row.
+
+If(
+    CountRows(colPunchReviewQueue) > 0 &&
+    !IsBlank(varPunchReviewCurrentId),
+
+    Set(
+        varPunchReviewRequestedIndex,
+        varPunchReviewCurrentIndex
+    );
+
+    Select(btnPR_SelectCurrent)
+)
