@@ -1,0 +1,21 @@
+// BLOCK 13A — DIRTY GUARD RUNTIME STATE
+//
+// Operation: REPLACE THE DIRTY-GUARD INITIALIZATION FRAGMENT in
+// scr_PunchReview.OnVisible.
+//
+// Locate the existing lines around:
+// - varPunchReviewRequestedIndex
+// - varPunchReviewPendingIndex
+// - varPunchReviewShowDirtyDialog
+//
+// Keep the existing varPunchReviewRequestedIndex line and replace the guard
+// initialization beneath it with the lines below.
+//
+// Purpose:
+// - varPunchReviewPendingIndex remains numeric and uses 0 as no-target sentinel.
+// - varPunchReviewPendingAction is explicitly typed as text.
+// - entering Punch Review always starts with no stale decision dialog.
+
+Set(varPunchReviewPendingIndex, 0);
+Set(varPunchReviewPendingAction, "");
+Set(varPunchReviewShowDirtyDialog, false);
