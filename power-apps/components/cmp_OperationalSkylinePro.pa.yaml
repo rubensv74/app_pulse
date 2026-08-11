@@ -1,0 +1,1344 @@
+ComponentDefinitions:
+  cmp_OperationalSkylinePro:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      AccentColor:
+        PropertyKind: Input
+        DisplayName: AccentColor
+        Description: Primary interaction and fallback bar color
+        DataType: Color
+        Default: =ColorValue("#1677FF")
+      AxisLabel:
+        PropertyKind: Input
+        DisplayName: AxisLabel
+        Description: Label shown above the timeline axis
+        DataType: Text
+        Default: ="TIMELINE"
+      BackgroundColor:
+        PropertyKind: Input
+        DisplayName: BackgroundColor
+        Description: Main component background
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        Description: Panel, axis and subtle border color
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      CompactMode:
+        PropertyKind: Input
+        DisplayName: CompactMode
+        Description: Use a denser slot width and typography
+        DataType: Boolean
+        Default: =false
+      DefaultSelectedSlotKey:
+        PropertyKind: Input
+        DisplayName: DefaultSelectedSlotKey
+        Description: Slot key selected by default; blank selects the first slot
+        DataType: Text
+        Default: =""
+      EmptyText:
+        PropertyKind: Input
+        DisplayName: EmptyText
+        Description: Empty-state message
+        DataType: Text
+        Default: ="No timeline data available."
+      EnableSelection:
+        PropertyKind: Input
+        DisplayName: EnableSelection
+        Description: Allow users to select timeline slots
+        DataType: Boolean
+        Default: =true
+      ErrorText:
+        PropertyKind: Input
+        DisplayName: ErrorText
+        Description: Error-state message
+        DataType: Text
+        Default: ="Timeline unavailable."
+      HasSelection:
+        PropertyKind: Output
+        DataType: Boolean
+      IsEmpty:
+        PropertyKind: Output
+        DataType: Boolean
+      IsError:
+        PropertyKind: Output
+        DataType: Boolean
+      IsLoading:
+        PropertyKind: Output
+        DataType: Boolean
+      Legend1Text:
+        PropertyKind: Input
+        DisplayName: Legend1Text
+        Description: Legend text for segment 1
+        DataType: Text
+        Default: ="Ready"
+      Legend2Text:
+        PropertyKind: Input
+        DisplayName: Legend2Text
+        Description: Legend text for segment 2
+        DataType: Text
+        Default: ="In progress"
+      Legend3Text:
+        PropertyKind: Input
+        DisplayName: Legend3Text
+        Description: Legend text for segment 3
+        DataType: Text
+        Default: ="At risk"
+      Legend4Text:
+        PropertyKind: Input
+        DisplayName: Legend4Text
+        Description: Legend text for segment 4
+        DataType: Text
+        Default: ="Critical"
+      LoadingText:
+        PropertyKind: Input
+        DisplayName: LoadingText
+        Description: Loading-state message
+        DataType: Text
+        Default: ="Loading timeline..."
+      MaxValue:
+        PropertyKind: Input
+        DisplayName: MaxValue
+        Description: Optional fixed scale maximum; zero enables automatic scaling
+        DataType: Number
+        Default: =0
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        Description: Secondary text color
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      OnSlotSelect:
+        PropertyKind: Event
+        ReturnType: None
+        Default: =
+      PeakSlotKey:
+        PropertyKind: Output
+        DataType: Text
+      PeakSlotLabel:
+        PropertyKind: Output
+        DataType: Text
+      PeakValue:
+        PropertyKind: Output
+        DataType: Number
+      ScaleMaximum:
+        PropertyKind: Output
+        DataType: Number
+      Segment1Color:
+        PropertyKind: Input
+        DisplayName: Segment1Color
+        Description: Color used by segment 1
+        DataType: Color
+        Default: =ColorValue("#22C55E")
+      Segment2Color:
+        PropertyKind: Input
+        DisplayName: Segment2Color
+        Description: Color used by segment 2
+        DataType: Color
+        Default: =ColorValue("#1677FF")
+      Segment3Color:
+        PropertyKind: Input
+        DisplayName: Segment3Color
+        Description: Color used by segment 3
+        DataType: Color
+        Default: =ColorValue("#F59E0B")
+      Segment4Color:
+        PropertyKind: Input
+        DisplayName: Segment4Color
+        Description: Color used by segment 4
+        DataType: Color
+        Default: =ColorValue("#EF4444")
+      SelectedBackgroundColor:
+        PropertyKind: Input
+        DisplayName: SelectedBackgroundColor
+        Description: Background used by the selected timeline slot
+        DataType: Color
+        Default: =ColorValue("#EFF6FF")
+      SelectedBorderColor:
+        PropertyKind: Input
+        DisplayName: SelectedBorderColor
+        Description: Border used by the selected timeline slot
+        DataType: Color
+        Default: =ColorValue("#91CAFF")
+      SelectedSlot:
+        PropertyKind: Output
+        DataType: Record
+      SelectedSlotKey:
+        PropertyKind: Output
+        DataType: Text
+      SelectedSlotLabel:
+        PropertyKind: Output
+        DataType: Text
+      SelectedSlotValue:
+        PropertyKind: Output
+        DataType: Number
+      SelectedStatusText:
+        PropertyKind: Output
+        DataType: Text
+      ShowLegend:
+        PropertyKind: Input
+        DisplayName: ShowLegend
+        Description: Show the four-segment legend
+        DataType: Boolean
+        Default: =true
+      ShowMarkers:
+        PropertyKind: Input
+        DisplayName: ShowMarkers
+        Description: Show marker pills above bars when MarkerText is present
+        DataType: Boolean
+        Default: =true
+      ShowStatus:
+        PropertyKind: Input
+        DisplayName: ShowStatus
+        Description: Show the status label below each slot
+        DataType: Boolean
+        Default: =true
+      ShowSummary:
+        PropertyKind: Input
+        DisplayName: ShowSummary
+        Description: Show slot, total and peak summary chips
+        DataType: Boolean
+        Default: =true
+      ShowValues:
+        PropertyKind: Input
+        DisplayName: ShowValues
+        Description: Show numeric values above bars
+        DataType: Boolean
+        Default: =true
+      SlotCount:
+        PropertyKind: Output
+        DataType: Number
+      Slots:
+        PropertyKind: Input
+        DisplayName: Slots
+        Description: Table with SlotKey, SlotLabel, SlotCaption, Value, Segment1Value..Segment4Value, MarkerText, MarkerColorHex, StatusText, StatusColorHex, BarColorHex, TooltipText, IsEnabled, IsToday and SortOrder
+        DataType: Table
+        Default: |-
+          =Table(
+              {
+                  SlotKey: "D01",
+                  SlotLabel: "11 AUG",
+                  SlotCaption: "Today",
+                  Value: 12,
+                  Segment1Value: 5,
+                  Segment2Value: 2,
+                  Segment3Value: 3,
+                  Segment4Value: 2,
+                  MarkerText: "WD",
+                  MarkerColorHex: "#1677FF",
+                  StatusText: "AT RISK",
+                  StatusColorHex: "#B45309",
+                  BarColorHex: "#1677FF",
+                  TooltipText: "11 Aug · 12 items · WD · At risk",
+                  IsEnabled: true,
+                  IsToday: true,
+                  SortOrder: 1
+              },
+              {
+                  SlotKey: "D02",
+                  SlotLabel: "14 AUG",
+                  SlotCaption: "Thu",
+                  Value: 7,
+                  Segment1Value: 5,
+                  Segment2Value: 1,
+                  Segment3Value: 1,
+                  Segment4Value: 0,
+                  MarkerText: "",
+                  MarkerColorHex: "#1677FF",
+                  StatusText: "READY",
+                  StatusColorHex: "#15803D",
+                  BarColorHex: "#22C55E",
+                  TooltipText: "14 Aug · 7 items · Ready",
+                  IsEnabled: true,
+                  IsToday: false,
+                  SortOrder: 2
+              },
+              {
+                  SlotKey: "D03",
+                  SlotLabel: "17 AUG",
+                  SlotCaption: "Mon",
+                  Value: 18,
+                  Segment1Value: 4,
+                  Segment2Value: 5,
+                  Segment3Value: 6,
+                  Segment4Value: 3,
+                  MarkerText: "MCC",
+                  MarkerColorHex: "#8B5CF6",
+                  StatusText: "CRITICAL",
+                  StatusColorHex: "#B91C1C",
+                  BarColorHex: "#EF4444",
+                  TooltipText: "17 Aug · 18 items · MCC · Critical",
+                  IsEnabled: true,
+                  IsToday: false,
+                  SortOrder: 3
+              },
+              {
+                  SlotKey: "D04",
+                  SlotLabel: "19 AUG",
+                  SlotCaption: "Wed",
+                  Value: 10,
+                  Segment1Value: 6,
+                  Segment2Value: 2,
+                  Segment3Value: 2,
+                  Segment4Value: 0,
+                  MarkerText: "RFC",
+                  MarkerColorHex: "#06B6D4",
+                  StatusText: "WATCH",
+                  StatusColorHex: "#1D4ED8",
+                  BarColorHex: "#06B6D4",
+                  TooltipText: "19 Aug · 10 items · RFC · Watch",
+                  IsEnabled: true,
+                  IsToday: false,
+                  SortOrder: 4
+              }
+          )
+      SlotWidth:
+        PropertyKind: Input
+        DisplayName: SlotWidth
+        Description: Width in pixels for each timeline slot
+        DataType: Number
+        Default: =78
+      State:
+        PropertyKind: Input
+        DisplayName: State
+        Description: ready, loading, empty or error
+        DataType: Text
+        Default: ="ready"
+      Subtitle:
+        PropertyKind: Input
+        DisplayName: Subtitle
+        Description: Component subtitle
+        DataType: Text
+        Default: ="Operational load and readiness over time"
+      SurfaceAltColor:
+        PropertyKind: Input
+        DisplayName: SurfaceAltColor
+        Description: Alternate surface color
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        Description: Primary text color
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      Title:
+        PropertyKind: Input
+        DisplayName: Title
+        Description: Component title
+        DataType: Text
+        Default: ="Operational Skyline"
+      TotalValue:
+        PropertyKind: Output
+        DataType: Number
+      ValueFormat:
+        PropertyKind: Input
+        DisplayName: ValueFormat
+        Description: Power Fx format used for values
+        DataType: Text
+        Default: ="[$-en-US]#,##0"
+      ValueSuffix:
+        PropertyKind: Input
+        DisplayName: ValueSuffix
+        Description: Optional suffix appended to displayed values
+        DataType: Text
+        Default: =""
+    Properties:
+      HasSelection: =!IsBlank(cmp_OperationalSkylinePro.SelectedSlotKey)
+      Height: =340
+      IsEmpty: =Lower(cmp_OperationalSkylinePro.State) = "empty" || CountRows(cmp_OperationalSkylinePro.Slots) = 0
+      IsError: =Lower(cmp_OperationalSkylinePro.State) = "error"
+      IsLoading: =Lower(cmp_OperationalSkylinePro.State) = "loading"
+      PeakSlotKey: |-
+        =If(
+            CountRows(cmp_OperationalSkylinePro.Slots) = 0,
+            "",
+            Text(
+                First(
+                    SortByColumns(
+                        cmp_OperationalSkylinePro.Slots,
+                        "Value",
+                        SortOrder.Descending,
+                        "SortOrder",
+                        SortOrder.Ascending
+                    )
+                ).SlotKey
+            )
+        )
+      PeakSlotLabel: |-
+        =If(
+            CountRows(cmp_OperationalSkylinePro.Slots) = 0,
+            "",
+            Text(
+                First(
+                    SortByColumns(
+                        cmp_OperationalSkylinePro.Slots,
+                        "Value",
+                        SortOrder.Descending,
+                        "SortOrder",
+                        SortOrder.Ascending
+                    )
+                ).SlotLabel
+            )
+        )
+      PeakValue: |-
+        =If(
+            CountRows(cmp_OperationalSkylinePro.Slots) = 0,
+            0,
+            Coalesce(
+                Value(
+                    First(
+                        SortByColumns(
+                            cmp_OperationalSkylinePro.Slots,
+                            "Value",
+                            SortOrder.Descending,
+                            "SortOrder",
+                            SortOrder.Ascending
+                        )
+                    ).Value
+                ),
+                0
+            )
+        )
+      ScaleMaximum: |-
+        =Max(
+            1,
+            If(
+                cmp_OperationalSkylinePro.MaxValue > 0,
+                cmp_OperationalSkylinePro.MaxValue,
+                Max(
+                    cmp_OperationalSkylinePro.Slots As OSPSlot,
+                    Coalesce(Value(OSPSlot.Value), 0)
+                )
+            )
+        )
+      SelectedSlot: =galOSP_Slots.Selected
+      SelectedSlotKey: =Coalesce(Text(galOSP_Slots.Selected.SlotKey), "")
+      SelectedSlotLabel: =Coalesce(Text(galOSP_Slots.Selected.SlotLabel), "")
+      SelectedSlotValue: =Coalesce(Value(galOSP_Slots.Selected.Value), 0)
+      SelectedStatusText: =Coalesce(Text(galOSP_Slots.Selected.StatusText), "")
+      SlotCount: =CountRows(cmp_OperationalSkylinePro.Slots)
+      TotalValue: |-
+        =Sum(
+            cmp_OperationalSkylinePro.Slots As OSPSlot,
+            Coalesce(Value(OSPSlot.Value), 0)
+        )
+      Width: =1000
+    Children:
+      - conOSP_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =cmp_OperationalSkylinePro.BorderColor
+            BorderThickness: =1
+            DropShadow: =DropShadow.None
+            Fill: =cmp_OperationalSkylinePro.BackgroundColor
+            Height: =Parent.Height
+            RadiusBottomLeft: =12
+            RadiusBottomRight: =12
+            RadiusTopLeft: =12
+            RadiusTopRight: =12
+            Width: =Parent.Width
+          Children:
+            - lblOSP_Title:
+                Control: Label@2.5.1
+                Properties:
+                  Color: =cmp_OperationalSkylinePro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =22
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =12
+                  Text: =cmp_OperationalSkylinePro.Title
+                  Width: =If(cmp_OperationalSkylinePro.ShowSummary && Parent.Width >= 760, Parent.Width - 372, Parent.Width - 32)
+                  X: =16
+                  Y: =12
+            - lblOSP_Subtitle:
+                Control: Label@2.5.1
+                Properties:
+                  Color: =cmp_OperationalSkylinePro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =16
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: =cmp_OperationalSkylinePro.Subtitle
+                  Width: =If(cmp_OperationalSkylinePro.ShowSummary && Parent.Width >= 760, Parent.Width - 372, Parent.Width - 32)
+                  X: =16
+                  Y: =34
+            - conOSP_SlotCountChip:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_OperationalSkylinePro.BorderColor
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_OperationalSkylinePro.SurfaceAltColor
+                  Height: =38
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Visible: =cmp_OperationalSkylinePro.ShowSummary && Parent.Width >= 760
+                  Width: =100
+                  X: =Parent.Width - 340
+                  Y: =10
+                Children:
+                  - lblOSP_SlotCountCaption:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =cmp_OperationalSkylinePro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =14
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: ="SLOTS"
+                        Width: =Parent.Width - 16
+                        X: =8
+                        Y: =4
+                  - lblOSP_SlotCountValue:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =cmp_OperationalSkylinePro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =18
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =11
+                        Text: =Text(cmp_OperationalSkylinePro.SlotCount, "[$-en-US]#,##0")
+                        Width: =Parent.Width - 16
+                        X: =8
+                        Y: =17
+            - conOSP_TotalChip:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_OperationalSkylinePro.BorderColor
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_OperationalSkylinePro.SurfaceAltColor
+                  Height: =38
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Visible: =cmp_OperationalSkylinePro.ShowSummary && Parent.Width >= 760
+                  Width: =100
+                  X: =Parent.Width - 232
+                  Y: =10
+                Children:
+                  - lblOSP_TotalCaption:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =cmp_OperationalSkylinePro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =14
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: ="TOTAL"
+                        Width: =Parent.Width - 16
+                        X: =8
+                        Y: =4
+                  - lblOSP_TotalValue:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =cmp_OperationalSkylinePro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =18
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =11
+                        Text: =Text(cmp_OperationalSkylinePro.TotalValue, cmp_OperationalSkylinePro.ValueFormat) & cmp_OperationalSkylinePro.ValueSuffix
+                        Width: =Parent.Width - 16
+                        X: =8
+                        Y: =17
+            - conOSP_PeakChip:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_OperationalSkylinePro.SelectedBorderColor
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_OperationalSkylinePro.SelectedBackgroundColor
+                  Height: =38
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Visible: =cmp_OperationalSkylinePro.ShowSummary && Parent.Width >= 760
+                  Width: =116
+                  X: =Parent.Width - 124
+                  Y: =10
+                Children:
+                  - lblOSP_PeakCaption:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =cmp_OperationalSkylinePro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =14
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: ="PEAK"
+                        Width: =Parent.Width - 16
+                        X: =8
+                        Y: =4
+                  - lblOSP_PeakValue:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =cmp_OperationalSkylinePro.AccentColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =18
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =11
+                        Text: =Text(cmp_OperationalSkylinePro.PeakValue, cmp_OperationalSkylinePro.ValueFormat) & cmp_OperationalSkylinePro.ValueSuffix
+                        Tooltip: =cmp_OperationalSkylinePro.PeakSlotLabel
+                        Width: =Parent.Width - 16
+                        X: =8
+                        Y: =17
+            - conOSP_Legend1Swatch:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderThickness: =0
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_OperationalSkylinePro.Segment1Color
+                  Height: =8
+                  RadiusBottomLeft: =4
+                  RadiusBottomRight: =4
+                  RadiusTopLeft: =4
+                  RadiusTopRight: =4
+                  Visible: =cmp_OperationalSkylinePro.ShowLegend
+                  Width: =8
+                  X: =16
+                  Y: =60
+            - lblOSP_Legend1:
+                Control: Label@2.5.1
+                Properties:
+                  Color: =cmp_OperationalSkylinePro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =16
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =8
+                  Text: =cmp_OperationalSkylinePro.Legend1Text
+                  Visible: =cmp_OperationalSkylinePro.ShowLegend
+                  Width: =86
+                  X: =29
+                  Y: =56
+            - conOSP_Legend2Swatch:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderThickness: =0
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_OperationalSkylinePro.Segment2Color
+                  Height: =8
+                  RadiusBottomLeft: =4
+                  RadiusBottomRight: =4
+                  RadiusTopLeft: =4
+                  RadiusTopRight: =4
+                  Visible: =cmp_OperationalSkylinePro.ShowLegend
+                  Width: =8
+                  X: =120
+                  Y: =60
+            - lblOSP_Legend2:
+                Control: Label@2.5.1
+                Properties:
+                  Color: =cmp_OperationalSkylinePro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =16
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =8
+                  Text: =cmp_OperationalSkylinePro.Legend2Text
+                  Visible: =cmp_OperationalSkylinePro.ShowLegend
+                  Width: =92
+                  X: =133
+                  Y: =56
+            - conOSP_Legend3Swatch:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderThickness: =0
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_OperationalSkylinePro.Segment3Color
+                  Height: =8
+                  RadiusBottomLeft: =4
+                  RadiusBottomRight: =4
+                  RadiusTopLeft: =4
+                  RadiusTopRight: =4
+                  Visible: =cmp_OperationalSkylinePro.ShowLegend
+                  Width: =8
+                  X: =230
+                  Y: =60
+            - lblOSP_Legend3:
+                Control: Label@2.5.1
+                Properties:
+                  Color: =cmp_OperationalSkylinePro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =16
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =8
+                  Text: =cmp_OperationalSkylinePro.Legend3Text
+                  Visible: =cmp_OperationalSkylinePro.ShowLegend
+                  Width: =82
+                  X: =243
+                  Y: =56
+            - conOSP_Legend4Swatch:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderThickness: =0
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_OperationalSkylinePro.Segment4Color
+                  Height: =8
+                  RadiusBottomLeft: =4
+                  RadiusBottomRight: =4
+                  RadiusTopLeft: =4
+                  RadiusTopRight: =4
+                  Visible: =cmp_OperationalSkylinePro.ShowLegend
+                  Width: =8
+                  X: =330
+                  Y: =60
+            - lblOSP_Legend4:
+                Control: Label@2.5.1
+                Properties:
+                  Color: =cmp_OperationalSkylinePro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =16
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =8
+                  Text: =cmp_OperationalSkylinePro.Legend4Text
+                  Visible: =cmp_OperationalSkylinePro.ShowLegend
+                  Width: =88
+                  X: =343
+                  Y: =56
+            - lblOSP_Axis:
+                Control: Label@2.5.1
+                Properties:
+                  Color: =cmp_OperationalSkylinePro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =16
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =8
+                  Text: =Upper(cmp_OperationalSkylinePro.AxisLabel)
+                  Width: =180
+                  X: =16
+                  Y: =78
+            - conOSP_Baseline:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderThickness: =0
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_OperationalSkylinePro.BorderColor
+                  Height: =1
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =galOSP_Slots.Y + galOSP_Slots.Height - 46
+            - galOSP_Slots:
+                Control: Gallery@2.15.0
+                Variant: Horizontal
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Fill: =Color.Transparent
+                  Default: |-
+                    =With(
+                        {
+                            _slots:
+                                SortByColumns(
+                                    cmp_OperationalSkylinePro.Slots,
+                                    "SortOrder",
+                                    SortOrder.Ascending
+                                ),
+                            _key:
+                                cmp_OperationalSkylinePro.DefaultSelectedSlotKey
+                        },
+                        If(
+                            IsBlank(_key),
+                            First(_slots),
+                            If(
+                                CountRows(
+                                    Filter(
+                                        _slots,
+                                        Text(SlotKey) = _key
+                                    )
+                                ) > 0,
+                                First(
+                                    Filter(
+                                        _slots,
+                                        Text(SlotKey) = _key
+                                    )
+                                ),
+                                First(_slots)
+                            )
+                        )
+                    )
+                  Height: =Parent.Height - 104
+                  Items: |-
+                    =SortByColumns(
+                        cmp_OperationalSkylinePro.Slots,
+                        "SortOrder",
+                        SortOrder.Ascending
+                    )
+                  OnSelect: =cmp_OperationalSkylinePro.OnSlotSelect()
+                  Selectable: =cmp_OperationalSkylinePro.EnableSelection
+                  ShowScrollbar: =true
+                  TemplateFill: |-
+                    =If(
+                        cmp_OperationalSkylinePro.EnableSelection && ThisItem.IsSelected,
+                        cmp_OperationalSkylinePro.SelectedBackgroundColor,
+                        Color.Transparent
+                    )
+                  TemplatePadding: =4
+                  TemplateSize: =If(cmp_OperationalSkylinePro.CompactMode, 64, Max(64, cmp_OperationalSkylinePro.SlotWidth))
+                  Visible: =!cmp_OperationalSkylinePro.IsLoading && !cmp_OperationalSkylinePro.IsEmpty && !cmp_OperationalSkylinePro.IsError
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =94
+                Children:
+                  - conOSP_SelectionFrame:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: =cmp_OperationalSkylinePro.SelectedBorderColor
+                        BorderThickness: =If(cmp_OperationalSkylinePro.EnableSelection && ThisItem.IsSelected, 1, 0)
+                        DropShadow: =DropShadow.None
+                        Fill: =Color.Transparent
+                        Height: =Parent.TemplateHeight - 4
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Width: =Parent.TemplateWidth - 4
+                        X: =2
+                        Y: =2
+                  - conOSP_TodayAccent:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderThickness: =0
+                        DropShadow: =DropShadow.None
+                        Fill: =cmp_OperationalSkylinePro.AccentColor
+                        Height: =Parent.TemplateHeight - 8
+                        Visible: =Coalesce(Boolean(ThisItem.IsToday), false)
+                        Width: =2
+                        X: =2
+                        Y: =4
+                  - conOSP_Marker:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: |-
+                          =If(
+                              IsBlank(Text(ThisItem.MarkerColorHex)),
+                              cmp_OperationalSkylinePro.SelectedBorderColor,
+                              ColorFade(ColorValue(Text(ThisItem.MarkerColorHex)), 0.45)
+                          )
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: |-
+                          =If(
+                              IsBlank(Text(ThisItem.MarkerColorHex)),
+                              cmp_OperationalSkylinePro.SelectedBackgroundColor,
+                              ColorFade(ColorValue(Text(ThisItem.MarkerColorHex)), 0.88)
+                          )
+                        Height: =18
+                        RadiusBottomLeft: =999
+                        RadiusBottomRight: =999
+                        RadiusTopLeft: =999
+                        RadiusTopRight: =999
+                        Visible: =cmp_OperationalSkylinePro.ShowMarkers && !IsBlank(Trim(Text(ThisItem.MarkerText)))
+                        Width: =Min(48, Parent.TemplateWidth - 12)
+                        X: =(Parent.TemplateWidth - Self.Width) / 2
+                        Y: =4
+                      Children:
+                        - lblOSP_MarkerText:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              Color: |-
+                                =If(
+                                    IsBlank(Text(ThisItem.MarkerColorHex)),
+                                    cmp_OperationalSkylinePro.AccentColor,
+                                    ColorValue(Text(ThisItem.MarkerColorHex))
+                                )
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =Parent.Height
+                              PaddingBottom: =0
+                              PaddingLeft: =3
+                              PaddingRight: =3
+                              PaddingTop: =0
+                              Size: =8
+                              Text: =Text(ThisItem.MarkerText)
+                              Width: =Parent.Width
+                  - lblOSP_Value:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =cmp_OperationalSkylinePro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =14
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: =Text(Coalesce(Value(ThisItem.Value), 0), cmp_OperationalSkylinePro.ValueFormat) & cmp_OperationalSkylinePro.ValueSuffix
+                        Visible: =cmp_OperationalSkylinePro.ShowValues
+                        Width: =Parent.TemplateWidth - 8
+                        X: =4
+                        Y: =Max(22, conOSP_BarTrack.Y - 15)
+                  - conOSP_BarTrack:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: =cmp_OperationalSkylinePro.BorderColor
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =cmp_OperationalSkylinePro.SurfaceAltColor
+                        Height: |-
+                          =Max(
+                              4,
+                              (Parent.TemplateHeight - 86) *
+                              Min(
+                                  1,
+                                  Coalesce(Value(ThisItem.Value), 0) /
+                                  cmp_OperationalSkylinePro.ScaleMaximum
+                              )
+                          )
+                        RadiusBottomLeft: =4
+                        RadiusBottomRight: =4
+                        RadiusTopLeft: =4
+                        RadiusTopRight: =4
+                        Width: =Max(22, Min(42, Parent.TemplateWidth - 18))
+                        X: =(Parent.TemplateWidth - Self.Width) / 2
+                        Y: =Parent.TemplateHeight - 46 - Self.Height
+                      Children:
+                        - conOSP_Segment1:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderThickness: =0
+                              DropShadow: =DropShadow.None
+                              Fill: |-
+                                =With(
+                                    {
+                                        _sum:
+                                            Coalesce(Value(ThisItem.Segment1Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment2Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment3Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment4Value), 0)
+                                    },
+                                    If(
+                                        _sum <= 0,
+                                        If(
+                                            IsBlank(Text(ThisItem.BarColorHex)),
+                                            cmp_OperationalSkylinePro.AccentColor,
+                                            ColorValue(Text(ThisItem.BarColorHex))
+                                        ),
+                                        cmp_OperationalSkylinePro.Segment1Color
+                                    )
+                                )
+                              Height: |-
+                                =With(
+                                    {
+                                        _sum:
+                                            Coalesce(Value(ThisItem.Segment1Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment2Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment3Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment4Value), 0)
+                                    },
+                                    If(
+                                        _sum <= 0,
+                                        Parent.Height,
+                                        Parent.Height *
+                                        Coalesce(Value(ThisItem.Segment1Value), 0) /
+                                        _sum
+                                    )
+                                )
+                              RadiusBottomLeft: =4
+                              RadiusBottomRight: =4
+                              RadiusTopLeft: =4
+                              RadiusTopRight: =4
+                              Width: =Parent.Width
+                              Y: =Parent.Height - Self.Height
+                        - conOSP_Segment2:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderThickness: =0
+                              DropShadow: =DropShadow.None
+                              Fill: =cmp_OperationalSkylinePro.Segment2Color
+                              Height: |-
+                                =With(
+                                    {
+                                        _sum:
+                                            Coalesce(Value(ThisItem.Segment1Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment2Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment3Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment4Value), 0)
+                                    },
+                                    If(
+                                        _sum <= 0,
+                                        0,
+                                        Parent.Height *
+                                        Coalesce(Value(ThisItem.Segment2Value), 0) /
+                                        _sum
+                                    )
+                                )
+                              RadiusBottomLeft: =4
+                              RadiusBottomRight: =4
+                              RadiusTopLeft: =4
+                              RadiusTopRight: =4
+                              Width: =Parent.Width
+                              Y: |-
+                                =With(
+                                    {
+                                        _sum:
+                                            Coalesce(Value(ThisItem.Segment1Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment2Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment3Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment4Value), 0)
+                                    },
+                                    If(
+                                        _sum <= 0,
+                                        Parent.Height,
+                                        Parent.Height -
+                                        (
+                                            Parent.Height *
+                                            (
+                                                Coalesce(Value(ThisItem.Segment1Value), 0) +
+                                                Coalesce(Value(ThisItem.Segment2Value), 0)
+                                            ) /
+                                            _sum
+                                        )
+                                    )
+                                )
+                        - conOSP_Segment3:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderThickness: =0
+                              DropShadow: =DropShadow.None
+                              Fill: =cmp_OperationalSkylinePro.Segment3Color
+                              Height: |-
+                                =With(
+                                    {
+                                        _sum:
+                                            Coalesce(Value(ThisItem.Segment1Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment2Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment3Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment4Value), 0)
+                                    },
+                                    If(
+                                        _sum <= 0,
+                                        0,
+                                        Parent.Height *
+                                        Coalesce(Value(ThisItem.Segment3Value), 0) /
+                                        _sum
+                                    )
+                                )
+                              RadiusBottomLeft: =4
+                              RadiusBottomRight: =4
+                              RadiusTopLeft: =4
+                              RadiusTopRight: =4
+                              Width: =Parent.Width
+                              Y: |-
+                                =With(
+                                    {
+                                        _sum:
+                                            Coalesce(Value(ThisItem.Segment1Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment2Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment3Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment4Value), 0)
+                                    },
+                                    If(
+                                        _sum <= 0,
+                                        Parent.Height,
+                                        Parent.Height -
+                                        (
+                                            Parent.Height *
+                                            (
+                                                Coalesce(Value(ThisItem.Segment1Value), 0) +
+                                                Coalesce(Value(ThisItem.Segment2Value), 0) +
+                                                Coalesce(Value(ThisItem.Segment3Value), 0)
+                                            ) /
+                                            _sum
+                                        )
+                                    )
+                                )
+                        - conOSP_Segment4:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderThickness: =0
+                              DropShadow: =DropShadow.None
+                              Fill: =cmp_OperationalSkylinePro.Segment4Color
+                              Height: |-
+                                =With(
+                                    {
+                                        _sum:
+                                            Coalesce(Value(ThisItem.Segment1Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment2Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment3Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment4Value), 0)
+                                    },
+                                    If(
+                                        _sum <= 0,
+                                        0,
+                                        Parent.Height *
+                                        Coalesce(Value(ThisItem.Segment4Value), 0) /
+                                        _sum
+                                    )
+                                )
+                              RadiusBottomLeft: =4
+                              RadiusBottomRight: =4
+                              RadiusTopLeft: =4
+                              RadiusTopRight: =4
+                              Width: =Parent.Width
+                              Y: |-
+                                =With(
+                                    {
+                                        _sum:
+                                            Coalesce(Value(ThisItem.Segment1Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment2Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment3Value), 0) +
+                                            Coalesce(Value(ThisItem.Segment4Value), 0)
+                                    },
+                                    If(
+                                        _sum <= 0,
+                                        Parent.Height,
+                                        Parent.Height -
+                                        (
+                                            Parent.Height *
+                                            (
+                                                Coalesce(Value(ThisItem.Segment1Value), 0) +
+                                                Coalesce(Value(ThisItem.Segment2Value), 0) +
+                                                Coalesce(Value(ThisItem.Segment3Value), 0) +
+                                                Coalesce(Value(ThisItem.Segment4Value), 0)
+                                            ) /
+                                            _sum
+                                        )
+                                    )
+                                )
+                  - lblOSP_SlotLabel:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =cmp_OperationalSkylinePro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =16
+                        PaddingBottom: =0
+                        PaddingLeft: =2
+                        PaddingRight: =2
+                        PaddingTop: =0
+                        Size: =8
+                        Text: =Text(ThisItem.SlotLabel)
+                        Width: =Parent.TemplateWidth - 8
+                        X: =4
+                        Y: =Parent.TemplateHeight - 42
+                  - lblOSP_SlotCaption:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =cmp_OperationalSkylinePro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =13
+                        PaddingBottom: =0
+                        PaddingLeft: =2
+                        PaddingRight: =2
+                        PaddingTop: =0
+                        Size: =8
+                        Text: =Text(ThisItem.SlotCaption)
+                        Width: =Parent.TemplateWidth - 8
+                        X: =4
+                        Y: =Parent.TemplateHeight - 27
+                  - lblOSP_Status:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: |-
+                          =If(
+                              IsBlank(Text(ThisItem.StatusColorHex)),
+                              cmp_OperationalSkylinePro.MutedTextColor,
+                              ColorValue(Text(ThisItem.StatusColorHex))
+                          )
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =12
+                        PaddingBottom: =0
+                        PaddingLeft: =2
+                        PaddingRight: =2
+                        PaddingTop: =0
+                        Size: =8
+                        Text: =Upper(Text(ThisItem.StatusText))
+                        Visible: =cmp_OperationalSkylinePro.ShowStatus && !IsBlank(Trim(Text(ThisItem.StatusText)))
+                        Width: =Parent.TemplateWidth - 8
+                        X: =4
+                        Y: =Parent.TemplateHeight - 14
+                  - lblOSP_HitSurface:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =Color.Transparent
+                        Fill: =Color.Transparent
+                        Height: =Parent.TemplateHeight - 4
+                        HoverFill: |-
+                          =If(
+                              cmp_OperationalSkylinePro.EnableSelection &&
+                              Coalesce(Boolean(ThisItem.IsEnabled), true) &&
+                              !ThisItem.IsSelected,
+                              ColorFade(cmp_OperationalSkylinePro.AccentColor, 0.95),
+                              Color.Transparent
+                          )
+                        OnSelect: |-
+                          =If(
+                              cmp_OperationalSkylinePro.EnableSelection &&
+                              Coalesce(Boolean(ThisItem.IsEnabled), true),
+                              Select(Parent)
+                          )
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Text: =""
+                        Tooltip: =Coalesce(Text(ThisItem.TooltipText), Text(ThisItem.SlotLabel))
+                        Width: =Parent.TemplateWidth - 4
+                        X: =2
+                        Y: =2
+            - conOSP_State:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =cmp_OperationalSkylinePro.BorderColor
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_OperationalSkylinePro.SurfaceAltColor
+                  Height: =Parent.Height - 104
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Visible: =cmp_OperationalSkylinePro.IsLoading || cmp_OperationalSkylinePro.IsEmpty || cmp_OperationalSkylinePro.IsError
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =94
+                Children:
+                  - lblOSP_StateTitle:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: |-
+                          =If(
+                              cmp_OperationalSkylinePro.IsError,
+                              cmp_OperationalSkylinePro.Segment4Color,
+                              cmp_OperationalSkylinePro.TextColor
+                          )
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        PaddingBottom: =0
+                        PaddingLeft: =16
+                        PaddingRight: =16
+                        PaddingTop: =0
+                        Size: =11
+                        Text: |-
+                          =If(
+                              cmp_OperationalSkylinePro.IsLoading,
+                              "Loading",
+                              If(
+                                  cmp_OperationalSkylinePro.IsError,
+                                  "Unable to load skyline",
+                                  "No timeline data"
+                              )
+                          )
+                        Width: =Parent.Width
+                        Y: =Parent.Height / 2 - 26
+                  - lblOSP_StateBody:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =cmp_OperationalSkylinePro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =36
+                        PaddingBottom: =0
+                        PaddingLeft: =24
+                        PaddingRight: =24
+                        PaddingTop: =0
+                        Size: =9
+                        Text: |-
+                          =If(
+                              cmp_OperationalSkylinePro.IsLoading,
+                              cmp_OperationalSkylinePro.LoadingText,
+                              If(
+                                  cmp_OperationalSkylinePro.IsError,
+                                  cmp_OperationalSkylinePro.ErrorText,
+                                  cmp_OperationalSkylinePro.EmptyText
+                              )
+                          )
+                        Width: =Parent.Width
+                        Wrap: =true
+                        Y: =Parent.Height / 2 - 2
