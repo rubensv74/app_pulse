@@ -2,9 +2,10 @@
 
 ## Status
 
-- `DF-01` — published; continuation to DF-02 explicitly authorized by the user, but Studio validation remains authoritative.
-- `DF-02` — published; pending Power Apps Studio validation.
-- `DF-03` and later — blocked until DF-02 is accepted in Studio or any reported issue is corrected.
+- `DF-01` — published; continuation explicitly authorized by the user, while Studio validation remains authoritative.
+- `DF-02` — published; continuation to DF-03 explicitly authorized by the user.
+- `DF-03` — published with mandatory DF-03A draft-initialization property guide; pending Power Apps Studio validation.
+- `DF-04` and later — blocked until DF-03 + DF-03A are accepted in Studio or any reported issue is corrected.
 
 ## DF-01 — Definition editor shell
 
@@ -68,10 +69,16 @@ Gate DF-02:
 
 ## DF-03 — Definition form
 
-Objective: edit the selected definition using only properties supported by the current backend.
+Artifacts:
+
+- `blocks/03_field_configuration.replace-control.pa.yaml`
+- `blocks/03A_definition_draft_initialization.property-guide.md`
+
+Objective: replace the center placeholder with a typed local definition form using only properties supported by the current backend contract.
 
 Includes:
 
+- local draft initialization for Add and Edit;
 - FieldKey;
 - Label;
 - FieldType;
@@ -84,11 +91,33 @@ Includes:
 - ShowInQuickFilters;
 - FilterOrder;
 - FilterMode;
-- validation and draft dirty state.
+- local `Modified / Loaded / New draft` state;
+- deterministic typed variables for draft fields;
+- filter dependency: disabling Filterable clears/disables Quick filter;
+- explicit empty state when no catalog row is selected;
+- no flow calls;
+- no raw OptionsJson editing.
 
-FieldKey mutability for existing definitions must follow the actual backend/host behavior validated during integration; do not assume it is safely renamable.
+Conservative rules:
 
-Gate: Add/Edit drafts are typed, deterministic and do not invent unsupported metadata.
+- existing `FieldKey` is read-only;
+- existing `FieldType` is read-only;
+- new definitions may set FieldKey and FieldType;
+- FilterMode is limited to the currently confirmed values `Equals` and `Contains`;
+- Choice/MultiChoice options remain deferred to DF-04.
+
+Gate DF-03:
+
+- apply DF-03A first so catalog selection initializes the draft;
+- Studio accepts `conCFDEPro_Editor` replacement without Source Code/formula errors;
+- selecting a seeded field populates the form and shows `Loaded`;
+- changing any supported property changes state to `Modified`;
+- selecting another field replaces the draft deterministically;
+- + Add creates blank/default local state and shows `New draft`;
+- FieldKey/FieldType are editable only in ADD mode;
+- Filterable=false clears/disables Quick filter;
+- Choice/MultiChoice display the DF-04 options notice rather than exposing JSON;
+- no backend service is invoked.
 
 ## DF-04 — Choice / MultiChoice options editor
 
