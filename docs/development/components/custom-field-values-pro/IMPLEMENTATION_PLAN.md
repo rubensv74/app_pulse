@@ -2,7 +2,7 @@
 
 ## Estado
 
-- `VF-01` — en preparación/publicación.
+- `VF-01` — publicado; pendiente de validación en Power Apps Studio.
 - `VF-02` y siguientes — bloqueados hasta validar VF-01 en Power Apps Studio.
 
 ## VF-01 — Component shell
