@@ -2,8 +2,9 @@
 
 ## Status
 
-- `DF-01` — published; pending Power Apps Studio validation.
-- `DF-02` and later — blocked until DF-01 is accepted by Power Apps Studio.
+- `DF-01` — published; continuation to DF-02 explicitly authorized by the user, but Studio validation remains authoritative.
+- `DF-02` — published; pending Power Apps Studio validation.
+- `DF-03` and later — blocked until DF-02 is accepted in Studio or any reported issue is corrected.
 
 ## DF-01 — Definition editor shell
 
@@ -33,19 +34,37 @@ Gate:
 
 ## DF-02 — Catalog / search / select / add
 
-Objective: turn the left zone into the project definition catalog.
+Artifact:
+
+`blocks/02_definition_catalog.replace-control.pa.yaml`
+
+Objective: turn the left zone into the project definition catalog without calling backend services.
 
 Includes:
 
-- internal selected FieldKey;
+- local selected `FieldKey` through component-scoped `Set()` state;
+- local edit mode `EDIT` / `ADD` prepared for DF-03;
 - active-only / include-inactive view;
 - search by Label or FieldKey;
 - sort by SortOrder;
-- selected-row state;
-- Add new definition local action;
-- output/event contract needed by the later host integration.
+- selected-row visual state;
+- Add new definition local action plus existing `OnAddRequested` host event;
+- loading, empty and error catalog states;
+- compact metadata for type / required / pinned / active state.
 
-Gate: catalog remains stable with empty, small and large definition sets and selection does not require a flow call.
+No new output property is required in DF-02 because DF-03 is inside the same component and can consume the component-scoped selection state directly. Host-facing save/toggle contracts are introduced only when their behavior is required.
+
+Gate DF-02:
+
+- Studio accepts the replacement control without Source Code or formula errors;
+- with DF-01A seed, six definitions appear when inactive definitions are included;
+- active-only hides the inactive Target Date definition;
+- search works by Label and FieldKey;
+- rows remain sorted by SortOrder;
+- clicking a row highlights one definition and establishes `EDIT` mode;
+- + Add establishes `ADD` mode and raises `OnAddRequested`;
+- empty/loading/error states render intentionally;
+- no flow is called.
 
 ## DF-03 — Definition form
 
@@ -139,4 +158,5 @@ Any partial property tuning in this phase must be delivered as `.property-guide.
 - Studio validation is authoritative.
 - Do not introduce unsupported definition properties.
 - Do not call flows directly from the reusable component in v1.
+- Partial property adjustments are delivered as executable `.property-guide.md` files.
 - Do not start the next DF increment while the current one has an unresolved Studio error.
