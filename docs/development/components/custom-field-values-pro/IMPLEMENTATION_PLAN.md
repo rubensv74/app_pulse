@@ -4,9 +4,11 @@
 
 - `VF-01` — completado como base del componente.
 - `VF-02` — completado como base de renderizado de los seis tipos.
-- `VF-03` — publicado; pendiente de validación en Power Apps Studio.
+- `VF-03` — completado como base de edición + dirty state; requiere VF-03A aplicada.
 - `VF-03A` — corrección obligatoria de Cancel para evitar `Reset()` no validado sobre Gallery.
-- `VF-04` y siguientes — bloqueados hasta validar VF-03 + VF-03A.
+- `VF-04` — publicado; pendiente de validación en Punch Review con un Punch real.
+- `VF-04A` — patch obligatorio para rebase del componente cuando la cola queda vacía.
+- `VF-05` — bloqueado hasta validar VF-04 + VF-04A.
 
 ## VF-01 — Component shell
 
@@ -23,30 +25,11 @@ Incluye:
 - footer visual Cancel / Save preparado para fases posteriores;
 - outputs simples `HasFields` y `FieldCount`.
 
-No incluye:
-
-- working buffer;
-- dirty payload;
-- editores por tipo;
-- flows;
-- integración en Punch Review.
-
-Gate: Studio debe aceptar el componente sin errores y el shell debe verse correctamente en un ancho aproximado de 420–600 px.
+No incluye working buffer, dirty payload, editores, flows ni integración en Punch Review.
 
 ## VF-02 — Value renderers
 
-Objetivo: convertir el cuerpo en la lista compacta de valores reales.
-
-Tipos:
-
-- Text;
-- Number;
-- Date;
-- YesNo;
-- Choice;
-- MultiChoice.
-
-Gate: los seis tipos muestran correctamente el valor recibido y se mantienen estables al hacer scroll.
+Objetivo: convertir el cuerpo en la lista compacta de valores reales para Text, Number, Date, YesNo, Choice y MultiChoice.
 
 ## VF-03 — Editing + dirty state
 
@@ -58,69 +41,71 @@ Incluye:
 - baseline `colCFVPro_Base`;
 - dirty tracking por `FieldKey` en `colCFVPro_Dirty`;
 - outputs `EditedItems`, `DirtyItems`, `IsDirty`, `DirtyCount` y `LastChangedFieldKey`;
-- editores reales para Text, Number, Date, YesNo, Choice y MultiChoice;
-- eliminación automática del dirty row cuando el valor vuelve a su baseline;
-- `OnValueChanged`;
-- Save requested;
-- Cancel requested;
-- Refresh requested;
-- Manage Fields requested;
-- serialización MultiChoice mediante `JSON(Value, JSONFormat.Compact)`.
+- editores reales para los seis tipos;
+- eliminación automática del dirty row al volver al baseline;
+- `OnValueChanged`, Save, Cancel, Refresh y Manage Fields requested;
+- serialización MultiChoice con `JSON(Value, JSONFormat.Compact)`.
 
 `AccessAppScope` está habilitado porque esta versión utiliza colecciones/variable transitorias namespaced del componente. Hasta que exista aislamiento por instancia, PULSE debe mantener una sola instancia activa de `cmp_CustomFieldValuesPro` cada vez.
 
-El host deberá resetear la instancia del componente después de entregar una tabla `Items` autoritativa nueva. Esa orquestación se implementará y validará en VF-04; VF-03 valida primero el comportamiento interno del componente.
-
 ### VF-03A — corrección obligatoria
 
-El primer borrador de VF-03 incluía `Reset(galCFVPro_Values)` al cancelar. El registro de compatibilidad prohíbe asumir que un control es reseteable sin validación previa. Por ello `03A_cancel_without_gallery_reset.mandatory-patch.pa.yaml` debe aplicarse inmediatamente después de VF-03 y antes de probarlo en Studio.
-
-Cancel restaura `colCFVPro_Working` desde `colCFVPro_Base`, limpia el dirty payload y emite `OnCancelRequested`. Si algún editor concreto no refleja visualmente el baseline tras la recolección, se documentará ese control específico antes de introducir cualquier mecanismo de reset.
-
-Gate VF-03:
-
-- los seis editores muestran el baseline;
-- una edición crea un solo dirty row por `FieldKey`;
-- ediciones repetidas del mismo campo no duplican dirty rows;
-- volver al baseline elimina su dirty row;
-- dos campos distintos producen `DirtyCount = 2`;
-- Cancel deja `DirtyCount = 0` y recupera visualmente el baseline;
-- Save requested no borra dirty state por sí mismo;
-- MultiChoice produce un `ValueJson` válido;
-- `CanEdit=false` y `IsEditable=false` dejan los editores en lectura;
-- no aparecen errores Source Code ni de fórmula.
+`03A_cancel_without_gallery_reset.mandatory-patch.pa.yaml` elimina el `Reset(galCFVPro_Values)` del primer borrador. Cancel restaura el working buffer desde el baseline, limpia dirty state y emite `OnCancelRequested`.
 
 ## VF-04 — Punch Review integration
 
-Objetivo: sustituir el bloque visual actual de Custom Fields por una instancia de `cmp_CustomFieldValuesPro`.
+Archivo principal:
 
-Se mantienen los servicios host existentes y el Dirty Guard del Bloque 13.
+`04_punch_review_integration.replace-control.pa.yaml`
 
-VF-04 será responsable de sincronizar:
+Objetivo: sustituir el bloque visual actual `conPR_CustomFieldsCard` por un host ligero que conserva los servicios de pantalla e instala una instancia productiva `cmpPR_CustomFieldValues`.
 
-- `colPunchReviewFieldsUI` -> `Items`;
-- `DirtyItems` -> `colPunchReviewFieldsDirty`;
-- `IsDirty` -> `varPunchReviewDirty` y `colPunchReviewQueue.IsDirty`;
+Responsabilidades integradas:
+
+- `colPunchReviewFieldsUI` -> `cmpPR_CustomFieldValues.Items`;
+- `cmpPR_CustomFieldValues.EditedItems` -> `colPunchReviewFieldsUI`;
+- `cmpPR_CustomFieldValues.DirtyItems` -> `colPunchReviewFieldsDirty`;
+- `cmpPR_CustomFieldValues.IsDirty` -> `varPunchReviewDirty` y `colPunchReviewQueue.IsDirty`;
 - `OnSaveRequested` -> `btnPR_SaveCustomFields`;
 - `OnRefresh` -> `btnPR_LoadCustomFields`;
-- `OnCancelRequested` -> restauración host;
-- `OnManageFieldsRequested` -> futura apertura del editor de definiciones;
-- reset/rebase del componente después de load/save/cambio de Punch.
+- `OnCancelRequested` -> limpieza de host dirty state y restauración del baseline interno;
+- `OnManageFieldsRequested` -> mensaje temporal hasta la fase DF;
+- load/save autoritativos -> `Reset(cmpPR_CustomFieldValues)` para rebase desde la tabla de servidor.
 
-Gate: Load / edit / Save / Cancel / cambio de Punch funcionan con datos reales y el Dirty Guard no tiene regresiones.
+Se mantienen sin cambios de contrato:
+
+- `WarRoom_GetCustomBundle`;
+- `WarRoom_SaveCustomBulk`;
+- `colPunchReviewFieldsUI`;
+- `colPunchReviewFieldsBase`;
+- `colPunchReviewFieldsDirty`;
+- `varPunchReviewDirty`;
+- Block 13 Dirty Guard.
+
+### VF-04A — empty queue rebase
+
+`04A_empty_queue_component_rebase.incremental-patch.powerfx` añade `Reset(cmpPR_CustomFieldValues)` a la rama de cola vacía de `btnPR_SelectCurrent.OnSelect`.
+
+Es necesario porque el componente mantiene working/base internos. Limpiar únicamente las colecciones host no garantiza que desaparezca visualmente el último Punch si la cola queda vacía.
+
+Gate VF-04:
+
+- seleccionar Punch real carga valores;
+- la instancia muestra el mismo bundle que el host;
+- editar cambia el estado a Unsaved y activa el Dirty Guard;
+- Cancel recupera el baseline y deja `varPunchReviewDirty=false`;
+- Save utiliza el servicio real y rebasa desde el bundle devuelto por servidor;
+- un fallo de Save conserva el dirty state;
+- cambiar de Punch después de Save/Discard carga y rebasa correctamente;
+- cola vacía muestra Empty sin valores residuales;
+- manager edita; otros roles ven solo lectura;
+- no aparecen errores Source Code, propiedades no soportadas o fórmulas inválidas.
 
 ## VF-05 — Visual polish
 
 Objetivo: ajustar la columna derecha completa de Punch Review.
 
-Incluye:
-
-- densidad;
-- altura del panel;
-- scroll;
-- alineación con Comments;
-- Review Progress;
-- responsive 1366×768, 1600×900 y 1920×1080.
+Incluye densidad, altura, scroll, alineación con Comments y Review Progress, y responsive 1366×768, 1600×900 y 1920×1080.
 
 Gate: sin clipping ni solapamientos y con jerarquía visual coherente.
 
