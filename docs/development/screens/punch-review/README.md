@@ -54,10 +54,12 @@ Do not work from memory. Every confirmed Studio incompatibility must become a pr
 18. `10B_custom_fields_test_seed.optional.powerfx` — optional field-type seed
 19. `10C_yesno_initial_state.incremental-patch.pa.yaml` — Toggle `Checked` binding correction
 20. `10D_help_custom_fields.incremental-patch.pa.yaml` — custom-fields help
-21. `11_review_progress.replace-control.pa.yaml` — corrected to use installed `cmp_DonutPro`; pending Studio revalidation
-22. `11A_help_review_progress.incremental-patch.pa.yaml` — dependent on Block 11 validation
+21. `11_review_progress.replace-control.pa.yaml` — implemented with installed `cmp_DonutPro`; continuation to Block 12 approved
+22. `11A_help_review_progress.incremental-patch.pa.yaml` — review-progress help
+23. `12_related_queue_context.replace-control.pa.yaml` — published; pending Studio validation
+24. `12A_help_related_queue_context.incremental-patch.pa.yaml` — apply only after Block 12 validates
 
-Do not begin Block 12 until Review Progress imports without errors and responds correctly to Mark Reviewed / Undo Review.
+Do not begin Block 13 until Block 12 imports without errors and its contextual navigation works correctly with the existing unsaved-change lock.
 
 ## Confirmed service contracts
 
@@ -122,6 +124,36 @@ colPunchReviewQueue
 using `IsReviewedInSession` to separate Reviewed and Remaining. It does not use SQL or a flow.
 
 `cmp_DonutPro` is confirmed as the installed component used for this session-progress indicator. It is not a substitute for the Home_PDS discipline-composition pie chart.
+
+## Related Queue Context contract
+
+Block 12 deliberately does **not** invent a backend Punch-to-Punch relationship.
+
+`Related in Queue` is derived only from the loaded review queue:
+
+```text
+colPunchReviewQueue
+```
+
+A row is included when it is not the current Punch and it shares at least one of these fields with the current Punch:
+
+```text
+SubsystemCode
+Discipline
+```
+
+The UI labels the reason explicitly as:
+
+```text
+Same subsystem
+Same discipline
+```
+
+If both match, `Same subsystem` takes precedence because it is the more specific context.
+
+The `Review` action routes through the existing `btnPR_SelectCurrent` pipeline, so Comments and Custom Fields continue to load through the same selection mechanism. When navigation is allowed, queue search and quick filters are reset to `ALL` so the target record remains visible. If Custom Fields are dirty, the temporary Block 10A navigation lock remains authoritative.
+
+This panel is contextual navigation only. It does not call SQL, a flow or a formal relationship service.
 
 ## Manual and compatibility knowledge
 
