@@ -2,7 +2,7 @@
 
 ## Status
 
-- `DF-01` — in preparation/publication.
+- `DF-01` — published; pending Power Apps Studio validation.
 - `DF-02` and later — blocked until DF-01 is accepted by Power Apps Studio.
 
 ## DF-01 — Definition editor shell
