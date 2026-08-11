@@ -1,0 +1,120 @@
+// VF-02 OPTIONAL TEST SEED
+//
+// Usage:
+// Paste this formula temporarily into the Items property of a test instance
+// of cmp_CustomFieldValuesPro.
+//
+// Purpose:
+// Validate the six current backend FieldTypes before Punch Review integration.
+// This formula calls no flow and contains no real Punch data.
+
+Table(
+    {
+        FieldKey: "vendor_package",
+        FieldLabel: "Vendor Package",
+        FieldType: "Text",
+        HelpText: "",
+        IsRequired: true,
+        IsPinned: true,
+        IsEditable: true,
+        SortOrder: 10,
+        OptionsJson: "[]",
+        ValueText: "PKG-07 · HVAC System",
+        ValueNumber: Blank(),
+        ValueDate: Blank(),
+        ValueBool: false,
+        ValueJson: "",
+        LastUpdatedOn: Now(),
+        LastUpdatedByEmail: "test@example.com"
+    },
+    {
+        FieldKey: "estimated_hours",
+        FieldLabel: "Estimated Hours",
+        FieldType: "Number",
+        HelpText: "",
+        IsRequired: false,
+        IsPinned: true,
+        IsEditable: true,
+        SortOrder: 20,
+        OptionsJson: "[]",
+        ValueText: "",
+        ValueNumber: 6.5,
+        ValueDate: Blank(),
+        ValueBool: false,
+        ValueJson: "",
+        LastUpdatedOn: Now(),
+        LastUpdatedByEmail: "test@example.com"
+    },
+    {
+        FieldKey: "target_date",
+        FieldLabel: "Target Date",
+        FieldType: "Date",
+        HelpText: "",
+        IsRequired: false,
+        IsPinned: true,
+        IsEditable: true,
+        SortOrder: 30,
+        OptionsJson: "[]",
+        ValueText: "",
+        ValueNumber: Blank(),
+        ValueDate: Today() + 5,
+        ValueBool: false,
+        ValueJson: "",
+        LastUpdatedOn: Now(),
+        LastUpdatedByEmail: "test@example.com"
+    },
+    {
+        FieldKey: "inspection_required",
+        FieldLabel: "Inspection Required",
+        FieldType: "YesNo",
+        HelpText: "",
+        IsRequired: false,
+        IsPinned: true,
+        IsEditable: true,
+        SortOrder: 40,
+        OptionsJson: "[]",
+        ValueText: "",
+        ValueNumber: Blank(),
+        ValueDate: Blank(),
+        ValueBool: true,
+        ValueJson: "",
+        LastUpdatedOn: Now(),
+        LastUpdatedByEmail: "test@example.com"
+    },
+    {
+        FieldKey: "walkdown_area",
+        FieldLabel: "Walkdown Area",
+        FieldType: "Choice",
+        HelpText: "",
+        IsRequired: false,
+        IsPinned: true,
+        IsEditable: true,
+        SortOrder: 50,
+        OptionsJson: "[""Area 1"",""Area 2A · Mechanical"",""Area 3""]",
+        ValueText: "Area 2A · Mechanical",
+        ValueNumber: Blank(),
+        ValueDate: Blank(),
+        ValueBool: false,
+        ValueJson: "",
+        LastUpdatedOn: Now(),
+        LastUpdatedByEmail: "test@example.com"
+    },
+    {
+        FieldKey: "constraints",
+        FieldLabel: "Constraints",
+        FieldType: "MultiChoice",
+        HelpText: "",
+        IsRequired: false,
+        IsPinned: true,
+        IsEditable: true,
+        SortOrder: 60,
+        OptionsJson: "[""Material"",""Access"",""Engineering"",""Permit""]",
+        ValueText: "",
+        ValueNumber: Blank(),
+        ValueDate: Blank(),
+        ValueBool: false,
+        ValueJson: "[""Material"",""Engineering""]",
+        LastUpdatedOn: Now(),
+        LastUpdatedByEmail: "test@example.com"
+    }
+)
