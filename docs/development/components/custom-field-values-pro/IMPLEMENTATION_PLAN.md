@@ -2,8 +2,9 @@
 
 ## Estado
 
-- `VF-01` — publicado; pendiente de validación en Power Apps Studio.
-- `VF-02` y siguientes — bloqueados hasta validar VF-01 en Power Apps Studio.
+- `VF-01` — publicado; continuación autorizada.
+- `VF-02` — publicado; pendiente de validación en Power Apps Studio.
+- `VF-03` y siguientes — bloqueados hasta validar VF-02 en Power Apps Studio.
 
 ## VF-01 — Component shell
 
@@ -32,18 +33,32 @@ Gate: Studio debe aceptar el componente sin errores y el shell debe verse correc
 
 ## VF-02 — Value renderers
 
-Objetivo: convertir el cuerpo en la lista compacta de valores reales.
+Objetivo: convertir el cuerpo en la lista compacta de valores reales, separando visualmente la etiqueta del campo y su valor actual.
 
 Tipos:
 
-- Text;
-- Number;
-- Date;
-- YesNo;
-- Choice;
-- MultiChoice.
+- Text -> `ValueText`;
+- Number -> `ValueNumber`;
+- Date -> `ValueDate`;
+- YesNo -> `ValueBool` como Yes/No;
+- Choice -> `ValueText`;
+- MultiChoice -> `ValueJson` parseado como lista legible.
 
-Gate: los seis tipos muestran correctamente el valor recibido y se mantienen estables al hacer scroll.
+Decisiones:
+
+- VF-02 es presentación de valores, todavía no edición;
+- no crea working buffer ni dirty payload;
+- no llama flows;
+- valores vacíos se muestran como `—`;
+- la lista utiliza filas compactas con scroll interno;
+- Loading / Error / Empty sustituyen deliberadamente la lista cuando corresponda.
+
+Artefactos:
+
+- `blocks/02_value_renderers.pa.yaml` — reemplaza únicamente `conCFVPro_Body`;
+- `blocks/02A_value_renderers_test_seed.optional.powerfx` — seed opcional para validar los seis tipos.
+
+Gate: los seis tipos muestran correctamente el valor recibido, MultiChoice se presenta como lista separada por comas, el scroll es estable y no existe clipping aproximadamente a 420, 500 y 600 px de ancho.
 
 ## VF-03 — Editing + dirty state
 
