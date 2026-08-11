@@ -1,0 +1,207 @@
+# BLOCK C16 — Review Progress donut card
+# Type: C — Component
+#
+# Operation: ADD CHILD
+# Target: conPR_RightColumn
+# Parent/anchor: scr_PunchReview > conPR_ScreenRoot > conPR_ContentShell > conPR_Body > conPR_Workspace > conPR_UpperGrid > conPR_RightColumn
+#
+# DEPENDS ON
+# - cmp_DonutPro installed in the active Power Apps app
+# - colPunchReviewQueue
+# - varPunchReviewCurrentIndex
+# - varTheme_Surface
+# - varTheme_SurfaceAlt
+# - varTheme_Border
+# - varTheme_Text
+# - varTheme_TextMuted
+# - varTheme_PulseBlueDark
+#
+# TOUCHES
+# - Adds one new child at the bottom of conPR_RightColumn only.
+#
+# DO NOT MODIFY
+# - conPR_CommentsCard
+# - conPR_CustomFieldsHost / cmpPR_CustomFieldValues
+# - conPR_RightColumn width/height/layout geometry
+# - queue, overview, session activity, header or navigation
+# - Custom Fields contracts or backend flows
+#
+# PURPOSE
+# - show session review progress for the full loaded review queue;
+# - reproduce the approved reference pattern: donut + Reviewed/Remaining + Current Position;
+# - remain purely local: no Flow, SQL or backend call.
+#
+# SEMANTICS
+# Reviewed = colPunchReviewQueue rows where IsReviewedInSession=true.
+# Remaining = the rest of the loaded queue.
+# Current Position = varPunchReviewCurrentIndex within the full loaded queue.
+# This is SESSION progress, not Punch operational status and not project completion.
+#
+# COLOR
+# Structure/behavior are the scope of this block.
+# SegmentColor is text/HEX in cmp_DonutPro, so the current PULSE primary and neutral
+# HEX values are used here. Color remains independently governable by the Design System.
+#
+# VALIDATION
+# 1. Paste as a new child of conPR_RightColumn after Custom Fields.
+# 2. Studio accepts the block with no Source Code/formula errors.
+# 3. Donut center shows queue total.
+# 4. Mark Reviewed updates Reviewed/Remaining immediately.
+# 5. Reviewed + Remaining always equals Total.
+# 6. Current Position follows Previous/Next/current-row selection.
+# 7. No backend call occurs.
+# 8. Comments and Custom Fields retain their existing behavior and geometry.
+#
+# EXPECTED STATUS AFTER VALIDATION
+# FUNCTIONAL_FROZEN — color may remain PENDING.
+
+- conPR_ReviewProgressCard:
+    Control: GroupContainer@1.5.0
+    Variant: ManualLayout
+    Properties:
+      BorderColor: =varTheme_Border
+      BorderThickness: =1
+      DropShadow: =DropShadow.Semilight
+      Fill: =varTheme_Surface
+      FillPortions: =0
+      Height: =184
+      LayoutMinHeight: =184
+      LayoutMinWidth: =300
+      RadiusBottomLeft: =12
+      RadiusBottomRight: =12
+      RadiusTopLeft: =12
+      RadiusTopRight: =12
+      Width: =Parent.Width
+    Children:
+      - cmpPR_ReviewProgressDonut:
+          Control: CanvasComponent
+          ComponentName: cmp_DonutPro
+          Properties:
+            AccentColor: =varTheme_PulseBlueDark
+            BackgroundColor: =Color.Transparent
+            BorderColor: =Color.Transparent
+            CenterFillColorHex: ="#FFFFFF"
+            CenterLabel: ="Total"
+            CenterLabelColorHex: ="#64748B"
+            CenterValueColorHex: ="#0F172A"
+            CenterValueText: =Text(CountRows(colPunchReviewQueue), "[$-en-US]#,##0")
+            CompactMode: =true
+            DangerColor: =ColorValue("#DC2626")
+            DonutThickness: =14
+            EmptyText: ="No punches in the review queue."
+            EnableSelection: =false
+            ErrorText: ="Review progress unavailable."
+            Height: =148
+            Items: |-
+              =Table(
+                  {
+                      SegmentKey: "REVIEWED",
+                      SegmentLabel: "Reviewed in Session",
+                      SegmentValue:
+                          CountIf(
+                              colPunchReviewQueue,
+                              Coalesce(IsReviewedInSession, false)
+                          ),
+                      SegmentColor: "#1677FF",
+                      SegmentOrder: 1
+                  },
+                  {
+                      SegmentKey: "REMAINING",
+                      SegmentLabel: "Remaining",
+                      SegmentValue:
+                          CountIf(
+                              colPunchReviewQueue,
+                              !Coalesce(IsReviewedInSession, false)
+                          ),
+                      SegmentColor: "#CBD5E1",
+                      SegmentOrder: 2
+                  }
+              )
+            LoadingText: ="Updating review progress..."
+            MutedTextColor: =varTheme_TextMuted
+            OnClearSelection: =
+            OnSegmentSelect: =
+            PercentageFormat: ="[$-en-US]0%"
+            SegmentGapPercent: =0.65
+            ShowLegend: =true
+            ShowPercentages: =true
+            ShowValues: =true
+            ShowZeroSegments: =true
+            State: =If(CountRows(colPunchReviewQueue) = 0, "empty", "ready")
+            Subtitle: =""
+            SurfaceAltColor: =varTheme_SurfaceAlt
+            TextColor: =varTheme_Text
+            Title: ="Review Progress"
+            TrackColorHex: ="#E2E8F0"
+            ValueFormat: ="[$-en-US]#,##0"
+            ValueSuffix: =""
+            Width: =Parent.Width
+      - rectPR_ProgressPositionDivider:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            BorderStyle: =BorderStyle.None
+            Fill: =varTheme_Border
+            Height: =1
+            Width: =Parent.Width - 28
+            X: =14
+            Y: =148
+      - icoPR_ProgressCurrentPosition:
+          Control: Classic/Icon@2.5.0
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_PulseBlueDark
+            Height: =14
+            Icon: =Icon.ArrowRight
+            Width: =14
+            X: =If(Parent.Width >= 420, 206, 14)
+            Y: =158
+      - lblPR_ProgressPositionLabel:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_TextMuted
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =24
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =7
+            Text: ="Current Position"
+            Width: =130
+            X: =If(Parent.Width >= 420, 226, 34)
+            Y: =153
+      - lblPR_ProgressPositionValue:
+          Control: Label@2.5.1
+          Properties:
+            Align: =Align.Right
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_Text
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =24
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =7
+            Text: |-
+              =If(
+                  CountRows(colPunchReviewQueue) = 0,
+                  "0 of 0",
+                  Text(
+                      Min(
+                          Max(1, Coalesce(varPunchReviewCurrentIndex, 1)),
+                          CountRows(colPunchReviewQueue)
+                      )
+                  ) &
+                  " of " &
+                  Text(CountRows(colPunchReviewQueue))
+              )
+            Width: =90
+            X: =Parent.Width - 104
+            Y: =153
