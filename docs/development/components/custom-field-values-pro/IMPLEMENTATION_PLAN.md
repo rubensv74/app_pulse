@@ -6,9 +6,9 @@
 - `VF-02` — completado como base de renderizado de los seis tipos.
 - `VF-03` — completado como base de edición + dirty state; requiere VF-03A aplicada.
 - `VF-03A` — corrección obligatoria de Cancel para evitar `Reset()` no validado sobre Gallery.
-- `VF-04` — publicado; pendiente de validación en Punch Review con un Punch real.
+- `VF-04` — publicado e integrado por continuidad autorizada; validación funcional real sigue siendo responsabilidad de Studio/runtime.
 - `VF-04A` — patch obligatorio para rebase del componente cuando la cola queda vacía.
-- `VF-05` — bloqueado hasta validar VF-04 + VF-04A.
+- `VF-05` — publicado; pendiente de validación visual/funcional en 1366×768, 1600×900 y 1920×1080.
 
 ## VF-01 — Component shell
 
@@ -88,26 +88,41 @@ Se mantienen sin cambios de contrato:
 
 Es necesario porque el componente mantiene working/base internos. Limpiar únicamente las colecciones host no garantiza que desaparezca visualmente el último Punch si la cola queda vacía.
 
-Gate VF-04:
-
-- seleccionar Punch real carga valores;
-- la instancia muestra el mismo bundle que el host;
-- editar cambia el estado a Unsaved y activa el Dirty Guard;
-- Cancel recupera el baseline y deja `varPunchReviewDirty=false`;
-- Save utiliza el servicio real y rebasa desde el bundle devuelto por servidor;
-- un fallo de Save conserva el dirty state;
-- cambiar de Punch después de Save/Discard carga y rebasa correctamente;
-- cola vacía muestra Empty sin valores residuales;
-- manager edita; otros roles ven solo lectura;
-- no aparecen errores Source Code, propiedades no soportadas o fórmulas inválidas.
-
 ## VF-05 — Visual polish
 
-Objetivo: ajustar la columna derecha completa de Punch Review.
+Archivo principal:
 
-Incluye densidad, altura, scroll, alineación con Comments y Review Progress, y responsive 1366×768, 1600×900 y 1920×1080.
+`05_visual_polish.incremental-patch.pa.yaml`
 
-Gate: sin clipping ni solapamientos y con jerarquía visual coherente.
+Matriz de validación:
+
+`05A_visual_validation_matrix.md`
+
+Objetivo: ajustar la columna derecha completa de Punch Review sin tocar contratos funcionales.
+
+Decisiones principales:
+
+- el header de `cmp_CustomFieldValuesPro` pasa a dos filas compactas para evitar solapamientos en el ancho real aproximado de 360–500 px;
+- la altura mínima de la columna derecha se fija en 660 px, calculada a partir de Comments 220 + Custom Field Values 280 + Review Progress 140 + dos gaps de 10;
+- `conPR_UpperGrid` garantiza esos 660 px en desktop y 1060 px en la disposición apilada por debajo de 1320 px;
+- el scroll permanece en los contenedores de workspace ya existentes en lugar de recortar tarjetas;
+- no se cambian flows, colecciones, Dirty Guard ni eventos.
+
+Gate VF-05:
+
+- 1366×768: ningún panel derecho queda recortado; el workspace puede hacer scroll vertical;
+- 1600×900: Comments, Values y Review Progress siguen utilizables;
+- 1920×1080: layout completo sin huecos excesivos;
+- ancho aproximado 360–380 px del componente: título/status y Record/Manage/Refresh no se solapan;
+- Comments composer permanece accesible;
+- Custom Fields conserva al menos 280 px y scroll interno;
+- Review Progress conserva 140 px;
+- Save/Cancel/Refresh/Dirty Guard no presentan regresiones;
+- sin errores Source Code/App Checker.
+
+## Siguiente fase
+
+Después de aceptar VF-05 se inicia `DF-01 — cmp_CustomFieldsEditorPro`, el editor modal de definiciones de Custom Fields a nivel de proyecto. No reutiliza el prototipo abandonado `cmp_CustomFieldEditorPro` de la línea CF.
 
 ## Política
 
