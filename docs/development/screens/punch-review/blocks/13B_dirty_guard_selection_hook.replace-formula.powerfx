@@ -1,0 +1,92 @@
+// BLOCK 13B — DIRTY-GUARD SELECTION HOOK
+//
+// Operation: REPLACE FORMULA COMPLETELY.
+// Target control: btnPR_SelectCurrent
+// Target property: OnSelect
+// Parent: conPR_QueueCard
+//
+// This supersedes Block 10A.
+//
+// Behavior:
+// - Clean state: selection proceeds and Comments + Custom Fields load.
+// - Dirty state + different target: stores target index and opens decision modal.
+// - Dirty state + same target: does nothing, preventing accidental reload/loss.
+// - Empty queue: clears current remote panels.
+
+With(
+    {
+        targetIndex:
+            Min(
+                Max(
+                    1,
+                    Coalesce(
+                        varPunchReviewRequestedIndex,
+                        varPunchReviewCurrentIndex,
+                        1
+                    )
+                ),
+                Max(1, CountRows(colPunchReviewQueue))
+            )
+    },
+
+    If(
+        varPunchReviewDirty,
+
+        If(
+            targetIndex <> varPunchReviewCurrentIndex,
+
+            Set(varPunchReviewPendingAction, "CHANGE_CURRENT");
+            Set(varPunchReviewPendingIndex, targetIndex);
+            Set(varPunchReviewShowDirtyDialog, true),
+
+            Set(
+                varPunchReviewRequestedIndex,
+                varPunchReviewCurrentIndex
+            )
+        ),
+
+        CountRows(colPunchReviewQueue) = 0,
+
+        Set(varPunchReviewCurrent, Blank());
+        Set(varPunchReviewCurrentId, Blank());
+        Set(varPunchReviewCommentsPage, 1);
+        Clear(colPunchReviewComments);
+        Set(varPunchReviewCommentsError, "");
+        Clear(colPunchReviewFieldsUI);
+        Clear(colPunchReviewFieldsBase);
+        Clear(colPunchReviewFieldsDirty);
+        Set(varPunchReviewFieldsError, "");
+        Set(varPunchReviewDirty, false);
+        Set(varPunchReviewPendingAction, "");
+        Set(varPunchReviewPendingIndex, 0);
+        Set(varPunchReviewShowDirtyDialog, false),
+
+        Set(varPunchReviewCurrentIndex, targetIndex);
+
+        Set(
+            varPunchReviewCurrent,
+            LookUp(
+                colPunchReviewQueue,
+                ReviewOrder = varPunchReviewCurrentIndex
+            )
+        );
+
+        Set(
+            varPunchReviewCurrentId,
+            varPunchReviewCurrent.PunchIdNumber
+        );
+
+        Set(
+            varPunchReviewRequestedIndex,
+            varPunchReviewCurrentIndex
+        );
+
+        Set(varPunchReviewPendingAction, "");
+        Set(varPunchReviewPendingIndex, 0);
+        Set(varPunchReviewShowDirtyDialog, false);
+
+        Set(varPunchReviewCommentsPage, 1);
+        Select(btnPR_LoadComments);
+        Select(btnPR_LoadCustomFields)
+    )
+)
