@@ -5,8 +5,10 @@
 - `DF-01` — published; continuation explicitly authorized by the user, while Studio validation remains authoritative.
 - `DF-02` — published; continuation to DF-03 explicitly authorized by the user.
 - `DF-03` — published with mandatory DF-03A draft-initialization property guide; continuation to DF-04 explicitly authorized by the user.
-- `DF-04` — published with mandatory DF-04A options-state property guide; pending Power Apps Studio validation.
-- `DF-05` and later — blocked until DF-04 + DF-04A are accepted in Studio or any reported issue is corrected.
+- `DF-04` — published with mandatory DF-04A options-state property guide.
+- `DF-04B` — published as full replacement of `conCFDEPro_Editor` to refine hierarchy, toggle ownership, Filtering and Options UX after visual validation in Studio.
+- `DF-04C` — published as full replacement of `conCFDEPro_Preview` to convert the static preview into a live draft-driven preview.
+- `DF-05` and later — blocked until DF-04B + DF-04C are accepted in Studio or any reported issue is corrected.
 
 ## DF-01 — Definition editor shell
 
@@ -135,29 +137,69 @@ Implementation:
 - new Choice/MultiChoice definitions start with an empty options list;
 - switching a new definition between Choice and MultiChoice preserves its option lines;
 - switching a new definition to a non-choice type clears options and normalizes `OptionsJson` to `[]`;
-- DF-04 replaces the informational DF-03 notice with a compact multiline options editor;
 - one line represents one option, so add/remove/reorder are performed by adding/removing/moving lines;
 - blank lines are ignored during serialization;
 - each option is serialized with `JSON(Trim(Value), JSONFormat.Compact)` and concatenated into the existing JSON string-array contract;
 - no raw JSON is displayed or edited;
 - no backend flow is called.
 
-Why the line-based editor is used in v1:
+## DF-04B — Field configuration visual refinement
 
-- it supports add/remove/reorder with control types already validated in PULSE;
-- it avoids introducing an unvalidated horizontal-gallery pattern or secondary modal;
-- it directly eliminates the manual JSON-editing UX from the legacy drawer;
-- it preserves option order explicitly through line order.
+Artifact:
 
-Gate DF-04:
+`blocks/04B_field_configuration_refined.replace-control.pa.yaml`
 
-- apply DF-04A before the control replacement;
-- Studio accepts `conCFDEPro_OptionsNotice` -> `conCFDEPro_OptionsEditor` without Source Code/formula errors;
-- seeded Choice/MultiChoice definitions round-trip from OptionsJson into visible lines;
-- non-choice fields hide the editor;
-- add/remove/reorder lines changes local draft state and serialized order;
-- blank lines do not generate empty JSON entries;
-- quotes/special characters do not break serialization because `JSON()` performs escaping;
+Triggered by Studio visual validation after DF-04.
+
+Objective: replace the entire center editor rather than applying a fragile set of isolated property tweaks.
+
+Changes:
+
+- groups Requirement / Pinning / Availability into a single Behavior subpanel so each switch has an unambiguous owner;
+- groups Filterable / Quick filter / Filter mode / Filter order into a dedicated Filtering subpanel;
+- compresses General fields without removing any supported property;
+- increases the Choice/MultiChoice Options editor to 92 px and keeps a visible option count;
+- keeps raw JSON hidden;
+- preserves all DF-03A / DF-04A draft variables and host ownership of backend operations.
+
+Gate DF-04B:
+
+- Studio accepts the complete `conCFDEPro_Editor` replacement;
+- all draft properties still load and edit correctly;
+- switch/text ownership is visually clear;
+- Filterable=false disables Quick filter and filter controls;
+- Choice/MultiChoice options are readable without immediate scrolling for small option sets;
+- OptionsJson remains synchronized;
+- no flow is called.
+
+## DF-04C — Dynamic live preview
+
+Artifact:
+
+`blocks/04C_live_preview_dynamic.replace-control.pa.yaml`
+
+Objective: replace the static `Sample field` preview with a useful local preview driven by the current draft.
+
+Preview reacts to:
+
+- Label;
+- FieldType;
+- HelpText;
+- Required;
+- Pinned;
+- Active;
+- option count for Choice/MultiChoice;
+- FieldKey;
+- filterability, FilterMode, FilterOrder and Quick Filter state.
+
+The input representation changes by type for Text, Number, Date, YesNo, Choice and MultiChoice. The preview is intentionally local and does not write record data.
+
+Gate DF-04C:
+
+- Studio accepts the complete `conCFDEPro_Preview` replacement;
+- selecting or editing a definition updates the preview immediately;
+- Choice/MultiChoice option count follows the local options draft;
+- empty selection shows the intentional empty state;
 - no backend service is invoked.
 
 ## DF-05 — Backend host integration
@@ -201,7 +243,7 @@ Includes:
 - responsive behavior;
 - keyboard/focus behavior;
 - empty/loading/error/saving states;
-- refined live preview;
+- final visual polish;
 - bilingual Punch Review help entry where appropriate;
 - Spanish user manual updates;
 - reusable component documentation;
@@ -216,4 +258,5 @@ Any partial property tuning in this phase must be delivered as `.property-guide.
 - Do not introduce unsupported definition properties.
 - Do not call flows directly from the reusable component in v1.
 - Partial property adjustments are delivered as executable `.property-guide.md` files.
+- Complete structural replacements are delivered as valid `.pa.yaml` controls.
 - Do not start the next DF increment while the current one has an unresolved Studio error.
