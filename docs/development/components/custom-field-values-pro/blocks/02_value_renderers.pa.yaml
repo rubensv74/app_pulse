@@ -1,0 +1,350 @@
+# VF-02 — cmp_CustomFieldValuesPro VALUE RENDERERS
+#
+# Operation: REPLACE CONTROL COMPLETELY.
+# Target control: conCFVPro_Body
+# Parent: conCFVPro_Root
+# Required base: VF-01 component shell.
+#
+# PRE-YAML GATE APPLIED
+# docs/development/screens/punch-review/
+# POWER_APPS_SOURCE_CODE_COMPATIBILITY.md was read immediately before
+# drafting this YAML.
+#
+# Purpose:
+# - replace the VF-01 body placeholder with the compact Field -> Value list;
+# - render the CURRENT VALUES received through Items;
+# - support the six current backend FieldTypes without introducing editing;
+# - keep the component visually dense enough for the Punch Review right column.
+#
+# Supported display types:
+# - Text      -> ValueText
+# - Number    -> ValueNumber
+# - Date      -> ValueDate
+# - YesNo     -> ValueBool as Yes / No
+# - Choice    -> ValueText
+# - MultiChoice -> ValueJson parsed as the current JSON string-array contract
+#
+# Important:
+# - VF-02 is READ-ONLY presentation only.
+# - No working buffer or dirty tracking is introduced here.
+# - No flow is called.
+# - No JSON is built manually. MultiChoice only PARSES ValueJson.
+# - Save/Cancel remain visual shell actions until VF-03.
+# - Punch Review is not modified by this block.
+#
+# Compatibility rules applied:
+# - no SVG inline;
+# - no CanvasComponent dependency;
+# - no Radius* on Label@2.5.1;
+# - no AccessibleLabel on Classic/Button@2.2.0;
+# - no Reset() assumptions;
+# - Gallery@2.15.0, GroupContainer@1.5.0, Label@2.5.1 and
+#   Rectangle@2.3.0 are already used in the current PULSE sources.
+#
+# Validation gate:
+# 1. Replace only conCFVPro_Body from VF-01 with this control.
+# 2. Studio accepts the component without PA1001 / PA2108 / PA2301.
+# 3. Test Items contains all six supported FieldTypes.
+# 4. Every row shows FieldLabel on the left and the current value on the right.
+# 5. Empty values render as an em dash rather than a fake value.
+# 6. MultiChoice renders a readable comma-separated list from ValueJson.
+# 7. Required fields show a discreet asterisk.
+# 8. Loading / Error / Empty states replace the list deliberately.
+# 9. Scrolling is stable with more rows than the visible body height.
+# 10. Validate approximately at 420, 500 and 600 px width.
+# 11. Do not proceed to VF-03 until Studio validates VF-02.
+
+- conCFVPro_Body:
+    Control: GroupContainer@1.5.0
+    Variant: ManualLayout
+    Properties:
+      DropShadow: =DropShadow.None
+      Fill: =cmp_CustomFieldValuesPro.BackgroundColor
+      Height: =Parent.Height - If(cmp_CustomFieldValuesPro.ShowFooter, 103, 55)
+      Width: =Parent.Width
+      Y: =55
+    Children:
+      - galCFVPro_Values:
+          Control: Gallery@2.15.0
+          Variant: Vertical
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Fill: =cmp_CustomFieldValuesPro.BackgroundColor
+            Height: =Parent.Height
+            Items: |-
+              =SortByColumns(
+                  cmp_CustomFieldValuesPro.Items,
+                  "SortOrder",
+                  SortOrder.Ascending
+              )
+            ShowNavigation: =false
+            ShowScrollbar: =true
+            TemplateFill: =cmp_CustomFieldValuesPro.BackgroundColor
+            TemplatePadding: =0
+            TemplateSize: =44
+            Visible: |-
+              =!cmp_CustomFieldValuesPro.IsLoading &&
+              IsBlank(cmp_CustomFieldValuesPro.ErrorText) &&
+              cmp_CustomFieldValuesPro.HasFields
+            Width: =Parent.Width
+          Children:
+            - conCFVPro_ValueRow:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_CustomFieldValuesPro.BackgroundColor
+                  Height: =Parent.TemplateHeight
+                  Width: =Parent.TemplateWidth
+                Children:
+                  - lblCFVPro_FieldLabel:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_CustomFieldValuesPro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =Parent.Height - 1
+                        PaddingBottom: =0
+                        PaddingLeft: =14
+                        PaddingRight: =8
+                        PaddingTop: =0
+                        Size: =8
+                        Text: =ThisItem.FieldLabel & If(ThisItem.IsRequired, " *", "")
+                        VerticalAlign: =VerticalAlign.Middle
+                        Width: =Max(140, Parent.Width * 0.38)
+                        Wrap: =false
+                  - lblCFVPro_FieldValue:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_CustomFieldValuesPro.TextColor
+                        Fill: =cmp_CustomFieldValuesPro.SurfaceAltColor
+                        Font: =Font.'Segoe UI'
+                        Height: =32
+                        PaddingBottom: =0
+                        PaddingLeft: =10
+                        PaddingRight: =10
+                        PaddingTop: =0
+                        Size: =8
+                        Text: |-
+                          =Switch(
+                              Lower(Trim(Coalesce(ThisItem.FieldType, "text"))),
+
+                              "text",
+                                  If(
+                                      IsBlank(Trim(Coalesce(ThisItem.ValueText, ""))),
+                                      "—",
+                                      ThisItem.ValueText
+                                  ),
+
+                              "number",
+                                  If(
+                                      IsBlank(ThisItem.ValueNumber),
+                                      "—",
+                                      Text(ThisItem.ValueNumber)
+                                  ),
+
+                              "date",
+                                  If(
+                                      IsBlank(ThisItem.ValueDate),
+                                      "—",
+                                      Text(ThisItem.ValueDate, "dd/mm/yyyy")
+                                  ),
+
+                              "yesno",
+                                  If(Coalesce(ThisItem.ValueBool, false), "Yes", "No"),
+
+                              "choice",
+                                  If(
+                                      IsBlank(Trim(Coalesce(ThisItem.ValueText, ""))),
+                                      "—",
+                                      ThisItem.ValueText
+                                  ),
+
+                              "multichoice",
+                                  With(
+                                      {
+                                          jsonText: Trim(Coalesce(ThisItem.ValueJson, ""))
+                                      },
+                                      If(
+                                          IsBlank(jsonText) || jsonText = "[]",
+                                          "—",
+                                          IfError(
+                                              Concat(
+                                                  Table(ParseJSON(jsonText)),
+                                                  Text(ThisRecord.Value),
+                                                  ", "
+                                              ),
+                                              "—"
+                                          )
+                                      )
+                                  ),
+
+                              If(
+                                  IsBlank(Trim(Coalesce(ThisItem.ValueText, ""))),
+                                  "—",
+                                  ThisItem.ValueText
+                              )
+                          )
+                        VerticalAlign: =VerticalAlign.Middle
+                        Width: =Parent.Width - lblCFVPro_FieldLabel.Width - 26
+                        Wrap: =false
+                        X: =lblCFVPro_FieldLabel.Width + 12
+                        Y: =6
+                  - rectCFVPro_RowDivider:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        BorderStyle: =BorderStyle.None
+                        Fill: =cmp_CustomFieldValuesPro.BorderColor
+                        Height: =1
+                        Width: =Parent.Width - 24
+                        X: =12
+                        Y: =Parent.Height - 1
+      - conCFVPro_LoadingState:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =cmp_CustomFieldValuesPro.BackgroundColor
+            Height: =Parent.Height
+            Visible: =cmp_CustomFieldValuesPro.IsLoading
+            Width: =Parent.Width
+          Children:
+            - lblCFVPro_LoadingTitle:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_CustomFieldValuesPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: ="Loading custom fields..."
+                  Width: =Parent.Width - 40
+                  X: =20
+                  Y: =Max(20, (Parent.Height - 48) / 2)
+            - lblCFVPro_LoadingBody:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_CustomFieldValuesPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =20
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: ="Preparing current values for this Punch."
+                  Width: =Parent.Width - 40
+                  X: =20
+                  Y: =lblCFVPro_LoadingTitle.Y + 26
+      - conCFVPro_ErrorState:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =cmp_CustomFieldValuesPro.BackgroundColor
+            Height: =Parent.Height
+            Visible: =!cmp_CustomFieldValuesPro.IsLoading && !IsBlank(cmp_CustomFieldValuesPro.ErrorText)
+            Width: =Parent.Width
+          Children:
+            - lblCFVPro_ErrorTitle:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_CustomFieldValuesPro.DangerColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: ="Custom fields unavailable"
+                  Width: =Parent.Width - 40
+                  X: =20
+                  Y: =Max(16, (Parent.Height - 70) / 2)
+            - lblCFVPro_ErrorBody:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_CustomFieldValuesPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =42
+                  PaddingBottom: =0
+                  PaddingLeft: =14
+                  PaddingRight: =14
+                  PaddingTop: =0
+                  Size: =7
+                  Text: =cmp_CustomFieldValuesPro.ErrorText
+                  VerticalAlign: =VerticalAlign.Top
+                  Width: =Parent.Width - 50
+                  X: =25
+                  Y: =lblCFVPro_ErrorTitle.Y + 28
+      - conCFVPro_EmptyState:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =cmp_CustomFieldValuesPro.BackgroundColor
+            Height: =Parent.Height
+            Visible: |-
+              =!cmp_CustomFieldValuesPro.IsLoading &&
+              IsBlank(cmp_CustomFieldValuesPro.ErrorText) &&
+              !cmp_CustomFieldValuesPro.HasFields
+            Width: =Parent.Width
+          Children:
+            - lblCFVPro_EmptyTitle:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_CustomFieldValuesPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: ="No custom fields"
+                  Width: =Parent.Width - 40
+                  X: =20
+                  Y: =Max(20, (Parent.Height - 48) / 2)
+            - lblCFVPro_EmptyBody:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =cmp_CustomFieldValuesPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =20
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: ="This Punch has no configured custom fields."
+                  Width: =Parent.Width - 40
+                  X: =20
+                  Y: =lblCFVPro_EmptyTitle.Y + 26
