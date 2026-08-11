@@ -8,7 +8,7 @@
 - `VF-03A` — corrección obligatoria de Cancel para evitar `Reset()` no validado sobre Gallery.
 - `VF-04` — publicado e integrado por continuidad autorizada; validación funcional real sigue siendo responsabilidad de Studio/runtime.
 - `VF-04A` — patch obligatorio para rebase del componente cuando la cola queda vacía.
-- `VF-05` — publicado; pendiente de validación visual/funcional en 1366×768, 1600×900 y 1920×1080.
+- `VF-05` — corregido tras `PR-SC-007 / PA1001`; se aplica como guía de propiedades, pendiente de revalidación visual/funcional.
 
 ## VF-01 — Component shell
 
@@ -90,13 +90,15 @@ Es necesario porque el componente mantiene working/base internos. Limpiar única
 
 ## VF-05 — Visual polish
 
-Archivo principal:
+Guía ejecutable vigente:
 
-`05_visual_polish.incremental-patch.pa.yaml`
+`05_visual_polish.property-guide.md`
 
 Matriz de validación:
 
 `05A_visual_validation_matrix.md`
+
+El artefacto anterior `05_visual_polish.incremental-patch.pa.yaml` fue retirado. Era un mapa conceptual de `control -> Properties`, no un módulo `PaYaml` pegable. Studio devolvió `PA1001 / YamlInvalidSyntax` al encontrar `conCFVPro_Header` como clave raíz. El incidente queda registrado como `PR-SC-007` en `POWER_APPS_SOURCE_CODE_COMPATIBILITY.md`.
 
 Objetivo: ajustar la columna derecha completa de Punch Review sin tocar contratos funcionales.
 
