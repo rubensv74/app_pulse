@@ -1,0 +1,27 @@
+// VF-04A — EMPTY QUEUE COMPONENT REBASE
+//
+// Operation: ADD ONE STATEMENT to the empty-queue branch of
+// btnPR_SelectCurrent.OnSelect (Block 13B formula).
+//
+// Exact location:
+// after the branch clears colPunchReviewFieldsUI / Base / Dirty and sets
+// varPunchReviewDirty=false, before the pending-action variables are cleared.
+//
+// Add:
+Reset(cmpPR_CustomFieldValues);
+
+// Reason:
+// cmp_CustomFieldValuesPro keeps its own working/base collections. Clearing the
+// host Items collection alone does not rebase those internal collections.
+// Without this reset, an empty review queue could leave stale values visible
+// from the previously selected Punch.
+//
+// Microsoft documents Reset(ComponentInstance) as the supported way to invoke
+// a component's built-in OnReset behavior. VF-03 defines OnReset specifically
+// to rebuild the internal working/base tables from Items.
+//
+// Validation:
+// 1. Load a Punch with custom fields.
+// 2. Make the review queue empty through the existing test/setup path.
+// 3. Trigger btnPR_SelectCurrent.
+// 4. The values component must show Empty and no values from the old Punch.
