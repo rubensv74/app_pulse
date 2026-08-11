@@ -1,0 +1,460 @@
+# BLOCK 12 — RELATED QUEUE CONTEXT
+#
+# Operation: REPLACE CONTROL COMPLETELY.
+# Target control: conPR_RelatedCard
+# Parent: conPR_Workspace
+# Exact location: after conPR_UpperGrid.
+#
+# IMPORTANT — PRE-YAML GATE APPLIED
+# The current docs/development/screens/punch-review/
+# POWER_APPS_SOURCE_CODE_COMPATIBILITY.md was consulted immediately before
+# drafting this YAML.
+#
+# Dependencies:
+# - Blocks 01–11 integrated.
+# - Block 10A is active on btnPR_SelectCurrent.OnSelect.
+# - colPunchReviewQueue contains ReviewOrder, PunchIdNumber, PunchCode,
+#   Description, SubsystemCode, Discipline, StatusLabel and
+#   IsReviewedInSession.
+#
+# Scope:
+# - Shows other Punches from the CURRENT LOADED REVIEW QUEUE that share
+#   SubsystemCode or Discipline with the current Punch.
+# - Excludes the currently selected Punch.
+# - Clearly labels why each row is included: Same subsystem or Same discipline.
+# - Lets the user jump directly to a related row through the existing
+#   btnPR_SelectCurrent selection pipeline.
+# - Clears queue search/quick-filter before navigation so the selected Punch
+#   remains visible in Review Queue.
+# - Respects the temporary unsaved-change lock from Block 10A.
+#
+# Semantic rule:
+# - This is contextual relation INSIDE THE CURRENT REVIEW QUEUE.
+# - It does NOT represent a formal SQL relationship between Punches.
+# - It does NOT call a flow or SQL.
+#
+# Compatibility:
+# - No CanvasComponent is introduced.
+# - No inline SVG is used.
+# - GroupContainer@1.5.0, Gallery@2.15.0, Label@2.5.1,
+#   Classic/Button@2.2.0 and Rectangle@2.3.0 are already used in Punch Review.
+# - No Radius* properties are declared on Label@2.5.1.
+# - AccessibleLabel is not used on Classic/Button@2.2.0.
+#
+# Validation:
+# 1. The block imports without PA1001/PA2108/PA2301.
+# 2. No selected Punch shows the deliberate empty instruction.
+# 3. P-100346 from seed 05A shows P-100347 as Same discipline.
+# 4. P-100347 shows P-100349 as Same subsystem and P-100346 as Same discipline.
+# 5. Review opens the selected related Punch through btnPR_SelectCurrent.
+# 6. Search/quick-filter return to ALL only when navigation is allowed.
+# 7. Unsaved custom-field changes prevent navigation through the existing lock.
+
+- conPR_RelatedCard:
+    Control: GroupContainer@1.5.0
+    Variant: ManualLayout
+    Properties:
+      BorderColor: =varTheme_Border
+      BorderThickness: =1
+      DropShadow: =DropShadow.Semilight
+      Fill: =varTheme_Surface
+      FillPortions: =0
+      Height: =190
+      LayoutMinHeight: =180
+      LayoutMinWidth: =300
+      RadiusBottomLeft: =12
+      RadiusBottomRight: =12
+      RadiusTopLeft: =12
+      RadiusTopRight: =12
+      Width: =Parent.Width
+    Children:
+      - lblPR_RelatedTitle:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_Text
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =11
+            Text: ="Related in Queue"
+            Width: =180
+            X: =14
+            Y: =7
+      - lblPR_RelatedSubtitle:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =varTheme_TextMuted
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =18
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =8
+            Text: ="Same subsystem or discipline · current review queue only"
+            Width: =Parent.Width - 170
+            X: =14
+            Y: =29
+      - conPR_RelatedCountBadge:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =varTheme_Border
+            BorderThickness: =1
+            DropShadow: =DropShadow.None
+            Fill: =varTheme_SurfaceAlt
+            Height: =24
+            RadiusBottomLeft: =12
+            RadiusBottomRight: =12
+            RadiusTopLeft: =12
+            RadiusTopRight: =12
+            Width: =86
+            X: =Parent.Width - 100
+            Y: =15
+          Children:
+            - lblPR_RelatedCount:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_TextMuted
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =Parent.Height
+                  PaddingBottom: =0
+                  PaddingLeft: =2
+                  PaddingRight: =2
+                  PaddingTop: =0
+                  Size: =7
+                  Text: |-
+                    =With(
+                        {
+                            prSubsystem: Lower(Trim(Coalesce(varPunchReviewCurrent.SubsystemCode, ""))),
+                            prDiscipline: Lower(Trim(Coalesce(varPunchReviewCurrent.Discipline, "")))
+                        },
+                        Text(
+                            CountRows(
+                                Filter(
+                                    colPunchReviewQueue,
+                                    PunchIdNumber <> varPunchReviewCurrentId &&
+                                    (
+                                        (!IsBlank(prSubsystem) && Lower(Trim(Coalesce(SubsystemCode, ""))) = prSubsystem) ||
+                                        (!IsBlank(prDiscipline) && Lower(Trim(Coalesce(Discipline, ""))) = prDiscipline)
+                                    )
+                                )
+                            )
+                        ) & " related"
+                    )
+                  Width: =Parent.Width
+      - rectPR_RelatedHeaderDivider:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            BorderStyle: =BorderStyle.None
+            Fill: =varTheme_Border
+            Height: =1
+            Width: =Parent.Width
+            Y: =50
+      - galPR_RelatedQueue:
+          Control: Gallery@2.15.0
+          Variant: Vertical
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Fill: =varTheme_Surface
+            Height: =139
+            Items: |-
+              =With(
+                  {
+                      prSubsystem: Lower(Trim(Coalesce(varPunchReviewCurrent.SubsystemCode, ""))),
+                      prDiscipline: Lower(Trim(Coalesce(varPunchReviewCurrent.Discipline, "")))
+                  },
+                  SortByColumns(
+                      Filter(
+                          colPunchReviewQueue,
+                          PunchIdNumber <> varPunchReviewCurrentId &&
+                          (
+                              (!IsBlank(prSubsystem) && Lower(Trim(Coalesce(SubsystemCode, ""))) = prSubsystem) ||
+                              (!IsBlank(prDiscipline) && Lower(Trim(Coalesce(Discipline, ""))) = prDiscipline)
+                          )
+                      ),
+                      "ReviewOrder",
+                      SortOrder.Ascending
+                  )
+              )
+            ShowScrollbar: =true
+            TemplateFill: =varTheme_Surface
+            TemplatePadding: =0
+            TemplateSize: =62
+            Visible: |-
+              =!IsBlank(varPunchReviewCurrentId) &&
+              With(
+                  {
+                      prSubsystem: Lower(Trim(Coalesce(varPunchReviewCurrent.SubsystemCode, ""))),
+                      prDiscipline: Lower(Trim(Coalesce(varPunchReviewCurrent.Discipline, "")))
+                  },
+                  CountRows(
+                      Filter(
+                          colPunchReviewQueue,
+                          PunchIdNumber <> varPunchReviewCurrentId &&
+                          (
+                              (!IsBlank(prSubsystem) && Lower(Trim(Coalesce(SubsystemCode, ""))) = prSubsystem) ||
+                              (!IsBlank(prDiscipline) && Lower(Trim(Coalesce(Discipline, ""))) = prDiscipline)
+                          )
+                      )
+                  ) > 0
+              )
+            Width: =Parent.Width
+            Y: =51
+          Children:
+            - lblPR_RelatedPunchCode:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_Text
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =20
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =8
+                  Text: =Coalesce(ThisItem.PunchCode, Text(ThisItem.PunchIdNumber))
+                  Width: =104
+                  X: =14
+                  Y: =6
+            - lblPR_RelatedMeta:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_TextMuted
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: |-
+                    =Coalesce(ThisItem.StatusLabel, ThisItem.StatusCode, "Unknown") &
+                    " · " & Coalesce(ThisItem.SubsystemCode, "—") &
+                    " · " & Coalesce(ThisItem.Discipline, "—") &
+                    If(Coalesce(ThisItem.IsReviewedInSession, false), " · Reviewed", " · Pending")
+                  Width: =Max(120, Parent.TemplateWidth - 340)
+                  X: =122
+                  Y: =7
+            - conPR_RelatedReasonBadge:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: |-
+                    =If(
+                        !IsBlank(Trim(Coalesce(varPunchReviewCurrent.SubsystemCode, ""))) &&
+                        Lower(Trim(Coalesce(ThisItem.SubsystemCode, ""))) = Lower(Trim(Coalesce(varPunchReviewCurrent.SubsystemCode, ""))),
+                        ColorValue("#BFDBFE"),
+                        ColorValue("#DDD6FE")
+                    )
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: |-
+                    =If(
+                        !IsBlank(Trim(Coalesce(varPunchReviewCurrent.SubsystemCode, ""))) &&
+                        Lower(Trim(Coalesce(ThisItem.SubsystemCode, ""))) = Lower(Trim(Coalesce(varPunchReviewCurrent.SubsystemCode, ""))),
+                        ColorValue("#EFF6FF"),
+                        ColorValue("#F5F3FF")
+                    )
+                  Height: =22
+                  RadiusBottomLeft: =11
+                  RadiusBottomRight: =11
+                  RadiusTopLeft: =11
+                  RadiusTopRight: =11
+                  Width: =112
+                  X: =Parent.TemplateWidth - 198
+                  Y: =5
+                Children:
+                  - lblPR_RelatedReason:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: |-
+                          =If(
+                              !IsBlank(Trim(Coalesce(varPunchReviewCurrent.SubsystemCode, ""))) &&
+                              Lower(Trim(Coalesce(ThisItem.SubsystemCode, ""))) = Lower(Trim(Coalesce(varPunchReviewCurrent.SubsystemCode, ""))),
+                              ColorValue("#1D4ED8"),
+                              ColorValue("#6D28D9")
+                          )
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =Parent.Height
+                        PaddingBottom: =0
+                        PaddingLeft: =2
+                        PaddingRight: =2
+                        PaddingTop: =0
+                        Size: =6
+                        Text: |-
+                          =If(
+                              !IsBlank(Trim(Coalesce(varPunchReviewCurrent.SubsystemCode, ""))) &&
+                              Lower(Trim(Coalesce(ThisItem.SubsystemCode, ""))) = Lower(Trim(Coalesce(varPunchReviewCurrent.SubsystemCode, ""))),
+                              "Same subsystem",
+                              "Same discipline"
+                          )
+                        Width: =Parent.Width
+            - lblPR_RelatedDescription:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_Text
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =6
+                  PaddingTop: =0
+                  Size: =8
+                  Text: =Coalesce(ThisItem.Description, "No description")
+                  VerticalAlign: =VerticalAlign.Top
+                  Width: =Parent.TemplateWidth - 108
+                  X: =14
+                  Y: =31
+            - btnPR_RelatedReview:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =varTheme_Border
+                  BorderThickness: =1
+                  Color: =varTheme_PulseBlueDark
+                  DisplayMode: |-
+                    =If(
+                        varPunchReviewIsLoading ||
+                        varPunchReviewCommentsLoading ||
+                        varPunchReviewFieldsLoading ||
+                        varPunchReviewFieldsSaving,
+                        DisplayMode.Disabled,
+                        DisplayMode.Edit
+                    )
+                  Fill: =varTheme_Surface
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =28
+                  HoverColor: =varTheme_PulseBlueDark
+                  HoverFill: =varTheme_SurfaceAlt
+                  OnSelect: |-
+                    =If(
+                        varPunchReviewDirty,
+
+                        Set(varPunchReviewRequestedIndex, ThisItem.ReviewOrder);
+                        Select(btnPR_SelectCurrent),
+
+                        Set(varPunchReviewSearch, "");
+                        Set(varPunchReviewQuickFilter, "ALL");
+                        Select(btnPR_RebuildQueue);
+                        Set(varPunchReviewRequestedIndex, ThisItem.ReviewOrder);
+                        Select(btnPR_SelectCurrent)
+                    )
+                  RadiusBottomLeft: =7
+                  RadiusBottomRight: =7
+                  RadiusTopLeft: =7
+                  RadiusTopRight: =7
+                  Size: =7
+                  Text: ="Review"
+                  Width: =66
+                  X: =Parent.TemplateWidth - 80
+                  Y: =29
+            - rectPR_RelatedRowDivider:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderStyle: =BorderStyle.None
+                  Fill: =varTheme_Border
+                  Height: =1
+                  Width: =Parent.TemplateWidth - 24
+                  X: =12
+                  Y: =Parent.TemplateHeight - 1
+      - conPR_RelatedEmpty:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =varTheme_Surface
+            Height: =139
+            Visible: |-
+              =IsBlank(varPunchReviewCurrentId) ||
+              With(
+                  {
+                      prSubsystem: Lower(Trim(Coalesce(varPunchReviewCurrent.SubsystemCode, ""))),
+                      prDiscipline: Lower(Trim(Coalesce(varPunchReviewCurrent.Discipline, "")))
+                  },
+                  CountRows(
+                      Filter(
+                          colPunchReviewQueue,
+                          PunchIdNumber <> varPunchReviewCurrentId &&
+                          (
+                              (!IsBlank(prSubsystem) && Lower(Trim(Coalesce(SubsystemCode, ""))) = prSubsystem) ||
+                              (!IsBlank(prDiscipline) && Lower(Trim(Coalesce(Discipline, ""))) = prDiscipline)
+                          )
+                      )
+                  ) = 0
+              )
+            Width: =Parent.Width
+            Y: =51
+          Children:
+            - lblPR_RelatedEmptyTitle:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_Text
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: |-
+                    =If(
+                        IsBlank(varPunchReviewCurrentId),
+                        "Select a Punch",
+                        "No related queue items"
+                    )
+                  Width: =Parent.Width - 40
+                  X: =20
+                  Y: =32
+            - lblPR_RelatedEmptyBody:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_TextMuted
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =42
+                  PaddingBottom: =0
+                  PaddingLeft: =14
+                  PaddingRight: =14
+                  PaddingTop: =0
+                  Size: =8
+                  Text: |-
+                    =If(
+                        IsBlank(varPunchReviewCurrentId),
+                        "Choose a row in Review Queue to see contextual records.",
+                        "No other Punches in the loaded queue share this subsystem or discipline."
+                    )
+                  Width: =Parent.Width - 50
+                  X: =25
+                  Y: =61
