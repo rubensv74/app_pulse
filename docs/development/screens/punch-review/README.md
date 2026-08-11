@@ -54,12 +54,18 @@ Do not work from memory. Every confirmed Studio incompatibility must become a pr
 18. `10B_custom_fields_test_seed.optional.powerfx` — optional field-type seed
 19. `10C_yesno_initial_state.incremental-patch.pa.yaml` — Toggle `Checked` binding correction
 20. `10D_help_custom_fields.incremental-patch.pa.yaml` — custom-fields help
-21. `11_review_progress.replace-control.pa.yaml` — implemented with installed `cmp_DonutPro`; continuation to Block 12 approved
+21. `11_review_progress.replace-control.pa.yaml` — implemented with installed `cmp_DonutPro`; continuation approved
 22. `11A_help_review_progress.incremental-patch.pa.yaml` — review-progress help
-23. `12_related_queue_context.replace-control.pa.yaml` — published; pending Studio validation
-24. `12A_help_related_queue_context.incremental-patch.pa.yaml` — apply only after Block 12 validates
+23. `12_related_queue_context.replace-control.pa.yaml` — integrated path completed; continuation to Block 13 approved
+24. `12A_help_related_queue_context.incremental-patch.pa.yaml` — related-context help
+25. `13_dirty_guard_modal.add-screen-child.pa.yaml` — published; pending Studio validation
+26. `13A_dirty_guard_runtime_state.incremental-patch.powerfx` — typed guard runtime state
+27. `13B_dirty_guard_selection_hook.replace-formula.powerfx` — replaces Block 10A selection lock with decision modal routing
+28. `13C_dirty_guard_back.replace-formula.powerfx` — protects Back navigation
+29. `13D_dirty_guard_review_actions.replace-formula.powerfx` — protects Open Punch List and preserves dirty state
+30. `13E_help_dirty_guard.incremental-patch.pa.yaml` — apply only after Block 13 validates
 
-Do not begin Block 13 until Block 12 imports without errors and its contextual navigation works correctly with the existing unsaved-change lock.
+Do not begin Block 14 until Block 13 imports without errors and Save/Discard/Cancel are validated for queue navigation, Back and Open Punch List.
 
 ## Confirmed service contracts
 
@@ -142,18 +148,43 @@ SubsystemCode
 Discipline
 ```
 
-The UI labels the reason explicitly as:
+The UI labels the reason explicitly as `Same subsystem` or `Same discipline`. If both match, `Same subsystem` takes precedence because it is the more specific context.
+
+The `Review` action routes through `btnPR_SelectCurrent`, so Comments and Custom Fields continue to load through the same selection mechanism. Search and quick filters reset to `ALL` only when navigation is allowed.
+
+## Dirty Guard contract
+
+Block 13 replaces the temporary hard navigation lock from Block 10A with an explicit decision flow.
+
+Dirty navigation can originate from:
+
+- selecting another queue record;
+- `Related in Queue > Review`;
+- `Back to Punches`;
+- `Open Punch List`.
+
+The modal offers:
 
 ```text
-Same subsystem
-Same discipline
+Save and continue
+Discard and continue
+Cancel
 ```
 
-If both match, `Same subsystem` takes precedence because it is the more specific context.
+`Save and continue` calls the existing `btnPR_SaveCustomFields` service control and continues only when the save clears `varPunchReviewDirty` without a save error.
 
-The `Review` action routes through the existing `btnPR_SelectCurrent` pipeline, so Comments and Custom Fields continue to load through the same selection mechanism. When navigation is allowed, queue search and quick filters are reset to `ALL` so the target record remains visible. If Custom Fields are dirty, the temporary Block 10A navigation lock remains authoritative.
+`Discard and continue` restores `colPunchReviewFieldsBase`, clears the dirty collection/state and then continues.
 
-This panel is contextual navigation only. It does not call SQL, a flow or a formal relationship service.
+`Cancel` keeps the current Punch and all local edits.
+
+Pending routing is represented by:
+
+```text
+varPunchReviewPendingAction   text
+varPunchReviewPendingIndex    numeric, 0 = no pending queue target
+```
+
+The hidden `btnPR_ContinuePendingAction` centralizes continuation for `CHANGE_CURRENT`, `BACK` and `OPEN_PUNCHES`.
 
 ## Manual and compatibility knowledge
 
