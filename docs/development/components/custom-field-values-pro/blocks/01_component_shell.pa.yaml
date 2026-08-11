@@ -1,0 +1,603 @@
+# VF-01 — cmp_CustomFieldValuesPro COMPONENT SHELL
+#
+# Operation: CREATE NEW CANVAS COMPONENT DEFINITION.
+# Component: cmp_CustomFieldValuesPro
+# First consumer: Punch Review Workspace
+#
+# PRE-YAML GATE APPLIED
+# docs/development/screens/punch-review/
+# POWER_APPS_SOURCE_CODE_COMPATIBILITY.md was read immediately before
+# drafting this YAML.
+#
+# Purpose:
+# - validate the new component definition in Power Apps Studio;
+# - validate the normalized Items contract already used by Punch Review;
+# - validate the compact premium header/body/footer shell;
+# - validate host events without adding local dirty state or field renderers.
+#
+# This block intentionally does NOT:
+# - call flows;
+# - render/edit the six FieldTypes yet;
+# - maintain a working buffer;
+# - create dirty payloads;
+# - modify Punch Review.
+#
+# Compatibility rules applied:
+# - no SVG inline;
+# - no CanvasComponent dependency;
+# - no Radius* on Label@2.5.1;
+# - no AccessibleLabel on Classic/Button@2.2.0;
+# - no Reset() assumptions;
+# - only control versions already used in PULSE are introduced.
+#
+# Validation gate:
+# 1. Add/import cmp_CustomFieldValuesPro into the component library.
+# 2. Studio accepts it without PA1001 / PA2108 / PA2301.
+# 3. Test the component between approximately 420 and 600 px width.
+# 4. Header, status, Manage, Refresh and footer actions do not overlap.
+# 5. FieldCount and HasFields react to Items.
+# 6. READY / EMPTY / LOADING / SAVING / ERROR / UNSAVED display correctly.
+# 7. Host events can be assigned on a temporary instance.
+# 8. Do not proceed to VF-02 until this shell is validated in Studio.
+
+ComponentDefinitions:
+  cmp_CustomFieldValuesPro:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      Items:
+        PropertyKind: Input
+        DisplayName: Items
+        Description: Normalized custom-field values supplied by the host
+        DataType: Table
+        Default: |-
+          =Table(
+              {
+                  FieldKey: "sample_field",
+                  FieldLabel: "Sample field",
+                  FieldType: "Text",
+                  HelpText: "",
+                  IsRequired: false,
+                  IsPinned: true,
+                  IsEditable: true,
+                  SortOrder: 10,
+                  OptionsJson: "[]",
+                  ValueText: "Sample value",
+                  ValueNumber: 0,
+                  ValueDate: Date(2000,1,1),
+                  ValueBool: false,
+                  ValueJson: "",
+                  LastUpdatedOn: Date(2000,1,1),
+                  LastUpdatedByEmail: ""
+              }
+          )
+      Title:
+        PropertyKind: Input
+        DisplayName: Title
+        Description: Panel title
+        DataType: Text
+        Default: ="Custom Fields"
+      RecordLabel:
+        PropertyKind: Input
+        DisplayName: RecordLabel
+        Description: Current Punch code or record label
+        DataType: Text
+        Default: ="PUNCH-000001"
+      State:
+        PropertyKind: Input
+        DisplayName: State
+        Description: READY, EMPTY, LOADING, SAVING, ERROR or UNSAVED
+        DataType: Text
+        Default: ="READY"
+      CanEdit:
+        PropertyKind: Input
+        DisplayName: CanEdit
+        Description: Enables value actions for the current user
+        DataType: Boolean
+        Default: =true
+      CanManageFields:
+        PropertyKind: Input
+        DisplayName: CanManageFields
+        Description: Shows the project-level Manage Fields action
+        DataType: Boolean
+        Default: =true
+      IsLoading:
+        PropertyKind: Input
+        DisplayName: IsLoading
+        Description: Host is loading values
+        DataType: Boolean
+        Default: =false
+      IsSaving:
+        PropertyKind: Input
+        DisplayName: IsSaving
+        Description: Host is saving values
+        DataType: Boolean
+        Default: =false
+      ErrorText:
+        PropertyKind: Input
+        DisplayName: ErrorText
+        Description: Host error message
+        DataType: Text
+        Default: =""
+      ShowFooter:
+        PropertyKind: Input
+        DisplayName: ShowFooter
+        Description: Shows Cancel and Save action area
+        DataType: Boolean
+        Default: =true
+      AccentColor:
+        PropertyKind: Input
+        DisplayName: AccentColor
+        Description: Primary interaction color
+        DataType: Color
+        Default: =ColorValue("#1677FF")
+      BackgroundColor:
+        PropertyKind: Input
+        DisplayName: BackgroundColor
+        Description: Main surface color
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      SurfaceAltColor:
+        PropertyKind: Input
+        DisplayName: SurfaceAltColor
+        Description: Alternate surface color
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        Description: Border and divider color
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        Description: Primary text color
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        Description: Secondary text color
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      SuccessColor:
+        PropertyKind: Input
+        DisplayName: SuccessColor
+        Description: Saved-state color
+        DataType: Color
+        Default: =ColorValue("#22C55E")
+      WarningColor:
+        PropertyKind: Input
+        DisplayName: WarningColor
+        Description: Unsaved-state color
+        DataType: Color
+        Default: =ColorValue("#F59E0B")
+      DangerColor:
+        PropertyKind: Input
+        DisplayName: DangerColor
+        Description: Error-state color
+        DataType: Color
+        Default: =ColorValue("#EF4444")
+      HasFields:
+        PropertyKind: Output
+        DisplayName: HasFields
+        Description: True when Items contains at least one row
+        DataType: Boolean
+      FieldCount:
+        PropertyKind: Output
+        DisplayName: FieldCount
+        Description: Number of current custom-field rows
+        DataType: Number
+      OnRefresh:
+        PropertyKind: Event
+        DisplayName: OnRefresh
+        Description: Host refresh requested
+        ReturnType: None
+        Default: =
+      OnManageFieldsRequested:
+        PropertyKind: Event
+        DisplayName: OnManageFieldsRequested
+        Description: Open the project-level Custom Fields definition editor
+        ReturnType: None
+        Default: =
+      OnCancelRequested:
+        PropertyKind: Event
+        DisplayName: OnCancelRequested
+        Description: Host cancel/reset requested
+        ReturnType: None
+        Default: =
+      OnSaveRequested:
+        PropertyKind: Event
+        DisplayName: OnSaveRequested
+        Description: Host save requested
+        ReturnType: None
+        Default: =
+    Properties:
+      FieldCount: =CountRows(cmp_CustomFieldValuesPro.Items)
+      HasFields: =CountRows(cmp_CustomFieldValuesPro.Items) > 0
+      Height: =250
+      Width: =560
+    Children:
+      - conCFVPro_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =cmp_CustomFieldValuesPro.BorderColor
+            BorderThickness: =1
+            DropShadow: =DropShadow.Semilight
+            Fill: =cmp_CustomFieldValuesPro.BackgroundColor
+            Height: =Parent.Height
+            RadiusBottomLeft: =12
+            RadiusBottomRight: =12
+            RadiusTopLeft: =12
+            RadiusTopRight: =12
+            Width: =Parent.Width
+          Children:
+            - conCFVPro_Header:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_CustomFieldValuesPro.BackgroundColor
+                  Height: =54
+                  Width: =Parent.Width
+                Children:
+                  - lblCFVPro_Title:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_CustomFieldValuesPro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =21
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =10
+                        Text: =cmp_CustomFieldValuesPro.Title
+                        Width: =Max(100, Parent.Width - 310)
+                        Wrap: =false
+                        X: =14
+                        Y: =6
+                  - lblCFVPro_Record:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_CustomFieldValuesPro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =17
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =7
+                        Text: =Coalesce(cmp_CustomFieldValuesPro.RecordLabel, "")
+                        Width: =Max(100, Parent.Width - 310)
+                        Wrap: =false
+                        X: =14
+                        Y: =28
+                  - conCFVPro_StatusPill:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: |-
+                          =If(
+                              cmp_CustomFieldValuesPro.IsSaving || cmp_CustomFieldValuesPro.IsLoading,
+                              cmp_CustomFieldValuesPro.AccentColor,
+                              !IsBlank(cmp_CustomFieldValuesPro.ErrorText) || Upper(Trim(Coalesce(cmp_CustomFieldValuesPro.State, "READY"))) = "ERROR",
+                              cmp_CustomFieldValuesPro.DangerColor,
+                              Upper(Trim(Coalesce(cmp_CustomFieldValuesPro.State, "READY"))) = "UNSAVED",
+                              cmp_CustomFieldValuesPro.WarningColor,
+                              !cmp_CustomFieldValuesPro.HasFields || Upper(Trim(Coalesce(cmp_CustomFieldValuesPro.State, "READY"))) = "EMPTY",
+                              cmp_CustomFieldValuesPro.BorderColor,
+                              cmp_CustomFieldValuesPro.SuccessColor
+                          )
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: |-
+                          =If(
+                              cmp_CustomFieldValuesPro.IsSaving || cmp_CustomFieldValuesPro.IsLoading,
+                              ColorFade(cmp_CustomFieldValuesPro.AccentColor, 92%),
+                              !IsBlank(cmp_CustomFieldValuesPro.ErrorText) || Upper(Trim(Coalesce(cmp_CustomFieldValuesPro.State, "READY"))) = "ERROR",
+                              ColorFade(cmp_CustomFieldValuesPro.DangerColor, 90%),
+                              Upper(Trim(Coalesce(cmp_CustomFieldValuesPro.State, "READY"))) = "UNSAVED",
+                              ColorFade(cmp_CustomFieldValuesPro.WarningColor, 88%),
+                              !cmp_CustomFieldValuesPro.HasFields || Upper(Trim(Coalesce(cmp_CustomFieldValuesPro.State, "READY"))) = "EMPTY",
+                              cmp_CustomFieldValuesPro.SurfaceAltColor,
+                              ColorFade(cmp_CustomFieldValuesPro.SuccessColor, 90%)
+                          )
+                        Height: =22
+                        RadiusBottomLeft: =11
+                        RadiusBottomRight: =11
+                        RadiusTopLeft: =11
+                        RadiusTopRight: =11
+                        Width: =68
+                        X: =Parent.Width - 264
+                        Y: =16
+                      Children:
+                        - lblCFVPro_Status:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: |-
+                                =If(
+                                    cmp_CustomFieldValuesPro.IsSaving || cmp_CustomFieldValuesPro.IsLoading,
+                                    cmp_CustomFieldValuesPro.AccentColor,
+                                    !IsBlank(cmp_CustomFieldValuesPro.ErrorText) || Upper(Trim(Coalesce(cmp_CustomFieldValuesPro.State, "READY"))) = "ERROR",
+                                    ColorValue("#991B1B"),
+                                    Upper(Trim(Coalesce(cmp_CustomFieldValuesPro.State, "READY"))) = "UNSAVED",
+                                    ColorValue("#92400E"),
+                                    !cmp_CustomFieldValuesPro.HasFields || Upper(Trim(Coalesce(cmp_CustomFieldValuesPro.State, "READY"))) = "EMPTY",
+                                    cmp_CustomFieldValuesPro.MutedTextColor,
+                                    ColorValue("#166534")
+                                )
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =Parent.Height
+                              PaddingBottom: =0
+                              PaddingLeft: =2
+                              PaddingRight: =2
+                              PaddingTop: =0
+                              Size: =6
+                              Text: |-
+                                =If(
+                                    cmp_CustomFieldValuesPro.IsSaving,
+                                    "Saving...",
+                                    cmp_CustomFieldValuesPro.IsLoading,
+                                    "Loading...",
+                                    !IsBlank(cmp_CustomFieldValuesPro.ErrorText) || Upper(Trim(Coalesce(cmp_CustomFieldValuesPro.State, "READY"))) = "ERROR",
+                                    "Error",
+                                    !cmp_CustomFieldValuesPro.HasFields || Upper(Trim(Coalesce(cmp_CustomFieldValuesPro.State, "READY"))) = "EMPTY",
+                                    "Empty",
+                                    Upper(Trim(Coalesce(cmp_CustomFieldValuesPro.State, "READY"))) = "UNSAVED",
+                                    "Unsaved",
+                                    "Saved"
+                                )
+                              Width: =Parent.Width
+                  - btnCFVPro_Manage:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =cmp_CustomFieldValuesPro.BorderColor
+                        BorderThickness: =1
+                        Color: =cmp_CustomFieldValuesPro.AccentColor
+                        DisplayMode: |-
+                          =If(
+                              cmp_CustomFieldValuesPro.IsLoading || cmp_CustomFieldValuesPro.IsSaving,
+                              DisplayMode.Disabled,
+                              DisplayMode.Edit
+                          )
+                        Fill: =cmp_CustomFieldValuesPro.BackgroundColor
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =28
+                        HoverFill: =cmp_CustomFieldValuesPro.SurfaceAltColor
+                        OnSelect: =cmp_CustomFieldValuesPro.OnManageFieldsRequested()
+                        RadiusBottomLeft: =7
+                        RadiusBottomRight: =7
+                        RadiusTopLeft: =7
+                        RadiusTopRight: =7
+                        Size: =7
+                        Text: ="Manage"
+                        Visible: =cmp_CustomFieldValuesPro.CanManageFields
+                        Width: =82
+                        X: =Parent.Width - 188
+                        Y: =13
+                  - btnCFVPro_Refresh:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =cmp_CustomFieldValuesPro.BorderColor
+                        BorderThickness: =1
+                        Color: =cmp_CustomFieldValuesPro.AccentColor
+                        DisplayMode: |-
+                          =If(
+                              cmp_CustomFieldValuesPro.IsLoading || cmp_CustomFieldValuesPro.IsSaving || Upper(Trim(Coalesce(cmp_CustomFieldValuesPro.State, "READY"))) = "UNSAVED",
+                              DisplayMode.Disabled,
+                              DisplayMode.Edit
+                          )
+                        Fill: =cmp_CustomFieldValuesPro.BackgroundColor
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =28
+                        HoverFill: =cmp_CustomFieldValuesPro.SurfaceAltColor
+                        OnSelect: =cmp_CustomFieldValuesPro.OnRefresh()
+                        RadiusBottomLeft: =7
+                        RadiusBottomRight: =7
+                        RadiusTopLeft: =7
+                        RadiusTopRight: =7
+                        Size: =8
+                        Text: ="↻"
+                        Width: =34
+                        X: =Parent.Width - 42
+                        Y: =13
+            - rectCFVPro_HeaderDivider:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderStyle: =BorderStyle.None
+                  Fill: =cmp_CustomFieldValuesPro.BorderColor
+                  Height: =1
+                  Width: =Parent.Width
+                  Y: =54
+            - conCFVPro_Body:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_CustomFieldValuesPro.BackgroundColor
+                  Height: =Parent.Height - If(cmp_CustomFieldValuesPro.ShowFooter, 103, 55)
+                  Width: =Parent.Width
+                  Y: =55
+                Children:
+                  - conCFVPro_BodyPreview:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: =cmp_CustomFieldValuesPro.BorderColor
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =cmp_CustomFieldValuesPro.SurfaceAltColor
+                        Height: =78
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                        Width: =Parent.Width - 28
+                        X: =14
+                        Y: =14
+                      Children:
+                        - lblCFVPro_BodyTitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =cmp_CustomFieldValuesPro.TextColor
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =21
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =9
+                              Text: |-
+                                =If(
+                                    cmp_CustomFieldValuesPro.IsLoading,
+                                    "Loading values...",
+                                    !IsBlank(cmp_CustomFieldValuesPro.ErrorText),
+                                    "Values unavailable",
+                                    cmp_CustomFieldValuesPro.HasFields,
+                                    Text(cmp_CustomFieldValuesPro.FieldCount) & " current values ready",
+                                    "No custom fields"
+                                )
+                              Width: =Parent.Width - 24
+                              X: =12
+                              Y: =12
+                        - lblCFVPro_BodyText:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =cmp_CustomFieldValuesPro.MutedTextColor
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              Height: =32
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =7
+                              Text: |-
+                                =If(
+                                    cmp_CustomFieldValuesPro.IsLoading,
+                                    "The host is preparing the current Punch custom-field bundle.",
+                                    !IsBlank(cmp_CustomFieldValuesPro.ErrorText),
+                                    cmp_CustomFieldValuesPro.ErrorText,
+                                    cmp_CustomFieldValuesPro.HasFields,
+                                    "VF-02 will replace this shell preview with the compact field/value list.",
+                                    "This Punch has no configured custom fields."
+                                )
+                              VerticalAlign: =VerticalAlign.Top
+                              Width: =Parent.Width - 24
+                              X: =12
+                              Y: =38
+            - rectCFVPro_FooterDivider:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderStyle: =BorderStyle.None
+                  Fill: =cmp_CustomFieldValuesPro.BorderColor
+                  Height: =1
+                  Visible: =cmp_CustomFieldValuesPro.ShowFooter
+                  Width: =Parent.Width
+                  Y: =Parent.Height - 48
+            - conCFVPro_Footer:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_CustomFieldValuesPro.BackgroundColor
+                  Height: =47
+                  Visible: =cmp_CustomFieldValuesPro.ShowFooter
+                  Width: =Parent.Width
+                  Y: =Parent.Height - 47
+                Children:
+                  - lblCFVPro_FooterHint:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_CustomFieldValuesPro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =24
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =7
+                        Text: |-
+                          =If(
+                              Upper(Trim(Coalesce(cmp_CustomFieldValuesPro.State, "READY"))) = "UNSAVED",
+                              "Unsaved changes",
+                              "Values for current Punch"
+                          )
+                        Width: =Max(100, Parent.Width - 220)
+                        X: =14
+                        Y: =12
+                  - btnCFVPro_Cancel:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =cmp_CustomFieldValuesPro.BorderColor
+                        BorderThickness: =1
+                        Color: =cmp_CustomFieldValuesPro.TextColor
+                        DisplayMode: |-
+                          =If(
+                              !cmp_CustomFieldValuesPro.CanEdit || cmp_CustomFieldValuesPro.IsLoading || cmp_CustomFieldValuesPro.IsSaving || Upper(Trim(Coalesce(cmp_CustomFieldValuesPro.State, "READY"))) <> "UNSAVED",
+                              DisplayMode.Disabled,
+                              DisplayMode.Edit
+                          )
+                        Fill: =cmp_CustomFieldValuesPro.BackgroundColor
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =30
+                        HoverFill: =cmp_CustomFieldValuesPro.SurfaceAltColor
+                        OnSelect: =cmp_CustomFieldValuesPro.OnCancelRequested()
+                        RadiusBottomLeft: =7
+                        RadiusBottomRight: =7
+                        RadiusTopLeft: =7
+                        RadiusTopRight: =7
+                        Size: =7
+                        Text: ="Cancel"
+                        Width: =72
+                        X: =Parent.Width - 160
+                        Y: =8
+                  - btnCFVPro_Save:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =cmp_CustomFieldValuesPro.AccentColor
+                        BorderThickness: =1
+                        Color: =Color.White
+                        DisplayMode: |-
+                          =If(
+                              !cmp_CustomFieldValuesPro.CanEdit || cmp_CustomFieldValuesPro.IsLoading || cmp_CustomFieldValuesPro.IsSaving || Upper(Trim(Coalesce(cmp_CustomFieldValuesPro.State, "READY"))) <> "UNSAVED",
+                              DisplayMode.Disabled,
+                              DisplayMode.Edit
+                          )
+                        Fill: =cmp_CustomFieldValuesPro.AccentColor
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =30
+                        HoverFill: =ColorFade(cmp_CustomFieldValuesPro.AccentColor, -12%)
+                        OnSelect: =cmp_CustomFieldValuesPro.OnSaveRequested()
+                        RadiusBottomLeft: =7
+                        RadiusBottomRight: =7
+                        RadiusTopLeft: =7
+                        RadiusTopRight: =7
+                        Size: =7
+                        Text: =If(cmp_CustomFieldValuesPro.IsSaving, "Saving...", "Save")
+                        Width: =72
+                        X: =Parent.Width - 80
+                        Y: =8
