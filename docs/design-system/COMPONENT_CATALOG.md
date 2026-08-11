@@ -3,7 +3,7 @@
 **Status:** active  
 **Canonical:** yes  
 **Purpose:** lifecycle and reuse guidance for `power-apps/components/`  
-**Last reviewed:** 2026-08-10  
+**Last reviewed:** 2026-08-11  
 **Usage audit:** `docs/analysis/repository/COMPONENT_USAGE_AUDIT_2026-08-10.md`
 
 ## Canonical active-component policy
@@ -39,6 +39,7 @@ LEGACY_SUPPORTED  live runtime dependency awaiting validated migration; do not s
 | `cmp_EmptyState` | PDS_CANDIDATE | Preferred empty/error state base; continue visual hardening |
 | `cmp_HeatMapPro` | PDS_CANDIDATE | Preferred heatmap component |
 | `cmp_KpiCardPro` | PDS_CANDIDATE | Preferred KPI card for new PDS work |
+| `cmp_OperationalSkylinePro` | REVIEW_REQUIRED | Universal operational timeline/skyline for Punches, Tasks, milestones, readiness and capacity. Canonical source and PDS specification exist; Studio definition, isolated instance, public-contract and visual QA remain mandatory before screen integration. Spec: `docs/design-system/components/CMP_OPERATIONAL_SKYLINE_PRO.md` |
 | `cmp_PageHeaderPro` | PDS_CANDIDATE | Corrected complete Source Code passes isolated instantiation and has been accepted for progression into Home_PDS Block 03. Target-screen contract/visual QA remains mandatory during integration. Spec: `docs/design-system/components/CMP_PAGE_HEADER_PRO.md` |
 | `cmp_PieChartPro` | PDS_CANDIDATE | Preferred composition chart for Home_PDS discipline distribution |
 | `cmp_SidebarNav` | ACTIVE | Current shared navigation component |
@@ -67,3 +68,5 @@ The parallel Home_PDS strategy preserves `scr_Home` as fallback during construct
 Punches currently depends on `cmp_DetailDrawer_old`; it remains until a replacement is implemented and Studio-validated.
 
 `cmp_PageHeaderPro` is now approved for controlled Home_PDS integration. Any regression found in Block 03 must be attributed and corrected before Block 04 advances.
+
+`cmp_OperationalSkylinePro` is intentionally blocked at `REVIEW_REQUIRED` until its isolated Power Apps Studio validation gate is completed. No consuming PULSE screen should instantiate it before that result is recorded.
