@@ -1,0 +1,530 @@
+# VF-04 — PUNCH REVIEW INTEGRATION
+#
+# Operation: REPLACE CONTROL COMPLETELY.
+# Target control: conPR_CustomFieldsCard
+# Parent: conPR_RightColumn
+#
+# Required component state:
+# - cmp_CustomFieldValuesPro VF-03 installed in the active app.
+# - VF-03A mandatory Cancel patch applied.
+#
+# PRE-YAML GATE APPLIED
+# docs/development/screens/punch-review/
+# POWER_APPS_SOURCE_CODE_COMPATIBILITY.md was read immediately before
+# drafting this YAML.
+#
+# Purpose:
+# - replace the legacy on-screen Custom Fields editor with one instance of
+#   cmp_CustomFieldValuesPro;
+# - preserve btnPR_LoadCustomFields and btnPR_SaveCustomFields as host-owned
+#   service controls;
+# - synchronize component EditedItems/DirtyItems back to Punch Review state;
+# - preserve Block 13 Dirty Guard through varPunchReviewDirty and
+#   colPunchReviewFieldsDirty;
+# - rebase/reset the component after authoritative load/save responses.
+#
+# IMPORTANT
+# - No new flow or SQL contract is introduced.
+# - Manage Fields is deliberately not implemented in VF-04; the event produces
+#   an informational notification until the DF definition-editor phase.
+# - Reset(cmpPR_CustomFieldValues) is used only on the component instance.
+#   The component defines OnReset specifically to rebase its working state from
+#   the host Items table.
+# - Do not keep the old visual controls from conPR_CustomFieldsCard.
+#
+# Validation gate:
+# 1. Studio accepts the replacement without Source Code errors.
+# 2. Selecting a real Punch loads fields through WarRoom_GetCustomBundle.
+# 3. cmpPR_CustomFieldValues renders the loaded values.
+# 4. Editing one value updates varPunchReviewDirty and queue IsDirty.
+# 5. Dirty Guard opens when navigating away with unsaved changes.
+# 6. Cancel inside the component restores the loaded baseline and clears host dirty state.
+# 7. Save uses WarRoom_SaveCustomBulk and rebases from the server-returned bundle.
+# 8. Save failure keeps local dirty state and blocks continuation.
+# 9. Refresh works only when the component is clean.
+# 10. Manager can edit; other roles remain read-only.
+# 11. Manage displays the temporary information message only.
+
+- conPR_CustomFieldsHost:
+    Control: GroupContainer@1.5.0
+    Variant: ManualLayout
+    Properties:
+      AlignInContainer: =AlignInContainer.Stretch
+      DropShadow: =DropShadow.None
+      Fill: =Color.Transparent
+      FillPortions: =1
+      LayoutMinHeight: =280
+      LayoutMinWidth: =300
+      Width: =Parent.Width
+    Children:
+      - btnPR_LoadCustomFields:
+          Control: Classic/Button@2.2.0
+          Properties:
+            Height: =1
+            OnSelect: |-
+              =If(
+                  IsBlank(varPunchReviewCurrentId),
+
+                  Clear(colPunchReviewFieldsUI);
+                  Clear(colPunchReviewFieldsBase);
+                  Clear(colPunchReviewFieldsDirty);
+                  Set(varPunchReviewFieldsError, "");
+                  Set(varPunchReviewFieldsLoading, false);
+                  Set(varPunchReviewDirty, false);
+                  UpdateIf(
+                      colPunchReviewQueue,
+                      PunchIdNumber = varPunchReviewCurrentId,
+                      {IsDirty: false}
+                  );
+                  Reset(cmpPR_CustomFieldValues),
+
+                  IsBlank(varProjectId),
+
+                  Clear(colPunchReviewFieldsUI);
+                  Clear(colPunchReviewFieldsBase);
+                  Clear(colPunchReviewFieldsDirty);
+                  Set(
+                      varPunchReviewFieldsError,
+                      "No active project is available for loading custom fields."
+                  );
+                  Set(varPunchReviewFieldsLoading, false);
+                  Set(varPunchReviewDirty, false);
+                  Reset(cmpPR_CustomFieldValues),
+
+                  Set(varPunchReviewFieldsLoading, true);
+                  Set(varPunchReviewFieldsError, "");
+                  Set(varPunchReviewDirty, false);
+                  Clear(colPunchReviewFieldsDirty);
+                  Clear(colPunchReviewFieldsUI);
+                  Clear(colPunchReviewFieldsBase);
+
+                  IfError(
+                      With(
+                          {
+                              resp:
+                                  WarRoom_GetCustomBundle.Run(
+                                      varProjectId,
+                                      "PUNCH",
+                                      varPunchReviewCurrentId
+                                  )
+                          },
+                          With(
+                              {
+                                  bundle:
+                                      ParseJSON(
+                                          Coalesce(
+                                              resp.bundlejson,
+                                              "{}"
+                                          )
+                                      )
+                              },
+                              ClearCollect(
+                                  colPunchReviewFieldsUI,
+                                  ForAll(
+                                      Table(bundle.merged),
+                                      With(
+                                          {r: ThisRecord.Value},
+                                          {
+                                              FieldKey:
+                                                  Coalesce(Text(r.FieldKey), ""),
+                                              FieldLabel:
+                                                  Coalesce(Text(r.Label), Text(r.FieldKey), ""),
+                                              FieldType:
+                                                  Coalesce(Text(r.FieldType), "Text"),
+                                              HelpText:
+                                                  Coalesce(Text(r.HelpText), ""),
+                                              IsRequired:
+                                                  Boolean(r.IsRequired),
+                                              IsPinned:
+                                                  Boolean(r.IsPinned),
+                                              IsEditable:
+                                                  Lower(Coalesce(varUserRole, "reader")) = "manager",
+                                              SortOrder:
+                                                  If(
+                                                      IsBlank(Text(r.SortOrder)) ||
+                                                      Text(r.SortOrder) = "null",
+                                                      0,
+                                                      Value(Text(r.SortOrder))
+                                                  ),
+                                              OptionsJson:
+                                                  Coalesce(Text(r.OptionsJson), ""),
+                                              ValueText:
+                                                  Coalesce(Text(r.ValueText), ""),
+                                              ValueNumber:
+                                                  If(
+                                                      IsBlank(Text(r.ValueNumber)) ||
+                                                      Text(r.ValueNumber) = "null",
+                                                      Blank(),
+                                                      Value(Text(r.ValueNumber))
+                                                  ),
+                                              ValueDate:
+                                                  If(
+                                                      IsBlank(Text(r.ValueDate)) ||
+                                                      Text(r.ValueDate) = "null",
+                                                      Blank(),
+                                                      DateValue(Text(r.ValueDate))
+                                                  ),
+                                              ValueBool:
+                                                  Boolean(r.ValueBool),
+                                              ValueJson:
+                                                  Coalesce(Text(r.ValueJson), ""),
+                                              LastUpdatedOn:
+                                                  If(
+                                                      IsBlank(Text(r.LastUpdatedOn)) ||
+                                                      Text(r.LastUpdatedOn) = "null",
+                                                      Blank(),
+                                                      DateTimeValue(Text(r.LastUpdatedOn))
+                                                  ),
+                                              LastUpdatedByEmail:
+                                                  Coalesce(Text(r.LastUpdatedByEmail), "")
+                                          }
+                                      )
+                                  )
+                              );
+
+                              ClearCollect(
+                                  colPunchReviewFieldsBase,
+                                  colPunchReviewFieldsUI
+                              )
+                          )
+                      ),
+
+                      Set(
+                          varPunchReviewFieldsError,
+                          Coalesce(
+                              FirstError.Message,
+                              "Custom fields could not be loaded."
+                          )
+                      );
+                      Clear(colPunchReviewFieldsUI);
+                      Clear(colPunchReviewFieldsBase)
+                  );
+
+                  Clear(colPunchReviewFieldsDirty);
+                  Set(varPunchReviewDirty, false);
+                  UpdateIf(
+                      colPunchReviewQueue,
+                      PunchIdNumber = varPunchReviewCurrentId,
+                      {IsDirty: false}
+                  );
+                  Set(varPunchReviewFieldsLoading, false);
+                  Reset(cmpPR_CustomFieldValues)
+              )
+            Text: =""
+            Visible: =false
+            Width: =1
+      - btnPR_SaveCustomFields:
+          Control: Classic/Button@2.2.0
+          Properties:
+            Height: =1
+            OnSelect: |-
+              =If(
+                  IsBlank(varPunchReviewCurrentId),
+
+                  Notify(
+                      "Select a Punch before saving custom fields.",
+                      NotificationType.Information
+                  ),
+
+                  Lower(Coalesce(varUserRole, "reader")) <> "manager",
+
+                  Notify(
+                      "Your current role has read-only access to custom fields.",
+                      NotificationType.Warning
+                  ),
+
+                  CountRows(colPunchReviewFieldsDirty) = 0,
+
+                  Notify(
+                      "There are no custom-field changes to save.",
+                      NotificationType.Information
+                  ),
+
+                  IsBlank(varProjectId),
+
+                  Notify(
+                      "No active project is available.",
+                      NotificationType.Error
+                  ),
+
+                  With(
+                      {
+                          currentPunchId: varPunchReviewCurrentId,
+                          currentPunchCode:
+                              Coalesce(
+                                  varPunchReviewCurrent.PunchCode,
+                                  Text(varPunchReviewCurrentId)
+                              ),
+                          saveJson:
+                              JSON(
+                                  colPunchReviewFieldsDirty,
+                                  JSONFormat.Compact
+                              )
+                      },
+
+                      Set(varPunchReviewFieldsSaving, true);
+                      Set(varPunchReviewFieldsError, "");
+
+                      IfError(
+                          With(
+                              {
+                                  resp:
+                                      WarRoom_SaveCustomBulk.Run(
+                                          varProjectId,
+                                          "PUNCH",
+                                          currentPunchId,
+                                          saveJson,
+                                          Lower(User().Email)
+                                      )
+                              },
+                              With(
+                                  {
+                                      saveOuter:
+                                          Table(
+                                              ParseJSON(
+                                                  Coalesce(
+                                                      resp.result,
+                                                      "[]"
+                                                  )
+                                              )
+                                          )
+                                  },
+                                  If(
+                                      CountRows(saveOuter) = 0,
+
+                                      Set(
+                                          varPunchReviewFieldsError,
+                                          "Save returned no data."
+                                      ),
+
+                                      With(
+                                          {
+                                              bundle:
+                                                  ParseJSON(
+                                                      Text(
+                                                          First(saveOuter).Value.result
+                                                      )
+                                                  )
+                                          },
+                                          ClearCollect(
+                                              colPunchReviewFieldsUI,
+                                              ForAll(
+                                                  Table(bundle.merged),
+                                                  With(
+                                                      {r: ThisRecord.Value},
+                                                      {
+                                                          FieldKey:
+                                                              Coalesce(Text(r.FieldKey), ""),
+                                                          FieldLabel:
+                                                              Coalesce(Text(r.Label), Text(r.FieldKey), ""),
+                                                          FieldType:
+                                                              Coalesce(Text(r.FieldType), "Text"),
+                                                          HelpText:
+                                                              Coalesce(Text(r.HelpText), ""),
+                                                          IsRequired:
+                                                              Boolean(r.IsRequired),
+                                                          IsPinned:
+                                                              Boolean(r.IsPinned),
+                                                          IsEditable:
+                                                              Lower(Coalesce(varUserRole, "reader")) = "manager",
+                                                          SortOrder:
+                                                              If(
+                                                                  IsBlank(Text(r.SortOrder)) ||
+                                                                  Text(r.SortOrder) = "null",
+                                                                  0,
+                                                                  Value(Text(r.SortOrder))
+                                                              ),
+                                                          OptionsJson:
+                                                              Coalesce(Text(r.OptionsJson), ""),
+                                                          ValueText:
+                                                              Coalesce(Text(r.ValueText), ""),
+                                                          ValueNumber:
+                                                              If(
+                                                                  IsBlank(Text(r.ValueNumber)) ||
+                                                                  Text(r.ValueNumber) = "null",
+                                                                  Blank(),
+                                                                  Value(Text(r.ValueNumber))
+                                                              ),
+                                                          ValueDate:
+                                                              If(
+                                                                  IsBlank(Text(r.ValueDate)) ||
+                                                                  Text(r.ValueDate) = "null",
+                                                                  Blank(),
+                                                                  DateValue(Text(r.ValueDate))
+                                                              ),
+                                                          ValueBool:
+                                                              Boolean(r.ValueBool),
+                                                          ValueJson:
+                                                              Coalesce(Text(r.ValueJson), ""),
+                                                          LastUpdatedOn:
+                                                              If(
+                                                                  IsBlank(Text(r.LastUpdatedOn)) ||
+                                                                  Text(r.LastUpdatedOn) = "null",
+                                                                  Blank(),
+                                                                  DateTimeValue(Text(r.LastUpdatedOn))
+                                                              ),
+                                                          LastUpdatedByEmail:
+                                                              Coalesce(Text(r.LastUpdatedByEmail), "")
+                                                      }
+                                                  )
+                                              )
+                                          );
+
+                                          ClearCollect(
+                                              colPunchReviewFieldsBase,
+                                              colPunchReviewFieldsUI
+                                          );
+
+                                          Clear(colPunchReviewFieldsDirty);
+                                          Set(varPunchReviewDirty, false);
+
+                                          UpdateIf(
+                                              colPunchReviewQueue,
+                                              PunchIdNumber = currentPunchId,
+                                              {IsDirty: false}
+                                          );
+
+                                          Collect(
+                                              colPunchReviewSessionEvents,
+                                              {
+                                                  EventKey: Text(GUID()),
+                                                  PunchIdNumber: currentPunchId,
+                                                  EventLabel:
+                                                      "Custom fields saved for " &
+                                                      currentPunchCode,
+                                                  EventOn: Now(),
+                                                  EventBy: User().FullName,
+                                                  EventType: "CUSTOM_FIELDS_SAVED"
+                                              }
+                                          );
+
+                                          Reset(cmpPR_CustomFieldValues);
+
+                                          Notify(
+                                              "Custom fields saved successfully.",
+                                              NotificationType.Success
+                                          )
+                                      )
+                                  )
+                              )
+                          ),
+
+                          Set(
+                              varPunchReviewFieldsError,
+                              Coalesce(
+                                  FirstError.Message,
+                                  "Custom fields could not be saved."
+                              )
+                          )
+                      );
+
+                      Set(varPunchReviewFieldsSaving, false);
+
+                      If(
+                          !IsBlank(varPunchReviewFieldsError),
+                          Notify(
+                              varPunchReviewFieldsError,
+                              NotificationType.Error
+                          )
+                      )
+                  )
+              )
+            Text: =""
+            Visible: =false
+            Width: =1
+      - cmpPR_CustomFieldValues:
+          Control: CanvasComponent
+          ComponentName: cmp_CustomFieldValuesPro
+          Properties:
+            AccentColor: =varTheme_PulseBlueDark
+            BackgroundColor: =varTheme_Surface
+            BorderColor: =varTheme_Border
+            CanEdit: =Lower(Coalesce(varUserRole, "reader")) = "manager"
+            CanManageFields: =Lower(Coalesce(varUserRole, "reader")) = "manager"
+            DangerColor: =ColorValue("#EF4444")
+            ErrorText: =Coalesce(varPunchReviewFieldsError, "")
+            Height: =Parent.Height
+            IsLoading: =varPunchReviewFieldsLoading
+            IsSaving: =varPunchReviewFieldsSaving
+            Items: =colPunchReviewFieldsUI
+            MutedTextColor: =varTheme_TextMuted
+            OnCancelRequested: |-
+              =ClearCollect(
+                  colPunchReviewFieldsUI,
+                  cmpPR_CustomFieldValues.EditedItems
+              );
+              Clear(colPunchReviewFieldsDirty);
+              Set(varPunchReviewDirty, false);
+              Set(varPunchReviewFieldsError, "");
+              UpdateIf(
+                  colPunchReviewQueue,
+                  PunchIdNumber = varPunchReviewCurrentId,
+                  {IsDirty: false}
+              )
+            OnManageFieldsRequested: |-
+              =Notify(
+                  "Project Custom Fields definition editor will be enabled in the next configuration phase.",
+                  NotificationType.Information
+              )
+            OnRefresh: =Select(btnPR_LoadCustomFields)
+            OnSaveRequested: |-
+              =ClearCollect(
+                  colPunchReviewFieldsUI,
+                  cmpPR_CustomFieldValues.EditedItems
+              );
+              ClearCollect(
+                  colPunchReviewFieldsDirty,
+                  cmpPR_CustomFieldValues.DirtyItems
+              );
+              Set(
+                  varPunchReviewDirty,
+                  cmpPR_CustomFieldValues.IsDirty
+              );
+              UpdateIf(
+                  colPunchReviewQueue,
+                  PunchIdNumber = varPunchReviewCurrentId,
+                  {IsDirty: varPunchReviewDirty}
+              );
+              Select(btnPR_SaveCustomFields)
+            OnValueChanged: |-
+              =ClearCollect(
+                  colPunchReviewFieldsUI,
+                  cmpPR_CustomFieldValues.EditedItems
+              );
+              ClearCollect(
+                  colPunchReviewFieldsDirty,
+                  cmpPR_CustomFieldValues.DirtyItems
+              );
+              Set(
+                  varPunchReviewDirty,
+                  cmpPR_CustomFieldValues.IsDirty
+              );
+              UpdateIf(
+                  colPunchReviewQueue,
+                  PunchIdNumber = varPunchReviewCurrentId,
+                  {IsDirty: varPunchReviewDirty}
+              )
+            RecordLabel: |-
+              =If(
+                  IsBlank(varPunchReviewCurrentId),
+                  "No Punch selected",
+                  Coalesce(
+                      varPunchReviewCurrent.PunchCode,
+                      Text(varPunchReviewCurrentId)
+                  )
+              )
+            ShowFooter: =true
+            State: |-
+              =If(
+                  !IsBlank(varPunchReviewFieldsError),
+                  "ERROR",
+                  CountRows(colPunchReviewFieldsUI) = 0,
+                  "EMPTY",
+                  "READY"
+              )
+            SuccessColor: =ColorValue("#22C55E")
+            SurfaceAltColor: =varTheme_SurfaceAlt
+            TextColor: =varTheme_Text
+            Title: ="Custom Fields"
+            WarningColor: =ColorValue("#F59E0B")
+            Width: =Parent.Width
