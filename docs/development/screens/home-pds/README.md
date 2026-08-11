@@ -5,7 +5,7 @@
 **Primary archetype:** Operational Control Tower  
 **Secondary pattern:** Data Explorer  
 **Construction mode:** parallel rebuild from blank screen  
-**Current Studio baseline:** `scr_Home_PDS` intentionally empty as of 2026-08-11
+**Current Studio baseline:** restart in progress as of 2026-08-11
 
 ## Current restart authority
 
@@ -17,10 +17,10 @@ Start here:
 docs/development/screens/home-pds/RESTART_BASELINE_2026-08-11.md
 ```
 
-Immediate executable artifact:
+Current corrective artifact:
 
 ```text
-docs/development/screens/home-pds/blocks/01_screen_shell.pa.yaml
+docs/development/screens/home-pds/blocks/01A_sidebar_manual_instance.md
 ```
 
 ## Normative references
@@ -61,9 +61,10 @@ scr_Home_PDS
 | Block | Name | Current status |
 |---:|---|---|
 | 00 | Foundation audit and reuse matrix | **retained / validated architecture** |
-| 01 | Blank screen shell | **NEXT — reapply to empty screen** |
+| 01 | Blank screen shell | **visual shell PASS / project binding unresolved** |
+| 01A | Sidebar instance hydration | **NEXT — manual Studio insertion** |
 | 02 | PDS Page Header contract / implementation | **retained component evidence; `INSTANCE_SAFE = PASS`** |
-| 03 | Home_PDS header integration | **pending after Block 01; use manual Studio insertion path** |
+| 03 | Home_PDS header integration | **pending after Block 01A; use manual Studio insertion path** |
 | 04 | Workspace/body structural layout | **blocked by Block 03** |
 | 05 | Minimum typed runtime state | planned |
 | 06 | KPI strip with local presentation model | planned |
@@ -85,18 +86,45 @@ scr_Home_PDS
 | 22 | Remove scaffolding + visual QA | planned |
 | 23 | Consolidation + user guide + cutover decision | planned |
 
-## Historical evidence retained
+## Restart Block 01 result — 2026-08-11
 
-Before the 2026-08-11 reset, implementation had reached Block 03.
+The restarted screen successfully rendered the major shell:
 
-`cmp_PageHeaderPro` had already demonstrated:
+```text
+cmpHPDS_Sidebar visible
+Home visually active
+conHPDS_ContentShell fills remaining area
+content surface intentionally empty
+```
+
+However, the screenshot showed the sidebar footer as:
+
+```text
+CURRENT PROJECT
+Text
+Text
+```
+
+Those values match the component defaults rather than the expected screen bindings to `varSelectedProject`.
+
+Therefore Block 01 is not closed yet. Geometry/rendering passed, but the source-created sidebar instance did not apply the required custom Input values reliably.
+
+Corrective path:
+
+```text
+docs/development/screens/home-pds/blocks/01A_sidebar_manual_instance.md
+```
+
+## Historical Page Header evidence retained
+
+Before the 2026-08-11 reset, `cmp_PageHeaderPro` had demonstrated:
 
 ```text
 DEFINITION_ACCEPTED = PASS
 INSTANCE_SAFE       = PASS
 ```
 
-However, Block 03 showed that a PageHeader instance created from screen Source Code did not hydrate the same usable public contract/body as the manually inserted instance. Host-side custom-property assignments produced `PA2108`, and a later generic Source Code-created instance rendered blank and lacked expected public Inputs.
+Block 03 then showed that a PageHeader instance created from screen Source Code did not hydrate the same usable public contract/body as the manually inserted instance. Host-side custom-property assignments produced `PA2108`, and a later generic Source Code-created instance rendered blank and lacked expected public Inputs.
 
 Retained evidence:
 
@@ -106,29 +134,7 @@ docs/development/screens/home-pds/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
 docs/development/screens/home-pds/blocks/03C_header_integration_manual_instance.md
 ```
 
-Therefore, after Block 01 is revalidated, PageHeader integration must use the proven route:
-
-```text
-create host
-→ insert cmp_PageHeaderPro manually in Studio
-→ configure public inputs in Studio
-→ integration smoke test
-```
-
-Do not generate further equivalent screen-YAML variants for the header unless new evidence requires it.
-
-## Immediate Block 01 acceptance
-
-```text
-scr_Home_PDS opens normally
-cmpHPDS_Sidebar renders at left
-Home is active
-current project is preserved
-conHPDS_ContentShell fills remaining area
-content shell intentionally empty
-scr_Home remains unchanged
-no new PA1001 / PA2108 attributable to Block 01
-```
+After Block 01A passes, PageHeader integration must use the proven manual Studio route.
 
 ## Construction policy
 
