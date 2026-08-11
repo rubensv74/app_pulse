@@ -1,0 +1,195 @@
+# DF-05A — HOST DEFINITION LOAD
+# Type: I — Integration
+# Operation: ADD CHILD
+# Target parent: conPR_CustomFieldsHost
+# New control: btnPR_LoadCustomFieldDefs
+#
+# PURPOSE
+# Load the complete PUNCH Custom Field definition catalog for the active project
+# through the existing host-owned WarRoom_ListCustomFieldDefs flow.
+#
+# DEPENDS ON
+# - varProjectId contains the active project id.
+# - WarRoom_ListCustomFieldDefs is available in the active app.
+# - Existing backend response contract:
+#   outer resp.result -> first row .result -> bundle.defs.
+#
+# TOUCHES
+# - Adds one hidden host service control only.
+# - Creates/refreshes colPunchReviewFieldDefsAdmin.
+# - Uses varPunchReviewFieldDefsLoading and varPunchReviewFieldDefsError.
+#
+# DO NOT MODIFY
+# - Punch Review geometry.
+# - Comments.
+# - Current Punch Custom Field values panel.
+# - Review Progress.
+# - cmp_CustomFieldsEditorPro structure or local behavior.
+# - backend mutation flows.
+# - color/theme layer.
+#
+# COMPATIBILITY GATES APPLIED
+# - Current modular-power-apps-screen-construction playbook consulted.
+# - Current Punch Review POWER_APPS_SOURCE_CODE_COMPATIBILITY.md consulted.
+# - No Reset(), CanvasComponent dependency, SVG, Label radius or Classic Button AccessibleLabel introduced.
+#
+# VALIDATION
+# 1. Add this child under conPR_CustomFieldsHost.
+# 2. Select a real project.
+# 3. Trigger btnPR_LoadCustomFieldDefs (DF-05A property guide wires Manage temporarily).
+# 4. varPunchReviewFieldDefsLoading returns to false.
+# 5. varPunchReviewFieldDefsError remains blank.
+# 6. colPunchReviewFieldDefsAdmin contains all active + inactive PUNCH definitions.
+# 7. FieldKey, Label, FieldType, OptionsJson and filter metadata are normalized.
+# 8. No screen geometry changes.
+#
+# EXPECTED STATUS AFTER STUDIO VALIDATION
+# BACKEND READ = FUNCTIONAL_FROZEN
+# UI / COLOR = unchanged
+
+- btnPR_LoadCustomFieldDefs:
+    Control: Classic/Button@2.2.0
+    Properties:
+      Height: =1
+      OnSelect: |-
+        =Set(varPunchReviewFieldDefsLoading, true);
+        Set(varPunchReviewFieldDefsError, "");
+        Clear(colPunchReviewFieldDefsAdmin);
+
+        If(
+            IsBlank(varProjectId),
+
+            Set(
+                varPunchReviewFieldDefsError,
+                "No active project is available for loading Custom Field definitions."
+            ),
+
+            IfError(
+                With(
+                    {
+                        resp:
+                            WarRoom_ListCustomFieldDefs.Run(
+                                varProjectId,
+                                "PUNCH",
+                                1
+                            )
+                    },
+                    With(
+                        {
+                            outer:
+                                Table(
+                                    ParseJSON(
+                                        Coalesce(
+                                            resp.result,
+                                            "[]"
+                                        )
+                                    )
+                                )
+                        },
+                        If(
+                            CountRows(outer) = 0,
+
+                            Set(
+                                varPunchReviewFieldDefsError,
+                                "The definition service returned no data."
+                            ),
+
+                            With(
+                                {
+                                    bundle:
+                                        ParseJSON(
+                                            Text(
+                                                First(outer).Value.result
+                                            )
+                                        )
+                                },
+                                ClearCollect(
+                                    colPunchReviewFieldDefsAdmin,
+                                    ForAll(
+                                        Table(bundle.defs),
+                                        With(
+                                            {r: ThisRecord.Value},
+                                            {
+                                                FieldDefId:
+                                                    If(
+                                                        IsBlank(Text(r.FieldDefId)) ||
+                                                        Text(r.FieldDefId) = "null",
+                                                        0,
+                                                        Value(Text(r.FieldDefId))
+                                                    ),
+                                                ProjectId:
+                                                    If(
+                                                        IsBlank(Text(r.ProjectId)) ||
+                                                        Text(r.ProjectId) = "null",
+                                                        Value(varProjectId),
+                                                        Value(Text(r.ProjectId))
+                                                    ),
+                                                EntityType:
+                                                    Coalesce(Text(r.EntityType), "PUNCH"),
+                                                FieldKey:
+                                                    Coalesce(Text(r.FieldKey), ""),
+                                                Label:
+                                                    Coalesce(Text(r.Label), Text(r.FieldKey), ""),
+                                                FieldType:
+                                                    Coalesce(Text(r.FieldType), "Text"),
+                                                HelpText:
+                                                    Coalesce(Text(r.HelpText), ""),
+                                                IsRequired:
+                                                    Boolean(r.IsRequired),
+                                                IsPinned:
+                                                    Boolean(r.IsPinned),
+                                                IsActive:
+                                                    Boolean(r.IsActive),
+                                                SortOrder:
+                                                    If(
+                                                        IsBlank(Text(r.SortOrder)) ||
+                                                        Text(r.SortOrder) = "null",
+                                                        1000,
+                                                        Value(Text(r.SortOrder))
+                                                    ),
+                                                OptionsJson:
+                                                    Coalesce(Text(r.OptionsJson), "[]"),
+                                                IsFilterable:
+                                                    Boolean(r.IsFilterable),
+                                                ShowInQuickFilters:
+                                                    Boolean(r.ShowInQuickFilters),
+                                                FilterOrder:
+                                                    If(
+                                                        IsBlank(Text(r.FilterOrder)) ||
+                                                        Text(r.FilterOrder) = "null",
+                                                        If(
+                                                            IsBlank(Text(r.SortOrder)) ||
+                                                            Text(r.SortOrder) = "null",
+                                                            1000,
+                                                            Value(Text(r.SortOrder))
+                                                        ),
+                                                        Value(Text(r.FilterOrder))
+                                                    ),
+                                                FilterMode:
+                                                    Coalesce(Text(r.FilterMode), "Equals")
+                                            }
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+
+                Set(
+                    varPunchReviewFieldDefsError,
+                    Coalesce(
+                        FirstError.Message,
+                        "Custom Field definitions could not be loaded."
+                    )
+                );
+                Clear(colPunchReviewFieldDefsAdmin)
+            )
+        );
+
+        Set(varPunchReviewFieldDefsLoading, false)
+      Text: =""
+      Visible: =false
+      Width: =1
+      X: =0
+      Y: =0
