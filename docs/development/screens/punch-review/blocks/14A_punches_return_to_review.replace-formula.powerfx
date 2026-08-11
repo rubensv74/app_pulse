@@ -1,0 +1,39 @@
+// BLOCK 14A — PUNCH LIST RETURN ROUTE TO PUNCH REVIEW
+//
+// Operation: REPLACE FORMULA COMPLETELY.
+// Target screen: scr_Punches
+// Target control: backPunchesBackToOperations_2
+// Target property: OnSelect
+//
+// Scope:
+// - Preserves existing Home and Overview return routes.
+// - Adds PunchReview as a valid varPunches_ReturnView route.
+// - Does not rebuild colPunchReviewQueue when returning from Punch List.
+// - Therefore session Reviewed state and Session Activity remain intact.
+//
+// Validation:
+// 1. PunchReview -> Open Punch List -> back returns to scr_PunchReview.
+// 2. Existing Home return still works.
+// 3. Existing Overview/default return still works.
+
+Switch(
+    Coalesce(varPunches_ReturnView, "Overview"),
+
+    "PunchReview",
+        Set(varAppView, "PunchReview");
+        Navigate(scr_PunchReview, ScreenTransition.None),
+
+    "Home",
+        Set(varAppView, "Home");
+        Set(varHomeViewMode, "DASHBOARD");
+        Navigate(scr_Home, ScreenTransition.None),
+
+    "Overview",
+        Set(varAppView, "Overview");
+        Set(varOps_ViewMode, "OVERVIEW");
+        Navigate(scr_Overview, ScreenTransition.None),
+
+    Set(varAppView, "Overview");
+    Set(varOps_ViewMode, "OVERVIEW");
+    Navigate(scr_Overview, ScreenTransition.None)
+)
