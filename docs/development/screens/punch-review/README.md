@@ -58,14 +58,17 @@ Do not work from memory. Every confirmed Studio incompatibility must become a pr
 22. `11A_help_review_progress.incremental-patch.pa.yaml` — review-progress help
 23. `12_related_queue_context.replace-control.pa.yaml` — integrated path completed; continuation to Block 13 approved
 24. `12A_help_related_queue_context.incremental-patch.pa.yaml` — related-context help
-25. `13_dirty_guard_modal.add-screen-child.pa.yaml` — published; pending Studio validation
+25. `13_dirty_guard_modal.add-screen-child.pa.yaml` — integrated path completed; continuation to Block 14 approved
 26. `13A_dirty_guard_runtime_state.incremental-patch.powerfx` — typed guard runtime state
-27. `13B_dirty_guard_selection_hook.replace-formula.powerfx` — replaces Block 10A selection lock with decision modal routing
+27. `13B_dirty_guard_selection_hook.replace-formula.powerfx` — decision-modal queue routing
 28. `13C_dirty_guard_back.replace-formula.powerfx` — protects Back navigation
-29. `13D_dirty_guard_review_actions.replace-formula.powerfx` — protects Open Punch List and preserves dirty state
-30. `13E_help_dirty_guard.incremental-patch.pa.yaml` — apply only after Block 13 validates
+29. `13D_dirty_guard_review_actions.replace-formula.powerfx` — protects Open Punch List
+30. `13E_help_dirty_guard.incremental-patch.pa.yaml` — dirty-guard help
+31. `14_punches_entry.add-child.pa.yaml` — published; pending Studio validation
+32. `14A_punches_return_to_review.replace-formula.powerfx` — Punch List return route
+33. `14B_punchreview_initial_selection.append-onvisible.powerfx` — loads initial Comments + Custom Fields on workspace entry
 
-Do not begin Block 14 until Block 13 imports without errors and Save/Discard/Cancel are validated for queue navigation, Back and Open Punch List.
+Do not begin Block 15 until Block 14 is validated end-to-end from a real loaded Punch List page and the return path back to Punch Review preserves the review session.
 
 ## Confirmed service contracts
 
@@ -121,70 +124,55 @@ The backend-returned merged state remains authoritative after save.
 
 ## Review Progress contract
 
-Review Progress is session-local and is calculated over:
+Review Progress is session-local and is calculated over `colPunchReviewQueue` using `IsReviewedInSession` to separate Reviewed and Remaining. It does not use SQL or a flow.
 
-```text
-colPunchReviewQueue
-```
-
-using `IsReviewedInSession` to separate Reviewed and Remaining. It does not use SQL or a flow.
-
-`cmp_DonutPro` is confirmed as the installed component used for this session-progress indicator. It is not a substitute for the Home_PDS discipline-composition pie chart.
+`cmp_DonutPro` is confirmed as the installed component used for this session-progress indicator.
 
 ## Related Queue Context contract
 
 Block 12 deliberately does **not** invent a backend Punch-to-Punch relationship.
 
-`Related in Queue` is derived only from the loaded review queue:
+`Related in Queue` is derived only from the loaded `colPunchReviewQueue`. A row is included when it is not the current Punch and shares `SubsystemCode` or `Discipline` with the current Punch.
 
-```text
-colPunchReviewQueue
-```
-
-A row is included when it is not the current Punch and it shares at least one of these fields with the current Punch:
-
-```text
-SubsystemCode
-Discipline
-```
-
-The UI labels the reason explicitly as `Same subsystem` or `Same discipline`. If both match, `Same subsystem` takes precedence because it is the more specific context.
-
-The `Review` action routes through `btnPR_SelectCurrent`, so Comments and Custom Fields continue to load through the same selection mechanism. Search and quick filters reset to `ALL` only when navigation is allowed.
+The `Review` action routes through `btnPR_SelectCurrent`, so Comments and Custom Fields continue to load through the same selection mechanism.
 
 ## Dirty Guard contract
 
-Block 13 replaces the temporary hard navigation lock from Block 10A with an explicit decision flow.
+Block 13 replaces the temporary hard navigation lock with an explicit decision flow for queue selection, Related in Queue, Back and Open Punch List.
 
-Dirty navigation can originate from:
+The modal offers Save and continue, Discard and continue, and Cancel. Pending routing is represented by `varPunchReviewPendingAction` and numeric `varPunchReviewPendingIndex`.
 
-- selecting another queue record;
-- `Related in Queue > Review`;
-- `Back to Punches`;
-- `Open Punch List`.
+## Punch List integration contract
 
-The modal offers:
+Block 14 establishes the first production entry route into Punch Review.
 
-```text
-Save and continue
-Discard and continue
-Cancel
-```
-
-`Save and continue` calls the existing `btnPR_SaveCustomFields` service control and continues only when the save clears `varPunchReviewDirty` without a save error.
-
-`Discard and continue` restores `colPunchReviewFieldsBase`, clears the dirty collection/state and then continues.
-
-`Cancel` keeps the current Punch and all local edits.
-
-Pending routing is represented by:
+Source screen:
 
 ```text
-varPunchReviewPendingAction   text
-varPunchReviewPendingIndex    numeric, 0 = no pending queue target
+scr_Punches
 ```
 
-The hidden `btnPR_ContinuePendingAction` centralizes continuation for `CHANGE_CURRENT`, `BACK` and `OPEN_PUNCHES`.
+Source collection:
+
+```text
+colPunches
+```
+
+The `Review page` action builds a fresh session queue from the **currently loaded Punch List page only**. It does not claim to load every row in the filtered SQL result set.
+
+Each `colPunches` row is normalized into the Punch Review queue contract using already available fields such as PunchId, PunchCode, PunchDescription, WBS codes, PunchDiscipline, CategoryCode, StatusCode/PunchStatus, SubcontractorName, InspectionName, Originator, CommentCount and LastCommentOn.
+
+If `varSelectedTaskId` belongs to the loaded page, that Punch becomes the initial active review record; otherwise the review starts at row 1.
+
+`14B_punchreview_initial_selection.append-onvisible.powerfx` routes the initial active record through `btnPR_SelectCurrent`, ensuring Comments and Custom Fields use the same loading pipeline as later queue navigation.
+
+When Punch Review uses `Open Punch List`, the existing action sets:
+
+```text
+varPunches_ReturnView = "PunchReview"
+```
+
+`14A_punches_return_to_review.replace-formula.powerfx` makes that route functional without rebuilding the queue, so Reviewed state and Session Activity remain part of the current review session.
 
 ## Manual and compatibility knowledge
 
