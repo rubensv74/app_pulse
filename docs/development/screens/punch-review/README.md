@@ -8,27 +8,15 @@ This workspace contains incremental blocks for building and evolving `scr_PunchR
 
 ## Canonical-source rule
 
-```text
-power-apps/screens/PunchReview/scr_PunchReview.pa.yaml
-```
+`power-apps/screens/PunchReview/scr_PunchReview.pa.yaml` is the canonical complete screen source.
 
-is the canonical complete screen source.
-
-Files under:
-
-```text
-docs/development/screens/punch-review/blocks/
-```
-
-are controlled construction artifacts. They do not replace the canonical screen source until the relevant increment has been validated and consolidated.
+Files under `docs/development/screens/punch-review/blocks/` are controlled construction artifacts. They do not replace the canonical screen source until the relevant increment has been validated and consolidated.
 
 ## Mandatory compatibility gate
 
 Before drafting, correcting or publishing any `.pa.yaml`, consult:
 
-```text
-docs/development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
-```
+`docs/development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md`
 
 Do not work from memory. Every confirmed Studio incompatibility must become a preventive rule before dependent blocks continue.
 
@@ -49,16 +37,16 @@ Do not work from memory. Every confirmed Studio incompatibility must become a pr
 13. `09A_comments_selection_hook.replace-formula.powerfx` — comments selection hook
 14. `09B_comments_test_seed.optional.powerfx` — optional visual test seed
 15. `09C_help_comments.incremental-patch.pa.yaml` — comments help
-16. `10_custom_fields.replace-control.pa.yaml` — integrated
+16. `10_custom_fields.replace-control.pa.yaml` — integrated legacy implementation; now scheduled for responsibility-separated refactor
 17. `10A_custom_fields_selection_hook.replace-formula.powerfx` — comments + custom-fields selection hook
 18. `10B_custom_fields_test_seed.optional.powerfx` — optional field-type seed
 19. `10C_yesno_initial_state.incremental-patch.pa.yaml` — Toggle `Checked` binding correction
 20. `10D_help_custom_fields.incremental-patch.pa.yaml` — custom-fields help
 21. `11_review_progress.replace-control.pa.yaml` — implemented with installed `cmp_DonutPro`; continuation approved
 22. `11A_help_review_progress.incremental-patch.pa.yaml` — review-progress help
-23. `12_related_queue_context.replace-control.pa.yaml` — integrated path completed; continuation to Block 13 approved
+23. `12_related_queue_context.replace-control.pa.yaml` — integrated path completed; continuation approved
 24. `12A_help_related_queue_context.incremental-patch.pa.yaml` — related-context help
-25. `13_dirty_guard_modal.add-screen-child.pa.yaml` — integrated path completed; continuation to Block 14 approved
+25. `13_dirty_guard_modal.add-screen-child.pa.yaml` — integrated path completed; continuation approved
 26. `13A_dirty_guard_runtime_state.incremental-patch.powerfx` — typed guard runtime state
 27. `13B_dirty_guard_selection_hook.replace-formula.powerfx` — decision-modal queue routing
 28. `13C_dirty_guard_back.replace-formula.powerfx` — protects Back navigation
@@ -70,85 +58,67 @@ Do not work from memory. Every confirmed Studio incompatibility must become a pr
 34. `15_home_entry.replace-formula.powerfx` — validated in Studio / runtime
 35. `15A_help_source_integrations.incremental-patch.pa.yaml` — source-integration help
 
-## Pre-Block 16 refactor — Premium Custom Fields
+## Pre-Block 16 refactor — Custom Fields responsibility split
 
-Block 16 is intentionally paused while the current Custom Fields panel is refactored into a reusable premium component.
+Block 16 is intentionally paused.
 
-Approved architecture:
+The previous `cmp_CustomFieldEditorPro` prototype path has been stopped because it mixed the naming and responsibility of record values with project-level field definitions.
 
-```text
-Opción A — reusable core + first implementation focused on Punch Review
-```
+Authoritative architecture:
 
-Component workspace:
+`docs/development/custom-fields/CUSTOM_FIELDS_ARCHITECTURE_REFACTOR_PLAN.md`
 
-```text
-docs/development/components/custom-field-editor-pro/
-```
+Two components will replace that approach:
 
-Target component:
+### `cmp_CustomFieldValuesPro`
 
-```text
-cmp_CustomFieldEditorPro
-```
+Record-level component for the selected Punch. It will occupy the existing Custom Fields area in the right column and provide the compact current-values experience while preserving the real load/save contract and Block 13 Dirty Guard.
 
-The refactor is incremental and must validate CF-01 through CF-07 before Block 16 resumes.
+### `cmp_CustomFieldsEditorPro`
 
-The component owns presentation, editor rendering and local edit state. Punch Review continues to own backend flows, dirty-guard routing, session activity and authoritative reload after save.
+Project-level definition editor modal. It manages which Custom Fields exist for PUNCH in the project. It is independent of the selected Punch and will first be opened from Punch Review. The same component will later be exposed from Punch List when that screen is modernized.
 
-Do not begin Block 16 until the premium Custom Fields refactor has been integrated and validated with a real Punch.
+The legacy `cmp_DetailDrawer_old` remains operational in Punch List temporarily but receives no new Custom Fields features.
 
-## Confirmed service contracts
+Do not begin Block 16 until the values component and the project-definition editor are integrated and validated from Punch Review.
 
-### Comments read
+## Confirmed Custom Fields service contracts
 
-```text
-Warroom_GetTaskCommentsPaged.Run(
-    ProjectId,
-    RecordId,
-    Page,
-    PageSize,
-    EntityType
-)
-```
+### Record values read
 
-### Comment create
+`WarRoom_GetCustomBundle(ProjectId, EntityType, RecordId).bundlejson`
 
-```text
-Warroom_AddTaskComment.Run(
-    ProjectId,
-    RecordId,
-    CommentHtml,
-    UserEmail,
-    EntityType,
-    UserName,
-    CommentType
-)
-```
+### Record values save
 
-### Custom fields read
-
-```text
-WarRoom_GetCustomBundle.Run(
-    ProjectId,
-    EntityType,
-    RecordId
-).bundlejson
-```
-
-### Custom fields save
-
-```text
-WarRoom_SaveCustomBulk.Run(
-    ProjectId,
-    EntityType,
-    RecordId,
-    JSON(colDirty, JSONFormat.Compact),
-    UserEmail
-)
-```
+`WarRoom_SaveCustomBulk(ProjectId, EntityType, RecordId, JSON(colDirty, JSONFormat.Compact), UserEmail)`
 
 The backend-returned merged state remains authoritative after save.
+
+### Project definitions list
+
+`WarRoom_ListCustomFieldDefs(ProjectId, EntityType, IncludeInactive)`
+
+### Project definition upsert
+
+`WarRoom_UpsertCustomFieldDef(...)`
+
+Current definition schema includes FieldDefId, ProjectId, EntityType, FieldKey, Label, FieldType, HelpText, IsRequired, IsPinned, IsActive, SortOrder, OptionsJson, IsFilterable, ShowInQuickFilters, FilterOrder and FilterMode.
+
+### Project definition enable/disable
+
+`WarRoom_SetCustomFieldActive(ProjectId, EntityType, FieldKey, IsActive, UserEmail)`
+
+Definition mutations must invalidate Punch dynamic-filter configuration so Punch List reloads active/filterable field definitions later.
+
+## Comments contract
+
+Read:
+
+`Warroom_GetTaskCommentsPaged(ProjectId, RecordId, Page, PageSize, EntityType)`
+
+Create:
+
+`Warroom_AddTaskComment(ProjectId, RecordId, CommentHtml, UserEmail, EntityType, UserName, CommentType)`
 
 ## Review Progress contract
 
@@ -170,128 +140,44 @@ Block 13 replaces the temporary hard navigation lock with an explicit decision f
 
 The modal offers Save and continue, Discard and continue, and Cancel. Pending routing is represented by `varPunchReviewPendingAction` and numeric `varPunchReviewPendingIndex`.
 
+The Custom Fields values refactor must preserve this contract.
+
 ## Punch List integration contract
 
-Block 14 establishes the first production entry route into Punch Review.
+Block 14 establishes the first production entry route into Punch Review from the currently loaded Punch List page. It does not claim to load every row in the filtered SQL result set.
 
-Source screen:
-
-```text
-scr_Punches
-```
-
-Source collection:
-
-```text
-colPunches
-```
-
-The `Review page` action builds a fresh session queue from the **currently loaded Punch List page only**. It does not claim to load every row in the filtered SQL result set.
-
-Each `colPunches` row is normalized into the Punch Review queue contract using already available fields such as PunchId, PunchCode, PunchDescription, WBS codes, PunchDiscipline, CategoryCode, StatusCode/PunchStatus, SubcontractorName, InspectionName, Originator, CommentCount and LastCommentOn.
-
-If `varSelectedTaskId` belongs to the loaded page, that Punch becomes the initial active review record; otherwise the review starts at row 1.
-
-`14B_punchreview_initial_selection.append-onvisible.powerfx` routes the initial active record through `btnPR_SelectCurrent`, ensuring Comments and Custom Fields use the same loading pipeline as later queue navigation.
-
-When Punch Review uses `Open Punch List`, the existing action sets `varPunches_ReturnView = "PunchReview"`. `14A_punches_return_to_review.replace-formula.powerfx` makes that route functional without rebuilding the queue, so Reviewed state and Session Activity remain part of the current review session.
+The current Punch List still opens `cmp_DetailDrawer_old` when a row is selected. That behavior is now considered legacy and is explicitly deferred to the later Punch List modernization phase. Do not remove the drawer until its remaining Overview/Comments/detail responsibilities have replacements.
 
 ## Home integration contract
 
-Block 15 activates the existing `REVIEW` action in:
-
-```text
-cmpHomePunchActionToolbar
-```
-
-Source screen:
-
-```text
-scr_Home
-```
-
-Source data:
-
-```text
-colPunchExecutiveGridFiltered
-colHomePunchGridView
-colHomePunchGridSelectedKeys
-```
-
-Home uses a deliberately local queue contract:
-
-- if checked rows exist, only those loaded rows enter Punch Review and queue scope is `SELECTED`;
-- otherwise, the current loaded Home grid view enters Punch Review and queue scope is `HOME_CONTEXT`;
-- no unloaded SQL rows are simulated or claimed to exist in the review queue;
-- `varHomePunchGridSelectedKey` becomes the initial Punch when it belongs to the queue, otherwise row 1 is used;
-- the review source is `HOME` and Back naturally returns to the Home screen.
-
-The current Home cell-details response contains the numeric Punch identity and operational context required to open real Comments and Custom Fields. It does not currently materialize AreaCode, UnitCode, SystemCode, ElementCode, CommentCount or LastCommentOn into `colPunchExecutiveGridFiltered`; Block 15 therefore leaves those queue projection fields empty/zero rather than inventing values. Real Comments and Custom Fields are still loaded through the existing services after entry.
-
-`15_home_entry.replace-formula.powerfx` replaces the complete `cmpHomePunchActionToolbar.OnAction` formula while preserving the existing non-Review actions.
-
-`15A_help_source_integrations.incremental-patch.pa.yaml` documents both Punch List and Home entry semantics in the bilingual help modal after validation.
+Block 15 activates the existing Review action in Home and builds a local Punch Review queue from selected or currently loaded Home rows. Unavailable fields are left empty rather than invented. Real Comments and Custom Field values are loaded after entry through the existing services.
 
 ## Manual and compatibility knowledge
 
 User guide:
 
-```text
-docs/development/screens/punch-review/user-guide/MANUAL_USUARIO_PUNCH_REVIEW.md
-```
+`docs/development/screens/punch-review/user-guide/MANUAL_USUARIO_PUNCH_REVIEW.md`
 
 Compatibility register:
 
-```text
-docs/development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
-```
-
-Confirmed reusable rules include:
-
-- `Label@2.5.1` does not support corner-radius properties used on containers;
-- `Classic/Button@2.2.0` does not support the previously attempted `AccessibleLabel` Source Code pattern;
-- `TabList@2.2.30` is not reset with `Reset()`;
-- new numeric variables require an unequivocal numeric initialization;
-- modern Toggle uses `Checked` for the initial Boolean state;
-- a Canvas component must exist in the active app; a GitHub file alone is insufficient;
-- do not use inline SVG as a substitute for an installed/maintainable visual component when the PULSE component pattern is available.
+`docs/development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md`
 
 ## Naming
 
-```text
-Screen       scr_PunchReview
-Controls     PR prefix
-Collections  colPunchReview prefix
-Variables    varPunchReview prefix
-Service      btnPR_ prefix
-```
+- Screen: `scr_PunchReview`
+- Screen controls: `PR` prefix
+- Collections: `colPunchReview` prefix
+- Variables: `varPunchReview` prefix
+- Service controls: `btnPR_` prefix
 
 ## Validation minimum
 
-1. review the compatibility register;
-2. work from current repository `main` branch state;
-3. save the block in Studio;
-4. wait for formula validation;
+1. read the compatibility register;
+2. work from current repository `main`;
+3. integrate only the current increment;
+4. save and wait for formula validation;
 5. check App Checker;
 6. navigate to the screen;
-7. confirm no overlaps, visible defects or broken references;
-8. stop on new PA1001, PA2108, PA2301, unsupported property or type error;
-9. correct the repository artifact and record reusable learning before continuing.
-
-## Current source references
-
-```text
-power-apps/screens/PunchReview/scr_PunchReview.pa.yaml
-power-apps/screens/Home/scr_Home.pa.yaml
-power-apps/screens/Punches/scr_Punches_1.pa.yaml
-power-apps/components/cmp_SidebarNav.pa.yaml
-power-apps/components/cmp_DonutPro.pa.yaml
-power-apps/components/
-```
-
-The repository structure and legacy policy are governed by:
-
-```text
-docs/governance/REPOSITORY_STRUCTURE_STANDARD.md
-docs/governance/ACTIVE_SOURCE_POLICY.md
-```
+7. confirm no overlap or broken references;
+8. stop on any new Source Code error;
+9. correct the repository artifact and record the reusable learning before continuing.
