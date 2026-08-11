@@ -1,0 +1,148 @@
+# VF-05 — PUNCH REVIEW CUSTOM FIELD VALUES VISUAL POLISH
+#
+# Operation: APPLY TARGETED PROPERTY PATCHES ONLY.
+# Do NOT replace complete controls with this file.
+# Apply each patch to the named existing control/property in Studio Source Code.
+#
+# Required state:
+# - VF-03 + VF-03A applied to cmp_CustomFieldValuesPro.
+# - VF-04 + VF-04A applied to scr_PunchReview.
+# - cmpPR_CustomFieldValues exists inside conPR_CustomFieldsHost.
+#
+# PRE-YAML GATE APPLIED
+# docs/development/screens/punch-review/
+# POWER_APPS_SOURCE_CODE_COMPATIBILITY.md was read immediately before
+# drafting this YAML.
+#
+# Purpose:
+# 1. Make cmp_CustomFieldValuesPro header safe at the real ~360–500 px
+#    Punch Review right-column width.
+# 2. Preserve a compact two-row header without overlap.
+# 3. Give the desktop upper workspace the minimum vertical height required by
+#    Comments + Custom Field Values + Review Progress.
+# 4. Keep the narrow (<1320 px) stacked layout internally consistent.
+# 5. Do not change data contracts, flows, Dirty Guard or component events.
+#
+# Layout arithmetic used by this patch:
+# - Comments minimum: 220 px
+# - Custom Field Values minimum: 280 px
+# - Review Progress: 140 px
+# - Two 10 px gaps
+# - Required right-column minimum = 660 px
+#
+# Narrow stacked UpperGrid:
+# - Center column: 390 px
+# - gap: 10 px
+# - Right column: 660 px
+# - Required UpperGrid height = 1060 px
+#
+# Compatibility:
+# - no new controls;
+# - no SVG;
+# - no new CanvasComponent dependency;
+# - no Radius* on Label;
+# - no Reset() changes;
+# - only properties already present on the same control types are changed.
+#
+# =============================================================
+# PATCH A — cmp_CustomFieldValuesPro compact responsive header
+# =============================================================
+# Target component: cmp_CustomFieldValuesPro
+# Apply these property replacements to the existing controls.
+
+conCFVPro_Header:
+  Properties:
+    Height: =64
+
+lblCFVPro_Title:
+  Properties:
+    Width: =Max(120, Parent.Width - 110)
+    X: =14
+    Y: =5
+
+lblCFVPro_Record:
+  Properties:
+    Width: =Max(100, Parent.Width - 160)
+    X: =14
+    Y: =29
+
+conCFVPro_StatusPill:
+  Properties:
+    X: =Parent.Width - 82
+    Y: =7
+
+btnCFVPro_Manage:
+  Properties:
+    Height: =26
+    Width: =72
+    X: =Parent.Width - 122
+    Y: =32
+
+btnCFVPro_Refresh:
+  Properties:
+    Height: =26
+    Width: =34
+    X: =Parent.Width - 42
+    Y: =32
+
+rectCFVPro_HeaderDivider:
+  Properties:
+    Y: =64
+
+conCFVPro_Body:
+  Properties:
+    Height: =Parent.Height - If(cmp_CustomFieldValuesPro.ShowFooter, 113, 65)
+    Y: =65
+
+# =============================================================
+# PATCH B — Punch Review upper-grid / right-column sizing
+# =============================================================
+# Target screen: scr_PunchReview
+# These changes avoid clipping at 1366x768 and 1600x900 while preserving
+# the existing 1920x1080 behavior.
+
+conPR_UpperGrid:
+  Properties:
+    Height: =If(App.Width < 1320, 1060, Max(660, Parent.Height - 200))
+    LayoutMinHeight: =If(App.Width < 1320, 1060, 660)
+
+conPR_RightColumn:
+  Properties:
+    Height: =If(App.Width < 1320, 660, Parent.Height)
+    LayoutMinHeight: =660
+
+# =============================================================
+# PATCH C — Keep the Custom Field Values host contract explicit
+# =============================================================
+# Target screen: scr_PunchReview > conPR_RightColumn
+# These values are already consistent with VF-04; re-apply only if Studio
+# shows a different value after manual integration.
+
+conPR_CustomFieldsHost:
+  Properties:
+    FillPortions: =1
+    LayoutMinHeight: =280
+    LayoutMinWidth: =300
+    Width: =Parent.Width
+
+cmpPR_CustomFieldValues:
+  Properties:
+    Height: =Parent.Height
+    Width: =Parent.Width
+
+# =============================================================
+# VALIDATION GATE
+# =============================================================
+# 1. Studio accepts every property replacement with no Source Code errors.
+# 2. At 1366x768 the right column does not clip Comments, Custom Fields or
+#    Review Progress; the workspace may scroll vertically as designed.
+# 3. At approximately 360–380 px component width, title/status/actions do not
+#    overlap.
+# 4. At 1600x900 the same three right-column regions remain usable.
+# 5. At 1920x1080 no unnecessary vertical gap is introduced.
+# 6. Comments composer remains fully visible inside its card.
+# 7. Custom Fields keeps at least 280 px and its internal gallery scrolls.
+# 8. Review Progress remains 140 px and fully visible.
+# 9. Editing, Save, Cancel, Refresh and Dirty Guard behavior are unchanged.
+# 10. Do not begin the DF project-definition editor until this visual pass is
+#     accepted in Studio/runtime.
