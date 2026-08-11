@@ -1,0 +1,362 @@
+# BLOCK 13 — UNSAVED CHANGES DECISION MODAL
+#
+# Operation: ADD AS SCREEN CHILD.
+# Parent: scr_PunchReview > Children.
+# Exact location: after conPR_HelpModalLayer so this guard remains above the screen.
+#
+# PRE-YAML GATE APPLIED:
+# docs/development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
+# was consulted immediately before drafting this YAML.
+#
+# Dependencies:
+# - Block 10 Custom Fields is integrated.
+# - 13A initializes varPunchReviewPendingAction as text.
+# - 13B replaces btnPR_SelectCurrent.OnSelect.
+# - 13C protects btnPR_Back.OnSelect.
+# - 13D protects OPEN_PUNCHES and preserves queue dirty state.
+#
+# Scope:
+# - Appears when navigation would leave the current Punch while Custom Fields
+#   contain unsaved changes.
+# - Offers Save and continue, Discard and continue, and Cancel.
+# - Save and continue uses the existing btnPR_SaveCustomFields service control.
+# - Discard and continue restores colPunchReviewFieldsBase before navigating.
+# - Continue routing is centralized in hidden btnPR_ContinuePendingAction.
+#
+# Compatibility:
+# - No CanvasComponent introduced.
+# - No inline SVG.
+# - No Radius* on Label@2.5.1.
+# - No AccessibleLabel on Classic/Button@2.2.0.
+# - Uses only control types already present in Punch Review.
+#
+# Validation:
+# 1. Modal is hidden when varPunchReviewShowDirtyDialog=false.
+# 2. Dirty queue navigation opens the modal.
+# 3. Cancel keeps current Punch and local edits.
+# 4. Discard restores base values, clears dirty state, then continues.
+# 5. Save calls the real bulk-save service and only continues if save succeeds.
+# 6. Back and Open Punch List use the same modal when dirty.
+
+- conPR_DirtyGuardLayer:
+    Control: GroupContainer@1.5.0
+    Variant: ManualLayout
+    Properties:
+      DropShadow: =DropShadow.None
+      Fill: =Color.Transparent
+      Height: =Parent.Height
+      Visible: =Coalesce(varPunchReviewShowDirtyDialog, false)
+      Width: =Parent.Width
+    Children:
+      - btnPR_ContinuePendingAction:
+          Control: Classic/Button@2.2.0
+          Properties:
+            Height: =1
+            OnSelect: |-
+              =Switch(
+                  Coalesce(varPunchReviewPendingAction, ""),
+
+                  "CHANGE_CURRENT",
+                      With(
+                          {targetIndex: varPunchReviewPendingIndex},
+                          Set(varPunchReviewPendingAction, "");
+                          Set(varPunchReviewPendingIndex, 0);
+                          Set(varPunchReviewRequestedIndex, targetIndex);
+                          Select(btnPR_SelectCurrent)
+                      ),
+
+                  "BACK",
+                      Set(varPunchReviewPendingAction, "");
+                      Set(varPunchReviewPendingIndex, 0);
+                      Back(),
+
+                  "OPEN_PUNCHES",
+                      Set(varPunchReviewPendingAction, "");
+                      Set(varPunchReviewPendingIndex, 0);
+                      Set(varPunches_ReturnView, "PunchReview");
+                      Set(varSelectedTaskId, varPunchReviewCurrentId);
+                      Set(varDrawerRecordId, varPunchReviewCurrentId);
+                      Set(varAppView, "Punches");
+                      Navigate(scr_Punches, ScreenTransition.None),
+
+                  Set(varPunchReviewPendingAction, "");
+                  Set(varPunchReviewPendingIndex, 0)
+              )
+            Text: =""
+            Visible: =false
+            Width: =1
+      - rectPR_DirtyGuardBackdrop:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            BorderStyle: =BorderStyle.None
+            Fill: =RGBA(15,23,42,0.58)
+            Height: =Parent.Height
+            Width: =Parent.Width
+      - conPR_DirtyGuardDialog:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =varTheme_Border
+            BorderThickness: =1
+            DropShadow: =DropShadow.Bold
+            Fill: =varTheme_Surface
+            Height: =330
+            RadiusBottomLeft: =20
+            RadiusBottomRight: =20
+            RadiusTopLeft: =20
+            RadiusTopRight: =20
+            Width: =Min(620, Parent.Width - 64)
+            X: =(Parent.Width - Self.Width) / 2
+            Y: =(Parent.Height - Self.Height) / 2
+          Children:
+            - conPR_DirtyGuardIcon:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#FDE68A")
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =ColorValue("#FFFBEB")
+                  Height: =48
+                  RadiusBottomLeft: =14
+                  RadiusBottomRight: =14
+                  RadiusTopLeft: =14
+                  RadiusTopRight: =14
+                  Width: =48
+                  X: =22
+                  Y: =22
+                Children:
+                  - lblPR_DirtyGuardIcon:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =ColorValue("#B45309")
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =Parent.Height
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =18
+                        Text: ="!"
+                        Width: =Parent.Width
+            - lblPR_DirtyGuardTitle:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_Text
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =30
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =15
+                  Text: ="You have unsaved changes"
+                  Width: =Parent.Width - 118
+                  X: =84
+                  Y: =20
+            - lblPR_DirtyGuardSubtitle:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_TextMuted
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: |-
+                    ="Custom Fields for " &
+                    Coalesce(
+                        varPunchReviewCurrent.PunchCode,
+                        Text(varPunchReviewCurrentId)
+                    ) &
+                    " contain local changes."
+                  Width: =Parent.Width - 118
+                  X: =84
+                  Y: =49
+            - rectPR_DirtyGuardDivider:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderStyle: =BorderStyle.None
+                  Fill: =varTheme_Border
+                  Height: =1
+                  Width: =Parent.Width - 44
+                  X: =22
+                  Y: =88
+            - lblPR_DirtyGuardBody:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_Text
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =58
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =10
+                  Text: ="Choose whether to save these changes before continuing, discard them, or cancel the navigation."
+                  VerticalAlign: =VerticalAlign.Top
+                  Width: =Parent.Width - 44
+                  X: =22
+                  Y: =108
+            - conPR_DirtyGuardCountBadge:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#FDE68A")
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =ColorValue("#FFFBEB")
+                  Height: =28
+                  RadiusBottomLeft: =14
+                  RadiusBottomRight: =14
+                  RadiusTopLeft: =14
+                  RadiusTopRight: =14
+                  Width: =126
+                  X: =22
+                  Y: =176
+                Children:
+                  - lblPR_DirtyGuardCount:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =ColorValue("#92400E")
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =Parent.Height
+                        PaddingBottom: =0
+                        PaddingLeft: =2
+                        PaddingRight: =2
+                        PaddingTop: =0
+                        Size: =8
+                        Text: =Text(CountRows(colPunchReviewFieldsDirty)) & " changed fields"
+                        Width: =Parent.Width
+            - lblPR_DirtyGuardSaveError:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =ColorValue("#B91C1C")
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =34
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =8
+                  Text: =Coalesce(varPunchReviewFieldsError, "")
+                  Visible: =!IsBlank(varPunchReviewFieldsError)
+                  Width: =Parent.Width - 44
+                  X: =22
+                  Y: =212
+            - btnPR_DirtyCancel:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =varTheme_Border
+                  BorderThickness: =1
+                  Color: =varTheme_TextMuted
+                  Fill: =varTheme_Surface
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =40
+                  HoverFill: =varTheme_SurfaceAlt
+                  OnSelect: |-
+                    =Set(varPunchReviewShowDirtyDialog, false);
+                    Set(varPunchReviewPendingAction, "");
+                    Set(varPunchReviewPendingIndex, 0);
+                    Set(varPunchReviewRequestedIndex, varPunchReviewCurrentIndex)
+                  RadiusBottomLeft: =9
+                  RadiusBottomRight: =9
+                  RadiusTopLeft: =9
+                  RadiusTopRight: =9
+                  Size: =9
+                  Text: ="Cancel"
+                  Width: =92
+                  X: =22
+                  Y: =268
+            - btnPR_DirtyDiscardContinue:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =ColorValue("#FCA5A5")
+                  BorderThickness: =1
+                  Color: =ColorValue("#B91C1C")
+                  Fill: =ColorValue("#FEF2F2")
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =40
+                  HoverFill: =ColorValue("#FEE2E2")
+                  OnSelect: |-
+                    =ClearCollect(
+                        colPunchReviewFieldsUI,
+                        colPunchReviewFieldsBase
+                    );
+                    Clear(colPunchReviewFieldsDirty);
+                    Set(varPunchReviewDirty, false);
+                    Set(varPunchReviewFieldsError, "");
+                    UpdateIf(
+                        colPunchReviewQueue,
+                        PunchIdNumber = varPunchReviewCurrentId,
+                        {IsDirty: false}
+                    );
+                    Set(varPunchReviewShowDirtyDialog, false);
+                    Select(btnPR_ContinuePendingAction)
+                  RadiusBottomLeft: =9
+                  RadiusBottomRight: =9
+                  RadiusTopLeft: =9
+                  RadiusTopRight: =9
+                  Size: =9
+                  Text: ="Discard and continue"
+                  Width: =170
+                  X: =Parent.Width - 374
+                  Y: =268
+            - btnPR_DirtySaveContinue:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =varTheme_PulseBlueDark
+                  BorderThickness: =1
+                  Color: =Color.White
+                  DisplayMode: |-
+                    =If(
+                        varPunchReviewFieldsSaving,
+                        DisplayMode.Disabled,
+                        DisplayMode.Edit
+                    )
+                  Fill: =varTheme_PulseBlueDark
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =40
+                  HoverFill: =ColorFade(varTheme_PulseBlueDark, -0.08)
+                  OnSelect: |-
+                    =Set(varPunchReviewFieldsError, "");
+                    Select(btnPR_SaveCustomFields);
+                    If(
+                        !varPunchReviewDirty &&
+                        IsBlank(varPunchReviewFieldsError),
+                        Set(varPunchReviewShowDirtyDialog, false);
+                        Select(btnPR_ContinuePendingAction)
+                    )
+                  RadiusBottomLeft: =9
+                  RadiusBottomRight: =9
+                  RadiusTopLeft: =9
+                  RadiusTopRight: =9
+                  Size: =9
+                  Text: =If(varPunchReviewFieldsSaving, "Saving...", "Save and continue")
+                  Width: =176
+                  X: =Parent.Width - 198
+                  Y: =268
