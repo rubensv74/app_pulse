@@ -6,6 +6,12 @@ Construir `cmp_CustomFieldEditorPro` por piezas pequeñas y validables antes de 
 
 Se aplica el Protocolo de Implementación Incremental Asistida y el gate PRE-YAML de Punch Review.
 
+## Estado actual
+
+- `CF-01` — component shell publicado; continuación autorizada.
+- `CF-02` — working buffer + dirty tracking publicado; pendiente de validación en Power Apps Studio.
+- `CF-03` y siguientes — bloqueados hasta validar CF-02.
+
 ## Secuencia
 
 ### CF-01 — Component shell
@@ -39,11 +45,12 @@ Incluye:
 - dirty tracking por `FieldKey`;
 - outputs `EditedItems`, `DirtyItems`, `IsDirty`, `DirtyCount`, `LastChangedFieldKey`;
 - Reset interno;
-- status Saved / Unsaved calculado desde estado real.
+- status Saved / Unsaved calculado desde estado real;
+- `DebugMode` temporal para validar el comportamiento sin introducir todavía los editores reales.
 
-No se conectan todavía flows.
+No se conectan flows.
 
-**Gate:** cambiar un valor de prueba debe producir un solo dirty item por `FieldKey` y Reset debe volver al input original.
+**Gate:** una edición simulada debe producir un solo dirty item por `FieldKey`, las repeticiones sobre el mismo campo no deben duplicarlo y Reset debe volver al input original.
 
 ---
 
@@ -152,7 +159,7 @@ Ante cualquier error:
 5. volver a validar;
 6. continuar solo después de confirmación.
 
-## Artefactos previstos
+## Artefactos
 
 ```text
 docs/development/components/custom-field-editor-pro/
@@ -168,4 +175,4 @@ docs/development/components/custom-field-editor-pro/
     └── 07_consolidation.md
 ```
 
-Los nombres de archivos posteriores son orientativos hasta que el bloque precedente quede validado.
+Los nombres de archivos posteriores siguen siendo orientativos hasta que el bloque precedente quede validado.
