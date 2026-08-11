@@ -1,0 +1,93 @@
+# BLOCK 15A — SOURCE-SCREEN ENTRY IN BILINGUAL HELP
+#
+# Apply only after:
+# - Block 13E has been applied.
+# - Block 14 Punch List integration has been validated.
+# - Block 15 Home integration has been validated.
+#
+# PRE-YAML GATE APPLIED:
+# docs/development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
+# was consulted immediately before drafting this YAML.
+#
+# OPERATION 1 — ADD TWO CHILDREN
+# Parent: conPR_HelpContent
+# Exact location: after lblPR_HelpDirtyGuardBody and before conPR_HelpWarningCard.
+#
+# OPERATION 2 — REPLACE TEXT PROPERTY
+# Control: lblPR_HelpActivityTitle
+#
+# OPERATION 3 — REPLACE TEXT PROPERTY
+# Controls: lblPR_HelpLimitationsTitle and lblPR_HelpLimitationsBody
+#
+# Compatibility:
+# - Uses ModernText@1.0.0 already validated in the help modal.
+# - No CanvasComponent introduced.
+# - No inline SVG.
+# - No unsupported Label radius or Classic Button AccessibleLabel pattern.
+
+# =====================================================
+# OPERATION 1 — ADD AFTER lblPR_HelpDirtyGuardBody
+# =====================================================
+
+- lblPR_HelpEntryTitle:
+    Control: ModernText@1.0.0
+    Properties:
+      AutoHeight: =true
+      Color: =varTheme_Text
+      FontWeight: =FontWeight.Semibold
+      Height: =26
+      Size: =11
+      Text: |-
+        =If(
+            Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+            "9. Start a review from Punch List or Home",
+            "9. Inicia una revisión desde Punch List o Home"
+        )
+      Width: =Parent.Width
+- lblPR_HelpEntryBody:
+    Control: ModernText@1.0.0
+    Properties:
+      AutoHeight: =true
+      Color: =varTheme_TextMuted
+      Height: =126
+      Size: =9
+      Text: |-
+        =If(
+            Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+            "Punch List starts Review Workspace from the currently loaded page. Home starts from checked rows when rows are selected; otherwise it uses the current loaded Home grid view. These queues contain only records already loaded in the source screen and do not claim to represent every matching SQL row. The active source and queue scope are shown in the workspace header.",
+            "Punch List inicia Review Workspace con la página actualmente cargada. Home utiliza las filas marcadas cuando existen selecciones; si no, usa la vista cargada actualmente en la tabla de Home. Estas colas contienen únicamente registros ya cargados en la pantalla de origen y no pretenden representar todas las filas coincidentes de SQL. El origen y el alcance de la cola se muestran en la cabecera del workspace."
+        )
+      Width: =Parent.Width
+
+# =====================================================
+# OPERATION 2 — REPLACE lblPR_HelpActivityTitle.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "10. Read Session Activity",
+      "10. Consulta Session Activity"
+  )
+
+# =====================================================
+# OPERATION 3A — REPLACE lblPR_HelpLimitationsTitle.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "11. Current implementation status",
+      "11. Estado actual de implementación"
+  )
+
+# =====================================================
+# OPERATION 3B — REPLACE lblPR_HelpLimitationsBody.Text
+# =====================================================
+
+Text: |-
+  =If(
+      Coalesce(varPunchReviewHelpLanguage, "ES") = "EN",
+      "Reviewed and Review Progress remain session-only. Related in Queue remains contextual to the loaded queue. Source-screen entry from Punch List and Home is now implemented for loaded records. Final hardening, test-data cleanup and canonical consolidation remain pending.",
+      "Reviewed y Review Progress siguen siendo solo de sesión. Related in Queue continúa siendo un contexto derivado de la cola cargada. La entrada desde Punch List y Home ya está implementada para los registros cargados. Quedan pendientes el endurecimiento final, la retirada de datos de prueba y la consolidación canónica."
+  )
