@@ -1,0 +1,118 @@
+// CF-03A — OPTIONAL SIX-TYPE TEST SEED
+//
+// Paste this formula into the Items property of a temporary
+// cmp_CustomFieldEditorPro instance while validating CF-03.
+//
+// This is visual/interaction test data only.
+// It does not call a flow and must not be treated as persisted data.
+
+Table(
+    {
+        FieldKey: "area_owner",
+        FieldLabel: "Area owner",
+        FieldType: "Text",
+        HelpText: "Team currently responsible for the area",
+        IsRequired: true,
+        IsPinned: true,
+        IsEditable: true,
+        SortOrder: 10,
+        OptionsJson: "[]",
+        ValueText: "Mechanical Completion Team",
+        ValueNumber: Blank(),
+        ValueDate: Blank(),
+        ValueBool: false,
+        ValueJson: "",
+        LastUpdatedOn: Now(),
+        LastUpdatedByEmail: User().Email
+    },
+    {
+        FieldKey: "estimated_hours",
+        FieldLabel: "Estimated hours",
+        FieldType: "Number",
+        HelpText: "Estimated effort to close the Punch",
+        IsRequired: false,
+        IsPinned: true,
+        IsEditable: true,
+        SortOrder: 20,
+        OptionsJson: "[]",
+        ValueText: "",
+        ValueNumber: 6,
+        ValueDate: Blank(),
+        ValueBool: false,
+        ValueJson: "",
+        LastUpdatedOn: Now(),
+        LastUpdatedByEmail: User().Email
+    },
+    {
+        FieldKey: "ready_for_walkdown",
+        FieldLabel: "Ready for walkdown",
+        FieldType: "YesNo",
+        HelpText: "Indicates whether the item is ready for field verification",
+        IsRequired: false,
+        IsPinned: true,
+        IsEditable: true,
+        SortOrder: 30,
+        OptionsJson: "[]",
+        ValueText: "",
+        ValueNumber: Blank(),
+        ValueDate: Blank(),
+        ValueBool: true,
+        ValueJson: "",
+        LastUpdatedOn: Now(),
+        LastUpdatedByEmail: User().Email
+    },
+    {
+        FieldKey: "target_date",
+        FieldLabel: "Target date",
+        FieldType: "Date",
+        HelpText: "Target date agreed for the current review context",
+        IsRequired: false,
+        IsPinned: true,
+        IsEditable: true,
+        SortOrder: 40,
+        OptionsJson: "[]",
+        ValueText: "",
+        ValueNumber: Blank(),
+        ValueDate: Today() + 5,
+        ValueBool: false,
+        ValueJson: "",
+        LastUpdatedOn: Now(),
+        LastUpdatedByEmail: User().Email
+    },
+    {
+        FieldKey: "closure_route",
+        FieldLabel: "Closure route",
+        FieldType: "Choice",
+        HelpText: "Preferred route to resolve the item",
+        IsRequired: true,
+        IsPinned: true,
+        IsEditable: true,
+        SortOrder: 50,
+        OptionsJson: "[\"Field repair\",\"Engineering review\",\"Vendor action\"]",
+        ValueText: "Engineering review",
+        ValueNumber: Blank(),
+        ValueDate: Blank(),
+        ValueBool: false,
+        ValueJson: "",
+        LastUpdatedOn: Now(),
+        LastUpdatedByEmail: User().Email
+    },
+    {
+        FieldKey: "constraints",
+        FieldLabel: "Constraints",
+        FieldType: "MultiChoice",
+        HelpText: "Known constraints affecting closure",
+        IsRequired: false,
+        IsPinned: true,
+        IsEditable: true,
+        SortOrder: 60,
+        OptionsJson: "[\"Material\",\"Access\",\"Engineering\",\"Permit\"]",
+        ValueText: "",
+        ValueNumber: Blank(),
+        ValueDate: Blank(),
+        ValueBool: false,
+        ValueJson: "[\"Material\",\"Engineering\"]",
+        LastUpdatedOn: Now(),
+        LastUpdatedByEmail: User().Email
+    }
+)
