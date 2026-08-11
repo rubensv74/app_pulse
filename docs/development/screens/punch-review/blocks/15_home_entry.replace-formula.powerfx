@@ -1,0 +1,368 @@
+// BLOCK 15 — HOME ENTRY INTO PUNCH REVIEW
+//
+// Operation: REPLACE FORMULA COMPLETELY.
+// Target screen: scr_Home
+// Target control: cmpHomePunchActionToolbar
+// Target property: OnAction
+//
+// Dependencies:
+// - Blocks 01–14 integrated.
+// - Home Punch dashboard has a loaded cell-details page in
+//   colPunchExecutiveGridFiltered / colHomePunchGridView.
+// - Block 14B initial-selection hook exists on scr_PunchReview.OnVisible.
+//
+// Scope:
+// - Replaces the current REVIEW informational placeholder with real navigation.
+// - If Home has checked rows in colHomePunchGridSelectedKeys, reviews only
+//   those loaded rows. Otherwise reviews the current Home grid view.
+// - The queue never claims to contain rows that are not loaded in Home.
+// - Starts on varHomePunchGridSelectedKey when that row belongs to the queue;
+//   otherwise starts on the first queue row.
+// - Resets session-local Punch Review state before starting the new session.
+// - Preserves every other existing ActionToolbar action unchanged.
+//
+// Home contract confirmed from current scr_Home:
+// - colPunchExecutiveGridFiltered contains numeric PunchId plus the operational
+//   fields returned by warroom_GetPunchDashboardCellDetails.
+// - colHomePunchGridView contains the current presentation rows and RowKey is
+//   Text(PunchId).
+// - Home cell-details contract does not currently materialize AreaCode,
+//   UnitCode, SystemCode, ElementCode, CommentCount or LastCommentOn, so this
+//   integration leaves those queue fields empty/zero rather than inventing data.
+
+Switch(
+    Self.SelectedActionKey,
+
+    "REVIEW",
+        If(
+            CountRows(colHomePunchGridView) = 0,
+
+            Notify(
+                "Load Punches in the Home grid before starting Review Workspace.",
+                NotificationType.Information
+            ),
+
+            With(
+                {
+                    _useSelectedRows:
+                        CountRows(colHomePunchGridSelectedKeys) > 0
+                },
+
+                With(
+                    {
+                        _seedRows:
+                            If(
+                                _useSelectedRows,
+                                Filter(
+                                    colHomePunchGridView As _gridRow,
+                                    !IsBlank(
+                                        LookUp(
+                                            colHomePunchGridSelectedKeys,
+                                            RowKey = Text(_gridRow.RowKey)
+                                        )
+                                    )
+                                ),
+                                colHomePunchGridView
+                            )
+                    },
+
+                    If(
+                        CountRows(_seedRows) = 0,
+
+                        Notify(
+                            "No loaded Home rows are available for review.",
+                            NotificationType.Information
+                        ),
+
+                        ClearCollect(
+                            colPunchReviewQueue,
+
+                            ForAll(
+                                Sequence(CountRows(_seedRows)) As _position,
+
+                                With(
+                                    {
+                                        _gridRow:
+                                            Last(
+                                                FirstN(
+                                                    _seedRows,
+                                                    _position.Value
+                                                )
+                                            )
+                                    },
+
+                                    With(
+                                        {
+                                            _raw:
+                                                LookUp(
+                                                    colPunchExecutiveGridFiltered,
+                                                    Text(PunchId) = Text(_gridRow.RowKey)
+                                                )
+                                        },
+
+                                        {
+                                            ReviewOrder: _position.Value,
+                                            RowKey: Text(_raw.PunchId),
+                                            PunchIdNumber: Value(_raw.PunchId),
+                                            PunchCode:
+                                                Coalesce(
+                                                    Text(_raw.PunchCode),
+                                                    Text(_raw.PunchId)
+                                                ),
+                                            Description:
+                                                Coalesce(
+                                                    Text(_raw.PunchDescription),
+                                                    ""
+                                                ),
+                                            AreaCode: "",
+                                            UnitCode: "",
+                                            SystemCode: "",
+                                            SubsystemCode:
+                                                Coalesce(
+                                                    Text(_raw.SubsystemCode),
+                                                    ""
+                                                ),
+                                            ElementCode: "",
+                                            Discipline:
+                                                Coalesce(
+                                                    Text(_raw.DisciplineName),
+                                                    Text(_raw.DisciplineCode),
+                                                    ""
+                                                ),
+                                            Category:
+                                                Coalesce(
+                                                    Text(_raw.CategoryCode),
+                                                    Text(_raw.CategoryName),
+                                                    ""
+                                                ),
+                                            StatusCode:
+                                                Coalesce(
+                                                    Text(_raw.StatusCode),
+                                                    "OPEN"
+                                                ),
+                                            StatusLabel:
+                                                Coalesce(
+                                                    Text(_raw.StatusName),
+                                                    Text(_raw.PunchStatus),
+                                                    Text(_raw.StatusCode),
+                                                    "OPEN"
+                                                ),
+                                            ResponsibleParty:
+                                                Coalesce(
+                                                    Text(_raw.ResponsibleCompany),
+                                                    Text(_raw.ResponsiblePerson),
+                                                    ""
+                                                ),
+                                            InspectionName:
+                                                Coalesce(
+                                                    Text(_raw.InspectionName),
+                                                    ""
+                                                ),
+                                            Originator:
+                                                Coalesce(
+                                                    Text(_raw.Originator),
+                                                    ""
+                                                ),
+                                            CommentCount: 0,
+                                            LastCommentOn: Blank(),
+                                            IsReviewedInSession: false,
+                                            IsDirty: false
+                                        }
+                                    )
+                                )
+                            )
+                        );
+
+                        Clear(colPunchReviewQueueView);
+                        Clear(colPunchReviewComments);
+                        Clear(colPunchReviewFieldsUI);
+                        Clear(colPunchReviewFieldsBase);
+                        Clear(colPunchReviewFieldsDirty);
+                        Clear(colPunchReviewSessionEvents);
+
+                        Set(varPunchReviewSearch, "");
+                        Set(varPunchReviewQuickFilter, "ALL");
+                        Set(varPunchReviewSource, "HOME");
+                        Set(varPunchReviewReturnScreen, "HOME");
+                        Set(
+                            varPunchReviewQueueScope,
+                            If(
+                                _useSelectedRows,
+                                "SELECTED",
+                                "HOME_CONTEXT"
+                            )
+                        );
+                        Set(
+                            varPunchReviewTemplateId,
+                            varPunchDashboardTemplateId
+                        );
+                        Set(varPunchReviewDirty, false);
+                        Set(varPunchReviewIsLoading, false);
+                        Set(varPunchReviewError, "");
+                        Set(varPunchReviewCommentsPage, 1);
+                        Set(varPunchReviewCommentsError, "");
+                        Set(varPunchReviewFieldsError, "");
+                        Set(varPunchReviewShowDirtyDialog, false);
+                        Set(varPunchReviewPendingAction, "");
+                        Set(varPunchReviewPendingIndex, 0);
+
+                        Set(
+                            varPunchReviewCurrentIndex,
+                            Coalesce(
+                                LookUp(
+                                    colPunchReviewQueue,
+                                    RowKey = Text(varHomePunchGridSelectedKey),
+                                    ReviewOrder
+                                ),
+                                1
+                            )
+                        );
+
+                        Set(
+                            varPunchReviewRequestedIndex,
+                            varPunchReviewCurrentIndex
+                        );
+
+                        Set(
+                            varPunchReviewCurrent,
+                            LookUp(
+                                colPunchReviewQueue,
+                                ReviewOrder = varPunchReviewCurrentIndex
+                            )
+                        );
+
+                        Set(
+                            varPunchReviewCurrentId,
+                            varPunchReviewCurrent.PunchIdNumber
+                        );
+
+                        Set(varAppView, "PunchReview");
+
+                        Navigate(
+                            scr_PunchReview,
+                            ScreenTransition.None
+                        )
+                    )
+                )
+            )
+        ),
+
+    "OPEN_PUNCHES",
+        Select(
+            btnPunchExecutiveOpenInPunchList
+        ),
+
+    "REFRESH",
+        Select(btnPunchExecutiveLoadCellDetails),
+
+    "EXPORT",
+        Select(btnPunchExecutiveGridExport),
+
+    "COMMENTS",
+        If(
+            IsBlank(varHomePunchGridSelectedKey),
+            Notify(
+                "Select a Punch first.",
+                NotificationType.Warning
+            ),
+            Notify(
+                "The selected Punch will open in the review workspace.",
+                NotificationType.Information
+            )
+        ),
+
+    "COLUMNS",
+        Notify(
+            "Use the grid gear while the column selector remains inside DataTableProV2.",
+            NotificationType.Information
+        ),
+
+    "DENSITY",
+        Set(
+            varHomePunchGridDensity,
+            Switch(
+                Lower(varHomePunchGridDensity),
+                "compact", "Comfortable",
+                "comfortable", "Spacious",
+                "Compact"
+            )
+        ),
+
+    "SELECT_VISIBLE",
+        ClearCollect(
+            colHomePunchGridSelectedKeys,
+            ForAll(
+                colHomePunchGridView,
+                {
+                    RowKey: Text(RowKey)
+                }
+            )
+        ),
+
+    "CLEAR_FILTERS",
+
+        Set(
+            varHomePunchSelectedDisciplineCode,
+            ""
+        );
+
+        Set(
+            varPunchDrillDisciplineCode,
+            ""
+        );
+
+        Set(
+            varPunchExecutiveGridPage,
+            1
+        );
+
+        Set(
+            varPunchExecutiveGridSelectedId,
+            Blank()
+        );
+
+        Set(
+            varHomePunchGridSelectedKey,
+            ""
+        );
+
+        Clear(
+            colHomePunchGridSelectedKeys
+        );
+
+        Set(
+            varHomePunchGridAllMatchingSelected,
+            false
+        );
+
+        Set(
+            varPunchExecutiveGridLoading,
+            true
+        );
+
+        Set(
+            varPunchExecutiveGridError,
+            ""
+        );
+
+        Set(
+            varPunchExecutiveGridMessage,
+            "Loading all disciplines for the selected cell..."
+        );
+
+        Set(
+            varPunchExecutiveGridLoadPending,
+            false
+        );
+
+        Set(
+            varPunchExecutiveGridLoadPending,
+            true
+        ),
+
+    "MORE",
+        Notify(
+            "Additional actions will be added here.",
+            NotificationType.Information
+        )
+)
