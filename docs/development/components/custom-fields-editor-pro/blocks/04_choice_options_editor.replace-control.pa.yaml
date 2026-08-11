@@ -1,0 +1,156 @@
+# DF-04 — cmp_CustomFieldsEditorPro CHOICE / MULTICHOICE OPTIONS EDITOR
+#
+# Operation: REPLACE CONTROL COMPLETELY.
+# Target control: conCFDEPro_OptionsNotice
+# Parent: cmp_CustomFieldsEditorPro > conCFDEPro_Root > conCFDEPro_Body >
+#         conCFDEPro_Editor > conCFDEPro_Form
+# Required base: DF-01 + DF-02 + DF-03 + DF-03A.
+#
+# PRE-YAML GATE APPLIED
+# docs/development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
+# was read immediately before drafting this YAML.
+#
+# Purpose:
+# - replace the DF-03 informational placeholder with an actual options editor;
+# - keep raw OptionsJson hidden from the user;
+# - let users maintain Choice/MultiChoice options as one option per line;
+# - serialize the lines to the existing OptionsJson string-array contract;
+# - use JSON(..., JSONFormat.Compact) for each option and avoid manual quote escaping;
+# - preserve host ownership of backend flows.
+#
+# IMPORTANT
+# Apply 04A_choice_options_state.property-guide.md before validating this control.
+# That guide initializes varCFDEPro_Draft_OptionsText from OptionsJson whenever
+# the user selects an existing definition or starts a new draft.
+#
+# UX decision for v1
+# The visual editor is deliberately a line-based list rather than raw JSON:
+# - one line = one option;
+# - add = type another line;
+# - remove = delete a line;
+# - reorder = move lines;
+# This covers add/remove/reorder without introducing an unvalidated gallery
+# variant or a second modal. Empty lines are ignored during serialization.
+#
+# Compatibility rules applied:
+# - valid list-of-controls root for complete control replacement;
+# - no SVG;
+# - no nested CanvasComponent;
+# - no Radius* on Label@2.5.1;
+# - no AccessibleLabel on Classic/Button@2.2.0;
+# - no Reset() assumptions;
+# - no manual JSON quote escaping;
+# - ModernTextInput@1.1.1 is already present and validated in current PULSE sources.
+#
+# Validation gate:
+# 1. Apply DF-04A first.
+# 2. Replace only conCFDEPro_OptionsNotice with this complete control.
+# 3. Studio accepts the replacement without Source Code/formula errors.
+# 4. Selecting Vendor Package shows PKG-01 / PKG-02 / PKG-03 as separate lines.
+# 5. Selecting a non Choice/MultiChoice field hides the options editor.
+# 6. Adding a line increments the options count and marks the draft Modified.
+# 7. Deleting a line decrements the count and marks the draft Modified.
+# 8. Reordering lines changes the serialized order.
+# 9. Blank lines are ignored in OptionsJson.
+# 10. Quotes inside an option do not break the formula because JSON() performs serialization.
+# 11. No flow is called.
+# 12. Do not begin DF-05 while DF-04 has an unresolved Studio error.
+
+- conCFDEPro_OptionsEditor:
+    Control: GroupContainer@1.5.0
+    Variant: ManualLayout
+    Properties:
+      BorderColor: =cmp_CustomFieldsEditorPro.BorderColor
+      BorderThickness: =1
+      DropShadow: =DropShadow.None
+      Fill: =cmp_CustomFieldsEditorPro.SurfaceAltColor
+      Height: =54
+      RadiusBottomLeft: =10
+      RadiusBottomRight: =10
+      RadiusTopLeft: =10
+      RadiusTopRight: =10
+      Visible: |-
+        =varCFDEPro_Draft_FieldType = "Choice" ||
+        varCFDEPro_Draft_FieldType = "MultiChoice"
+      Width: =Parent.Width
+      Y: =466
+    Children:
+      - lblCFDEPro_OptionsTitle:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =cmp_CustomFieldsEditorPro.TextColor
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =16
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =6
+            Text: ="Options · one per line"
+            Width: =Parent.Width - 94
+            X: =8
+            Y: =2
+      - lblCFDEPro_OptionsCount:
+          Control: Label@2.5.1
+          Properties:
+            Align: =Align.Right
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =cmp_CustomFieldsEditorPro.MutedTextColor
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =16
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =6
+            Text: |-
+              =Text(
+                  CountRows(
+                      Filter(
+                          Split(Coalesce(varCFDEPro_Draft_OptionsText, ""), Char(10)),
+                          !IsBlank(Trim(Value))
+                      )
+                  )
+              ) & " options"
+            Width: =82
+            X: =Parent.Width - 90
+            Y: =2
+      - txtCFDEPro_OptionsLines:
+          Control: ModernTextInput@1.1.1
+          Properties:
+            Appearance: =Appearance.Outline
+            Default: =Coalesce(varCFDEPro_Draft_OptionsText, "")
+            DisplayMode: |-
+              =If(
+                  cmp_CustomFieldsEditorPro.CanManage &&
+                  !cmp_CustomFieldsEditorPro.IsLoading &&
+                  !cmp_CustomFieldsEditorPro.IsSaving,
+                  DisplayMode.Edit,
+                  DisplayMode.View
+              )
+            Height: =32
+            OnChange: |-
+              =Set(varCFDEPro_Draft_OptionsText, Self.Text);
+              Set(
+                  varCFDEPro_Draft_OptionsJson,
+                  "[" &
+                  Concat(
+                      Filter(
+                          Split(Self.Text, Char(10)),
+                          !IsBlank(Trim(Value))
+                      ),
+                      JSON(Trim(Value), JSONFormat.Compact),
+                      ","
+                  ) &
+                  "]"
+              );
+              Set(varCFDEPro_DraftDirty, true)
+            Placeholder: ="High" & Char(10) & "Medium" & Char(10) & "Low"
+            Type: =TextInputType.Multiline
+            Width: =Parent.Width - 16
+            X: =8
+            Y: =19
