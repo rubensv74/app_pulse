@@ -28,6 +28,7 @@ No es un registro histórico pasivo. Cada error confirmado debe convertirse en u
 14. Registrar mensaje de error, causa, corrección, Session ID y regla preventiva.
 15. Todo control o componente nuevo debe considerarse pendiente de validación hasta que Power Apps Studio lo acepte.
 16. Para construir JSON desde valores Power Fx, evitar secuencias manuales de escape con barras invertidas y comillas. Preferir `JSON(valor, JSONFormat.Compact)` y componer estructuras mayores a partir de esos fragmentos serializados.
+17. Un archivo `.pa.yaml` destinado a pegarse en el editor Source Code debe tener una raíz válida para el contexto (`ComponentDefinitions`, pantalla/módulo completo o lista de controles esperada). No publicar como `.pa.yaml` un mapa conceptual de parches con nombres de controles en la raíz; ese formato no es un `PaModule` válido.
 
 ---
 
@@ -45,6 +46,7 @@ No es un registro histórico pasivo. Cada error confirmado debe convertirse en u
 | `CanvasComponent` | Componente presente solo en GitHub, no en la app | `PA2301` | Instalar el componente primero o no instanciarlo |
 | SVG inline en bloque de pantalla | Renderizado visual poco fiable en este caso | Problema visual | Preferir componente premium instalado y validado |
 | Construcción manual de JSON con `\"`/barras invertidas en Power Fx | El parser puede interpretar mal las comillas y romper la aridad de funciones | `Invalid number of arguments` | Serializar cada valor con `JSON(..., JSONFormat.Compact)` |
+| Mapa de parches con `controlName:` en la raíz de un `.pa.yaml` pegado como módulo | La raíz no pertenece al esquema `PaModule`; el parser intenta tratar el nombre del control como una propiedad del módulo | `PA1001 / YamlInvalidSyntax` | Entregar módulo completo válido o una guía `.md` de cambios de propiedades; no pegar el mapa como Source Code |
 
 ---
 
@@ -261,6 +263,59 @@ CORREGIDO EN REPOSITORIO — pendiente de revalidación en Studio.
 
 ---
 
+## Incidente PR-SC-007 — Un mapa de parches no es un módulo Source Code válido
+
+**Fecha:** 2026-08-11  
+**Bloque afectado:** `docs/development/components/custom-field-values-pro/blocks/05_visual_polish.incremental-patch.pa.yaml`  
+**Primera clave reportada:** `conCFVPro_Header`  
+**Línea reportada:** `(53,1)`  
+**Session ID:** no facilitado; error confirmado mediante captura de Power Apps Studio.
+
+### Error
+
+```text
+PA1001 : An error occurred while parsing PaYaml.
+Error code: YamlInvalidSyntax.
+Reason: Property 'conCFVPro_Header' not found on type
+'Microsoft.PowerPlatform.PowerApps.Persistence.PaYaml.Models.SchemaV3.PaModule'.
+```
+
+### Causa
+
+El archivo VF-05 fue publicado como un **mapa conceptual de cambios de propiedades**:
+
+```text
+conCFVPro_Header:
+  Properties:
+    ...
+```
+
+Ese formato es útil como documentación de diff, pero **no es una raíz válida de Power Apps Source Code**. Al pegarlo en el editor Source Code del componente, Studio intenta interpretar `conCFVPro_Header` como si fuera una propiedad de `PaModule`, por lo que falla antes de evaluar las propiedades internas.
+
+### Corrección
+
+- retirar el artefacto `.pa.yaml` de parche conceptual como archivo pegable;
+- entregar estos ajustes como guía `.md` de cambios de propiedades o como un módulo/componente completo con raíz válida;
+- no pedir al usuario que pegue un mapa de parches en Source Code.
+
+### Regla preventiva
+
+Antes de publicar cualquier `.pa.yaml`, clasificar explícitamente el artefacto como uno de estos formatos:
+
+1. **módulo/componente completo pegable**, con raíz válida;
+2. **control completo pegable** solo cuando el contexto de Studio acepte esa forma y haya sido validado;
+3. **guía de modificación**, que debe usar `.md`/`.txt` y nunca presentarse como `.pa.yaml` pegable.
+
+Si el contenido solo enumera `control -> Properties`, debe ser una guía, no un archivo Source Code.
+
+### Estado
+
+```text
+CORREGIDO EN REPOSITORIO — VF-05 se reemite como guía de propiedades, pendiente de revalidación visual.
+```
+
+---
+
 ## Lección PR-UX-001 — Evitar SVG inline en bloques de pantalla
 
 **Fecha:** 2026-08-10  
@@ -398,6 +453,7 @@ Antes de guardar cualquier `.pa.yaml`:
 
 - [ ] He leído la versión actual de este archivo inmediatamente antes de redactar el YAML.
 - [ ] He confirmado tipo y versión de cada control.
+- [ ] He confirmado que la raíz del archivo corresponde al contexto Source Code real; no es un mapa conceptual de parches.
 - [ ] No existe ninguna propiedad `Radius*` dentro de un `Label@2.5.1`.
 - [ ] No existe `AccessibleLabel` dentro de un `Classic/Button@2.2.0`.
 - [ ] No existe `Reset()` sobre un control no confirmado como reseteable.
