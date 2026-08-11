@@ -1,16 +1,17 @@
 # HOME_PDS — BLOCK 01 — BLANK SCREEN SHELL
 #
-# Status: PUBLISHED — PENDING POWER APPS STUDIO VALIDATION
-# Operation: CREATE NEW SCREEN FROM SOURCE CODE
+# Status: RESTART READY — PENDING POWER APPS STUDIO VALIDATION
+# Operation: REPLACE COMPLETE SOURCE OF EXISTING EMPTY scr_Home_PDS
 # Target screen: scr_Home_PDS
-# Baseline screens/components: 3b71b860ed869a970a5a1b43cc137a580118b30c
+# Restart baseline: docs/development/screens/home-pds/RESTART_BASELINE_2026-08-11.md
 # Dependencies: cmp_SidebarNav must already exist in the app.
 #
 # Primary responsibility:
-# - prove that scr_Home_PDS can coexist safely with scr_Home;
+# - rebuild the validated shell on the intentionally empty scr_Home_PDS;
 # - create the root horizontal AutoLayout;
 # - reuse the shared PULSE sidebar;
-# - create an empty PDS content shell.
+# - create an empty PDS content shell;
+# - leave all later modules out until this gate passes.
 #
 # Explicitly OUT OF SCOPE:
 # - Page Header;
@@ -23,15 +24,16 @@
 # - Punch Review navigation;
 # - StartScreen or production navigation changes.
 #
-# Validation after paste/save in Power Apps Studio:
-# 1. scr_Home_PDS is created without replacing or modifying scr_Home.
-# 2. The screen opens without formula errors.
-# 3. The existing PULSE sidebar is visible at the left.
-# 4. Home remains the active sidebar business key.
-# 5. The remaining area is an empty #F6F8FB content surface.
-# 6. No project selection is reset.
-# 7. App Checker reports no new PA1001 / PA2108 attributable to Block 01.
-# 8. scr_Home still opens and behaves as before.
+# Validation after replace/save in Power Apps Studio:
+# 1. scr_Home_PDS opens without formula errors.
+# 2. The existing PULSE sidebar is visible at the left.
+# 3. Home remains the active sidebar business key.
+# 4. The remaining area is an empty #F6F8FB content surface.
+# 5. No project selection is reset.
+# 6. App Checker reports no new PA1001 / PA2108 attributable to Block 01.
+# 7. scr_Home still opens and behaves as before.
+#
+# Acceptance result to report: BLOCK 01 OK
 
 Screens:
   scr_Home_PDS:
