@@ -10,7 +10,7 @@ This workspace contains incremental blocks for building and evolving `scr_PunchR
 
 `power-apps/screens/PunchReview/scr_PunchReview.pa.yaml` is the canonical complete screen source.
 
-Files under `docs/development/screens/punch-review/blocks/` are controlled construction artifacts. They do not replace the canonical screen source until the relevant increment has been validated and consolidated.
+Files under `docs/development/screens/punch-review/blocks/` and the dedicated component workspaces are controlled construction artifacts. They do not replace canonical source until the relevant increment has been validated and consolidated.
 
 ## Mandatory compatibility gate
 
@@ -20,7 +20,7 @@ Before drafting, correcting or publishing any `.pa.yaml`, consult:
 
 Do not work from memory. Every confirmed Studio incompatibility must become a preventive rule before dependent blocks continue.
 
-## Current block sequence
+## Current screen block sequence
 
 1. `01_screen_shell.pa.yaml` — validated
 2. `02_header_premium.children.pa.yaml` — validated
@@ -37,8 +37,8 @@ Do not work from memory. Every confirmed Studio incompatibility must become a pr
 13. `09A_comments_selection_hook.replace-formula.powerfx` — comments selection hook
 14. `09B_comments_test_seed.optional.powerfx` — optional visual test seed
 15. `09C_help_comments.incremental-patch.pa.yaml` — comments help
-16. `10_custom_fields.replace-control.pa.yaml` — integrated legacy implementation; now scheduled for responsibility-separated refactor
-17. `10A_custom_fields_selection_hook.replace-formula.powerfx` — comments + custom-fields selection hook
+16. `10_custom_fields.replace-control.pa.yaml` — integrated legacy values implementation; VF-04 now replaces its visual responsibility
+17. `10A_custom_fields_selection_hook.replace-formula.powerfx` — superseded later by Dirty Guard routing
 18. `10B_custom_fields_test_seed.optional.powerfx` — optional field-type seed
 19. `10C_yesno_initial_state.incremental-patch.pa.yaml` — Toggle `Checked` binding correction
 20. `10D_help_custom_fields.incremental-patch.pa.yaml` — custom-fields help
@@ -60,19 +60,40 @@ Do not work from memory. Every confirmed Studio incompatibility must become a pr
 
 ## Pre-Block 16 refactor — Custom Fields responsibility split
 
-Block 16 is intentionally paused.
-
-The previous `cmp_CustomFieldEditorPro` prototype path has been stopped because it mixed the naming and responsibility of record values with project-level field definitions.
+Block 16 remains paused.
 
 Authoritative architecture:
 
 `docs/development/custom-fields/CUSTOM_FIELDS_ARCHITECTURE_REFACTOR_PLAN.md`
 
-Two components will replace that approach:
+Two components replace the former mixed-responsibility approach:
 
 ### `cmp_CustomFieldValuesPro`
 
-Record-level component for the selected Punch. It will occupy the existing Custom Fields area in the right column and provide the compact current-values experience while preserving the real load/save contract and Block 13 Dirty Guard.
+Record-level component for the selected Punch. It occupies the existing Custom Fields area in the right column and provides the compact current-values experience while preserving the real load/save contract and Block 13 Dirty Guard.
+
+Current VF status:
+
+- VF-01 shell — completed as base;
+- VF-02 six value renderers — completed as base;
+- VF-03 editing + local dirty state — completed as base, with VF-03A mandatory Cancel correction;
+- VF-04 Punch Review integration — published and pending real-Punch validation;
+- VF-04A empty-queue component rebase — mandatory patch;
+- VF-05 visual polish — blocked until VF-04 validates.
+
+VF workspace:
+
+`docs/development/components/custom-field-values-pro/`
+
+VF-04 replaces `conPR_CustomFieldsCard` with `conPR_CustomFieldsHost`, preserving `btnPR_LoadCustomFields` and `btnPR_SaveCustomFields` as hidden host-owned service controls and adding one product instance:
+
+`cmpPR_CustomFieldValues`
+
+The instance receives `colPunchReviewFieldsUI`, synchronizes its `EditedItems` and `DirtyItems` to the existing host collections, and continues to drive `varPunchReviewDirty` / queue `IsDirty`, so Block 13 Dirty Guard remains authoritative.
+
+Authoritative load/save responses call `Reset(cmpPR_CustomFieldValues)` to invoke the component's built-in `OnReset` and rebase its internal working state from the latest host `Items` table. VF-04A applies the same rebase when the review queue becomes empty, preventing stale values from the previous Punch.
+
+`Manage Fields` remains intentionally non-functional during VF-04 except for an informational message. Project-level definition management starts in the DF phase.
 
 ### `cmp_CustomFieldsEditorPro`
 
@@ -112,13 +133,9 @@ Definition mutations must invalidate Punch dynamic-filter configuration so Punch
 
 ## Comments contract
 
-Read:
+Read: `Warroom_GetTaskCommentsPaged(ProjectId, RecordId, Page, PageSize, EntityType)`
 
-`Warroom_GetTaskCommentsPaged(ProjectId, RecordId, Page, PageSize, EntityType)`
-
-Create:
-
-`Warroom_AddTaskComment(ProjectId, RecordId, CommentHtml, UserEmail, EntityType, UserName, CommentType)`
+Create: `Warroom_AddTaskComment(ProjectId, RecordId, CommentHtml, UserEmail, EntityType, UserName, CommentType)`
 
 ## Review Progress contract
 
@@ -128,39 +145,33 @@ Review Progress is session-local and is calculated over `colPunchReviewQueue` us
 
 ## Related Queue Context contract
 
-Block 12 deliberately does **not** invent a backend Punch-to-Punch relationship.
-
 `Related in Queue` is derived only from the loaded `colPunchReviewQueue`. A row is included when it is not the current Punch and shares `SubsystemCode` or `Discipline` with the current Punch.
 
-The `Review` action routes through `btnPR_SelectCurrent`, so Comments and Custom Fields continue to load through the same selection mechanism.
+The `Review` action routes through `btnPR_SelectCurrent`, so Comments and Custom Field values continue to load through the same selection mechanism.
 
 ## Dirty Guard contract
 
-Block 13 replaces the temporary hard navigation lock with an explicit decision flow for queue selection, Related in Queue, Back and Open Punch List.
+Block 13 provides Save and continue, Discard and continue, and Cancel for queue selection, Related in Queue, Back and Open Punch List.
 
-The modal offers Save and continue, Discard and continue, and Cancel. Pending routing is represented by `varPunchReviewPendingAction` and numeric `varPunchReviewPendingIndex`.
+Pending routing is represented by `varPunchReviewPendingAction` and numeric `varPunchReviewPendingIndex`.
 
-The Custom Fields values refactor must preserve this contract.
+VF-04 preserves the host `colPunchReviewFieldsDirty` and `varPunchReviewDirty` contract instead of replacing the guard with component-private state.
 
 ## Punch List integration contract
 
-Block 14 establishes the first production entry route into Punch Review from the currently loaded Punch List page. It does not claim to load every row in the filtered SQL result set.
+Block 14 establishes the production entry route into Punch Review from the currently loaded Punch List page. It does not claim to load every row in the filtered SQL result set.
 
-The current Punch List still opens `cmp_DetailDrawer_old` when a row is selected. That behavior is now considered legacy and is explicitly deferred to the later Punch List modernization phase. Do not remove the drawer until its remaining Overview/Comments/detail responsibilities have replacements.
+The current Punch List still opens `cmp_DetailDrawer_old` when a row is selected. That behavior remains legacy and is deferred to the later Punch List modernization phase.
 
 ## Home integration contract
 
-Block 15 activates the existing Review action in Home and builds a local Punch Review queue from selected or currently loaded Home rows. Unavailable fields are left empty rather than invented. Real Comments and Custom Field values are loaded after entry through the existing services.
+Block 15 activates the existing Review action in Home and builds a local Punch Review queue from selected or currently loaded Home rows. Real Comments and Custom Field values are loaded after entry through the existing services.
 
 ## Manual and compatibility knowledge
 
-User guide:
+User guide: `docs/development/screens/punch-review/user-guide/MANUAL_USUARIO_PUNCH_REVIEW.md`
 
-`docs/development/screens/punch-review/user-guide/MANUAL_USUARIO_PUNCH_REVIEW.md`
-
-Compatibility register:
-
-`docs/development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md`
+Compatibility register: `docs/development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md`
 
 ## Naming
 
