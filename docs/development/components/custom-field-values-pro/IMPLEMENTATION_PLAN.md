@@ -2,9 +2,11 @@
 
 ## Estado
 
-- `VF-01` — publicado; continuación autorizada.
-- `VF-02` — publicado; pendiente de validación en Power Apps Studio.
-- `VF-03` y siguientes — bloqueados hasta validar VF-02 en Power Apps Studio.
+- `VF-01` — completado como base del componente.
+- `VF-02` — completado como base de renderizado de los seis tipos.
+- `VF-03` — publicado; pendiente de validación en Power Apps Studio.
+- `VF-03A` — corrección obligatoria de Cancel para evitar `Reset()` no validado sobre Gallery.
+- `VF-04` y siguientes — bloqueados hasta validar VF-03 + VF-03A.
 
 ## VF-01 — Component shell
 
@@ -33,32 +35,18 @@ Gate: Studio debe aceptar el componente sin errores y el shell debe verse correc
 
 ## VF-02 — Value renderers
 
-Objetivo: convertir el cuerpo en la lista compacta de valores reales, separando visualmente la etiqueta del campo y su valor actual.
+Objetivo: convertir el cuerpo en la lista compacta de valores reales.
 
 Tipos:
 
-- Text -> `ValueText`;
-- Number -> `ValueNumber`;
-- Date -> `ValueDate`;
-- YesNo -> `ValueBool` como Yes/No;
-- Choice -> `ValueText`;
-- MultiChoice -> `ValueJson` parseado como lista legible.
+- Text;
+- Number;
+- Date;
+- YesNo;
+- Choice;
+- MultiChoice.
 
-Decisiones:
-
-- VF-02 es presentación de valores, todavía no edición;
-- no crea working buffer ni dirty payload;
-- no llama flows;
-- valores vacíos se muestran como `—`;
-- la lista utiliza filas compactas con scroll interno;
-- Loading / Error / Empty sustituyen deliberadamente la lista cuando corresponda.
-
-Artefactos:
-
-- `blocks/02_value_renderers.pa.yaml` — reemplaza únicamente `conCFVPro_Body`;
-- `blocks/02A_value_renderers_test_seed.optional.powerfx` — seed opcional para validar los seis tipos.
-
-Gate: los seis tipos muestran correctamente el valor recibido, MultiChoice se presenta como lista separada por comas, el scroll es estable y no existe clipping aproximadamente a 420, 500 y 600 px de ancho.
+Gate: los seis tipos muestran correctamente el valor recibido y se mantienen estables al hacer scroll.
 
 ## VF-03 — Editing + dirty state
 
@@ -66,17 +54,41 @@ Objetivo: incorporar edición local sin backend dentro del componente.
 
 Incluye:
 
-- working buffer;
-- dirty tracking por `FieldKey`;
-- `DirtyItems`;
-- `IsDirty`;
-- `DirtyCount`;
+- working buffer `colCFVPro_Working`;
+- baseline `colCFVPro_Base`;
+- dirty tracking por `FieldKey` en `colCFVPro_Dirty`;
+- outputs `EditedItems`, `DirtyItems`, `IsDirty`, `DirtyCount` y `LastChangedFieldKey`;
+- editores reales para Text, Number, Date, YesNo, Choice y MultiChoice;
+- eliminación automática del dirty row cuando el valor vuelve a su baseline;
+- `OnValueChanged`;
 - Save requested;
-- Cancel/Reset requested;
+- Cancel requested;
 - Refresh requested;
-- Manage Fields requested.
+- Manage Fields requested;
+- serialización MultiChoice mediante `JSON(Value, JSONFormat.Compact)`.
 
-Gate: una edición produce un único dirty row por FieldKey y Cancel restaura el input vigente.
+`AccessAppScope` está habilitado porque esta versión utiliza colecciones/variable transitorias namespaced del componente. Hasta que exista aislamiento por instancia, PULSE debe mantener una sola instancia activa de `cmp_CustomFieldValuesPro` cada vez.
+
+El host deberá resetear la instancia del componente después de entregar una tabla `Items` autoritativa nueva. Esa orquestación se implementará y validará en VF-04; VF-03 valida primero el comportamiento interno del componente.
+
+### VF-03A — corrección obligatoria
+
+El primer borrador de VF-03 incluía `Reset(galCFVPro_Values)` al cancelar. El registro de compatibilidad prohíbe asumir que un control es reseteable sin validación previa. Por ello `03A_cancel_without_gallery_reset.mandatory-patch.pa.yaml` debe aplicarse inmediatamente después de VF-03 y antes de probarlo en Studio.
+
+Cancel restaura `colCFVPro_Working` desde `colCFVPro_Base`, limpia el dirty payload y emite `OnCancelRequested`. Si algún editor concreto no refleja visualmente el baseline tras la recolección, se documentará ese control específico antes de introducir cualquier mecanismo de reset.
+
+Gate VF-03:
+
+- los seis editores muestran el baseline;
+- una edición crea un solo dirty row por `FieldKey`;
+- ediciones repetidas del mismo campo no duplican dirty rows;
+- volver al baseline elimina su dirty row;
+- dos campos distintos producen `DirtyCount = 2`;
+- Cancel deja `DirtyCount = 0` y recupera visualmente el baseline;
+- Save requested no borra dirty state por sí mismo;
+- MultiChoice produce un `ValueJson` válido;
+- `CanEdit=false` y `IsEditable=false` dejan los editores en lectura;
+- no aparecen errores Source Code ni de fórmula.
 
 ## VF-04 — Punch Review integration
 
@@ -84,7 +96,18 @@ Objetivo: sustituir el bloque visual actual de Custom Fields por una instancia d
 
 Se mantienen los servicios host existentes y el Dirty Guard del Bloque 13.
 
-Gate: Load / edit / Save / Cancel / cambio de Punch funcionan con datos reales.
+VF-04 será responsable de sincronizar:
+
+- `colPunchReviewFieldsUI` -> `Items`;
+- `DirtyItems` -> `colPunchReviewFieldsDirty`;
+- `IsDirty` -> `varPunchReviewDirty` y `colPunchReviewQueue.IsDirty`;
+- `OnSaveRequested` -> `btnPR_SaveCustomFields`;
+- `OnRefresh` -> `btnPR_LoadCustomFields`;
+- `OnCancelRequested` -> restauración host;
+- `OnManageFieldsRequested` -> futura apertura del editor de definiciones;
+- reset/rebase del componente después de load/save/cambio de Punch.
+
+Gate: Load / edit / Save / Cancel / cambio de Punch funcionan con datos reales y el Dirty Guard no tiene regresiones.
 
 ## VF-05 — Visual polish
 
