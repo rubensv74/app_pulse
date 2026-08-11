@@ -10,8 +10,8 @@ Se aplica el Protocolo de Implementación Incremental Asistida y el gate PRE-YAM
 
 - `CF-01` — component shell publicado; continuación autorizada.
 - `CF-02` — working buffer + dirty tracking publicado; continuación autorizada.
-- `CF-03` — renderizadores premium multitype publicados; pendiente de validación en Power Apps Studio.
-- `CF-04` y siguientes — bloqueados hasta validar CF-03.
+- `CF-03` — renderizadores premium multitype corregidos tras error de serialización MultiChoice; pendiente de revalidación en Power Apps Studio.
+- `CF-04` y siguientes — bloqueados hasta validar la versión corregida de CF-03.
 
 ## Secuencia
 
@@ -82,7 +82,9 @@ Incluye:
 
 No se conectan flows y todavía no se emite `OnChange` hacia el host.
 
-**Gate:** todos los tipos se renderizan correctamente, sus valores se conservan al hacer scroll, los cambios generan un único dirty item por `FieldKey`, el indicador Modified coincide con los dirty rows y Reset restaura el input vigente.
+**Corrección registrada:** la serialización MultiChoice ya no usa secuencias manuales de escape de comillas. Cada valor se serializa con `JSON(Value, JSONFormat.Compact)` y se concatena dentro del array JSON requerido por `ValueJson`.
+
+**Gate:** todos los tipos se renderizan correctamente, sus valores se conservan al hacer scroll, los cambios generan un único dirty item por `FieldKey`, el indicador Modified coincide con los dirty rows, MultiChoice genera un array JSON válido y Reset restaura el input vigente.
 
 ---
 
