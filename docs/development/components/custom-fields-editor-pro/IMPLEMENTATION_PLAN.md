@@ -8,7 +8,10 @@
 - `DF-04` — published with mandatory DF-04A options-state property guide.
 - `DF-04B` — published as full replacement of `conCFDEPro_Editor` to refine hierarchy, toggle ownership, Filtering and Options UX after visual validation in Studio.
 - `DF-04C` — published as full replacement of `conCFDEPro_Preview` to convert the static preview into a live draft-driven preview.
-- `DF-05` and later — blocked until DF-04B + DF-04C are accepted in Studio or any reported issue is corrected.
+- `DF-04D-FIX` — component structure consolidated and visually accepted in Studio; current working geometry frozen.
+- `DF-05A` — host definition-load service published and continuation to DF-05B explicitly requested by the user.
+- `DF-05B` — host upsert/save service published; pending Studio validation. End-to-end write remains pending until DF-06 wires the editor draft to the host service.
+- `DF-05C` and later — blocked until DF-05B has no Studio errors.
 
 ## DF-01 — Definition editor shell
 
@@ -212,13 +215,62 @@ Contracts:
 - `WarRoom_UpsertCustomFieldDef(...)`;
 - `WarRoom_SetCustomFieldActive(ProjectId, EntityType, FieldKey, IsActive, UserEmail)`.
 
+### DF-05A — Host definition load
+
+Artifacts:
+
+- `blocks/05A_definition_load.add-child.pa.yaml`
+- `blocks/05A_manage_load_trigger.property-guide.md`
+- `blocks/05A_orden_implementacion.guia.md`
+
+Result:
+
+- `btnPR_LoadCustomFieldDefs` owns the read Flow;
+- definitions are normalized into `colPunchReviewFieldDefsAdmin`;
+- active and inactive definitions are loaded together;
+- component remains flow-free.
+
+### DF-05B — Host definition upsert/save
+
+Artifacts:
+
+- `blocks/05B_host_save_runtime.property-guide.md`
+- `blocks/05B_definition_upsert.add-child.pa.yaml`
+- `blocks/05B_GUIA_IMPLEMENTACION_Y_VALIDACION.md`
+
+Result:
+
+- typed host staging variables `varPunchReviewDef_*`;
+- hidden service `btnPR_SaveCustomFieldDef`;
+- validation of project, permission, Label, FieldKey, duplicate key, SortOrder and Choice/MultiChoice options;
+- write through `WarRoom_UpsertCustomFieldDef` using the confirmed legacy parameter order;
+- authoritative definition reload after success;
+- current Punch Custom Field bundle refresh after success when applicable;
+- `varPunchDynamicFilters_NeedRefresh=true` after mutation.
+
+Important: the reusable component still does not call the Flow. DF-06 will wire its draft outputs/event into the host staging variables and then call `Select(btnPR_SaveCustomFieldDef)`.
+
+DF-05B gate:
+
+- Studio accepts host runtime and hidden save service without formula or Source Code errors;
+- all `varPunchReviewDef_*` names are recognized;
+- `WarRoom_UpsertCustomFieldDef` is recognized;
+- no screen geometry changes;
+- end-to-end write is completed only after DF-06 wiring with a real controlled definition.
+
+### DF-05C — Active/inactive mutation
+
+Blocked until DF-05B has no Studio errors.
+
+### DF-05D — Final backend integration validation
+
+Blocked until DF-05C.
+
 After mutation:
 
 - reload catalog;
 - mark Punch dynamic filters for refresh;
 - preserve backend response as authoritative.
-
-Gate: list/upsert/toggle work with real project data and error states remain actionable.
 
 ## DF-06 — Punch Review modal integration
 
@@ -230,7 +282,8 @@ Includes:
 - ProjectId + EntityType=PUNCH context;
 - close/reopen lifecycle;
 - definition refresh after save/toggle;
-- reload current Punch custom bundle after successful definition change.
+- reload current Punch custom bundle after successful definition change;
+- copy component draft outputs into `varPunchReviewDef_*` immediately before calling `btnPR_SaveCustomFieldDef`.
 
 Gate: definition changes are visible in the current Punch values panel after closing/refreshing the modal.
 
@@ -254,6 +307,7 @@ Any partial property tuning in this phase must be delivered as `.property-guide.
 ## Policy
 
 - Read `POWER_APPS_SOURCE_CODE_COMPATIBILITY.md` immediately before every `.pa.yaml` delivery.
+- Read `30-playbooks/power-platform/modular-power-apps-screen-construction.md` before every new YAML block.
 - Studio validation is authoritative.
 - Do not introduce unsupported definition properties.
 - Do not call flows directly from the reusable component in v1.
