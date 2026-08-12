@@ -1,7 +1,7 @@
 # C17 — Punch Review Workspace Recomposition
 
 **Tipo:** `S/C — Structural + Component evolution`  
-**Estado:** PLANNED — aprobado conceptualmente para ejecutar antes de continuar DF-07B.  
+**Estado:** PLANNED — composición corregida por el usuario antes de iniciar C17-A.  
 **Pantalla:** `scr_PunchReview`
 
 ## Motivo
@@ -10,7 +10,7 @@ La validación visual del Punch Review Workspace ha mostrado que la composición
 
 - Comments y Custom Fields son áreas de trabajo activas y necesitan más espacio útil;
 - Session Activity es contexto pasivo y funciona mejor como rail lateral;
-- Review Progress ocupa demasiado espacio como tarjeta independiente y encaja mejor junto a las acciones de revisión;
+- Review Progress también es contexto persistente de sesión y encaja mejor en el rail derecho, por encima de Session Activity;
 - Related in Queue aporta poco valor en la composición actual y ya se ha dejado `Visible=false`;
 - `cmp_CustomFieldValuesPro` mezcla renderers modernos con `Classic/ComboBox@2.4.0` para Choice/MultiChoice, produciendo una experiencia visual inconsistente.
 
@@ -26,27 +26,42 @@ No se cancela. Se reanuda cuando C17 haya estabilizado el host real donde se usa
 
 `conPR_RelatedCard` permanece temporalmente en código con `Visible=false` durante la transición. Se decidirá su eliminación física en el cleanup final de C17.
 
-### 3. Review Progress pasa al strip de acciones
+### 3. Review Progress permanece como tarjeta contextual y pasa a la parte superior del rail derecho
 
-No se utilizará la tarjeta vertical actual en la columna derecha.
+Se corrige la propuesta inicial de situarlo junto a `cmpPR_Actions`.
 
-Se creará una variante compacta específica para cabecera/toolbar, manteniendo el contrato funcional:
-
-- TotalCount;
-- ReviewedCount;
-- RemainingCount;
-- CurrentPosition;
-- State.
-
-Objetivo visual aproximado para desktop:
+La composición definitiva será:
 
 ```text
-Height: 56–64 px
-Width: 280–340 px
-Donut: 42–48 px
+Right rail
+├── Review Progress
+└── Session Activity
 ```
 
-No se reducirá simplemente la instancia actual porque `cmp_ReviewProgressPro` utiliza geometría interna absoluta (`164 x 354`, donut `108 x 108`). La variante compacta debe ser una pieza aislada para no degradar el componente ya aprobado.
+Esto mantiene juntos los dos elementos de contexto de sesión:
+
+- Review Progress responde a «cómo avanza la sesión»;
+- Session Activity responde a «qué hemos hecho durante la sesión».
+
+El usuario no necesita dedicarles el área principal de trabajo, pero sí conviene mantenerlos visibles durante la revisión.
+
+#### Donut
+
+No se creará de entrada un segundo componente compacto.
+
+Primero se reutilizará `cmp_ReviewProgressPro` en el rail derecho y se validará su geometría real en Studio. El componente actual tiene una geometría nominal aproximada de `354 x 164` con donut `108 x 108`.
+
+Objetivo visual para C17:
+
+```text
+Card height: aproximadamente 140–165 px
+Rail width: aproximadamente 330–360 px
+Donut objetivo: aproximadamente 88–100 px si Studio confirma que 108 px domina demasiado
+```
+
+La reducción del donut, si es necesaria, será un ajuste visual explícito posterior y no una condición para construir primero la nueva estructura.
+
+No se degradará la legibilidad de Reviewed / Remaining / Current Position para ganar unos pocos píxeles.
 
 ### 4. Comments + Custom Fields forman el workspace activo
 
@@ -58,11 +73,13 @@ Comments | Custom Fields
 
 Ambas zonas deben disponer de altura suficiente para lectura/edición continua.
 
-### 5. Session Activity pasa al rail derecho
+Esta fila ocupará el espacio actualmente consumido en gran parte por Session Activity en la columna central.
 
-`conPR_HistoryCard` se convierte en la pieza principal de `conPR_RightColumn`.
+### 5. Session Activity pasa debajo de Review Progress en el rail derecho
 
-Es coherente con su naturaleza: contexto de sesión, no tarea primaria.
+`conPR_HistoryCard` se reubica en `conPR_RightColumn`, inmediatamente debajo de Review Progress.
+
+Session Activity debe utilizar el resto de la altura disponible del rail para mostrar eventos sin competir con Comments o Custom Fields.
 
 ### 6. Custom Field Values se moderniza antes del cierre visual
 
@@ -88,7 +105,7 @@ La modernización debe preservar íntegramente:
 - `OnSaveRequested`;
 - JSON de MultiChoice.
 
-## Árbol objetivo
+## Árbol objetivo corregido
 
 ```text
 scr_PunchReview
@@ -97,14 +114,14 @@ scr_PunchReview
     └── conPR_Workspace
         └── conPR_UpperGrid
             ├── conPR_MainColumn
-            │   ├── conPR_ActionProgressRow
-            │   │   ├── cmpPR_Actions
-            │   │   └── cmpPR_ReviewProgressCompact
+            │   ├── cmpPR_Actions
             │   ├── conPR_OverviewCard
             │   └── conPR_CollaborationRow
             │       ├── conPR_CommentsCard
             │       └── conPR_CustomFieldsHost
             └── conPR_RightColumn
+                ├── conPR_ReviewProgressCard
+                │   └── cmpPR_ReviewProgress
                 └── conPR_HistoryCard
 ```
 
@@ -117,15 +134,22 @@ A partir de 1320 px:
 ```text
 Queue                    330 px
 Main workspace            flexible / dominante
-Session Activity rail     300–340 px
+Right context rail        330–360 px
 ```
 
 Dentro del main workspace:
 
 ```text
-Action + Progress strip    60–64 px
+Action toolbar             ~60 px
 Punch Overview             ~210 px
 Comments / Custom Fields   resto de la altura
+```
+
+Dentro del rail derecho:
+
+```text
+Review Progress            ~140–165 px
+Session Activity           resto de la altura
 ```
 
 Comments y Custom Fields deben partir aproximadamente 50/50, permitiendo ajustar posteriormente a 55/45 si la validación real demuestra que Comments necesita más ancho.
@@ -134,25 +158,34 @@ Comments y Custom Fields deben partir aproximadamente 50/50, permitiendo ajustar
 
 Por debajo del breakpoint desktop:
 
-- el rail derecho podrá apilarse debajo del main workspace;
+- el rail derecho completo `Review Progress + Session Activity` podrá apilarse debajo del main workspace;
 - Comments y Custom Fields podrán apilarse verticalmente si el ancho no permite dos columnas útiles;
-- Review Progress Compact no debe forzar scroll horizontal en el action strip.
+- Review Progress debe conservar sus tres métricas sin clipping;
+- el donut podrá reducirse de forma controlada si el rail disponible lo exige.
 
 No se resolverá responsive mediante clipping.
 
-## Secuencia incremental
+## Secuencia incremental corregida
 
 ### C17-A — Target layout / geometry
 
 Responsabilidad única: estabilizar la nueva composición y proporciones usando contenedores/slots, sin modernizar controles.
 
-### C17-B — Compact Review Progress
+Debe dejar preparado:
 
-Responsabilidad única: crear `cmp_ReviewProgressCompactPro` y situarlo junto a `cmpPR_Actions`.
+- main workspace dominante;
+- collaboration row para Comments + Custom Fields;
+- rail derecho con slot superior de Review Progress y slot inferior de Session Activity.
+
+### C17-B — Right rail integration
+
+Responsabilidad única: reubicar el `cmp_ReviewProgressPro` existente arriba y `conPR_HistoryCard` debajo.
+
+Primero se reutiliza el componente existente. Solo si Studio demuestra que el donut de 108 px domina demasiado se abre un ajuste visual aislado para llevarlo aproximadamente a 88–100 px.
 
 ### C17-C — Collaboration workspace
 
-Responsabilidad única: reubicar Comments y Custom Fields como dos columnas bajo Overview y mover Session Activity al rail derecho.
+Responsabilidad única: reubicar Comments y Custom Fields como dos columnas bajo Overview.
 
 ### C17-D — Custom Field Values modern renderers
 
@@ -169,7 +202,8 @@ Responsabilidad:
 - scroll intencional;
 - validar Text/Number/Date/YesNo/Choice/MultiChoice;
 - validar Comments largos y 7+ Custom Fields;
-- validar Session Activity vacío/con eventos;
+- validar Review Progress con 0%, parcial y 100%;
+- validar Session Activity vacío/con muchos eventos;
 - validar queue vacía y cola larga.
 
 ## Congelado durante C17
