@@ -1,0 +1,215 @@
+# DF-05B — GUARDADO / UPSERT DE DEFINICIONES
+# Tipo: I — Integration
+# Operación: ADD CHILD
+# Target parent: conPR_CustomFieldsHost
+# Nuevo control: btnPR_SaveCustomFieldDef
+#
+# PROPÓSITO
+# Persistir una definición PUNCH mediante WarRoom_UpsertCustomFieldDef desde el host.
+# El componente reutilizable no llama directamente a Power Automate.
+#
+# DEPENDE DE
+# - DF-05A validado.
+# - 05B_host_save_runtime.property-guide.md aplicado.
+# - btnPR_LoadCustomFieldDefs existente.
+# - btnPR_LoadCustomFields existente.
+# - colPunchReviewFieldDefsAdmin cargada.
+# - varProjectId y varUserRole existentes.
+# - WarRoom_UpsertCustomFieldDef disponible en la app activa.
+#
+# TOCA
+# - Añade un único control de servicio invisible bajo conPR_CustomFieldsHost.
+# - Usa variables host varPunchReviewDef_*.
+# - Usa varPunchReviewFieldDefsSaving / varPunchReviewFieldDefsError.
+# - Marca varPunchDynamicFilters_NeedRefresh=true después de guardar correctamente.
+#
+# NO MODIFICAR
+# - geometría de Punch Review.
+# - Comments.
+# - Custom Field Values.
+# - Review Progress.
+# - Dirty Guard.
+# - cmp_CustomFieldsEditorPro.
+# - colores / Design System.
+#
+# CONTRATO BACKEND CONFIRMADO
+# WarRoom_UpsertCustomFieldDef.Run(
+#   FieldDefId,
+#   ProjectId,
+#   EntityType,
+#   Label,
+#   FieldType,
+#   HelpText,
+#   SortOrder,
+#   OptionsJson,
+#   UserEmail,
+#   FieldKey,
+#   IsRequired,
+#   IsPinned,
+#   IsActive,
+#   IsFilterable,
+#   ShowInQuickFilters,
+#   FilterOrder,
+#   FilterMode
+# )
+#
+# VALIDACIÓN
+# - Studio acepta el bloque sin errores.
+# - No se invoca todavía desde el componente; DF-06 hará el wiring.
+# - Con variables host válidas y un proyecto real, la llamada debe persistir la definición.
+# - Tras éxito, las definiciones se recargan desde servidor y los filtros dinámicos quedan marcados para refresh.
+#
+# ESTADO ESPERADO TRAS VALIDACIÓN
+# BACKEND WRITE SERVICE = FUNCTIONAL_FROZEN
+
+- btnPR_SaveCustomFieldDef:
+    Control: Classic/Button@2.2.0
+    Properties:
+      Height: =1
+      OnSelect: |-
+        =Set(varPunchReviewFieldDefsSaving, true);
+        Set(varPunchReviewFieldDefsError, "");
+
+        If(
+            IsBlank(varProjectId),
+
+            Set(
+                varPunchReviewFieldDefsError,
+                "No active project is available for saving Custom Field definitions."
+            ),
+
+            Lower(Coalesce(varUserRole, "reader")) <> "manager",
+
+            Set(
+                varPunchReviewFieldDefsError,
+                "Your current role does not allow Custom Field definition management."
+            ),
+
+            IsBlank(Trim(Coalesce(varPunchReviewDef_Label, ""))),
+
+            Set(
+                varPunchReviewFieldDefsError,
+                "Field label is required."
+            ),
+
+            IsBlank(Trim(Coalesce(varPunchReviewDef_FieldKey, ""))),
+
+            Set(
+                varPunchReviewFieldDefsError,
+                "Field key is required."
+            ),
+
+            !IsBlank(
+                LookUp(
+                    colPunchReviewFieldDefsAdmin,
+                    Lower(Trim(FieldKey)) = Lower(Trim(varPunchReviewDef_FieldKey)) &&
+                    FieldDefId <> Coalesce(varPunchReviewDef_FieldDefId, 0)
+                )
+            ),
+
+            Set(
+                varPunchReviewFieldDefsError,
+                "This Field Key already exists. Use another key or edit the existing field."
+            ),
+
+            Value(Coalesce(varPunchReviewDef_SortOrder, 0)) <= 0,
+
+            Set(
+                varPunchReviewFieldDefsError,
+                "Sort order must be greater than zero."
+            ),
+
+            (
+                varPunchReviewDef_FieldType = "Choice" ||
+                varPunchReviewDef_FieldType = "MultiChoice"
+            ) &&
+            IfError(
+                CountRows(
+                    Table(
+                        ParseJSON(
+                            Coalesce(varPunchReviewDef_OptionsJson, "[]")
+                        )
+                    )
+                ) = 0,
+                true
+            ),
+
+            Set(
+                varPunchReviewFieldDefsError,
+                "Choice and MultiChoice fields require at least one valid option."
+            ),
+
+            IfError(
+                With(
+                    {
+                        resp:
+                            WarRoom_UpsertCustomFieldDef.Run(
+                                Coalesce(varPunchReviewDef_FieldDefId, 0),
+                                varProjectId,
+                                "PUNCH",
+                                Trim(varPunchReviewDef_Label),
+                                Coalesce(varPunchReviewDef_FieldType, "Text"),
+                                Trim(Coalesce(varPunchReviewDef_HelpText, "")),
+                                Value(varPunchReviewDef_SortOrder),
+                                If(
+                                    varPunchReviewDef_FieldType = "Choice" ||
+                                    varPunchReviewDef_FieldType = "MultiChoice",
+                                    Coalesce(varPunchReviewDef_OptionsJson, "[]"),
+                                    " "
+                                ),
+                                Lower(User().Email),
+                                Lower(Trim(varPunchReviewDef_FieldKey)),
+                                Coalesce(varPunchReviewDef_IsRequired, false),
+                                Coalesce(varPunchReviewDef_IsPinned, false),
+                                Coalesce(varPunchReviewDef_IsActive, true),
+                                Coalesce(varPunchReviewDef_IsFilterable, false),
+                                Coalesce(varPunchReviewDef_ShowInQuickFilters, false),
+                                Coalesce(
+                                    varPunchReviewDef_FilterOrder,
+                                    varPunchReviewDef_SortOrder,
+                                    1000
+                                ),
+                                Coalesce(varPunchReviewDef_FilterMode, "Equals")
+                            )
+                    },
+
+                    Select(btnPR_LoadCustomFieldDefs);
+
+                    If(
+                        !IsBlank(varPunchReviewCurrentId),
+                        Select(btnPR_LoadCustomFields)
+                    );
+
+                    Set(varPunchDynamicFilters_NeedRefresh, true);
+                    Set(varPunchReviewDefDirty, false);
+
+                    Notify(
+                        "Custom Field definition saved successfully.",
+                        NotificationType.Success
+                    )
+                ),
+
+                Set(
+                    varPunchReviewFieldDefsError,
+                    Coalesce(
+                        FirstError.Message,
+                        "Custom Field definition could not be saved."
+                    )
+                )
+            )
+        );
+
+        Set(varPunchReviewFieldDefsSaving, false);
+
+        If(
+            !IsBlank(varPunchReviewFieldDefsError),
+            Notify(
+                varPunchReviewFieldDefsError,
+                NotificationType.Error
+            )
+        )
+      Text: =""
+      Visible: =false
+      Width: =1
+      X: =0
+      Y: =0
