@@ -1,85 +1,85 @@
-# C16-FIX — Donut thickness binding in Punch Review
+# C16-FIX — Vinculación del grosor del donut en Punch Review
 
-## Classification
+## Clasificación
 
 `C — Component / FIX`
 
-## Problem
+## Problema
 
-In the Punch Review `Review Progress` card, changing `cmpPR_ReviewProgressDonut.DonutThickness` in the component instance does not produce the expected visual change.
+En la tarjeta `Review Progress` de Punch Review, cambiar `cmpPR_ReviewProgressDonut.DonutThickness` en la instancia del componente no produce el cambio visual esperado.
 
-The current canonical `cmp_DonutPro` source **does** bind `DonutThickness` to both SVG strokes inside `imgDNP_Donut.Image`:
+El código canónico actual de `cmp_DonutPro` **sí** vincula `DonutThickness` a los dos trazos SVG de `imgDNP_Donut.Image`:
 
-- background track `stroke-width`;
-- every data segment `stroke-width`.
+- grosor del track de fondo (`stroke-width`);
+- grosor de cada segmento de datos (`stroke-width`).
 
-Therefore the first repair is to synchronize the active app component's `imgDNP_Donut.Image` formula with the canonical repository version before redesigning geometry or changing unrelated controls.
+Por tanto, la primera reparación consiste en sincronizar la fórmula `imgDNP_Donut.Image` del componente activo con la versión canónica del repositorio antes de rediseñar geometría o modificar controles no relacionados.
 
-## Target
+## Objetivo
 
-Component definition:
+Definición del componente:
 
 `cmp_DonutPro > conDNP_Root > imgDNP_Donut`
 
-Property:
+Propiedad:
 
 `Image`
 
-## Operation
+## Operación
 
-Replace the complete `Image` formula with the formula in:
+Reemplazar la fórmula completa de `Image` por la fórmula almacenada en:
 
 `C16-FIX_imgDNP_Donut.Image.powerfx`
 
-Direct repository file:
+Archivo directo en el repositorio:
 
 `docs/development/components/donut-pro/fixes/C16-FIX_imgDNP_Donut.Image.powerfx`
 
-## Dependencies
+## Dependencias
 
-- `cmp_DonutPro` already exists in the active app.
-- `cmpPR_ReviewProgressDonut` already exists in Punch Review.
-- No new component instance is introduced.
+- `cmp_DonutPro` ya existe en la aplicación activa.
+- `cmpPR_ReviewProgressDonut` ya existe en Punch Review.
+- No se introduce ninguna instancia nueva de componente.
 
-## Touches
+## Modifica
 
-- `cmp_DonutPro.imgDNP_Donut.Image` only.
+- Únicamente `cmp_DonutPro.imgDNP_Donut.Image`.
 
-## Do not modify
+## No modificar
 
-- Punch Review geometry;
+- geometría de Punch Review;
 - `conPR_ReviewProgressCard`;
 - Comments;
 - Custom Fields;
 - Review Queue;
-- component CustomProperties;
-- Items contract;
-- colors;
+- CustomProperties del componente;
+- contrato de `Items`;
+- colores;
 - backend.
 
-## Why this is the correct first FIX
+## Por qué este es el primer FIX correcto
 
-The repository implementation already uses `cmp_DonutPro.DonutThickness` for both the track and segment strokes. If the active component instance does not react to the property, the active app component definition must first be aligned with the known canonical formula. This avoids introducing a new rendering model before confirming that the existing contract works as designed.
+La implementación del repositorio ya utiliza `cmp_DonutPro.DonutThickness` tanto para el track como para los segmentos. Si la instancia activa no reacciona a esa propiedad, primero hay que alinear la definición del componente de la aplicación activa con la fórmula canónica conocida. Así evitamos introducir un modelo de renderizado nuevo antes de comprobar que el contrato existente funciona como está diseñado.
 
-## Validation
+## Validación
 
-After replacing the formula:
+Después de reemplazar la fórmula:
 
-1. Return to `scr_PunchReview`.
-2. Select `cmpPR_ReviewProgressDonut`.
-3. Set `DonutThickness = 8` and observe the ring.
-4. Set `DonutThickness = 20` and observe the ring again.
-5. The difference must be clearly visible without changing Width or Height.
-6. Restore the preferred value after the test; for the current compact Review Progress card start with `18`.
-7. Confirm Reviewed/Remaining values still update correctly.
-8. Confirm no other `cmp_DonutPro` behavior is affected.
+1. Volver a `scr_PunchReview`.
+2. Seleccionar `cmpPR_ReviewProgressDonut`.
+3. Establecer `DonutThickness = 8` y observar el anillo.
+4. Establecer `DonutThickness = 20` y volver a observarlo.
+5. La diferencia debe ser claramente visible sin modificar `Width` ni `Height`.
+6. Restaurar después el valor preferido; para la tarjeta compacta actual de Review Progress comenzar con `18`.
+7. Confirmar que los valores Reviewed/Remaining siguen actualizándose correctamente.
+8. Confirmar que no se ha alterado ningún otro comportamiento de `cmp_DonutPro`.
 
 ## Gate
 
-If `8` versus `20` still produces no visible difference after this formula is synchronized, stop. Do not continue to DF-05. The next repair must be isolated as a rendering FIX for compact-width SVG scaling; do not change Punch Review structure or color to compensate.
+Si después de sincronizar esta fórmula sigue sin existir una diferencia visual entre `8` y `20`, detenerse. No continuar todavía con DF-05. La siguiente reparación deberá aislarse como un FIX específico del escalado/renderizado SVG a ancho compacto; no se debe modificar la estructura ni el color de Punch Review para compensarlo.
 
-## Expected status after validation
+## Estado esperado después de validar
 
 `C16 — FUNCTIONAL_FROZEN`
 
-Color can remain `PENDING` independently.
+El color puede permanecer en estado `PENDING` de forma independiente.
