@@ -1,7 +1,7 @@
 # C17 — Punch Review Workspace Recomposition
 
 **Tipo:** `S/C — Structural + Component evolution`  
-**Estado:** IN PROGRESS — C17-A publicado y pendiente de validación en Power Apps Studio.  
+**Estado:** IN PROGRESS — C17-A validado visualmente en Studio; C17-B publicado y pendiente de validación.  
 **Pantalla:** `scr_PunchReview`
 
 ## Motivo
@@ -54,8 +54,6 @@ Esto mantiene juntos los dos elementos de contexto de sesión:
 - Review Progress responde a «cómo avanza la sesión»;
 - Session Activity responde a «qué hemos hecho durante la sesión».
 
-El usuario no necesita dedicarles el área principal de trabajo, pero sí conviene mantenerlos visibles durante la revisión.
-
 #### Anchura del rail
 
 Objetivo desktop:
@@ -70,17 +68,18 @@ No debe crecer proporcionalmente si el workspace central puede aprovechar ese es
 
 #### Review Progress / donut
 
-El `cmp_ReviewProgressPro` actual tiene una geometría nominal aproximada de `354 x 164` con donut `108 x 108`, por lo que C17-B deberá adaptar su presentación a un rail de 260–280 px sin limitarse a comprimir la instancia externamente.
+El `cmp_ReviewProgressPro` original fue diseñado aproximadamente para `354 x 164` con donut `108 x 108`.
 
-Objetivo visual:
+C17-B lo adapta a:
 
 ```text
-Card width: rail completo (~260–280 px nominal)
-Card height: ~130–150 px
-Donut: ~76–88 px
+Instance height: 140 px
+Rail width: 260–280 px nominal
+Donut rendering: 82 x 82 px
+Labels compactos: Reviewed / Remaining / Position
 ```
 
-Reviewed / Remaining / Current Position deben seguir siendo legibles y no sufrir clipping.
+La fórmula del arco aprobada en C16-FIX5 permanece intacta.
 
 ### 4. Comments + Custom Fields forman el workspace activo
 
@@ -98,7 +97,7 @@ El aumento de anchura del main workspace es una condición explícita de C17.
 
 `conPR_HistoryCard` se reubica en `conPR_RightColumn`, inmediatamente debajo de Review Progress.
 
-Session Activity debe utilizar el resto de la altura disponible del rail y aceptar una presentación más estrecha, con wrapping/overflow controlado de sus textos en lugar de reclamar anchura adicional al main workspace.
+Session Activity utiliza el resto de la altura disponible del rail y debe adaptarse a una presentación más estrecha sin reclamar anchura adicional al main workspace.
 
 ### 6. Custom Field Values se moderniza antes del cierre visual
 
@@ -122,7 +121,7 @@ La modernización debe preservar íntegramente:
 - `OnSaveRequested`;
 - JSON de MultiChoice.
 
-## Árbol objetivo corregido
+## Árbol objetivo
 
 ```text
 scr_PunchReview
@@ -137,8 +136,7 @@ scr_PunchReview
             │       ├── conPR_CommentsCard
             │       └── conPR_CustomFieldsHost
             └── conPR_RightColumn
-                ├── conPR_ReviewProgressCard
-                │   └── cmpPR_ReviewProgress
+                ├── cmpPR_ReviewProgress
                 └── conPR_HistoryCard
 ```
 
@@ -165,25 +163,23 @@ Comments / Custom Fields   resto de la altura
 Dentro del rail derecho:
 
 ```text
-Review Progress            ~130–150 px
+Review Progress            140 px
 Session Activity           resto de la altura
 ```
 
-### Regla de distribución horizontal
+## Evidencia de C17-A
 
-No usar un `FillPortions` simétrico entre main y right rail.
+La captura de Studio del 2026-08-12 confirma visualmente:
 
-El main workspace debe absorber prácticamente todo el crecimiento horizontal de la pantalla. El rail contextual debe mantenerse dentro de su banda estrecha.
+- Review Queue estable a la izquierda;
+- main workspace claramente dominante;
+- rail derecho estrecho;
+- eliminación efectiva del espacio reservado a Related;
+- Punch Overview aprovechando el ancho recuperado.
 
-### Comments / Custom Fields
+La compresión temporal de Comments y Custom Fields en el rail era esperada en C17-A y se resolverá en C17-C, no ensanchando el rail.
 
-En pantallas suficientemente anchas deben comenzar aproximadamente 50/50 dentro del main workspace.
-
-Si el ancho útil conjunto cae por debajo de un nivel cómodo para dos editores operativos, la solución preferida es apilar Comments y Custom Fields, no volver a ensanchar el rail derecho.
-
-## Breakpoints de C17-A
-
-C17-A fija explícitamente:
+## Breakpoints
 
 ```text
 >= 1500 px   Right rail = 280 px
@@ -195,28 +191,30 @@ C17-A fija explícitamente:
 
 ### C17-A — Target layout / geometry
 
-**Estado:** PUBLISHED / PENDING STUDIO VALIDATION.
+**Estado:** VISUALLY VALIDATED IN STUDIO / GEOMETRY FROZEN.
 
 Artefactos:
 
 - `C17-A_target_layout_geometry.property-guide.md`
 - `C17-A_GUIA_IMPLEMENTACION_Y_VALIDACION.md`
 
-Responsabilidad única:
-
-- liberar la altura que todavía reservaba Related;
-- convertir el centro en workspace dominante mediante `FillPortions`;
-- fijar el rail derecho a 260/280 px en desktop;
-- mantener apilado bajo 1320 px;
-- no mover todavía hijos entre columnas.
-
-Durante C17-A es normal que los paneles aún alojados en la columna antigua se vean temporalmente comprimidos. No deben corregirse internamente hasta C17-B/C.
-
 ### C17-B — Right rail integration
 
-Responsabilidad única: reubicar Review Progress arriba y `conPR_HistoryCard` debajo.
+**Estado:** PUBLISHED / PENDING STUDIO VALIDATION.
 
-Debe adaptar Review Progress al rail estrecho sin degradar su contrato ni recurrir a clipping.
+Artefactos:
+
+- `C17-B_right_rail_integration.property-guide.md`
+- `C17-B_GUIA_IMPLEMENTACION_Y_VALIDACION.md`
+
+Responsabilidad única:
+
+- mover Review Progress al inicio del rail;
+- compactar únicamente su geometría interna para 260–280 px;
+- mantener la fórmula C16-FIX5;
+- mover Session Activity inmediatamente debajo;
+- conservar el main workspace dominante;
+- no mover todavía Comments ni Custom Fields.
 
 ### C17-C — Collaboration workspace
 
