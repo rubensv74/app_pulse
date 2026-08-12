@@ -1,0 +1,97 @@
+# C16-FIX3 — Integración de cmp_ReviewProgressPro en Punch Review
+# Tipo: I — Integration / FIX
+# Operation: REPLACE CONTROL
+# Target control: conPR_ReviewProgressCard
+# Parent: conPR_RightColumn
+#
+# PROPÓSITO
+# Sustituir el panel temporal de Review Progress por la instancia del componente
+# cmp_ReviewProgressPro ya validado visualmente en Power Apps Studio.
+#
+# DEPENDE DE
+# - cmp_ReviewProgressPro presente en la app activa (confirmado mediante instancia de prueba).
+# - colPunchReviewQueue.
+# - varPunchReviewCurrentIndex.
+# - varTheme_Surface, varTheme_Border, varTheme_Text, varTheme_TextMuted y varTheme_SurfaceAlt.
+#
+# TOCA
+# - conPR_ReviewProgressCard únicamente.
+#
+# NO MODIFICAR
+# - conPR_CommentsCard.
+# - conPR_CustomFieldsHost / cmpPR_CustomFieldValues.
+# - conPR_RightColumn geometry.
+# - Review Queue.
+# - Punch Overview.
+# - Session Activity.
+# - Header / Navigation.
+# - backend, flows o SQL.
+# - colores globales / Design System.
+#
+# SEMÁNTICA
+# - TotalCount = total de Punches de la cola completa cargada.
+# - ReviewedCount = Punches con IsReviewedInSession=true.
+# - CurrentPosition = posición actual dentro de la cola completa.
+# - Reviewed representa revisión en sesión; NO representa cierre operativo del Punch.
+#
+# COMPATIBILIDAD
+# - Playbook modular vigente consultado antes de generar este YAML.
+# - Registro POWER_APPS_SOURCE_CODE_COMPATIBILITY.md vigente consultado.
+# - cmp_ReviewProgressPro está confirmado en la app activa.
+# - No se introducen Reset(), SVG inline en pantalla, Label Radius*, ni AccessibleLabel en Classic/Button.
+#
+# VALIDACIÓN
+# 1. Seleccionar conPR_ReviewProgressCard y reemplazar el control completo con este bloque.
+# 2. Studio debe aceptar el YAML sin errores.
+# 3. El panel debe mantener la geometría de la columna derecha.
+# 4. Con la cola de prueba de 5 Punches y 2 revisados debe mostrar Total=5, Reviewed=2, Remaining=3.
+# 5. Mark Reviewed debe actualizar Reviewed/Remaining inmediatamente.
+# 6. Previous/Next/selección de fila debe actualizar Current Position.
+# 7. Comments y Custom Fields deben permanecer sin cambios.
+# 8. No debe realizarse ninguna llamada a backend.
+#
+# ESTADO ESPERADO TRAS VALIDACIÓN
+# C16 = FUNCTIONAL_FROZEN + VISUAL_APPROVED
+# COLOR = PENDING / gobernado por Design System
+
+- cmpPR_ReviewProgress:
+    Control: CanvasComponent
+    ComponentName: cmp_ReviewProgressPro
+    Properties:
+      BackgroundColor: =varTheme_Surface
+      BorderColor: =varTheme_Border
+      CenterFillColorHex: ="#FFFFFF"
+      CurrentPosition: |-
+        =If(
+            CountRows(colPunchReviewQueue) = 0,
+            0,
+            Min(
+                Max(1, Coalesce(varPunchReviewCurrentIndex, 1)),
+                CountRows(colPunchReviewQueue)
+            )
+        )
+      CurrentPositionLabel: ="Current Position"
+      EmptyText: ="No punches in the review queue."
+      ErrorText: ="Review progress unavailable."
+      Height: =164
+      MutedTextColor: =varTheme_TextMuted
+      RemainingColorHex: ="#94A3B8"
+      RemainingLabel: ="Remaining"
+      ReviewedColorHex: ="#1677FF"
+      ReviewedCount: |-
+        =CountIf(
+            colPunchReviewQueue,
+            Coalesce(IsReviewedInSession, false)
+        )
+      ReviewedLabel: ="Reviewed in Session"
+      State: |-
+        =If(
+            CountRows(colPunchReviewQueue) = 0,
+            "empty",
+            "ready"
+        )
+      SurfaceAltColor: =varTheme_SurfaceAlt
+      TextColor: =varTheme_Text
+      Title: ="Review Progress"
+      TotalCount: =CountRows(colPunchReviewQueue)
+      Width: =Parent.Width
