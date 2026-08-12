@@ -1,0 +1,31 @@
+=With(
+    {
+        wasDirty: Coalesce(varCFDEPro_DraftDirty, false),
+        targetActive: Self.Value
+    },
+
+    Set(varCFDEPro_Draft_IsActive, targetActive);
+    Set(varCFDEPro_DraftDirty, true);
+
+    If(
+        varCFDEPro_EditMode = "EDIT" &&
+        !IsBlank(Trim(Coalesce(varCFDEPro_Draft_FieldKey, ""))),
+
+        Set(
+            varCFDEPro_ActiveChangeFieldKey,
+            Coalesce(varCFDEPro_Draft_FieldKey, "")
+        );
+        Set(
+            varCFDEPro_ActiveChangeTarget,
+            targetActive
+        );
+
+        cmp_CustomFieldsEditorPro.OnActiveChangeRequested();
+
+        If(
+            Coalesce(cmp_CustomFieldsEditorPro.ActiveMutationSucceeded, false) &&
+            !wasDirty,
+            Set(varCFDEPro_DraftDirty, false)
+        )
+    )
+)
