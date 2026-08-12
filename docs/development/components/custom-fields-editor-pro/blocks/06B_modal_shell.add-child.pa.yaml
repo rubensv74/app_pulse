@@ -1,0 +1,106 @@
+# DF-06B — MODAL SHELL + INSTANCIA REAL DE cmp_CustomFieldsEditorPro
+# Tipo: S/I — Structural / Integration
+# Operación: ADD CHILD
+# Target parent: scr_PunchReview
+# Nuevo control: conPR_CustomFieldsEditorModalLayer
+#
+# PROPÓSITO ÚNICO
+# Añadir a Punch Review una capa modal real que aloja cmp_CustomFieldsEditorPro
+# y conectar únicamente sus inputs host ya disponibles.
+#
+# DEPENDE DE
+# - DF-06A validado.
+# - cmp_CustomFieldsEditorPro instalado en la app activa.
+# - 06B_modal_visibility_state.property-guide.md aplicado.
+# - colPunchReviewFieldDefsAdmin existente.
+# - varPunchReviewFieldDefsLoading / Saving / Error existentes.
+# - varProjectId / varUserRole existentes.
+#
+# TOCA
+# - Añade un único hijo de nivel pantalla a scr_PunchReview.
+# - No modifica controles existentes.
+#
+# NO MODIFICAR
+# - conPR_ScreenRoot.
+# - conPR_RightColumn.
+# - Comments.
+# - Custom Field Values.
+# - Review Progress.
+# - Help modal.
+# - Dirty Guard.
+# - servicios btnPR_*.
+# - geometría interna de cmp_CustomFieldsEditorPro.
+#
+# IMPORTANTE
+# - DF-06B NO conecta todavía Manage, Close, Refresh ni Save.
+# - DF-06C hará Open / Close / Refresh.
+# - DF-06D hará Save real.
+#
+# VALIDACIÓN
+# - El bloque debe pegarse como nuevo hijo directo de scr_PunchReview.
+# - Para probar visualmente el shell, establece temporalmente
+#   varPunchReviewFieldDefsModalVisible=true desde la barra de fórmulas o un control de prueba.
+# - La capa debe cubrir la pantalla y el componente quedar centrado.
+# - No debe alterar la geometría de Punch Review cuando Visible=false.
+
+- conPR_CustomFieldsEditorModalLayer:
+    Control: GroupContainer@1.5.0
+    Variant: ManualLayout
+    Properties:
+      DropShadow: =DropShadow.None
+      Fill: =Color.Transparent
+      Height: =Parent.Height
+      Visible: =Coalesce(varPunchReviewFieldDefsModalVisible, false)
+      Width: =Parent.Width
+      X: =0
+      Y: =0
+    Children:
+      - rectPR_CustomFieldsEditorBackdrop:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            BorderStyle: =BorderStyle.None
+            Fill: =RGBA(15,23,42,0.58)
+            Height: =Parent.Height
+            Width: =Parent.Width
+            X: =0
+            Y: =0
+      - cmpPR_CustomFieldsEditor:
+          Control: CanvasComponent
+          ComponentName: cmp_CustomFieldsEditorPro
+          Properties:
+            AccentColor: =varTheme_PulseBlueDark
+            BackgroundColor: =varTheme_Surface
+            BorderColor: =varTheme_Border
+            CanManage: =Lower(Coalesce(varUserRole, "reader")) = "manager"
+            Definitions: =colPunchReviewFieldDefsAdmin
+            EntityType: ="PUNCH"
+            ErrorText: |-
+              =If(
+                  !IsBlank(Coalesce(varPunchReviewFieldDefsError, "")),
+                  varPunchReviewFieldDefsError,
+                  If(
+                      !IsBlank(Coalesce(varPunchReviewFieldDefToggleError, "")),
+                      varPunchReviewFieldDefToggleError,
+                      ""
+                  )
+              )
+            Height: =Min(700, Parent.Height - 48)
+            IsLoading: =Coalesce(varPunchReviewFieldDefsLoading, false)
+            IsSaving: |-
+              =Coalesce(varPunchReviewFieldDefsSaving, false) ||
+              Coalesce(varPunchReviewFieldDefToggleLoading, false)
+            MutedTextColor: =varTheme_TextMuted
+            ProjectId: =Coalesce(varProjectId, 0)
+            ProjectLabel: |-
+              =If(
+                  IsBlank(varProjectId),
+                  "No project selected",
+                  "Current project"
+              )
+            SurfaceAltColor: =varTheme_SurfaceAlt
+            TextColor: =varTheme_Text
+            Title: ="Custom Fields"
+            Width: =Min(1180, Parent.Width - 48)
+            X: =(Parent.Width - Self.Width) / 2
+            Y: =(Parent.Height - Self.Height) / 2
