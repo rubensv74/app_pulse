@@ -1,7 +1,7 @@
 # DF-06 — Integración modal de `cmp_CustomFieldsEditorPro` en Punch Review
 
 **Tipo:** `I — Integration`  
-**Estado:** IN PROGRESS — DF-06A/B/C continuados sin error reportado; DF-06D publicado y pendiente de validación en Power Apps Studio.
+**Estado:** IN PROGRESS — DF-06A/B/C/D continuados sin error reportado; DF-06E publicado y pendiente de validación en Power Apps Studio.
 
 ## Gate de entrada
 
@@ -11,7 +11,11 @@ DF-06A ha preparado el contrato host del componente mediante `DraftDefinition`, 
 
 DF-06B ha creado la capa modal y la instancia real `cmpPR_CustomFieldsEditor`.
 
-DF-06C conecta Manage, Close y Refresh. El usuario ha solicitado avanzar al siguiente incremento sin reportar errores de DF-06C; Power Apps Studio continúa siendo la autoridad final de validación.
+DF-06C conecta Manage, Close y Refresh.
+
+DF-06D conecta Save real con `btnPR_SaveCustomFieldDef`, conserva el servidor como fuente autoritativa y reconcilia `FieldDefId` después del guardado.
+
+El usuario ha solicitado avanzar a DF-06E sin reportar errores nuevos de DF-06D. Power Apps Studio continúa siendo la autoridad final de validación.
 
 ## Objetivo
 
@@ -29,10 +33,9 @@ Convertir el botón **Manage** de Custom Fields en Punch Review en una experienc
 - expone el draft local mediante `DraftDefinition`;
 - expone `DraftDirty` y `EditMode`;
 - añade eventos `OnSaveRequested` / `OnCancelRequested`;
-- sustituye el texto local-only por acciones Save / Cancel;
-- no toca Punch Review.
+- sustituye el texto local-only por acciones Save / Cancel.
 
-**Estado:** integrado / gate superado para continuar.
+**Estado:** continuado sin error reportado.
 
 ### DF-06B — S/I · Modal shell + instancia
 
@@ -46,10 +49,9 @@ Responsabilidad:
 
 - crea `conPR_CustomFieldsEditorModalLayer` como hijo directo de `scr_PunchReview`;
 - inserta `cmpPR_CustomFieldsEditor` usando `cmp_CustomFieldsEditorPro`;
-- conecta `ProjectId`, `EntityType`, `Definitions`, `CanManage`, `Loading`, `Saving`, `Error` y roles visuales existentes;
-- mantiene el modal cerrado por defecto.
+- conecta contexto, permisos, loading/saving/error y roles visuales existentes.
 
-**Estado:** continuado por el usuario sin error reportado; no se declara validación independiente fuera de Studio.
+**Estado:** continuado sin error reportado.
 
 ### DF-06C — I · Manage open / Close / Refresh
 
@@ -60,12 +62,11 @@ Artefactos:
 
 Responsabilidad:
 
-- `cmpPR_CustomFieldValues.OnManageFieldsRequested` valida proyecto/permiso, abre modal y ejecuta `btnPR_LoadCustomFieldDefs`;
-- `cmpPR_CustomFieldsEditor.OnClose` cierra únicamente con draft limpio;
-- `cmpPR_CustomFieldsEditor.OnRefresh` recarga únicamente con draft limpio;
-- evita pérdida silenciosa del draft mediante warnings.
+- Manage valida contexto y abre modal;
+- Close protege draft modificado;
+- Refresh recarga solo con draft limpio.
 
-**Estado:** continuado por el usuario sin error reportado; pendiente de validación funcional completa en Studio.
+**Estado:** continuado sin error reportado.
 
 ### DF-06D — I · Save real
 
@@ -80,20 +81,31 @@ Responsabilidad:
 
 - copia `DraftDefinition` a `varPunchReviewDef_*`;
 - ejecuta `btnPR_SaveCustomFieldDef`;
-- utiliza `varPunchReviewFieldDefsLastMutationSucceeded` y `varPunchReviewFieldDefsRefreshWarning` como resultado host;
-- reconcilia el `FieldDefId` autoritativo desde `colPunchReviewFieldDefsAdmin`;
-- mantiene el draft sucio si backend o refresh/reconciliación fallan;
-- tras éxito reconciliado, pasa el componente a `EDIT` y deja `DraftDirty=false`;
-- mantiene el modal abierto.
+- reconcilia el `FieldDefId` autoritativo;
+- mantiene dirty si backend/reconciliación falla;
+- tras éxito convierte ADD en EDIT y conserva el modal abierto.
+
+**Estado:** continuado por el usuario sin error nuevo reportado; validación final sigue siendo responsabilidad de Studio.
+
+### DF-06E — I · Active / Inactive real
+
+Artefactos:
+
+- `06E_active_inactive_contract.property-guide.md`
+- `06E_tglCFDEPro_Active.OnChange.powerfx`
+- `06E_cmpPR_CustomFieldsEditor.OnActiveChangeRequested.powerfx`
+- `06E_GUIA_IMPLEMENTACION_Y_VALIDACION.md`
+
+Responsabilidad:
+
+- añade al componente el contrato `ActiveChangeFieldKey`, `ActiveChangeTarget`, `ActiveMutationSucceeded` y `OnActiveChangeRequested`;
+- en `EDIT`, el toggle Availability ejecuta el servicio host DF-05C inmediatamente;
+- en `ADD`, Availability permanece dentro del draft y se persiste mediante DF-06D;
+- si Active/Inactive era el único cambio y la mutación host tiene éxito, `DraftDirty` vuelve a false;
+- si existían otros cambios locales, esos cambios permanecen dirty;
+- no duplica Flow dentro del componente.
 
 **Estado:** PUBLISHED / PENDING STUDIO VALIDATION.
-
-### DF-06E — I · Active/Inactive
-
-- conecta la intención de cambio de disponibilidad al servicio host DF-05C cuando proceda;
-- no duplica lógica de persistencia.
-
-**Estado:** bloqueado hasta validar DF-06D.
 
 ## Congelado durante DF-06
 
@@ -112,4 +124,16 @@ Responsabilidad:
 
 Cada incremento debe validarse en Studio antes del siguiente.
 
-El componente `cmp_CustomFieldsEditorPro` está confirmado como componente real de la app activa; por tanto puede utilizarse como `CanvasComponent` en la capa modal. Power Apps Studio continúa siendo la autoridad final de validación.
+El componente `cmp_CustomFieldsEditorPro` está confirmado como componente real de la app activa; Power Apps Studio continúa siendo la autoridad final de validación.
+
+## Estado esperado al cerrar DF-06
+
+```text
+MODAL SHELL                 FUNCTIONAL_FROZEN
+OPEN / CLOSE / REFRESH      FUNCTIONAL_FROZEN
+SAVE                        FUNCTIONAL_FROZEN
+ACTIVE / INACTIVE           FUNCTIONAL_FROZEN
+HOST FLOW OWNERSHIP         FUNCTIONAL_FROZEN
+GEOMETRY                    FUNCTIONAL_FROZEN
+COLOR                        PENDING
+```
