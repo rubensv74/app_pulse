@@ -1,13 +1,15 @@
 # DF-06 — Integración modal de `cmp_CustomFieldsEditorPro` en Punch Review
 
 **Tipo:** `I — Integration`  
-**Estado:** IN PROGRESS — DF-06A integrado; DF-06B publicado y pendiente de validación en Power Apps Studio.
+**Estado:** IN PROGRESS — DF-06A integrado; DF-06B continuado por el usuario sin error reportado; DF-06C publicado y pendiente de validación en Power Apps Studio.
 
 ## Gate de entrada
 
 DF-05A/B/C/D ha quedado sin errores pendientes reportados en Power Apps Studio. El error duplicado por `btnPR_RefreshCustomFieldDefinitionContext` fue corregido antes de iniciar DF-06.
 
 DF-06A ha preparado el contrato host del componente mediante `DraftDefinition`, `DraftDirty`, `EditMode`, `OnSaveRequested` y `OnCancelRequested`.
+
+DF-06B ha creado la capa modal y la instancia real `cmpPR_CustomFieldsEditor`. El usuario ha solicitado continuar al siguiente incremento; Power Apps Studio continúa siendo la autoridad final de validación.
 
 ## Objetivo
 
@@ -46,16 +48,24 @@ Responsabilidad:
 - mantiene el modal cerrado por defecto;
 - no conecta todavía Manage, Close, Refresh ni Save.
 
-**Estado:** PUBLISHED / PENDING STUDIO VALIDATION.
+**Estado:** continuado por el usuario sin error reportado; no se declara validación independiente fuera de Studio.
 
 ### DF-06C — I · Manage open / Close / Refresh
 
-- `cmpPR_CustomFieldValues.OnManageFieldsRequested` carga definiciones y abre modal;
-- Close cierra modal;
-- Refresh ejecuta `btnPR_LoadCustomFieldDefs`;
+Artefactos:
+
+- `06C_open_close_refresh.property-guide.md`
+- `06C_GUIA_IMPLEMENTACION_Y_VALIDACION.md`
+
+Responsabilidad:
+
+- `cmpPR_CustomFieldValues.OnManageFieldsRequested` valida proyecto/permiso, abre modal y ejecuta `btnPR_LoadCustomFieldDefs`;
+- `cmpPR_CustomFieldsEditor.OnClose` cierra únicamente con draft limpio;
+- `cmpPR_CustomFieldsEditor.OnRefresh` recarga únicamente con draft limpio;
+- evita pérdida silenciosa del draft mediante warnings;
 - no conecta Save.
 
-**Estado:** bloqueado hasta validar DF-06B.
+**Estado:** PUBLISHED / PENDING STUDIO VALIDATION.
 
 ### DF-06D — I · Save real
 
@@ -64,7 +74,7 @@ Responsabilidad:
 - conserva servidor como fuente autoritativa;
 - mantiene modal abierto y refleja el catálogo recargado.
 
-**Estado:** bloqueado.
+**Estado:** bloqueado hasta validar DF-06C.
 
 ### DF-06E — I · Active/Inactive
 
@@ -90,4 +100,4 @@ Responsabilidad:
 
 Cada incremento debe validarse en Studio antes del siguiente.
 
-El componente `cmp_CustomFieldsEditorPro` está confirmado como componente real de la app activa antes de DF-06B; por tanto puede utilizarse como `CanvasComponent` en la capa modal. Power Apps Studio continúa siendo la autoridad final de validación.
+El componente `cmp_CustomFieldsEditorPro` está confirmado como componente real de la app activa; por tanto puede utilizarse como `CanvasComponent` en la capa modal. Power Apps Studio continúa siendo la autoridad final de validación.
