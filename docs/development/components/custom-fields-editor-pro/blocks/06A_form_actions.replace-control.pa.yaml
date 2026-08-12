@@ -1,0 +1,206 @@
+# DF-06A — ACCIONES LOCALES DEL FORMULARIO
+# Tipo: C — Component
+# Operación: REPLACE CONTROL
+# Target: lblCFDEPro_LocalOnly
+# Parent: conCFDEPro_Form
+#
+# PROPÓSITO
+# Sustituir el texto local-only por una barra de acciones Cancel / Save que
+# mantiene el draft dentro del componente y delega la persistencia al host
+# mediante OnSaveRequested.
+#
+# DEPENDE DE
+# - 06A_component_host_contract.property-guide.md aplicado.
+# - OnSaveRequested y OnCancelRequested existentes en cmp_CustomFieldsEditorPro.
+# - DraftDefinition / DraftDirty / EditMode existentes como outputs.
+#
+# NO MODIFICAR
+# - geometría de conCFDEPro_Form;
+# - controles General / Behavior / Filtering / Options;
+# - catálogo;
+# - Live Preview;
+# - colores;
+# - backend / Flows;
+# - scr_PunchReview.
+#
+# VALIDACIÓN
+# - Studio acepta el reemplazo sin errores.
+# - Save permanece deshabilitado sin draft válido o sin cambios.
+# - Save solo dispara OnSaveRequested.
+# - Cancel en EDIT restaura el valor servidor recibido en Definitions.
+# - Cancel en ADD abandona el draft y vuelve al estado sin selección.
+
+- conCFDEPro_FormActions:
+    Control: GroupContainer@1.5.0
+    Variant: ManualLayout
+    Properties:
+      DropShadow: =DropShadow.None
+      Fill: =Color.Transparent
+      Height: =38
+      Width: =Parent.Width
+      Y: =494
+    Children:
+      - lblCFDEPro_FormActionsHint:
+          Control: Label@2.5.1
+          Properties:
+            Align: =Align.Right
+            BorderColor: =RGBA(0,0,0,0)
+            Color: =cmp_CustomFieldsEditorPro.MutedTextColor
+            Fill: =Color.Transparent
+            Font: =Font.'Segoe UI'
+            Height: =30
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =5
+            Text: |-
+              =If(
+                  Coalesce(varCFDEPro_DraftDirty, false),
+                  "Unsaved definition changes",
+                  "Definition draft synchronized"
+              )
+            Width: =Max(120, Parent.Width - 190)
+            Y: =4
+      - btnCFDEPro_CancelDraft:
+          Control: Classic/Button@2.2.0
+          Properties:
+            BorderColor: =cmp_CustomFieldsEditorPro.BorderColor
+            BorderThickness: =1
+            Color: =cmp_CustomFieldsEditorPro.TextColor
+            DisplayMode: |-
+              =If(
+                  cmp_CustomFieldsEditorPro.IsLoading || cmp_CustomFieldsEditorPro.IsSaving,
+                  DisplayMode.Disabled,
+                  DisplayMode.Edit
+              )
+            Fill: =cmp_CustomFieldsEditorPro.BackgroundColor
+            Font: =Font.'Segoe UI'
+            Height: =32
+            HoverFill: =cmp_CustomFieldsEditorPro.SurfaceAltColor
+            OnSelect: |-
+              =If(
+                  varCFDEPro_EditMode = "ADD",
+
+                  Set(varCFDEPro_EditMode, "");
+                  Set(varCFDEPro_SelectedFieldKey, "");
+                  Set(varCFDEPro_Draft_FieldDefId, 0);
+                  Set(varCFDEPro_Draft_FieldKey, "");
+                  Set(varCFDEPro_Draft_Label, "");
+                  Set(varCFDEPro_Draft_FieldType, "Text");
+                  Set(varCFDEPro_Draft_HelpText, "");
+                  Set(varCFDEPro_Draft_IsRequired, false);
+                  Set(varCFDEPro_Draft_IsPinned, true);
+                  Set(varCFDEPro_Draft_IsActive, true);
+                  Set(varCFDEPro_Draft_SortOrder, 100);
+                  Set(varCFDEPro_Draft_OptionsJson, "[]");
+                  Set(varCFDEPro_Draft_OptionsText, "");
+                  Set(varCFDEPro_Draft_IsFilterable, false);
+                  Set(varCFDEPro_Draft_ShowInQuickFilters, false);
+                  Set(varCFDEPro_Draft_FilterOrder, 100);
+                  Set(varCFDEPro_Draft_FilterMode, "Equals");
+                  Set(varCFDEPro_DraftDirty, false),
+
+                  varCFDEPro_EditMode = "EDIT" &&
+                  !IsBlank(Coalesce(varCFDEPro_SelectedFieldKey, "")),
+
+                  With(
+                      {
+                          currentDef:
+                              LookUp(
+                                  cmp_CustomFieldsEditorPro.Definitions,
+                                  FieldKey = varCFDEPro_SelectedFieldKey
+                              )
+                      },
+                      If(
+                          !IsBlank(currentDef),
+                          Set(varCFDEPro_Draft_FieldDefId, Coalesce(currentDef.FieldDefId, 0));
+                          Set(varCFDEPro_Draft_FieldKey, Coalesce(currentDef.FieldKey, ""));
+                          Set(varCFDEPro_Draft_Label, Coalesce(currentDef.Label, ""));
+                          Set(varCFDEPro_Draft_FieldType, Coalesce(currentDef.FieldType, "Text"));
+                          Set(varCFDEPro_Draft_HelpText, Coalesce(currentDef.HelpText, ""));
+                          Set(varCFDEPro_Draft_IsRequired, Coalesce(currentDef.IsRequired, false));
+                          Set(varCFDEPro_Draft_IsPinned, Coalesce(currentDef.IsPinned, false));
+                          Set(varCFDEPro_Draft_IsActive, Coalesce(currentDef.IsActive, true));
+                          Set(varCFDEPro_Draft_SortOrder, Coalesce(currentDef.SortOrder, 100));
+                          Set(
+                              varCFDEPro_Draft_OptionsJson,
+                              If(
+                                  currentDef.FieldType = "Choice" || currentDef.FieldType = "MultiChoice",
+                                  Coalesce(currentDef.OptionsJson, "[]"),
+                                  "[]"
+                              )
+                          );
+                          Set(
+                              varCFDEPro_Draft_OptionsText,
+                              If(
+                                  currentDef.FieldType = "Choice" || currentDef.FieldType = "MultiChoice",
+                                  IfError(
+                                      Concat(
+                                          Table(ParseJSON(Coalesce(currentDef.OptionsJson, "[]"))),
+                                          Text(ThisRecord.Value),
+                                          Char(10)
+                                      ),
+                                      ""
+                                  ),
+                                  ""
+                              )
+                          );
+                          Set(varCFDEPro_Draft_IsFilterable, Coalesce(currentDef.IsFilterable, false));
+                          Set(varCFDEPro_Draft_ShowInQuickFilters, Coalesce(currentDef.ShowInQuickFilters, false));
+                          Set(varCFDEPro_Draft_FilterOrder, Coalesce(currentDef.FilterOrder, 100));
+                          Set(varCFDEPro_Draft_FilterMode, Coalesce(currentDef.FilterMode, "Equals"));
+                          Set(varCFDEPro_DraftDirty, false)
+                      )
+                  )
+              );
+              cmp_CustomFieldsEditorPro.OnCancelRequested()
+            RadiusBottomLeft: =8
+            RadiusBottomRight: =8
+            RadiusTopLeft: =8
+            RadiusTopRight: =8
+            Size: =7
+            Text: ="Cancel"
+            Width: =78
+            X: =Parent.Width - 170
+            Y: =3
+      - btnCFDEPro_SaveDraft:
+          Control: Classic/Button@2.2.0
+          Properties:
+            BorderColor: =cmp_CustomFieldsEditorPro.AccentColor
+            BorderThickness: =1
+            Color: =Color.White
+            DisplayMode: |-
+              =If(
+                  !cmp_CustomFieldsEditorPro.CanManage ||
+                  cmp_CustomFieldsEditorPro.IsLoading ||
+                  cmp_CustomFieldsEditorPro.IsSaving ||
+                  !Coalesce(varCFDEPro_DraftDirty, false) ||
+                  IsBlank(Trim(Coalesce(varCFDEPro_Draft_Label, ""))) ||
+                  IsBlank(Trim(Coalesce(varCFDEPro_Draft_FieldKey, ""))) ||
+                  (
+                      (varCFDEPro_Draft_FieldType = "Choice" || varCFDEPro_Draft_FieldType = "MultiChoice") &&
+                      CountRows(
+                          Filter(
+                              Split(Coalesce(varCFDEPro_Draft_OptionsText, ""), Char(10)),
+                              !IsBlank(Trim(Value))
+                          )
+                      ) = 0
+                  ),
+                  DisplayMode.Disabled,
+                  DisplayMode.Edit
+              )
+            Fill: =cmp_CustomFieldsEditorPro.AccentColor
+            Font: =Font.'Segoe UI'
+            Height: =32
+            HoverFill: =ColorFade(cmp_CustomFieldsEditorPro.AccentColor, -12%)
+            OnSelect: =cmp_CustomFieldsEditorPro.OnSaveRequested()
+            RadiusBottomLeft: =8
+            RadiusBottomRight: =8
+            RadiusTopLeft: =8
+            RadiusTopRight: =8
+            Size: =7
+            Text: ="Save"
+            Width: =78
+            X: =Parent.Width - 84
+            Y: =3
