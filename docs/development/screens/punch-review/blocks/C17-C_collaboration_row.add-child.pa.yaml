@@ -1,0 +1,53 @@
+# C17-C — COLLABORATION WORKSPACE SHELL
+# Tipo: S — Structural
+# Operación: ADD CHILD
+# Target parent: conPR_CenterColumn
+# Nuevo control: conPR_CollaborationRow
+#
+# PROPÓSITO ÚNICO
+# Crear el host horizontal que recibirá los controles existentes
+# conPR_CommentsCard y conPR_CustomFieldsHost.
+#
+# DEPENDE DE
+# - C17-A validado visualmente en Studio.
+# - C17-B validado visualmente en Studio.
+# - conPR_CenterColumn existente.
+#
+# TOCA
+# - Añade un único hijo a conPR_CenterColumn, después de conPR_OverviewCard.
+#
+# NO MODIFICAR EN ESTE PEGADO
+# - conPR_CommentsCard.
+# - conPR_CustomFieldsHost.
+# - conPR_RightColumn.
+# - cmpPR_ReviewProgress.
+# - conPR_HistoryCard.
+# - Comments flows.
+# - Custom Fields flows / dirty state.
+#
+# DESPUÉS DE PEGAR
+# Mover, no duplicar, conPR_CommentsCard y conPR_CustomFieldsHost al nuevo host
+# siguiendo C17-C_collaboration_workspace.property-guide.md.
+
+- conPR_CollaborationRow:
+    Control: GroupContainer@1.5.0
+    Variant: AutoLayout
+    Properties:
+      DropShadow: =DropShadow.None
+      Fill: =Color.Transparent
+      FillPortions: =1
+      LayoutAlignItems: =LayoutAlignItems.Stretch
+      LayoutDirection: =If(App.Width < 900, LayoutDirection.Vertical, LayoutDirection.Horizontal)
+      LayoutGap: =10
+      LayoutMinHeight: =280
+      LayoutMinWidth: =300
+      LayoutOverflowY: =LayoutOverflow.Scroll
+      PaddingBottom: =0
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      RadiusBottomLeft: =0
+      RadiusBottomRight: =0
+      RadiusTopLeft: =0
+      RadiusTopRight: =0
+      Width: =Parent.Width
