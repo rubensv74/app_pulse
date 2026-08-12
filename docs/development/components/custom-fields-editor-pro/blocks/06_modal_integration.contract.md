@@ -1,7 +1,7 @@
 # DF-06 — Integración modal de `cmp_CustomFieldsEditorPro` en Punch Review
 
 **Tipo:** `I — Integration`  
-**Estado:** IN PROGRESS — DF-06A integrado; DF-06B continuado por el usuario sin error reportado; DF-06C publicado y pendiente de validación en Power Apps Studio.
+**Estado:** IN PROGRESS — DF-06A/B/C continuados sin error reportado; DF-06D publicado y pendiente de validación en Power Apps Studio.
 
 ## Gate de entrada
 
@@ -9,7 +9,9 @@ DF-05A/B/C/D ha quedado sin errores pendientes reportados en Power Apps Studio. 
 
 DF-06A ha preparado el contrato host del componente mediante `DraftDefinition`, `DraftDirty`, `EditMode`, `OnSaveRequested` y `OnCancelRequested`.
 
-DF-06B ha creado la capa modal y la instancia real `cmpPR_CustomFieldsEditor`. El usuario ha solicitado continuar al siguiente incremento; Power Apps Studio continúa siendo la autoridad final de validación.
+DF-06B ha creado la capa modal y la instancia real `cmpPR_CustomFieldsEditor`.
+
+DF-06C conecta Manage, Close y Refresh. El usuario ha solicitado avanzar al siguiente incremento sin reportar errores de DF-06C; Power Apps Studio continúa siendo la autoridad final de validación.
 
 ## Objetivo
 
@@ -45,8 +47,7 @@ Responsabilidad:
 - crea `conPR_CustomFieldsEditorModalLayer` como hijo directo de `scr_PunchReview`;
 - inserta `cmpPR_CustomFieldsEditor` usando `cmp_CustomFieldsEditorPro`;
 - conecta `ProjectId`, `EntityType`, `Definitions`, `CanManage`, `Loading`, `Saving`, `Error` y roles visuales existentes;
-- mantiene el modal cerrado por defecto;
-- no conecta todavía Manage, Close, Refresh ni Save.
+- mantiene el modal cerrado por defecto.
 
 **Estado:** continuado por el usuario sin error reportado; no se declara validación independiente fuera de Studio.
 
@@ -62,26 +63,37 @@ Responsabilidad:
 - `cmpPR_CustomFieldValues.OnManageFieldsRequested` valida proyecto/permiso, abre modal y ejecuta `btnPR_LoadCustomFieldDefs`;
 - `cmpPR_CustomFieldsEditor.OnClose` cierra únicamente con draft limpio;
 - `cmpPR_CustomFieldsEditor.OnRefresh` recarga únicamente con draft limpio;
-- evita pérdida silenciosa del draft mediante warnings;
-- no conecta Save.
+- evita pérdida silenciosa del draft mediante warnings.
 
-**Estado:** PUBLISHED / PENDING STUDIO VALIDATION.
+**Estado:** continuado por el usuario sin error reportado; pendiente de validación funcional completa en Studio.
 
 ### DF-06D — I · Save real
 
+Artefactos:
+
+- `06D_save_result_contract.property-guide.md`
+- `06D_cmpPR_CustomFieldsEditor.OnSaveRequested.powerfx`
+- `06D_btnCFDEPro_SaveDraft.OnSelect.powerfx`
+- `06D_GUIA_IMPLEMENTACION_Y_VALIDACION.md`
+
+Responsabilidad:
+
 - copia `DraftDefinition` a `varPunchReviewDef_*`;
 - ejecuta `btnPR_SaveCustomFieldDef`;
-- conserva servidor como fuente autoritativa;
-- mantiene modal abierto y refleja el catálogo recargado.
+- utiliza `varPunchReviewFieldDefsLastMutationSucceeded` y `varPunchReviewFieldDefsRefreshWarning` como resultado host;
+- reconcilia el `FieldDefId` autoritativo desde `colPunchReviewFieldDefsAdmin`;
+- mantiene el draft sucio si backend o refresh/reconciliación fallan;
+- tras éxito reconciliado, pasa el componente a `EDIT` y deja `DraftDirty=false`;
+- mantiene el modal abierto.
 
-**Estado:** bloqueado hasta validar DF-06C.
+**Estado:** PUBLISHED / PENDING STUDIO VALIDATION.
 
 ### DF-06E — I · Active/Inactive
 
 - conecta la intención de cambio de disponibilidad al servicio host DF-05C cuando proceda;
 - no duplica lógica de persistencia.
 
-**Estado:** bloqueado.
+**Estado:** bloqueado hasta validar DF-06D.
 
 ## Congelado durante DF-06
 
