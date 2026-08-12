@@ -1,0 +1,95 @@
+# DF-05D — REFRESH POSTERIOR A MUTACIÓN DE DEFINICIONES
+# Tipo: I — Integration
+# Operación: ADD CHILD
+# Target parent: conPR_CustomFieldsHost
+# Nuevo control: btnPR_RefreshCustomFieldDefinitionContext
+#
+# PROPÓSITO
+# Centralizar en un único servicio host el refresh posterior a una mutación de
+# Custom Field Definitions. El servicio:
+# - marca los filtros dinámicos de Punch List como pendientes de refresh;
+# - recarga el catálogo de definiciones desde servidor;
+# - recarga los valores del Punch actual cuando existe selección;
+# - registra una advertencia no bloqueante si el refresh posterior queda incompleto.
+#
+# DEPENDE DE
+# - DF-05A: btnPR_LoadCustomFieldDefs.
+# - DF-05B: btnPR_SaveCustomFieldDef.
+# - DF-05C: btnPR_SetCustomFieldActive.
+# - btnPR_LoadCustomFields existente.
+# - 05D_post_mutation_refresh_state.property-guide.md aplicado.
+#
+# TOCA
+# - Añade un único control de servicio invisible bajo conPR_CustomFieldsHost.
+# - varPunchDynamicFilters_NeedRefresh.
+# - varPunchReviewFieldDefsRefreshWarning.
+# - servicios de recarga ya existentes.
+#
+# NO MODIFICAR
+# - geometría de Punch Review.
+# - Comments.
+# - Review Progress.
+# - Review Queue.
+# - Dirty Guard.
+# - cmp_CustomFieldsEditorPro.
+# - capa de color / Design System.
+#
+# COMPATIBILIDAD
+# - Playbook modular vigente consultado antes de generar este YAML.
+# - Registro POWER_APPS_SOURCE_CODE_COMPATIBILITY.md vigente consultado.
+# - No Reset(), SVG inline, CanvasComponent nuevo, Label Radius* ni AccessibleLabel.
+#
+# VALIDACIÓN
+# 1. Añadir como hijo de conPR_CustomFieldsHost.
+# 2. Studio debe aceptar el YAML sin errores.
+# 3. Ejecutarlo tras una mutación correcta.
+# 4. varPunchDynamicFilters_NeedRefresh debe quedar true.
+# 5. colPunchReviewFieldDefsAdmin debe recargarse desde backend.
+# 6. Si existe Punch actual, sus Custom Fields deben recargarse.
+# 7. Si falla una recarga, debe quedar texto en varPunchReviewFieldDefsRefreshWarning.
+#
+# ESTADO ESPERADO TRAS VALIDACIÓN
+# POST-MUTATION REFRESH SERVICE = FUNCTIONAL_FROZEN
+
+- btnPR_RefreshCustomFieldDefinitionContext:
+    Control: Classic/Button@2.2.0
+    Properties:
+      Height: =1
+      OnSelect: |-
+        =Set(varPunchReviewFieldDefsRefreshWarning, "");
+        Set(varPunchDynamicFilters_NeedRefresh, true);
+
+        Select(btnPR_LoadCustomFieldDefs);
+
+        If(
+            !IsBlank(varPunchReviewFieldDefsError),
+            Set(
+                varPunchReviewFieldDefsRefreshWarning,
+                "The definition change was saved, but the definition catalog could not be refreshed: " &
+                varPunchReviewFieldDefsError
+            )
+        );
+
+        If(
+            !IsBlank(varPunchReviewCurrentId),
+            Select(btnPR_LoadCustomFields);
+            If(
+                !IsBlank(varPunchReviewFieldsError),
+                Set(
+                    varPunchReviewFieldDefsRefreshWarning,
+                    If(
+                        IsBlank(varPunchReviewFieldDefsRefreshWarning),
+                        "The definition change was saved, but the current Punch Custom Fields could not be refreshed: " &
+                        varPunchReviewFieldsError,
+                        varPunchReviewFieldDefsRefreshWarning &
+                        " | Current Punch refresh: " &
+                        varPunchReviewFieldsError
+                    )
+                )
+            )
+        )
+      Text: =""
+      Visible: =false
+      Width: =1
+      X: =0
+      Y: =0
