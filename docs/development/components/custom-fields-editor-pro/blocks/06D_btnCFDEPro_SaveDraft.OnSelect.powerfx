@@ -1,0 +1,17 @@
+=cmp_CustomFieldsEditorPro.OnSaveRequested();
+
+If(
+    Coalesce(cmp_CustomFieldsEditorPro.SaveSucceeded, false),
+
+    Set(
+        varCFDEPro_Draft_FieldDefId,
+        Coalesce(
+            cmp_CustomFieldsEditorPro.SavedFieldDefId,
+            varCFDEPro_Draft_FieldDefId,
+            0
+        )
+    );
+    Set(varCFDEPro_SelectedFieldKey, varCFDEPro_Draft_FieldKey);
+    Set(varCFDEPro_EditMode, "EDIT");
+    Set(varCFDEPro_DraftDirty, false)
+)
