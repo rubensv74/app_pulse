@@ -1,0 +1,58 @@
+=Set(varPunchReviewFieldDefsLastSavedId, 0);
+
+With(
+    {
+        draft: First(cmpPR_CustomFieldsEditor.DraftDefinition)
+    },
+
+    Set(varPunchReviewDef_FieldDefId, Coalesce(draft.FieldDefId, 0));
+    Set(varPunchReviewDef_FieldKey, Coalesce(draft.FieldKey, ""));
+    Set(varPunchReviewDef_Label, Coalesce(draft.Label, ""));
+    Set(varPunchReviewDef_FieldType, Coalesce(draft.FieldType, "Text"));
+    Set(varPunchReviewDef_HelpText, Coalesce(draft.HelpText, ""));
+    Set(varPunchReviewDef_IsRequired, Coalesce(draft.IsRequired, false));
+    Set(varPunchReviewDef_IsPinned, Coalesce(draft.IsPinned, false));
+    Set(varPunchReviewDef_IsActive, Coalesce(draft.IsActive, true));
+    Set(varPunchReviewDef_SortOrder, Coalesce(draft.SortOrder, 100));
+    Set(varPunchReviewDef_OptionsJson, Coalesce(draft.OptionsJson, "[]"));
+    Set(varPunchReviewDef_IsFilterable, Coalesce(draft.IsFilterable, false));
+    Set(varPunchReviewDef_ShowInQuickFilters, Coalesce(draft.ShowInQuickFilters, false));
+    Set(varPunchReviewDef_FilterOrder, Coalesce(draft.FilterOrder, 100));
+    Set(varPunchReviewDef_FilterMode, Coalesce(draft.FilterMode, "Equals"));
+    Set(varPunchReviewDefDirty, Coalesce(cmpPR_CustomFieldsEditor.DraftDirty, false))
+);
+
+Select(btnPR_SaveCustomFieldDef);
+
+If(
+    Coalesce(varPunchReviewFieldDefsLastMutationSucceeded, false) &&
+    IsBlank(Coalesce(varPunchReviewFieldDefsRefreshWarning, "")),
+
+    With(
+        {
+            savedDef:
+                LookUp(
+                    colPunchReviewFieldDefsAdmin,
+                    Lower(Trim(FieldKey)) = Lower(Trim(varPunchReviewDef_FieldKey))
+                )
+        },
+
+        If(
+            IsBlank(savedDef),
+
+            Set(
+                varPunchReviewFieldDefsRefreshWarning,
+                "La definición se guardó, pero no pudo reconciliarse con el catálogo recargado. Actualiza las definiciones antes de continuar editando."
+            );
+            Notify(
+                varPunchReviewFieldDefsRefreshWarning,
+                NotificationType.Warning
+            ),
+
+            Set(
+                varPunchReviewFieldDefsLastSavedId,
+                Coalesce(savedDef.FieldDefId, 0)
+            )
+        )
+    )
+)
