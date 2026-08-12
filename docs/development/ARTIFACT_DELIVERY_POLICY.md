@@ -16,6 +16,20 @@ This applies to:
 - test seeds;
 - implementation and validation documentation.
 
+## Idioma de las guías
+
+Las guías operativas dirigidas al usuario deben redactarse en **español** por defecto, incluyendo especialmente:
+
+- `.property-guide.md`;
+- instrucciones de integración;
+- guías de sustitución de fórmulas;
+- pasos de validación en Power Apps Studio;
+- contratos y checklists de ejecución cuando estén destinados al trabajo manual del usuario.
+
+Los nombres técnicos de controles, propiedades, componentes, funciones Power Fx, nombres de flows y contratos de backend deben conservarse exactamente como existen en la aplicación o en el código.
+
+El código fuente (`.pa.yaml`, `.powerfx`, SQL, PowerShell, etc.) no debe traducirse cuando la traducción altere identificadores, sintaxis o contratos técnicos.
+
 ## Delivery priority
 
 1. Repository file is the canonical artifact.
