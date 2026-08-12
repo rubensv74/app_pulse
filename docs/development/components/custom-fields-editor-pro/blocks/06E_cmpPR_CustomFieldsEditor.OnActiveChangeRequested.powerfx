@@ -1,0 +1,13 @@
+=Set(varPunchReviewFieldDefsLastMutationSucceeded, false);
+Set(varPunchReviewFieldDefToggleError, "");
+
+Set(
+    varPunchReviewFieldDefToggleKey,
+    Coalesce(cmpPR_CustomFieldsEditor.ActiveChangeFieldKey, "")
+);
+Set(
+    varPunchReviewFieldDefToggleActive,
+    Coalesce(cmpPR_CustomFieldsEditor.ActiveChangeTarget, false)
+);
+
+Select(btnPR_SetCustomFieldActive)
