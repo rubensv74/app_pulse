@@ -1,7 +1,7 @@
 # DF-07 — Custom Fields Editor UX Polish
 
 **Tipo:** `C/I — Component / Integration`  
-**Estado:** IN PROGRESS — DF-07A aplicado; DF-07A-FIX1 continuado por el usuario sin error reportado; DF-07B publicado y pendiente de validación en Power Apps Studio.
+**Estado:** IN PROGRESS — DF-07A aplicado; DF-07A-FIX1 y DF-07B continuados por el usuario sin nuevo error reportado; DF-07C publicado para cerrar teclado/foco antes del cierre documental.
 
 ## Objetivo
 
@@ -74,7 +74,38 @@ Responsabilidad:
 - ejecutar el second-order clipping pass completo;
 - no modificar backend, persistencia ni geometría macro.
 
+**Estado:** continuado por el usuario sin nuevo error reportado; pendiente de confirmación visual final en Studio.
+
+## DF-07C — Accessibility / keyboard / focus
+
+Artefactos:
+
+- `07C_accessibility_keyboard_focus.property-guide.md`
+- `07C_GUIA_IMPLEMENTACION_Y_VALIDACION.md`
+
+Responsabilidad:
+
+- asegurar participación coherente de controles interactivos en la navegación por teclado;
+- usar `TabIndex=0` para controles clásicos interactivos y foco visible;
+- usar `AcceptsFocus` en controles modernos cuando la versión exacta lo exponga en Studio;
+- evitar tab stops inútiles en controles read-only, especialmente Internal Key;
+- validar estados ADD/EDIT, Filterable, Choice/MultiChoice, Loading, Saving y Reader;
+- no introducir `AccessibleLabel` en `Classic/Button@2.2.0` por incompatibilidad PULSE ya confirmada;
+- documentar la limitación de accesibilidad inherente al modal overlay Canvas sin intentar construir un focus trap manual.
+
 **Estado:** PUBLISHED / PENDING STUDIO VALIDATION.
+
+## DF-07D — Help + documentación
+
+Pendiente después del gate DF-07C.
+
+Alcance previsto:
+
+- actualizar la ayuda bilingüe de Punch Review para explicar Manage / Definitions;
+- actualizar `MANUAL_USUARIO_PUNCH_REVIEW.md` con Review Progress, Dirty Guard y administración de definiciones;
+- retirar limitaciones ya superadas del manual;
+- consolidar documentación reutilizable de `cmp_CustomFieldsEditorPro`;
+- decidir qué fuente se considera canonical después de la última copia validada desde Studio.
 
 ## Congelado
 
@@ -93,13 +124,15 @@ Responsabilidad:
 
 Power Apps Studio es la autoridad final.
 
-DF-07 se cerrará cuando DF-07B supere la matriz visual en el host real. Después del PASS esperado:
+DF-07 se cerrará cuando se completen el gate visual, el gate de teclado/foco y el cierre documental. El estado objetivo es:
 
 ```text
 STRUCTURE      FROZEN
 BEHAVIOR       FROZEN
 DATA CONTRACT  FROZEN
 VISUAL QA      APPROVED
+KEYBOARD QA    APPROVED
+HELP / DOCS    CURRENT
 COLOR          PENDING
 ```
 
