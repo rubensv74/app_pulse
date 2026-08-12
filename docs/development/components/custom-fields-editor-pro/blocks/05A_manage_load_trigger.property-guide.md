@@ -1,20 +1,20 @@
-# DF-05A — Manage → definition-load validation hook
+# DF-05A — Manage → carga de definiciones para validación
 
-**Type:** `I — Integration`  
-**Artifact:** property-only guide  
-**Purpose:** temporarily connect the existing Punch Review **Manage** action to the new host definition-load service so DF-05A can be validated before DF-06 introduces the actual modal.
+**Tipo:** `I — Integration`  
+**Artefacto:** guía de propiedades  
+**Propósito:** conectar temporalmente la acción existente **Manage** de Punch Review con el nuevo servicio host de carga de definiciones, de modo que DF-05A pueda validarse antes de que DF-06 introduzca el modal real.
 
-## Target
+## Objetivo
 
 `cmpPR_CustomFieldValues.OnManageFieldsRequested`
 
-Location:
+Ubicación:
 
 `conPR_RightColumn → conPR_CustomFieldsHost → cmpPR_CustomFieldValues`
 
-## Replace only this property
+## Sustituir únicamente esta propiedad
 
-Replace the current informational placeholder formula in `OnManageFieldsRequested` with:
+Reemplaza la fórmula informativa actual de `OnManageFieldsRequested` por:
 
 ```powerfx
 =Select(btnPR_LoadCustomFieldDefs);
@@ -32,27 +32,27 @@ If(
 )
 ```
 
-## Do not modify
+## No modificar
 
-- component geometry;
-- `cmp_CustomFieldValuesPro` definition;
-- Custom Field value load/save behavior;
+- geometría del componente;
+- definición de `cmp_CustomFieldValuesPro`;
+- comportamiento actual de carga/guardado de valores Custom Field;
 - Comments;
 - Review Progress;
 - Dirty Guard;
-- theme/color properties.
+- propiedades de theme/color.
 
-## Validation
+## Validación
 
-1. Select a real project.
-2. Open a Punch in Punch Review.
-3. Press **Manage** in Custom Fields.
-4. Confirm the success notification reports the number of definitions loaded.
-5. Inspect `colPunchReviewFieldDefsAdmin` if needed and confirm both active and inactive definitions are present.
-6. Confirm `varPunchReviewFieldDefsError` is blank.
-7. Confirm no visual geometry changes occur.
-8. Test with no project selected: the action must show the host error instead of calling the flow successfully.
+1. Selecciona un proyecto real.
+2. Abre un Punch en Punch Review.
+3. Pulsa **Manage** dentro de Custom Fields.
+4. Confirma que la notificación de éxito muestra el número de definiciones cargadas.
+5. Si es necesario, inspecciona `colPunchReviewFieldDefsAdmin` y confirma que contiene definiciones activas e inactivas.
+6. Confirma que `varPunchReviewFieldDefsError` queda vacío.
+7. Confirma que no se produce ningún cambio de geometría visual.
+8. Prueba también sin proyecto seleccionado: la acción debe mostrar el error del host en lugar de completar correctamente la llamada al Flow.
 
-## Lifecycle
+## Ciclo de vida
 
-This notification hook is intentionally temporary. DF-06 will replace it with the real modal-open lifecycle while preserving `Select(btnPR_LoadCustomFieldDefs)` as the host read service.
+Este hook de notificación es deliberadamente temporal. DF-06 lo sustituirá por el ciclo real de apertura del modal, conservando `Select(btnPR_LoadCustomFieldDefs)` como servicio de lectura propiedad del host.
