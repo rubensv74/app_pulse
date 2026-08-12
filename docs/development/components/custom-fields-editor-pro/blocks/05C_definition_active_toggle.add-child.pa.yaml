@@ -1,0 +1,180 @@
+# DF-05C — ACTIVE / INACTIVE DE DEFINICIONES
+# Tipo: I — Integration
+# Operación: ADD CHILD
+# Target parent: conPR_CustomFieldsHost
+# Nuevo control: btnPR_SetCustomFieldActive
+#
+# PROPÓSITO
+# Activar o desactivar una definición PUNCH mediante WarRoom_SetCustomFieldActive
+# desde el host de Punch Review. El componente reutilizable no llama directamente
+# a Power Automate.
+#
+# DEPENDE DE
+# - DF-05A validado: btnPR_LoadCustomFieldDefs existente.
+# - DF-05B integrado: btnPR_LoadCustomFields y estado host disponibles.
+# - 05C_host_active_state.property-guide.md aplicado.
+# - colPunchReviewFieldDefsAdmin cargada.
+# - varProjectId y varUserRole existentes.
+# - WarRoom_SetCustomFieldActive disponible en la app activa.
+#
+# TOCA
+# - Añade un único control de servicio invisible bajo conPR_CustomFieldsHost.
+# - Usa varPunchReviewFieldDefToggle*.
+# - Recarga definiciones desde servidor después de una mutación correcta.
+# - Recarga los valores del Punch actual para reflejar activación/desactivación.
+# - Marca varPunchDynamicFilters_NeedRefresh=true cuando existe mutación.
+#
+# NO MODIFICAR
+# - geometría de Punch Review.
+# - Comments.
+# - Review Progress.
+# - Review Queue.
+# - Dirty Guard.
+# - cmp_CustomFieldsEditorPro.
+# - capa de color / Design System.
+#
+# CONTRATO BACKEND CONFIRMADO
+# WarRoom_SetCustomFieldActive.Run(
+#   ProjectId,
+#   EntityType,
+#   FieldKey,
+#   IsActive,
+#   UserEmail
+# )
+#
+# VALIDACIÓN
+# - Studio acepta el control sin nombres o fórmulas en rojo.
+# - El servicio no se invoca todavía desde cmp_CustomFieldsEditorPro; DF-06 hará el wiring.
+# - Con una definición de prueba, false la desactiva y true la reactiva.
+# - Tras cada mutación, el catálogo se recarga desde backend.
+# - El panel de valores del Punch actual se refresca.
+# - varPunchDynamicFilters_NeedRefresh queda true tras una mutación real.
+#
+# ESTADO ESPERADO TRAS VALIDACIÓN
+# BACKEND ACTIVE/INACTIVE SERVICE = FUNCTIONAL_FROZEN
+
+- btnPR_SetCustomFieldActive:
+    Control: Classic/Button@2.2.0
+    Properties:
+      Height: =1
+      OnSelect: |-
+        =Set(varPunchReviewFieldDefToggleLoading, true);
+        Set(varPunchReviewFieldDefToggleError, "");
+
+        If(
+            IsBlank(varProjectId),
+
+            Set(
+                varPunchReviewFieldDefToggleError,
+                "No active project is available for changing Custom Field definition status."
+            ),
+
+            Lower(Coalesce(varUserRole, "reader")) <> "manager",
+
+            Set(
+                varPunchReviewFieldDefToggleError,
+                "Your current role does not allow Custom Field definition management."
+            ),
+
+            IsBlank(Trim(Coalesce(varPunchReviewFieldDefToggleKey, ""))),
+
+            Set(
+                varPunchReviewFieldDefToggleError,
+                "Field key is required for changing definition status."
+            ),
+
+            IsBlank(
+                LookUp(
+                    colPunchReviewFieldDefsAdmin,
+                    Lower(Trim(FieldKey)) = Lower(Trim(varPunchReviewFieldDefToggleKey))
+                )
+            ),
+
+            Set(
+                varPunchReviewFieldDefToggleError,
+                "The selected Custom Field definition is not present in the loaded catalog. Refresh definitions and try again."
+            ),
+
+            Coalesce(
+                LookUp(
+                    colPunchReviewFieldDefsAdmin,
+                    Lower(Trim(FieldKey)) = Lower(Trim(varPunchReviewFieldDefToggleKey)),
+                    IsActive
+                ),
+                false
+            ) = Coalesce(varPunchReviewFieldDefToggleActive, false),
+
+            Notify(
+                If(
+                    Coalesce(varPunchReviewFieldDefToggleActive, false),
+                    "Custom Field definition is already active.",
+                    "Custom Field definition is already inactive."
+                ),
+                NotificationType.Information
+            ),
+
+            IfError(
+                With(
+                    {
+                        resp:
+                            WarRoom_SetCustomFieldActive.Run(
+                                varProjectId,
+                                "PUNCH",
+                                Trim(varPunchReviewFieldDefToggleKey),
+                                Coalesce(varPunchReviewFieldDefToggleActive, false),
+                                Lower(User().Email)
+                            )
+                    },
+
+                    Set(varPunchDynamicFilters_NeedRefresh, true);
+
+                    If(
+                        Lower(Trim(Coalesce(varPunchReviewDef_FieldKey, ""))) =
+                        Lower(Trim(varPunchReviewFieldDefToggleKey)),
+                        Set(
+                            varPunchReviewDef_IsActive,
+                            Coalesce(varPunchReviewFieldDefToggleActive, false)
+                        )
+                    );
+
+                    Select(btnPR_LoadCustomFieldDefs);
+
+                    If(
+                        !IsBlank(varPunchReviewCurrentId),
+                        Select(btnPR_LoadCustomFields)
+                    );
+
+                    Notify(
+                        If(
+                            Coalesce(varPunchReviewFieldDefToggleActive, false),
+                            "Custom Field definition activated successfully.",
+                            "Custom Field definition deactivated successfully."
+                        ),
+                        NotificationType.Success
+                    )
+                ),
+
+                Set(
+                    varPunchReviewFieldDefToggleError,
+                    Coalesce(
+                        FirstError.Message,
+                        "Custom Field definition status could not be changed."
+                    )
+                )
+            )
+        );
+
+        Set(varPunchReviewFieldDefToggleLoading, false);
+
+        If(
+            !IsBlank(varPunchReviewFieldDefToggleError),
+            Notify(
+                varPunchReviewFieldDefToggleError,
+                NotificationType.Error
+            )
+        )
+      Text: =""
+      Visible: =false
+      Width: =1
+      X: =0
+      Y: =0
