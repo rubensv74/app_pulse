@@ -1,7 +1,7 @@
 # DF-07 — Custom Fields Editor UX Polish
 
 **Tipo:** `C/I — Component / Integration`  
-**Estado:** IN PROGRESS — DF-07A aplicado en Studio; mejora confirmada visualmente; DF-07A-FIX1 publicado para resolver clipping residual de Filtering antes de DF-07B.
+**Estado:** IN PROGRESS — DF-07A aplicado; DF-07A-FIX1 continuado por el usuario sin error reportado; DF-07B publicado y pendiente de validación en Power Apps Studio.
 
 ## Objetivo
 
@@ -35,12 +35,9 @@ La captura de validación del 2026-08-12 confirma mejora clara en:
 - reducción del peso visual de los switches;
 - mejor balance general del modal.
 
-También revela un defecto residual producido por la compactación:
+También reveló un defecto de segundo orden en `Filtering`, tratado como FIX aislado.
 
-- `Not filterable` / `More filters` disponen de ancho insuficiente;
-- el texto se envuelve o recorta y se aproxima a la fila `Filter mode / Filter order`.
-
-**Estado:** FUNCTIONAL / VISUAL PARTIAL — requiere FIX antes de congelar.
+**Estado:** FUNCTIONAL / VISUAL PARTIAL.
 
 ## DF-07A-FIX1 — Filtering clipping y toggle density
 
@@ -58,20 +55,26 @@ Responsabilidad:
 - cerrar la escala tipográfica de los toggles compactos;
 - no tocar lógica, backend ni geometría macro.
 
-**Estado:** PUBLISHED / PENDING STUDIO VALIDATION.
+**Estado:** continuado por el usuario sin error reportado; Power Apps Studio sigue siendo la autoridad de validación visual final.
 
 ## DF-07B — Visual finish
 
-Bloque posterior, condicionado al PASS de DF-07A-FIX1.
+Artefactos:
 
-Alcance previsto:
+- `07B_visual_finish.property-guide.md`
+- `07B_GUIA_IMPLEMENTACION_Y_VALIDACION.md`
 
-- revisar spacing fino de Preview y Catalog;
-- confirmar balance vertical y uso del espacio sin llenar superficies de forma artificial;
-- comprobar estados loading / saving / error / disabled;
-- ejecutar second-order clipping pass sobre todos los tipos de campo;
-- acabado visual final;
-- sin cambios de backend ni comportamiento.
+Responsabilidad:
+
+- diferenciar `read-only` de `disabled` para mantener legibilidad en Filtering;
+- eliminar coordenadas innecesariamente absolutas en el Live Preview;
+- mejorar jerarquía y spacing interno del Preview sin añadir controles;
+- centrar empty states respecto al alto real del host;
+- validar Loading / Saving / Error / no-manager;
+- ejecutar el second-order clipping pass completo;
+- no modificar backend, persistencia ni geometría macro.
+
+**Estado:** PUBLISHED / PENDING STUDIO VALIDATION.
 
 ## Congelado
 
@@ -90,4 +93,14 @@ Alcance previsto:
 
 Power Apps Studio es la autoridad final.
 
-No se declara DF-07A `VISUAL_APPROVED` mientras el clipping residual siga presente. El protocolo exige resolverlo mediante DF-07A-FIX1 antes de iniciar DF-07B.
+DF-07 se cerrará cuando DF-07B supere la matriz visual en el host real. Después del PASS esperado:
+
+```text
+STRUCTURE      FROZEN
+BEHAVIOR       FROZEN
+DATA CONTRACT  FROZEN
+VISUAL QA      APPROVED
+COLOR          PENDING
+```
+
+Los ajustes exclusivamente cromáticos no deben reabrir estructura ni comportamiento.
