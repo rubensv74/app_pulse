@@ -2,35 +2,45 @@
 
 ## Preferred strategy
 
-Use imported SVG Media assets when the navigation color/state is known in advance. The current PULSE sidebar ships two files per destination:
+Use imported SVG Media assets when the navigation color/state is known in advance.
+
+The current PULSE sidebar ships two files per destination, but **every physical filename is globally unique**:
 
 ```text
-sidebar/inactive/*.svg  → white
-sidebar/active/*.svg    → PULSE cyan
+sidebar/inactive/pulse-nav-<destination>-inactive.svg
+sidebar/active/pulse-nav-<destination>-active.svg
 ```
 
 Current destinations: `home`, `overview`, `punch-review`, `punch-list`, `briefing`, `skyline`, `config`, `admin`.
 
-## Import pattern
+## Power Apps Media naming rule
 
-Import both variants with stable Media names, for example:
+Power Apps Media behaves as a flat asset namespace. Two files named `home.svg` cannot be safely treated as distinct merely because they came from different repository folders.
+
+Therefore the repository filename itself must encode state:
 
 ```text
-pulse_punch_review_inactive
-pulse_punch_review_active
+pulse-nav-home-inactive.svg
+pulse-nav-home-active.svg
+pulse-nav-punch-review-inactive.svg
+pulse-nav-punch-review-active.svg
 ```
 
-Bind the host Image conceptually as:
+This is the canonical rule for all future PULSE media assets that have state variants.
+
+## Import pattern
+
+After import, Power Apps may normalize hyphens in the Media identifier. Use the actual identifier shown by Studio. Conceptually:
 
 ```powerfx
 If(
     ThisItem.IsActive,
-    pulse_punch_review_active,
-    pulse_punch_review_inactive
+    pulse_nav_punch_review_active,
+    pulse_nav_punch_review_inactive
 )
 ```
 
-Preferred first validation:
+Preferred visual host:
 
 ```text
 Width = 20
@@ -44,17 +54,13 @@ Confirmed in Power Apps Studio:
 
 - SVG files upload through Media;
 - SVG content renders in Image controls;
-- `20×20` + `ImagePosition.Fit` renders without clipping or format failure.
-
-A side-by-side screenshot of all eight concepts also proved that technical equality is not optical equality. Several glyphs looked materially smaller even though every host was 20×20 and every SVG used `viewBox="0 0 24 24"`.
+- `20×20` + `ImagePosition.Fit` renders without clipping or format failure;
+- equal `viewBox` and host dimensions do not guarantee equal optical weight;
+- duplicate basenames across active/inactive repository folders are unsuitable for practical batch import.
 
 ## Optical QA rule
 
-At 20 px, compare the eight icons simultaneously. The primary silhouette should usually occupy about 17–18 units of the SVG's dominant 24-unit axis, but accept/reject by perception rather than coordinates.
-
-Reject/rework any glyph that appears noticeably smaller, thinner, denser, off-center or less recognizable than its neighbors.
-
-Validate on the actual dark sidebar, not only on a white test canvas. Then verify 16 px and 24 px.
+At 20 px, compare the eight icons simultaneously on the real `#07111F` sidebar. Reject/rework any glyph that appears noticeably smaller, thinner, denser, off-center or less recognizable than its neighbors. Then verify 16 px and 24 px.
 
 ## Accessibility
 

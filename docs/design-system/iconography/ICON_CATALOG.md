@@ -8,20 +8,20 @@ The canonical outline families remain: Navigation (10), Work/Punches (10), Proje
 
 ## Sidebar variants
 
-These eight destinations exist in both `sidebar/inactive/` and `sidebar/active/`:
+Each destination has two Power Apps-safe filenames:
 
-| File | PULSE destination | Visual metaphor |
-|---|---|---|
-| `home.svg` | Home | house |
-| `overview.svg` | Overview | bars + operational trend |
-| `punch-review.svg` | Punch Review | target + check |
-| `punch-list.svg` | Punch List | structured list |
-| `briefing.svg` | Briefing | message / concise briefing |
-| `skyline.svg` | Skyline | skyline/profile bars |
-| `config.svg` | Config | gear |
-| `admin.svg` | Admin | shield + user |
+| Destination | Inactive file | Active file | Visual metaphor |
+|---|---|---|---|
+| Home | `pulse-nav-home-inactive.svg` | `pulse-nav-home-active.svg` | house |
+| Overview | `pulse-nav-overview-inactive.svg` | `pulse-nav-overview-active.svg` | bars + operational trend |
+| Punch Review | `pulse-nav-punch-review-inactive.svg` | `pulse-nav-punch-review-active.svg` | target + check |
+| Punch List | `pulse-nav-punch-list-inactive.svg` | `pulse-nav-punch-list-active.svg` | structured list |
+| Briefing | `pulse-nav-briefing-inactive.svg` | `pulse-nav-briefing-active.svg` | message / concise briefing |
+| Skyline | `pulse-nav-skyline-inactive.svg` | `pulse-nav-skyline-active.svg` | skyline/profile bars |
+| Config | `pulse-nav-config-inactive.svg` | `pulse-nav-config-active.svg` | gear |
+| Admin | `pulse-nav-admin-inactive.svg` | `pulse-nav-admin-active.svg` | shield + user |
 
-The previous generic sidebar concepts (`dashboard`, `punches`, `tasks`, `projects`, `review`, `comments`, `users`, `analytics`, `settings`) are not retained as sidebar aliases. Their generic equivalents remain available where applicable in the canonical outline families.
+The filename pattern is normative: `pulse-nav-<destination>-<state>.svg`. State must be encoded in the basename because Power Apps Media uses a flat namespace.
 
 ## Semantic variants
 

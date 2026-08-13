@@ -1,7 +1,7 @@
 # PULSE Icon Set v1
 
 **Status:** PDS_CANDIDATE  
-**Version:** 1.0.1  
+**Version:** 1.0.3  
 **Target:** PULSE Canvas application / Power Apps
 
 This directory is the canonical runtime asset home for the PULSE-owned icon system.
@@ -15,16 +15,23 @@ This directory is the canonical runtime asset home for the PULSE-owned icon syst
 
 ## Sidebar set
 
-The sidebar is tailored to the current PULSE shell rather than a generic SaaS menu:
+The sidebar is tailored to the current PULSE shell: `home`, `overview`, `punch-review`, `punch-list`, `briefing`, `skyline`, `config`, `admin`.
 
-`home`, `overview`, `punch-review`, `punch-list`, `briefing`, `skyline`, `config`, `admin`.
-
-Each destination has:
+Each physical sidebar file has a globally unique basename so both states can be imported into Power Apps Media without collisions:
 
 ```text
-sidebar/inactive/<name>.svg  → #FFFFFF / 1.8 px
-sidebar/active/<name>.svg    → #00C8FF / 2.0 px
+sidebar/inactive/pulse-nav-<name>-inactive.svg  → #FFFFFF / 1.8 px
+sidebar/active/pulse-nav-<name>-active.svg      → #00C8FF / 2.0 px
 ```
+
+Example:
+
+```text
+pulse-nav-home-inactive.svg
+pulse-nav-home-active.svg
+```
+
+Do not publish active/inactive files with the same basename in different repository folders: Power Apps Media treats uploaded assets as one flat namespace.
 
 The geometry is normalized optically for a 20 px host. A common 24×24 viewBox is necessary but not sufficient; each glyph is balanced by occupied area, perceived mass and detail density.
 
@@ -37,8 +44,4 @@ The geometry is normalized optically for a 20 px host. A common 24×24 viewBox i
 - Rounded line caps and joins.
 - Transparent background.
 
-The SVG files are repository-local PULSE assets and are not copied from an external icon pack.
-
-Normative documentation lives in `docs/design-system/iconography/`.
-
-Power Apps Studio has already confirmed that imported SVG media renders correctly. The set remains `PDS_CANDIDATE` until the eight sidebar glyphs are visually validated at 20 px in the real dark PULSE sidebar and active/inactive switching is confirmed.
+Power Apps Studio has confirmed imported SVG media renders correctly. The set remains `PDS_CANDIDATE` until the sidebar family and active/inactive switching are visually validated in the real PULSE shell.
