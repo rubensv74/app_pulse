@@ -1,7 +1,7 @@
 # PULSE Icon System
 
-**Status:** PDS_CANDIDATE  
-**Version:** 1.0.3  
+**Status:** ACTIVE  
+**Version:** 1.0.4  
 **Date:** 2026-08-13  
 **Scope:** PULSE Power Apps iconography
 
@@ -33,7 +33,7 @@ active sidebar stroke: 2.0 px
 linecap: round
 linejoin: round
 background: transparent
-preferred validation host: 20×20 px
+canonical sidebar host: 20×20 px
 ```
 
 A shared viewBox does not guarantee equal perceived size. Primary navigation glyphs are normalized by occupied area, perceived stroke mass, visual center, internal detail density and silhouette recognition. Optical balance overrides mathematical equality.
@@ -53,26 +53,33 @@ This naming rule is part of the runtime contract. Power Apps Media uses a flat n
 
 ## 5. Accessibility
 
-Interactive hosts require meaningful `AccessibleLabel`, adequate hit targets and a non-color selection cue.
+Interactive hosts require meaningful `AccessibleLabel`, adequate hit targets and a non-color selection cue. The sidebar keeps the full gallery row as the click target while the SVG itself remains visually compact.
 
-## 6. Power Apps validation gate
+## 6. Power Apps validation
 
-Observed in the real PULSE Canvas app on 2026-08-13:
+Validated in the real PULSE Canvas app on 2026-08-13:
 
 - `.svg` imports successfully as Media;
-- imported SVG renders in an Image control;
-- `20×20` with `ImagePosition.Fit` renders without format failure or clipping;
-- side-by-side comparison is required because equal viewBox does not imply equal optical weight;
-- active/inactive physical filenames must be unique for reliable import.
+- active and inactive assets with unique basenames can coexist in Media;
+- imported SVG renders correctly in Image controls;
+- `20×20` with `ImagePosition.Fit` renders without clipping or format failure;
+- all eight sidebar concepts were reviewed together on the real `#07111F` sidebar;
+- inactive icons render in white and the active icon switches to PULSE cyan `#00C8FF`;
+- the selected row retains an additional non-color cue through its active background and left accent bar;
+- no material optical imbalance remains at the canonical 20 px navigation size;
+- the runtime test confirmed the final naming rule and active/inactive state model.
 
-Still required before `ACTIVE` promotion:
+The canonical sidebar gate is therefore **PASS** and the system is promoted to `ACTIVE`.
 
-1. import the uniquely named active/inactive assets;
-2. compare all eight concepts at 20 px on the real `#07111F` sidebar;
-3. verify active/inactive switching;
-4. check 16 px and 24 px fallbacks;
-5. confirm browser zoom behavior;
-6. verify accessible labels on host controls.
+### Recommended regression checks
+
+These are not blockers for v1.0.4 but should be repeated when the sidebar geometry or icon host changes:
+
+1. 16 px fallback check;
+2. 24 px fallback check;
+3. browser zoom / display scaling check;
+4. accessibility review of host controls;
+5. optical comparison after adding any new navigation concept.
 
 ## 7. Source of truth
 
