@@ -1,7 +1,7 @@
 # PULSE Icon System
 
 **Status:** PDS_CANDIDATE  
-**Version:** 1.0.1  
+**Version:** 1.0.2  
 **Date:** 2026-08-13  
 **Scope:** PULSE Power Apps iconography
 
@@ -38,15 +38,11 @@ background: transparent
 preferred validation host: 20×20 px
 ```
 
-A shared viewBox does **not** guarantee equal perceived size. Every primary navigation glyph must also be normalized by:
+A shared viewBox does **not** guarantee equal perceived size. Primary navigation glyphs must be normalized optically by occupied area, perceived stroke mass, visual center, internal-counter size, detail density and silhouette recognition.
 
-1. occupied area inside the 24×24 frame;
-2. perceived stroke mass at 20 px;
-3. vertical/horizontal visual center;
-4. number and size of internal counters;
-5. detail density and silhouette recognition.
+For the current sidebar, the primary silhouette should normally occupy roughly 17–18 units on its dominant axis inside the 24×24 frame. This is a starting envelope, not a rigid mathematical rule: optical balance overrides equal coordinates.
 
-Avoid icons that are geometrically wide but optically weak at navigation size.
+Avoid icons that are geometrically wide but visually weak, or icons whose internal detail collapses at 20 px.
 
 ## 4. Families
 
@@ -80,7 +76,7 @@ Each exists in white inactive and cyan active variants.
 | Config | gear |
 | Admin | protected user / shield |
 
-`eye` remains available as a generic view/review action but is not the primary Punch Review navigation icon.
+`eye` remains available as a generic view action but is not the Punch Review navigation metaphor.
 
 ## 6. Accessibility
 
@@ -92,15 +88,17 @@ Observed in the real PULSE Canvas app on 2026-08-13:
 
 - `.svg` imports successfully as Media;
 - imported SVG renders in an Image control;
-- `20×20` with `ImagePosition.Fit` renders without SVG-format failure or clipping.
+- `20×20` with `ImagePosition.Fit` renders without SVG-format failure or clipping;
+- side-by-side 20 px comparison is required because equal viewBox does not imply equal optical weight.
 
 Still required before `ACTIVE` promotion:
 
-1. compare all eight sidebar concepts at 20 px on the real dark sidebar;
-2. verify active/inactive switching;
-3. check 16 px and 24 px fallbacks;
-4. confirm browser zoom behavior;
-5. verify accessible labels on the host controls.
+1. import/reload v1.0.2 sidebar assets;
+2. compare all eight concepts at 20 px on the real `#07111F` sidebar;
+3. verify active/inactive switching;
+4. check 16 px and 24 px fallbacks;
+5. confirm browser zoom behavior;
+6. verify accessible labels on host controls.
 
 ## 8. Source of truth
 
