@@ -47,6 +47,16 @@ Incluye, entre otros controles:
 
 Este documento es normativo para cualquier pantalla o componente nuevo/modificado y debe consultarse antes de cerrar un gate visual.
 
+### 4. `iconography/`
+
+Define y cataloga el sistema propio de iconos SVG de PULSE:
+
+- `PULSE_ICON_SYSTEM.md` — gramática visual, color, geometría, accesibilidad y evolución;
+- `ICON_CATALOG.md` — catálogo funcional de pictogramas;
+- `POWER_APPS_USAGE.md` — patrón de importación y uso en Canvas Apps.
+
+Los SVG operativos viven en `power-apps/assets/icons/pulse/v1/` y siguen el PDS. La iconografía de marca usa cyan PULSE, no violeta.
+
 ## Método de aplicación
 
 Estos documentos deben utilizarse junto con:
@@ -58,4 +68,4 @@ docs/development/PROTOCOLO_CONSTRUCCION_MODULAR_PANTALLAS_POWER_APPS.md
 
 Regla resumida:
 
-> **El arquetipo define la arquitectura. El PDS define el lenguaje visual. Los Visual QA Guardrails evitan defectos visibles recurrentes. El protocolo modular define cómo construir y validar.**
+> **El arquetipo define la arquitectura. El PDS define el lenguaje visual. Los Visual QA Guardrails evitan defectos visibles recurrentes. El sistema de iconos normaliza la semántica visual. El protocolo modular define cómo construir y validar.**
