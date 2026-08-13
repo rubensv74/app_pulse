@@ -2,29 +2,37 @@
 
 **Pantalla host:** `scr_PunchReview`  
 **Componente:** `cmp_CustomFieldsEditorPro`  
-**Estado:** READY FOR STUDIO VALIDATION  
+**Estado:** STUDIO VALIDATED · 2026-08-13  
 **Tipo:** FIX funcional aislado · property-only
 
-## Diagnóstico
+## Resultado validado
 
-DF-06E-FIX3 corrigió los outputs `ActiveChangeFieldKey` y `ActiveChangeTarget`, pero la captura posterior sigue mostrando el error:
+Power Apps Studio confirmó que la mutación Active/Inactive funciona correctamente cuando el host toma el contexto directamente de `DraftDefinition`.
 
-> The selected Custom Field definition is not present in the loaded catalog after refresh.
+Validado por el usuario:
 
-El componente ya dispone de un output estable y autoritativo para la definición que el usuario está editando: `DraftDefinition`.
+- Active → Inactive funciona;
+- Inactive → Active funciona;
+- desaparece el falso error `definition is not present in the loaded catalog after refresh`;
+- la mutación usa el `FieldKey` visible/estable del draft;
+- el enfoque basado en outputs transitorios deja de ser crítico para persistencia.
 
-Ese output contiene exactamente:
+## Diagnóstico final
+
+El componente dispone de un output estable y autoritativo para la definición que el usuario está editando: `DraftDefinition`.
+
+Ese output contiene:
 
 - `FieldKey = varCFDEPro_Draft_FieldKey`
 - `IsActive = varCFDEPro_Draft_IsActive`
 
 Y esos mismos valores son los que se muestran en el formulario (`Internal key`) y en el toggle `Availability`.
 
-Para evitar cualquier divergencia o timing entre outputs transitorios y el host, la mutación Active/Inactive debe tomar su contexto directamente de `DraftDefinition`.
+Para evitar divergencias o timing entre outputs transitorios y el host, la mutación Active/Inactive toma su contexto directamente de `DraftDefinition`.
 
 ---
 
-# A. `cmpPR_CustomFieldsEditor.OnActiveChangeRequested` — REEMPLAZAR COMPLETAMENTE
+# A. `cmpPR_CustomFieldsEditor.OnActiveChangeRequested`
 
 Target:
 
@@ -69,13 +77,11 @@ Los dos outputs ActiveChange pueden mantenerse por compatibilidad, pero dejan de
 
 ---
 
-# B. `cmpPR_CustomFieldsEditor.OnRefresh` — limpiar error de mutación obsoleto
+# B. `cmpPR_CustomFieldsEditor.OnRefresh`
 
 Target:
 
 `scr_PunchReview → conPR_CustomFieldsEditorModalLayer → cmpPR_CustomFieldsEditor → OnRefresh`
-
-Reemplazar completamente por:
 
 ```powerfx
 =If(
@@ -98,8 +104,6 @@ Esto impide que un error Active/Inactive anterior siga visible después de un Re
 
 # No tocar
 
-En este FIX no cambiar:
-
 - `tglCFDEPro_Active.OnChange`;
 - `DraftDefinition` del componente;
 - `btnPR_SetCustomFieldActive.OnSelect` de DF-06E-FIX2;
@@ -109,32 +113,18 @@ En este FIX no cambiar:
 - definición `impact_score`;
 - catálogo.
 
----
-
-# Validación
-
-1. Aplicar A y B.
-2. Cerrar y volver a abrir Manage, o pulsar Refresh con draft limpio.
-3. Seleccionar `Impact Score`.
-4. Confirmar que `Internal key` muestra `impact_score`.
-5. Active → Inactive.
-6. Confirmar ausencia del error `not present in loaded catalog`.
-7. Confirmar que tras refresh automático `Impact Score` queda inactivo.
-8. Activar `Show inactive`.
-9. Seleccionar de nuevo `Impact Score`.
-10. Inactive → Active.
-11. Confirmar persistencia y ausencia de error.
-
-## PASS
+## Gate cerrado
 
 ```text
-HOST MUTATION KEY        impact_score
-HOST MUTATION TARGET     false / true según draft
-FALSE NOT-PRESENT ERROR  0
-STALE ERROR AFTER REFRESH 0
-DEACTIVATE               PASS
-REACTIVATE               PASS
-PERSIST AFTER REFRESH    PASS
+HOST MUTATION KEY          PASS
+HOST MUTATION TARGET       PASS
+FALSE NOT-PRESENT ERROR    0
+STALE ERROR AFTER REFRESH  0
+DEACTIVATE                 PASS
+REACTIVATE                 PASS
+PERSIST AFTER REFRESH      PASS
 ```
 
-Si este gate falla, capturar el valor visible de `Internal key` y el mensaje de error exacto; no modificar backend hasta tener esa evidencia.
+## Lección preventiva
+
+Para eventos inmediatos de componentes, cuando ya existe un output agregado y estable como `DraftDefinition`, el host debe preferir ese contrato autoritativo frente a varios outputs transitorios independientes que puedan divergir por timing o sincronización.
