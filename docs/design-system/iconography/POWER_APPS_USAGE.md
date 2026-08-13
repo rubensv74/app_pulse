@@ -1,10 +1,10 @@
-# Using PULSE SVG Icons in Power Apps
+# PULSE Icon System — Power Apps Usage
 
 ## Preferred strategy
 
 Use imported SVG Media assets when the navigation color/state is known in advance.
 
-The current PULSE sidebar ships two files per destination, but **every physical filename is globally unique**:
+The current PULSE sidebar ships two files per destination, and every physical filename is globally unique:
 
 ```text
 sidebar/inactive/pulse-nav-<destination>-inactive.svg
@@ -48,20 +48,52 @@ Height = 20
 ImagePosition = ImagePosition.Fit
 ```
 
-## Real PULSE evidence — 2026-08-13
+## Confirmed runtime behavior
 
-Confirmed in Power Apps Studio:
+Confirmed in the real PULSE Canvas app on 2026-08-13:
 
 - SVG files upload through Media;
+- active and inactive variants coexist when the physical basenames are unique;
 - SVG content renders in Image controls;
 - `20×20` + `ImagePosition.Fit` renders without clipping or format failure;
 - equal `viewBox` and host dimensions do not guarantee equal optical weight;
-- duplicate basenames across active/inactive repository folders are unsuitable for practical batch import.
+- duplicate basenames across active/inactive repository folders are unsuitable for practical batch import;
+- white inactive icons and PULSE-cyan active icons switch correctly in the real sidebar;
+- the selected row retains background and left-bar cues in addition to icon color.
 
 ## Optical QA rule
 
-At 20 px, compare the eight icons simultaneously on the real `#07111F` sidebar. Reject/rework any glyph that appears noticeably smaller, thinner, denser, off-center or less recognizable than its neighbors. Then verify 16 px and 24 px.
+At 20 px, compare the complete navigation family simultaneously on the real `#07111F` sidebar. Reject/rework any glyph that appears noticeably smaller, thinner, denser, off-center or less recognizable than its neighbors.
+
+The current eight-icon sidebar family passed this canonical test on 2026-08-13.
+
+When changing geometry or introducing a new icon, repeat the comparison and optionally verify 16 px and 24 px fallbacks.
+
+## Recommended component pattern
+
+Keep navigation semantics separate from Power Apps native icon names:
+
+```text
+Key      -> navigation state / route identity
+IconKey  -> PULSE visual semantic identity
+```
+
+Example:
+
+```powerfx
+{
+    Key: "punchreview",
+    Label: "Punch Review",
+    IconKey: "punch-review"
+}
+```
+
+Do not encode native concepts such as `Flag`, `Trending`, `Lock` or `Settings` in `IconKey` when the component is expected to use the PULSE SVG system.
+
+Resolve the Media asset inside the Image control from the semantic `IconKey` and the component's existing active state.
 
 ## Accessibility
 
-Use a meaningful `AccessibleLabel` on the interactive host. The hit target should be larger than the visual icon and selection must not rely on cyan alone.
+Do not shrink the click target to the SVG size. Keep the full row/button hit area and treat the 20 px SVG as presentation only.
+
+Interactive hosts should expose meaningful accessible labels and retain a non-color selection cue.
