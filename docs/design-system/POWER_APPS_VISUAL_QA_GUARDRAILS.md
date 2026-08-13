@@ -1,7 +1,7 @@
 # Power Apps Visual QA Guardrails
 
 **Status:** Normative  
-**Version:** 1.1  
+**Version:** 1.2  
 **Scope:** PULSE Canvas Power Apps screens and reusable components  
 **Applies to:** humans, ChatGPT, Codex and other agents producing Power Apps Source Code / Power Fx
 
@@ -241,18 +241,74 @@ If Studio shows an internal scrollbar, the block remains open and the defect mus
 
 ---
 
-## 10. Lessons-learned register
+## 10. VQA-002 — Equal SVG viewBox does not imply equal optical icon size
+
+### Origin
+
+Detected during real Power Apps Studio validation of the PULSE custom SVG sidebar icon set on 2026-08-13.
+
+Eight icons were placed in `20×20` Image controls using `ImagePosition.Fit`. Every SVG used the same `viewBox="0 0 24 24"`, yet several glyphs appeared materially smaller or weaker than their neighbors.
+
+### Confirmed lesson
+
+Mathematical equality is not optical equality.
+
+A shared viewBox, stroke grammar and host size are necessary for consistency but are not sufficient. Perceived size also depends on:
+
+```text
+- occupied silhouette area;
+- dominant-axis span;
+- internal counters/negative space;
+- detail density;
+- visual center;
+- stroke mass;
+- recognizability at the target pixel size.
+```
+
+### Preventive rule
+
+For primary PULSE navigation SVGs:
+
+```text
+viewBox             = 0 0 24 24
+preferred host      = 20×20 px
+ImagePosition       = Fit
+optical test        = simultaneous side-by-side comparison
+validation surface  = actual target surface, especially BrandDark sidebar
+```
+
+As a starting geometry envelope, the primary silhouette should normally occupy approximately **17–18 units on its dominant 24-unit axis**. This is not a rigid formula; perceived balance overrides mathematical equality.
+
+Do not approve an icon family by inspecting isolated SVG source or individual controls. Compare the complete navigation family together.
+
+### Acceptance checks
+
+```text
+[ ] No icon appears materially smaller/larger than its siblings at 20 px.
+[ ] Stroke mass feels consistent across the family.
+[ ] Visual centers align despite different metaphors.
+[ ] Internal detail remains legible and does not collapse.
+[ ] The silhouette is recognizable without relying on the label.
+[ ] Active and inactive variants preserve the same geometry.
+[ ] The family is checked on the actual dark sidebar.
+[ ] 16 px and 24 px fallbacks are checked after the 20 px baseline passes.
+```
+
+---
+
+## 11. Lessons-learned register
 
 | ID | Origin | Lesson | Preventive rule |
 |---|---|---|---|
 | VQA-001 | HOME_PDS Block 02/02A · `cmp_PageHeaderPro` | Fixed-height ModernText can show mini-scrollbars; increasing Height + `Wrap=false` is not a reliable cure | Static ModernText defaults to `AutoHeight=true`; fixed-height usage is an exception requiring Studio proof |
+| VQA-002 | PULSE SVG sidebar validation · 2026-08-13 | Common viewBox and identical Image size do not guarantee equal perceived icon size | Normalize and approve icon families optically at 20 px through simultaneous comparison on the actual target surface |
 
 Future recurring defects must be added here and promoted into a dedicated rule when reusable across screens/components.
 
 ---
 
-## 11. Acceptance statement
+## 12. Acceptance statement
 
 A PULSE interface is not visually complete merely because its formulas, colors, fonts and component placement are correct.
 
-It must also be free of implementation artifacts such as unintended scrollbars, clipping, overlap, accidental wrapping, hidden focus states and inconsistent alignment that reduce perceived enterprise SaaS quality.
+It must also be free of implementation artifacts such as unintended scrollbars, clipping, overlap, accidental wrapping, hidden focus states, inconsistent alignment and inconsistent icon weight that reduce perceived enterprise SaaS quality.
