@@ -1,36 +1,32 @@
 # PULSE Icon Set v1
 
 **Status:** PDS_CANDIDATE  
-**Version:** 1.0.0  
+**Version:** 1.0.1  
 **Target:** PULSE Canvas application / Power Apps
 
-This directory is the canonical runtime asset home for the first PULSE-owned icon system.
-
-## Structure
-
-```text
-v1/
-├── outline/
-│   ├── navigation/
-│   ├── work/
-│   ├── project/
-│   ├── review/
-│   ├── data/
-│   └── system/
-├── sidebar/
-│   ├── inactive/
-│   └── active/
-├── semantic/
-├── manifest.json
-└── README.md
-```
+This directory is the canonical runtime asset home for the PULSE-owned icon system.
 
 ## Counts
 
 - 64 canonical outline pictograms.
-- 10 sidebar pictograms with dedicated inactive and active assets: 20 files.
+- 8 sidebar destinations with dedicated inactive and active assets: 16 files.
 - 4 semantic status assets.
-- 88 SVG files in total.
+- 84 SVG files in total.
+
+## Sidebar set
+
+The sidebar is tailored to the current PULSE shell rather than a generic SaaS menu:
+
+`home`, `overview`, `punch-review`, `punch-list`, `briefing`, `skyline`, `config`, `admin`.
+
+Each destination has:
+
+```text
+sidebar/inactive/<name>.svg  → #FFFFFF / 1.8 px
+sidebar/active/<name>.svg    → #00C8FF / 2.0 px
+```
+
+The geometry is normalized optically for a 20 px host. A common 24×24 viewBox is necessary but not sufficient; each glyph is balanced by occupied area, perceived mass and detail density.
 
 ## Canonical rendering
 
@@ -43,12 +39,6 @@ v1/
 
 The SVG files are repository-local PULSE assets and are not copied from an external icon pack.
 
-Normative documentation:
+Normative documentation lives in `docs/design-system/iconography/`.
 
-```text
-docs/design-system/iconography/PULSE_ICON_SYSTEM.md
-docs/design-system/iconography/ICON_CATALOG.md
-docs/design-system/iconography/POWER_APPS_USAGE.md
-```
-
-Do not treat Git presence as proof of Studio validation. Visual/import validation in the target Power Apps application remains required before promoting the set from `PDS_CANDIDATE` to `ACTIVE`.
+Power Apps Studio has already confirmed that imported SVG media renders correctly. The set remains `PDS_CANDIDATE` until the eight sidebar glyphs are visually validated at 20 px in the real dark PULSE sidebar and active/inactive switching is confirmed.

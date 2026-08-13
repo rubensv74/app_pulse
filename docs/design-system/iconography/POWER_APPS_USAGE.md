@@ -2,81 +2,73 @@
 
 ## Preferred strategy
 
-For the current Canvas application, prefer **imported SVG media assets** when the color/state is known in advance. This avoids dependence on native Power Apps icon availability and avoids fragile runtime SVG parsing for routine navigation.
+Use imported SVG Media assets when the navigation color/state is known in advance. This avoids dependency on native Power Apps icon availability and avoids runtime recoloring complexity.
 
-The V1 sidebar therefore ships two physical variants per primary destination:
+The current PULSE sidebar ships two files per destination:
 
 ```text
 sidebar/inactive/*.svg  → white
 sidebar/active/*.svg    → PULSE cyan
 ```
 
-## Sidebar pattern
-
-Import both media files with stable names, for example:
+## Current sidebar files
 
 ```text
-pulse_home_inactive
-pulse_home_active
+home
+overview
+punch-review
+punch-list
+briefing
+skyline
+config
+admin
 ```
 
-Then bind the Image property conceptually as:
+## Import pattern
+
+Import both variants and give them stable Media names, for example:
+
+```text
+pulse_punch_review_inactive
+pulse_punch_review_active
+```
+
+Bind the host Image conceptually as:
 
 ```powerfx
 If(
     ThisItem.IsActive,
-    pulse_home_active,
-    pulse_home_inactive
+    pulse_punch_review_active,
+    pulse_punch_review_inactive
 )
 ```
 
-The selected container should still use the common PULSE selection language; do not rely on cyan alone.
-
-## Toolbar and light surfaces
-
-Use the canonical `outline/` assets on light surfaces. They use PDS Text `#0F172A` and are designed for compact toolbars, cards and grids.
-
-Recommended visual sizes:
+Recommended first validation:
 
 ```text
-16 px → dense secondary action, validate carefully
-20 px → preferred compact UI size
-24 px → navigation / prominent action
+Width = 20
+Height = 20
+ImagePosition = ImagePosition.Fit
 ```
 
-The clickable control itself should normally be larger than the icon.
+The selected container must still provide a non-color cue such as selected background, accent bar or label weight.
 
-## Semantic states
+## Real PULSE validation evidence — 2026-08-13
 
-Use `semantic/` assets only when the symbol communicates actual status. Do not recolor generic actions red, amber or green merely to make them more visible.
+Confirmed in Power Apps Studio:
+
+- SVG files upload successfully through Media;
+- SVG content renders in Image controls;
+- a `20×20` Image using `ImagePosition.Fit` renders without clipping or format failure.
+
+This proves format/runtime compatibility for the tested files. It does **not** yet prove that all glyphs have equal optical weight.
+
+## Optical QA
+
+At 20 px compare the eight sidebar icons side-by-side on `BrandDark #07111F`. Reject/rework any glyph that appears noticeably smaller, thinner, denser or less recognizable than its neighbors even if its viewBox is identical.
+
+Then verify 16 px and 24 px.
 
 ## Accessibility
 
-For interactive icon controls:
-
-```text
-AccessibleLabel = clear action name
-Tooltip         = useful short explanation when supported
-```
-
-A decorative Image should not be the only source of an action label.
-
-## Dynamic recoloring
-
-Dynamic SVG data-URI techniques can be introduced later for components that genuinely need arbitrary runtime colors. They should not be the default for navigation because fixed imported variants are simpler and more predictable in Power Apps Studio.
-
-If a dynamic implementation is added, it must preserve the same geometry and use PDS tokens; it must not create a parallel icon design.
-
-## Validation gate
-
-Before V1 becomes `ACTIVE`, validate at least:
-
-1. SVG import into the real PULSE Canvas app.
-2. Rendering on dark sidebar and light surfaces.
-3. 16/20/24 px legibility.
-4. No unexpected cropping or background.
-5. Active/inactive switching.
-6. Accessibility label on the host control.
-7. Rendering at normal browser zoom and one higher zoom level.
-
-Record any Power Apps-specific rendering lesson in the visual QA guardrails before changing the canonical geometry globally.
+Use a meaningful `AccessibleLabel` on the interactive host. The hit target should be larger than the visual icon and selection must not rely on cyan alone.

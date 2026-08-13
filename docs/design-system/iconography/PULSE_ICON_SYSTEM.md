@@ -1,36 +1,32 @@
 # PULSE Icon System
 
 **Status:** PDS_CANDIDATE  
-**Version:** 1.0  
+**Version:** 1.0.1  
 **Date:** 2026-08-13  
 **Scope:** PULSE Power Apps iconography
 
 ## 1. Purpose
 
-PULSE needs a reliable visual vocabulary that does not depend on the uneven availability or rendering of native Power Apps icons. This specification defines a repository-owned SVG system for sidebar navigation, workspaces, toolbars, data exploration and semantic feedback.
-
-The system is deliberately restrained. Icons support meaning and hierarchy; they are not decorative illustrations.
+PULSE uses a repository-owned SVG vocabulary so navigation and premium components do not depend on uneven native Power Apps icon availability or rendering.
 
 ## 2. Brand alignment
 
-The icon system follows `PULSE_DESIGN_SYSTEM.md`:
+| Role | Hex | Icon use |
+|---|---|---|
+| PULSE BrandAccent | `#00C8FF` | Active dark-navigation icon / deliberate brand accent |
+| BrandDark | `#07111F` | Sidebar surface |
+| ActionPrimary | `#1677FF` | Interaction/focus, not brand identity |
+| Primary ink | `#0F172A` | Default outline icon on light surfaces |
+| Inverse ink | `#FFFFFF` | Inactive dark-navigation icon |
+| Success | `#22C55E` | Actual success state only |
+| Warning | `#F59E0B` | Actual warning state only |
+| Danger | `#EF4444` | Error/destructive state only |
 
-| Role | Token | Hex | Icon use |
-|---|---|---|---|
-| Product identity | BrandAccent | `#00C8FF` | Active dark-navigation icon and deliberate brand accent |
-| Navigation surface | BrandDark | `#07111F` | Sidebar background, not the icon stroke |
-| Interaction | ActionPrimary | `#1677FF` | Interactive state/focus where appropriate, not PULSE identity |
-| Primary icon ink | Text | `#0F172A` | Default outline icon on light surfaces |
-| Inverse icon ink | TextWhite | `#FFFFFF` | Inactive icon on dark navigation |
-| Success | Success | `#22C55E` | Explicit successful state only |
-| Warning | Warning | `#F59E0B` | Explicit warning only |
-| Danger | Danger | `#EF4444` | Error/destructive state only |
+Violet is not a PULSE brand/iconography color.
 
-**Violet is not a PULSE brand color.** It may exist in the broader PDS as a semantic/data color, but it is not used to define the icon system or primary navigation.
+## 3. Geometry and optical normalization
 
-## 3. Geometry
-
-Canonical drawing frame:
+Canonical frame:
 
 ```text
 viewBox: 0 0 24 24
@@ -39,124 +35,74 @@ active sidebar stroke: 2.0 px
 linecap: round
 linejoin: round
 background: transparent
+preferred validation host: 20×20 px
 ```
 
-Design rules:
+A shared viewBox does **not** guarantee equal perceived size. Every primary navigation glyph must also be normalized by:
 
-1. Prefer one dominant silhouette and no more than two supporting details.
-2. Preserve a practical optical margin of roughly 2.5–3.5 units.
-3. Avoid hairlines, tiny enclosed counters and decorative micro-detail.
-4. Prefer rounded geometry consistent with PDS control radii.
-5. Optimize first for 20 px, then verify at 16 px and 24 px.
-6. Icons representing the same action must retain the same metaphor across screens.
-7. A new icon must use the existing grammar rather than introducing a new visual style.
+1. occupied area inside the 24×24 frame;
+2. perceived stroke mass at 20 px;
+3. vertical/horizontal visual center;
+4. number and size of internal counters;
+5. detail density and silhouette recognition.
+
+Avoid icons that are geometrically wide but optically weak at navigation size.
 
 ## 4. Families
 
-V1 contains 64 canonical pictograms:
+V1 contains 64 canonical outline pictograms plus dedicated sidebar and semantic assets.
 
-- Navigation: 10.
-- Work / Punches: 10.
-- Projects: 8.
-- Review / Collaboration: 10.
-- Data / Actions: 14.
-- System / Security: 12.
-
-In addition, the 10 primary sidebar concepts have fixed-color inactive and active variants, and four semantic status assets are supplied.
-
-Total physical SVG files: **88**.
-
-## 5. Sidebar language
-
-PULSE dark navigation uses a two-asset strategy to avoid runtime recoloring dependencies:
-
-```text
-inactive → white #FFFFFF / 1.8 px
-active   → PULSE cyan #00C8FF / 2.0 px
-```
-
-The active state must also have a non-color cue at container level (selected background, accent, label weight, or equivalent). Color alone must not communicate selection.
-
-The initial sidebar concepts are:
+The current sidebar set is intentionally specific to the real PULSE shell:
 
 ```text
 home
-dashboard
-punches
-tasks
-projects
-review
-comments
-users
-analytics
-settings
+overview
+punch-review
+punch-list
+briefing
+skyline
+config
+admin
 ```
 
-## 6. Semantic icon rule
+Each exists in white inactive and cyan active variants.
 
-Semantic color is allowed only when the icon itself represents status:
+## 5. Sidebar metaphors
 
-- success → green;
-- warning → amber;
-- danger/error → red;
-- information → ActionPrimary blue.
+| Destination | Metaphor |
+|---|---|
+| Home | house |
+| Overview | operational bars + trend |
+| Punch Review | punch target + review check |
+| Punch List | structured work-item list |
+| Briefing | executive message bubble |
+| Skyline | operational skyline/profile |
+| Config | gear |
+| Admin | protected user / shield |
 
-A generic toolbar icon must remain neutral even if the underlying data can contain warnings or errors.
+`eye` remains available as a generic view/review action but is not the primary Punch Review navigation icon.
 
-## 7. Naming
+## 6. Accessibility
 
-Files use lowercase kebab-case.
+Interactive hosts require meaningful `AccessibleLabel`, adequate hit targets and a non-color selection cue. The visual icon may be 16–24 px while the clickable control should normally be larger.
 
-Examples:
+## 7. Power Apps validation gate
 
-```text
-punch-review.svg
-filter-clear.svg
-bar-chart.svg
-chevron-left.svg
-```
+Observed in the real PULSE Canvas app on 2026-08-13:
 
-Names describe meaning, not shape. Avoid names such as `circle-3`, `icon-blue` or `new-icon`.
+- `.svg` imports successfully as Media;
+- imported SVG renders in an Image control;
+- `20×20` with `ImagePosition.Fit` renders without SVG-format failure or clipping.
 
-## 8. Accessibility
+Still required before `ACTIVE` promotion:
 
-SVG appearance does not replace accessible control semantics.
+1. compare all eight sidebar concepts at 20 px on the real dark sidebar;
+2. verify active/inactive switching;
+3. check 16 px and 24 px fallbacks;
+4. confirm browser zoom behavior;
+5. verify accessible labels on the host controls.
 
-For every interactive icon in Power Apps:
+## 8. Source of truth
 
-- provide a meaningful `AccessibleLabel` on the clickable control;
-- provide Tooltip where supported and useful;
-- maintain an adequate hit target independent from the visual 16–24 px icon size;
-- do not use color as the only state signal;
-- do not encode two distinct actions with visually indistinguishable icons.
-
-Decorative icons should not create redundant screen-reader announcements.
-
-## 9. Expansion protocol
-
-When a new concept is required:
-
-1. Confirm an existing icon cannot express the concept without ambiguity.
-2. Select the correct family.
-3. Draw in the 24×24 frame using the canonical stroke grammar.
-4. Test visual balance at 16, 20 and 24 px.
-5. Add the SVG to the canonical runtime folder.
-6. Add it to `manifest.json` and `ICON_CATALOG.md`.
-7. If it is a primary dark-sidebar destination, add both inactive and active variants.
-8. Validate in Power Apps Studio before considering the icon `ACTIVE`.
-
-## 10. Source of truth
-
-Runtime SVGs:
-
-```text
-power-apps/assets/icons/pulse/v1/
-```
-
-Normative documentation:
-
-```text
-docs/design-system/iconography/
-```
-
-V1 is a `PDS_CANDIDATE` until the first real Power Apps import/rendering gate is completed. Repository presence alone is not evidence of runtime compatibility.
+Runtime SVGs: `power-apps/assets/icons/pulse/v1/`  
+Normative docs: `docs/design-system/iconography/`
