@@ -8,93 +8,131 @@
 
 ## Problema confirmado
 
-El `OnSelect` actual de `btnPR_SetCustomFieldActive` ejecuta dentro del mismo `IfError(...)`:
-
-1. `WarRoom_SetCustomFieldActive.Run(...)`;
-2. actualización de variables locales;
-3. `Select(btnPR_RefreshCustomFieldDefinitionContext)`;
-4. notificación de éxito;
-5. comprobación de `varPunchReviewFieldDefsRefreshWarning`.
-
-Esto mezcla **mutación** y **refresco posterior** dentro del mismo bloque de error. Si el refresh del catálogo o de los valores del Punch falla después de una mutación válida, el error puede terminar mostrándose como si hubiera fallado la activación/desactivación.
-
-## Objetivo
-
-Separar inequívocamente:
-
-- **Mutation error** → `varPunchReviewFieldDefToggleError` + `NotificationType.Error`;
-- **Refresh error después de mutation correcta** → `varPunchReviewFieldDefsRefreshWarning` + `NotificationType.Warning`.
-
-No se cambia la firma del Flow ni los parámetros existentes.
-
----
+El `OnSelect` actual mezcla dentro del mismo `IfError(...)` la mutación `WarRoom_SetCustomFieldActive.Run(...)` y el posterior refresco `Select(btnPR_RefreshCustomFieldDefinitionContext)`. Un fallo de refresco puede terminar presentándose como si hubiera fallado la activación/desactivación.
 
 ## Operación
 
-En `btnPR_SetCustomFieldActive.OnSelect` conservar intactas todas las validaciones iniciales existentes:
+En Studio, seleccionar:
 
-- `varProjectId`;
-- role manager;
-- FieldKey obligatorio;
-- definición presente en `colPunchReviewFieldDefsAdmin`;
-- estado actual distinto del target.
+`btnPR_SetCustomFieldActive → OnSelect`
 
-Sustituir únicamente el bloque final actual que comienza en el `IfError(` que envuelve `WarRoom_SetCustomFieldActive.Run(...)` por el siguiente patrón.
+**Reemplazar la fórmula completa** por esta versión. No pegar solo una parte.
 
 ```powerfx
+=Set(varPunchReviewFieldDefToggleLoading, true);
+Set(varPunchReviewFieldDefToggleError, "");
+Set(varPunchReviewFieldDefsLastMutationSucceeded, false);
+Set(varPunchReviewFieldDefsRefreshWarning, "");
 Set(varPunchReviewFieldDefMutationCallSucceeded, false);
 
-IfError(
-    WarRoom_SetCustomFieldActive.Run(
-        varProjectId,
-        "PUNCH",
-        Trim(varPunchReviewFieldDefToggleKey),
-        Coalesce(varPunchReviewFieldDefToggleActive, false),
-        Lower(User().Email)
-    );
-    Set(varPunchReviewFieldDefMutationCallSucceeded, true),
+If(
+    IsBlank(varProjectId),
 
     Set(
         varPunchReviewFieldDefToggleError,
-        Coalesce(
-            FirstError.Message,
-            "Custom Field definition status could not be changed."
+        "No active project is available for changing Custom Field definition status."
+    ),
+
+    Lower(Coalesce(varUserRole, "reader")) <> "manager",
+
+    Set(
+        varPunchReviewFieldDefToggleError,
+        "Your current role does not allow Custom Field definition management."
+    ),
+
+    IsBlank(Trim(Coalesce(varPunchReviewFieldDefToggleKey, ""))),
+
+    Set(
+        varPunchReviewFieldDefToggleError,
+        "Field key is required for changing definition status."
+    ),
+
+    IsBlank(
+        LookUp(
+            colPunchReviewFieldDefsAdmin,
+            Lower(Trim(FieldKey)) = Lower(Trim(varPunchReviewFieldDefToggleKey))
         )
-    )
-);
+    ),
 
-If(
-    varPunchReviewFieldDefMutationCallSucceeded,
+    Set(
+        varPunchReviewFieldDefToggleError,
+        "The selected Custom Field definition is not present in the loaded catalog. Refresh definitions and try again."
+    ),
 
-    Set(varPunchDynamicFilters_NeedRefresh, true);
-
-    If(
-        Lower(Trim(Coalesce(varPunchReviewDef_FieldKey, ""))) =
-        Lower(Trim(varPunchReviewFieldDefToggleKey)),
-        Set(
-            varPunchReviewDef_IsActive,
-            Coalesce(varPunchReviewFieldDefToggleActive, false)
-        )
-    );
-
-    Set(varPunchReviewFieldDefsLastMutationSucceeded, true);
-
-    Select(btnPR_RefreshCustomFieldDefinitionContext);
+    Coalesce(
+        LookUp(
+            colPunchReviewFieldDefsAdmin,
+            Lower(Trim(FieldKey)) = Lower(Trim(varPunchReviewFieldDefToggleKey)),
+            IsActive
+        ),
+        false
+    ) = Coalesce(varPunchReviewFieldDefToggleActive, false),
 
     Notify(
         If(
             Coalesce(varPunchReviewFieldDefToggleActive, false),
-            "Custom Field definition activated successfully.",
-            "Custom Field definition deactivated successfully."
+            "Custom Field definition is already active.",
+            "Custom Field definition is already inactive."
         ),
-        NotificationType.Success
+        NotificationType.Information
+    ),
+
+    IfError(
+        With(
+            {
+                resp:
+                    WarRoom_SetCustomFieldActive.Run(
+                        varProjectId,
+                        "PUNCH",
+                        Trim(varPunchReviewFieldDefToggleKey),
+                        Coalesce(varPunchReviewFieldDefToggleActive, false),
+                        Lower(User().Email)
+                    )
+            },
+            Set(varPunchReviewFieldDefMutationCallSucceeded, true)
+        ),
+        Set(
+            varPunchReviewFieldDefToggleError,
+            Coalesce(
+                FirstError.Message,
+                "Custom Field definition status could not be changed."
+            )
+        )
     );
 
     If(
-        !IsBlank(varPunchReviewFieldDefsRefreshWarning),
+        varPunchReviewFieldDefMutationCallSucceeded,
+
+        Set(varPunchDynamicFilters_NeedRefresh, true);
+
+        If(
+            Lower(Trim(Coalesce(varPunchReviewDef_FieldKey, ""))) =
+            Lower(Trim(varPunchReviewFieldDefToggleKey)),
+            Set(
+                varPunchReviewDef_IsActive,
+                Coalesce(varPunchReviewFieldDefToggleActive, false)
+            )
+        );
+
+        Set(varPunchReviewFieldDefsLastMutationSucceeded, true);
+
+        Select(btnPR_RefreshCustomFieldDefinitionContext);
+
         Notify(
-            varPunchReviewFieldDefsRefreshWarning,
-            NotificationType.Warning
+            If(
+                Coalesce(varPunchReviewFieldDefToggleActive, false),
+                "Custom Field definition activated successfully.",
+                "Custom Field definition deactivated successfully."
+            ),
+            NotificationType.Success
+        );
+
+        If(
+            !IsBlank(varPunchReviewFieldDefsRefreshWarning),
+            Notify(
+                varPunchReviewFieldDefsRefreshWarning,
+                NotificationType.Warning
+            )
         )
     )
 );
@@ -110,69 +148,56 @@ If(
 )
 ```
 
-## Importante
+## Qué cambia
 
-`Select(btnPR_RefreshCustomFieldDefinitionContext)` queda **fuera** del `IfError` que protege la llamada al Flow.
-
-De esta forma:
+La llamada al Flow queda aislada de la fase posterior de refresco:
 
 ```text
 FLOW FAILS
-→ Error real de mutation
+→ varPunchReviewFieldDefToggleError
 → no refresh
 → no success notification
 
-FLOW SUCCEEDS + REFRESH FAILS
-→ mutation sigue marcada SUCCESS
-→ success notification
+FLOW SUCCEEDS
+→ local state update
+→ mutation SUCCESS
+→ refresh separado
 → refresh warning independiente
 ```
 
-## No tocar
+## Qué no cambia
 
-- `WarRoom_SetCustomFieldActive.Run` ni sus 5 parámetros;
+- `WarRoom_SetCustomFieldActive.Run` y sus 5 parámetros;
+- validación de proyecto;
+- validación de rol Manager;
+- validación de FieldKey;
+- validación contra `colPunchReviewFieldDefsAdmin`;
+- invalidación de filtros dinámicos;
 - `btnPR_RefreshCustomFieldDefinitionContext.OnSelect`;
 - `btnPR_LoadCustomFieldDefs`;
 - `btnPR_LoadCustomFields`;
 - `cmpPR_CustomFieldsEditor.OnActiveChangeRequested`;
-- DF-05/DF-06 save/upsert;
-- dynamic filter invalidation;
-- modal geometry;
-- typography en este FIX.
+- save/upsert DF-05/DF-06;
+- geometría y tipografía.
 
-## Validación mínima en Studio
-
-### Test A — Deactivate
+## Validación mínima
 
 1. Abrir Manage.
-2. Seleccionar una definición Active real.
-3. Cambiar `Active` → OFF.
-4. Confirmar que no aparece error genérico falso.
-5. Confirmar que el editor refleja `Inactive`.
-6. Cerrar/reabrir o Refresh y confirmar persistencia.
-
-### Test B — Reactivate
-
-1. Activar la misma definición.
-2. Confirmar `Active` después del refresh.
-3. Confirmar que Custom Fields del Punch vuelve a reflejarla cuando corresponda.
-
-### Test C — Diagnóstico
-
-Si vuelve a fallar:
-
-- copiar el texto exacto del `NotificationType.Error`;
-- no modificar todavía el Flow;
-- ese mensaje será considerado el error real de `WarRoom_SetCustomFieldActive.Run(...)`.
+2. Elegir una definición Active real.
+3. Cambiar Active → Inactive.
+4. Confirmar que persiste tras Refresh.
+5. Cambiar Inactive → Active.
+6. Confirmar que persiste tras Refresh.
+7. Si aparece Error, copiar literalmente el mensaje: ahora corresponde a la fase de mutación y no al refresh posterior.
 
 ### PASS
 
 ```text
 DEACTIVATE              PASS
-REACTIVATE               PASS
-PERSIST AFTER REFRESH    PASS
-FALSE MUTATION ERROR     0
-STUDIO FORMULA ERRORS    0
+REACTIVATE              PASS
+PERSIST AFTER REFRESH   PASS
+FALSE MUTATION ERROR    0
+STUDIO FORMULA ERRORS   0
 ```
 
-Solo después de este PASS continuar con `DF-07B-FIX1 — Readability floor`.
+Después del PASS continuar con `DF-07B-FIX1 — Readability floor`.
