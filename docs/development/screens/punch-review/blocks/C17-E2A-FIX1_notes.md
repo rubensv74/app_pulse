@@ -1,0 +1,1 @@
+C17-E2A-FIX1: Session Activity must show all events collected during the current review session, not only events for the currently selected Punch. The current UI filters the feed by current Punch; remove that presentation filter while leaving event collection unchanged.
