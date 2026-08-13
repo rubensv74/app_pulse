@@ -1,11 +1,59 @@
 # C17-D-FIX1 — Custom Field renderer safety
 
-Pending Studio validation.
+**Estado:** PENDING STUDIO VALIDATION  
+**Componente:** `cmp_CustomFieldValuesPro`  
+**Fuente:** Source Code completo exportado desde Studio el 2026-08-13.
 
-Findings from the Studio source dated 2026-08-13:
+## 1. `galCFVPro_Values.OnSelect`
 
-1. `galCFVPro_Values.OnSelect` currently resets the working collection and dirty state. Remove that behavior; cancellation must remain explicit through the Cancel button.
-2. `cmbCFVPro_Choice` is now `ModernCombobox@1.1.1`, but its current source does not declare the same read-only/edit policy used by the other renderers. Add the same DisplayMode policy based on CanEdit, IsEditable, IsLoading and IsSaving.
-3. Declare search behavior explicitly for the modern ComboBox instead of relying on defaults.
+Target:
 
-Validation: clicks on gallery whitespace must not discard unsaved edits; reader mode must keep Choice/MultiChoice read-only; manager mode must remain editable; Save, Cancel and dirty state must remain unchanged.
+`cmp_CustomFieldValuesPro → conCFVPro_Root → conCFVPro_Body → galCFVPro_Values → OnSelect`
+
+**Borrar completamente la fórmula actual.** La Gallery no debe restaurar `colCFVPro_Base`, vaciar `colCFVPro_Dirty` ni disparar `OnCancelRequested` al hacer click sobre su superficie.
+
+La cancelación explícita permanece únicamente en `btnCFVPro_Cancel.OnSelect`.
+
+## 2. `cmbCFVPro_Choice.DisplayMode`
+
+Target:
+
+`cmp_CustomFieldValuesPro → conCFVPro_Root → conCFVPro_Body → galCFVPro_Values → conCFVPro_ValueRow → cmbCFVPro_Choice → DisplayMode`
+
+Aplicar:
+
+```powerfx
+=If(
+    cmp_CustomFieldValuesPro.CanEdit &&
+    ThisItem.IsEditable &&
+    !cmp_CustomFieldValuesPro.IsLoading &&
+    !cmp_CustomFieldValuesPro.IsSaving,
+    DisplayMode.Edit,
+    DisplayMode.View
+)
+```
+
+Esta es la misma política usada por Text, Number, Date y YesNo.
+
+## 3. `cmbCFVPro_Choice.IsSearchable`
+
+Establecer:
+
+```powerfx
+=true
+```
+
+## No tocar
+
+No modificar `Items`, `ItemDisplayText`, `DefaultSelectedItems`, `OnChange`, `SelectMultiple`, JSON MultiChoice, `colCFVPro_Base`, `colCFVPro_Working`, `colCFVPro_Dirty`, Save/Cancel host ni geometría C17.
+
+## Validación mínima
+
+1. Editar un valor y confirmar `Unsaved`.
+2. Hacer click en espacio vacío de la Gallery: el cambio y `DirtyCount` deben permanecer.
+3. Reader: Text/Number/Date/YesNo/Choice/MultiChoice deben estar en View.
+4. Manager: Choice/MultiChoice deben ser editables.
+5. Validar dirty add/revert, Save y Cancel.
+6. Cero errores de Studio.
+
+Cuando este gate pase, C17-D queda `FUNCTIONAL_FROZEN` y puede continuar C17-E final.
