@@ -1,5 +1,22 @@
 # PULSE Icon Set Changelog
 
+## 1.0.4 — 2026-08-13
+
+### Promoted
+
+- Promoted the PULSE Icon System from `PDS_CANDIDATE` to `ACTIVE`.
+- Validated the eight real sidebar destinations together in the live PULSE Canvas app.
+- Confirmed white inactive state and PULSE-cyan active state in the real sidebar.
+- Confirmed the canonical `20×20` Image host with `ImagePosition.Fit`.
+- Confirmed the final unique Media naming contract works without active/inactive collisions.
+
+### Acceptance
+
+- Canonical sidebar visual QA: PASS.
+- Active/inactive state switching: PASS.
+- Optical balance at 20 px: PASS.
+- 16 px / 24 px checks remain recommended regression checks rather than blockers for v1.0.4.
+
 ## 1.0.3 — 2026-08-13
 
 ### Changed
