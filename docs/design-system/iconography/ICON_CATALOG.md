@@ -1,10 +1,14 @@
-# PULSE Icon Catalog v1
+# PULSE Icon Catalog
 
-**Base pictograms:** 64  
-**Physical SVG files:** 84  
-**Runtime root:** `power-apps/assets/icons/pulse/v1/`
+**Status:** ACTIVE  
+**Version:** 1.0.4  
+**Canonical runtime root:** `power-apps/assets/icons/pulse/v1/`
 
-The canonical outline families remain: Navigation (10), Work/Punches (10), Projects (8), Review/Collaboration (10), Data/Actions (14), System/Security (12).
+The library contains 64 canonical outline pictograms plus dedicated sidebar and semantic variants.
+
+## Canonical outline families
+
+The canonical outline families remain: Navigation (10), Work/Punches (10), Projects (10), Review/Collaboration (10), Data/Actions (12) and System/Security (12).
 
 ## Sidebar variants
 
@@ -23,6 +27,24 @@ Each destination has two Power Apps-safe filenames:
 
 The filename pattern is normative: `pulse-nav-<destination>-<state>.svg`. State must be encoded in the basename because Power Apps Media uses a flat namespace.
 
+The eight concepts and both active/inactive states were validated in the real PULSE sidebar at the canonical 20 px host size on 2026-08-13.
+
 ## Semantic variants
 
-`semantic/success.svg`, `semantic/warning.svg`, `semantic/danger.svg`, `semantic/info.svg`.
+The system includes dedicated semantic assets for:
+
+- success;
+- warning;
+- danger;
+- information.
+
+Semantic color is reserved for genuine semantic state and must not be used as decorative navigation color.
+
+## Counts
+
+```text
+64 canonical outline pictograms
+16 sidebar SVGs (8 destinations × 2 states)
+4 semantic SVGs
+84 physical SVG files
+```
