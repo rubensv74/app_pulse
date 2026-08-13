@@ -4,151 +4,110 @@ Estado: READY FOR FINAL STUDIO PASS
 Pantalla: scr_PunchReview
 Fecha: 2026-08-13
 
-## Evidencia visual ya confirmada
+## Fuente revisada
 
-La última validación en Power Apps Studio confirma:
+Se ha revisado el Source Code completo actual exportado desde Power Apps Studio el 2026-08-13, junto con el Source Code actual de `cmp_CustomFieldValuesPro`.
 
-- el template de Punch Review hereda correctamente el contexto de Home;
-- Queue Scope ya no ocupa espacio en el header;
-- Comments y Custom Fields comparten el workspace central;
-- Review Progress y Session Activity permanecen en el rail derecho;
-- el rail derecho ya no presenta clipping;
-- Choice y MultiChoice usan un selector moderno y muestran opciones reales;
-- Number ha recuperado una apariencia coherente con el resto de inputs;
-- el workspace central sigue siendo claramente dominante.
+La evidencia confirma:
 
-## Objetivo de C17-E
+- template heredado correctamente desde Home;
+- Queue Scope oculto;
+- Comments y Custom Fields en el workspace central;
+- Review Progress y Session Activity en el rail derecho;
+- rail derecho sin clipping;
+- Choice/MultiChoice ya modernizados;
+- Number con apariencia Outline.
 
-Cerrar C17 sin reabrir arquitectura ni backend. C17-E es un gate de limpieza y validación, no una fase de rediseño.
+## Pre-gate C17-D-FIX1
 
-## 1. Source sync gate
+Antes del cleanup final debe cerrarse un defecto funcional detectado en el componente de valores:
 
-Antes de eliminar controles o limpiar propiedades residuales, el Source Code de Studio debe volver a ser la fuente de verdad.
+- `galCFVPro_Values.OnSelect` no debe ejecutar una cancelación del borrador;
+- `cmbCFVPro_Choice` debe usar la misma política read-only/edit que Text, Number, Date y YesNo;
+- el comportamiento searchable del ModernCombobox debe quedar explícito.
 
-El archivo repository-owned `power-apps/screens/PunchReview/scr_PunchReview.pa.yaml` todavía conserva elementos anteriores a la última validación de Studio, como Queue Scope y el label fijo del botón Back. Por tanto, no debe usarse para un cleanup destructivo hasta sincronizarlo con el código actual de Studio.
+Referencia: `C17-D-FIX1_custom_field_renderer_safety.md`.
 
-Gate:
+## Cleanup estructural de pantalla
 
-```text
-STUDIO SOURCE CURRENT   required
-REPO SOURCE CURRENT     required before destructive cleanup
-```
+Después de validar C17-D-FIX1:
 
-## 2. Cleanup estructural pendiente
+- retirar del header `conPR_QueueScopeContext`; conservar `varPunchReviewQueueScope` únicamente como metadata interna de sesión;
+- retirar físicamente `conPR_RelatedCard`, ya fuera de la arquitectura aprobada;
+- limpiar `X/Y` residuales de `conPR_CustomFieldsHost`, gobernado por el AutoLayout de `conPR_CollaborationRow`;
+- limpiar `X` residual de `conPR_RightColumn`, gobernado por `conPR_UpperGrid`;
+- mantener Width, Height, LayoutMinWidth, LayoutMinHeight, FillPortions y el breakpoint de 1320 px que forman parte del width budget validado.
 
-Después de sincronizar el Source Code actual:
+## Navegación contextual
 
-- eliminar físicamente `conPR_RelatedCard` si sigue existiendo y `Visible=false`;
-- eliminar `X/Y` residuales en hijos gobernados por AutoLayout cuando Studio los siga serializando sin efecto funcional;
-- eliminar Width/Height redundantes solo cuando el parent AutoLayout ya gobierne correctamente la dimensión;
-- conservar explícitamente cualquier `LayoutMinWidth/Height` que forme parte del width budget validado;
-- no tocar controles de backend ocultos usados como servicios host.
+`btnPR_Back` conserva su Dirty Guard y el comportamiento `Back()`.
 
-## 3. Responsive QA
+Solo cambia el texto visible:
+
+- origen Home -> `Back to Home`;
+- origen Punch List -> `Back to Punch List`;
+- otro origen -> `Back`.
+
+## Session Activity
+
+Existe una inconsistencia nominal entre el evento generado al guardar Custom Fields (`CUSTOM_FIELDS_SAVED`) y el tipo visual esperado por Session Activity (`FIELDS_SAVED`).
+
+C17-E debe normalizar nuevos eventos a `FIELDS_SAVED` y mantener compatibilidad visual temporal con ambos valores para no perder el estilo de eventos ya creados durante una sesión.
+
+## Help bilingüe
+
+Actualizar el contenido obsoleto del modal de ayuda:
+
+- Review Progress ya está implementado;
+- Related ya no forma parte del workspace;
+- Dirty Guard ya está implementado;
+- Custom Fields usa `Cancel`, no el antiguo término `Reset`;
+- Reviewed permanece session-only y no modifica el estado operativo real del Punch.
+
+## Responsive QA
 
 Validar al menos:
 
-```text
-1366 x 768
-1600 x 900
-1920 x 1080
-```
+- 1366 x 768;
+- 1600 x 900;
+- 1920 x 1080.
 
-En cada tamaño:
+En cada tamaño comprobar Review Queue, workspace dominante, rail completo, ausencia de scroll horizontal global, Comments composer, Custom Fields footer, Review Progress y Session Activity.
 
-- Review Queue utilizable;
-- main workspace dominante;
-- rail derecho completo;
-- no scroll horizontal global;
-- Comments composer visible;
-- Custom Fields footer visible;
-- Review Progress legible;
-- Session Activity sin clipping.
+## Custom Fields QA
 
-## 4. Custom Fields QA
+Probar Text, Number, Date, YesNo, Choice y MultiChoice con valores vacíos/existentes, dirty add/revert, Save, Cancel, scroll de Gallery y retorno a la fila.
 
-Probar todos los tipos reales:
+## Review Progress QA
 
-```text
-Text
-Number
-Date
-YesNo
-Choice
-MultiChoice
-```
+Probar 0%, porcentaje parcial y 100% reviewed.
 
-Casos:
+## Session Activity QA
 
-- valor vacío;
-- valor existente;
-- editar;
-- dirty state;
-- revertir al baseline;
-- Save;
-- Cancel;
-- scroll de Gallery y retorno a la fila;
-- Choice/MultiChoice con opciones reales.
+Probar vacío, un evento, varios eventos, texto largo y scroll cuando aplique.
 
-## 5. Review Progress QA
+## Queue QA
 
-Probar:
+Probar cola vacía, una fila, cola larga, search, All/Remaining/Reviewed y selección primero/intermedio/último.
 
-```text
-0% reviewed
-porcentaje parcial
-100% reviewed
-```
+## Navigation QA
 
-El donut debe conservar la fórmula aprobada de arco y mantener Reviewed / Remaining / Position legibles dentro del rail de 260 px.
-
-## 6. Session Activity QA
-
-Probar:
-
-- vacío;
-- 1 evento;
-- varios eventos;
-- texto largo;
-- scroll si aplica.
-
-## 7. Queue QA
-
-Probar:
-
-- cola vacía;
-- 1 punch;
-- cola corta;
-- cola larga con scroll;
-- search;
-- All / Remaining / Reviewed;
-- selección del primer, intermedio y último punch.
-
-## 8. Navigation QA
-
-Validar entrada y salida desde:
-
-- Home;
-- Punch List.
-
-El comportamiento Back debe volver al origen real y el texto visible debe describir ese origen.
+Validar entrada y salida desde Home y Punch List. El label Back debe describir el origen real y el Dirty Guard debe permanecer operativo.
 
 ## Gate de cierre C17
 
-```text
-STRUCTURE             PASS
-SOURCE SYNC           PASS
-MAIN WIDTH            PASS
-RIGHT RAIL            PASS
-COMMENTS              PASS
-CUSTOM VALUES         PASS
-REVIEW PROGRESS       PASS
-SESSION ACTIVITY      PASS
-QUEUE                  PASS
-RESPONSIVE             PASS
-WIDTH BUDGET           PASS
-NO GLOBAL CLIPPING     PASS
-NO NEW FORMULA ERRORS  PASS
-```
+STRUCTURE PASS
+SOURCE REVIEW PASS
+MAIN WIDTH PASS
+RIGHT RAIL PASS
+COMMENTS PASS
+CUSTOM VALUES PASS
+REVIEW PROGRESS PASS
+SESSION ACTIVITY PASS
+QUEUE PASS
+RESPONSIVE PASS
+WIDTH BUDGET PASS
+NO GLOBAL CLIPPING PASS
+NO NEW FORMULA ERRORS PASS
 
 Solo después de este gate C17 puede marcarse CLOSED y reanudarse DF-07B.
