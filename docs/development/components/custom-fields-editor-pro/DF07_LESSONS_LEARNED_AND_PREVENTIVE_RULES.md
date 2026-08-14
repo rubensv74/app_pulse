@@ -1,9 +1,9 @@
 # cmp_CustomFieldsEditorPro — DF-07 lessons learned and preventive rules
 
-**Date:** 2026-08-12  
+**Date:** 2026-08-14  
 **Scope:** `cmp_CustomFieldsEditorPro` integrated as modal editor in `scr_PunchReview`  
-**Evidence:** Power Apps Studio visual validation after DF-07A  
-**Status:** functional behavior retained; UX improved; final visual approval still pending residual filtering-layout cleanup.
+**Evidence:** Power Apps Studio visual validation through DF-06E-FIX4 and DF-07B preparation  
+**Status:** functional behavior retained; UX improved; final visual approval pending readability-floor validation.
 
 ## Purpose
 
@@ -39,16 +39,30 @@ The Studio validation after DF-07A confirms that the following corrections mater
 
 ---
 
-## 2. Residual issue visible after DF-07A
+## 2. Active/Inactive host contract — validated lesson
 
-The compacting pass exposed a second-order visual defect in the **Filtering** section:
+DF-06E showed that multiple transient output properties can diverge from the visible draft state. The reliable host mutation was obtained by reading the stable `DraftDefinition` output instead of depending on separate `ActiveChangeFieldKey` / `ActiveChangeTarget` outputs.
 
-- labels/state text around `Filterable` and `More filters` can wrap, clip or overlap;
-- the disabled filter controls below are geometrically correct, but the state labels above need independent spacing validation.
+### PULSE rule
 
-This is important: **a density improvement can create a new defect in adjacent text even when the controls themselves become smaller.**
+When a reusable component exposes an aggregate draft contract that already contains the authoritative field values, host persistence should prefer that stable aggregate contract over several transient outputs unless there is a demonstrated reason not to.
 
-Therefore DF-07A is an improvement but should not yet be declared `VISUAL_APPROVED`.
+---
+
+## 3. Residual issue visible before DF-07B
+
+The compacting passes successfully reduced visual weight, but the component still contains multiple texts at `Size = 5`, `6` and `7`. In the real Punch Review host these become microtext, particularly in:
+
+- General captions;
+- Behavior captions;
+- Filtering captions;
+- Options metadata;
+- Live Preview flags and metadata;
+- small catalog metadata.
+
+This is important: **density is not premium when the user needs browser zoom or visual effort to decode secondary information.**
+
+Therefore DF-07B-FIX1 introduces a readability floor without increasing input size or reopening geometry.
 
 ---
 
@@ -78,57 +92,27 @@ IMMUTABLE_AFTER_CREATE
 
 ## PR-CF-UX-002 — Do not position persistent action bars with design-time fixed Y assumptions
 
-The original `Save / Cancel` area was positioned for the component's ideal design height while the real Punch Review modal could render with a smaller host height.
+Persistent form actions must be anchored to the actual available container height, not to a fixed coordinate derived from the ideal component size.
 
-### PULSE rule
-
-Persistent form actions must be anchored to the **actual available container height**, not to a fixed coordinate derived from the ideal component size.
-
-Before approval, validate at least:
-
-```text
-minimum supported host height
-nominal host height
-maximum/desktop host height
-```
-
-And repeat the test with a field type that expands the editor, especially `Choice` / `MultiChoice`.
+Before approval, validate minimum supported host height, nominal host height and desktop/max host height, including Choice/MultiChoice.
 
 ---
 
 ## PR-CF-UX-003 — Compact switches use external semantic labels
 
-Large toggles with embedded state text created unnecessary visual weight.
-
-### PULSE rule
-
-For dense administration forms:
+For dense administration forms prefer:
 
 ```text
 small switch + external caption + optional small state text
 ```
 
-Prefer this over a wide switch containing labels such as `Optional`, `Pinned`, `Active`, `Not filterable`, etc.
-
-After compacting a switch, revalidate neighboring captions. Do not assume smaller control geometry means the whole row is visually safe.
+After compacting a switch, revalidate neighboring captions.
 
 ---
 
 ## PR-CF-UX-004 — Visual density changes require a second-order clipping pass
 
-A change intended to reduce control size can produce:
-
-- wrapped captions;
-- clipped state text;
-- overlap with the next row;
-- reduced click/focus area;
-- disabled controls that no longer align with their labels.
-
-### Mandatory post-density check
-
-Inspect the **entire parent section**, not only the control changed.
-
-For this editor the minimum sections are:
+Inspect the entire parent section, not only the control changed. Minimum sections:
 
 ```text
 General
@@ -143,27 +127,24 @@ Live preview
 
 ## PR-CF-UX-005 — Avoid microtypography as a substitute for layout work
 
-Earlier versions compressed explanatory and metadata text to very small sizes to make the editor fit.
-
-### PULSE rule
-
 Do not solve geometry primarily by shrinking text.
 
-For dense PULSE editors:
+### PULSE readability floor for dense admin modals
 
-- normal compact metadata should generally remain around the established readable component scale;
-- sizes equivalent to 5–6 should be exceptional and require explicit Studio visual evidence;
-- prefer reclaiming space through container geometry, spacing, control density and wrapping rules first.
+```text
+15 pt  modal title
+10 pt  panel titles
+9 pt   important field labels
+8 pt   body/captions/normal metadata/buttons
+7 pt   micro-badges or very secondary metadata only
+<7 pt  not allowed without explicit exception and Studio evidence
+```
 
-`VISUAL_APPROVED` requires readable text at the actual runtime dimensions.
+If raising text creates overlap, fix spacing or container geometry. Do not revert to unreadable type solely to make the layout fit.
 
 ---
 
 ## PR-CF-UX-006 — Administration modals must expose real scope context
-
-A project-level editor must show the project being modified.
-
-### PULSE rule
 
 Prefer:
 
@@ -171,19 +152,11 @@ Prefer:
 ProjectCode · ProjectName · Entity scope
 ```
 
-over generic text such as:
-
-```text
-Current project
-```
-
-This is not decorative metadata; it is a safety/context control for administrative operations.
+over generic `Current project` text.
 
 ---
 
 ## PR-CF-UX-007 — Functional freeze and visual approval are separate gates
-
-The editor backend and host contract can be functionally correct while the rendered form still has clipping or density defects.
 
 Use distinct status:
 
@@ -194,7 +167,11 @@ VISUAL DENSITY       IN_VALIDATION
 COLOR                PENDING or VISUAL_APPROVED independently
 ```
 
-Do not infer `VISUAL_APPROVED` from the absence of formula errors.
+---
+
+## PR-CF-UX-008 — Stable aggregate outputs beat transient event outputs for host persistence
+
+If the component already publishes a complete current draft such as `DraftDefinition`, prefer that contract for host-owned persistence. Transient event outputs are acceptable for signaling intent, but should not become the only source of truth when they can diverge from the visible draft.
 
 ---
 
@@ -218,22 +195,24 @@ Before `cmp_CustomFieldsEditorPro` becomes `FINAL_FROZEN`, test in Power Apps St
 | Minimum modal height | no clipped actions or sections |
 | Long label/help text | no unintended overlap |
 | Long project name | header context remains readable |
+| Readability floor | no text below 7 pt; normal captions/metadata readable at runtime |
 
 ---
 
-## Current status after the 2026-08-12 Studio validation
+## Current status after DF-06E-FIX4
 
 ```text
 THREE-COLUMN ARCHITECTURE     FROZEN
 BACKEND HOST CONTRACT         FUNCTIONAL_FROZEN
-INTERNAL KEY MODEL            IMPROVED / VALIDATED VISUALLY
-BOTTOM ACTION VISIBILITY      IMPROVED / VALIDATED VISUALLY
-TOGGLE DENSITY                IMPROVED / VALIDATED VISUALLY
-PROJECT CONTEXT               IMPROVED / VALIDATED VISUALLY
-FILTERING CAPTION LAYOUT      NEEDS FINAL POLISH
+ACTIVE / INACTIVE              VALIDATED
+INTERNAL KEY MODEL            VALIDATED
+BOTTOM ACTION VISIBILITY      VALIDATED
+TOGGLE DENSITY                VALIDATED
+PROJECT CONTEXT               VALIDATED
+READABILITY FLOOR             PENDING STUDIO VALIDATION
 FINAL VISUAL APPROVAL         PENDING
 ```
 
 ## Next visual checkpoint
 
-`DF-07B` should be limited to final visual finishing, especially the Filtering section, spacing, clipping, typography consistency and Live Preview balance. It must not reopen backend behavior or the frozen three-column architecture.
+`DF-07B-FIX1` is limited to typography/readability. It must not reopen backend behavior or the frozen three-column architecture.
