@@ -1,0 +1,259 @@
+=// =====================================================
+// APP-START-02 — scr_Home.OnVisible
+// Screen-owned runtime only. No global bootstrap.
+// =====================================================
+
+// -----------------------------------------------------
+// 01) Screen identity
+// -----------------------------------------------------
+Set(varAppView, "Home");
+Set(varPageKey, "HOME");
+Set(varPageTitle, "Home");
+Set(varPageSubtitle, "Project command center");
+
+// -----------------------------------------------------
+// 02) Home discipline palette — initialize once
+// -----------------------------------------------------
+If(
+    CountRows(colDisciplinePalette) = 0,
+    ClearCollect(
+        colDisciplinePalette,
+        { DisciplineCode: "ELECTRICAL",       DisciplineName: "Electrical",       DisciplineColor: "#F97316", DisciplineOrder: 1 },
+        { DisciplineCode: "PIPING",           DisciplineName: "Piping",           DisciplineColor: "#14B8A6", DisciplineOrder: 2 },
+        { DisciplineCode: "MECHANICAL",       DisciplineName: "Mechanical",       DisciplineColor: "#2563EB", DisciplineOrder: 3 },
+        { DisciplineCode: "INSTRUMENTATION",  DisciplineName: "Instrumentation",  DisciplineColor: "#8B5CF6", DisciplineOrder: 4 },
+        { DisciplineCode: "CIVIL",            DisciplineName: "Civil",            DisciplineColor: "#06B6D4", DisciplineOrder: 5 },
+        { DisciplineCode: "HVAC",             DisciplineName: "HVAC",             DisciplineColor: "#0EA5E9", DisciplineOrder: 6 },
+        { DisciplineCode: "STRUCTURAL",       DisciplineName: "Structural",       DisciplineColor: "#6366F1", DisciplineOrder: 7 },
+        { DisciplineCode: "FIREPROOFING",     DisciplineName: "Fireproofing",     DisciplineColor: "#EF4444", DisciplineOrder: 8 },
+        { DisciplineCode: "TELECOM",          DisciplineName: "Telecom",          DisciplineColor: "#22C55E", DisciplineOrder: 9 },
+        { DisciplineCode: "SAFETY",           DisciplineName: "Safety",           DisciplineColor: "#F59E0B", DisciplineOrder: 10 },
+        { DisciplineCode: "OTHER",            DisciplineName: "Other",            DisciplineColor: "#64748B", DisciplineOrder: 999 }
+    )
+);
+
+// -----------------------------------------------------
+// 03) Home Punch dashboard typed state — initialize once
+// -----------------------------------------------------
+If(
+    IsBlank(varHomePunchSelectedDisciplineCode),
+    Set(varHomePunchSelectedDisciplineCode, "")
+);
+
+If(
+    IsBlank(varHomePunchGridSelectionInitialized),
+
+    ClearCollect(
+        colHomePunchGridSelectedKeys,
+        { RowKey: "" }
+    );
+    Clear(colHomePunchGridSelectedKeys);
+
+    Set(varHomePunchGridAllMatchingSelected, false);
+    Set(varHomePunchGridSelectionInitialized, true)
+);
+
+If(
+    IsBlank(varHomePunchCollectionsInitialized),
+
+    ClearCollect(
+        colHomePunchGridNormalized,
+        {
+            RowIndex: 0,
+            RowKey: "",
+            PunchId: "",
+            Title: "",
+            Subsystem: "",
+            Discipline: "",
+            DisciplineCode: "",
+            Priority: "",
+            Status: "",
+            DueDateText: "",
+            IsOverdue: false,
+            OwnerInitials: "",
+            OwnerName: "",
+            ProgressPct: 0
+        }
+    );
+    Clear(colHomePunchGridNormalized);
+
+    ClearCollect(
+        colHomePunchGridView,
+        {
+            RowIndex: 0,
+            RowKey: "",
+            PunchId: "",
+            Title: "",
+            Subsystem: "",
+            Discipline: "",
+            Priority: "",
+            Status: "",
+            DueDateText: "",
+            IsOverdue: false,
+            OwnerInitials: "",
+            OwnerName: "",
+            ProgressPct: 0
+        }
+    );
+    Clear(colHomePunchGridView);
+
+    ClearCollect(
+        colPunchExecutiveDisciplineDistribution,
+        {
+            DisciplineCode: "",
+            DisciplineName: "",
+            PunchCount: 0,
+            DisciplineColor: "#64748B"
+        }
+    );
+    Clear(colPunchExecutiveDisciplineDistribution);
+
+    ClearCollect(
+        colPunchExecutiveDonutItems,
+        {
+            SegmentKey: "",
+            SegmentLabel: "",
+            SegmentValue: 0,
+            SegmentColor: "#64748B",
+            SegmentOrder: 0
+        }
+    );
+    Clear(colPunchExecutiveDonutItems);
+
+    Set(varHomePunchCollectionsInitialized, true)
+);
+
+// -----------------------------------------------------
+// 04) Home interaction defaults — preserve existing runtime state
+// -----------------------------------------------------
+If(IsBlank(varHomePunchQuickFilter), Set(varHomePunchQuickFilter, "OPEN"));
+If(IsBlank(varHomePunchSearchText), Set(varHomePunchSearchText, ""));
+If(IsBlank(varHomePunchGridDensity), Set(varHomePunchGridDensity, "Compact"));
+If(IsBlank(varHomePunchGridSortKey), Set(varHomePunchGridSortKey, "PunchId"));
+If(IsBlank(varHomePunchGridSortDirection), Set(varHomePunchGridSortDirection, "asc"));
+If(IsBlank(varHomePunchGridSelectedKey), Set(varHomePunchGridSelectedKey, ""));
+
+If(IsBlank(varHomePunchKpiTotal), Set(varHomePunchKpiTotal, 0));
+If(IsBlank(varHomePunchKpiOpen), Set(varHomePunchKpiOpen, 0));
+If(IsBlank(varHomePunchKpiClosed), Set(varHomePunchKpiClosed, 0));
+If(IsBlank(varHomePunchKpiCompletion), Set(varHomePunchKpiCompletion, 0));
+If(IsBlank(varHomePunchKpiHasPreviousSnapshot), Set(varHomePunchKpiHasPreviousSnapshot, false));
+
+// -----------------------------------------------------
+// 05) Home data-grid column model — initialize once
+// -----------------------------------------------------
+If(
+    CountRows(colHomePunchGridColumns) = 0,
+
+    ClearCollect(
+        colHomePunchGridColumns,
+        { Key: "PunchId",      Label: "Punch",                           IsVisible: true,  IsLocked: true,  Width: 116, Sortable: true,  Order: 1 },
+        { Key: "Title",        Label: "Description",                     IsVisible: true,  IsLocked: true,  Width: 360, Sortable: true,  Order: 2 },
+        { Key: "Subsystem",    Label: "Category / Subsystem / Discipline", IsVisible: true, IsLocked: false, Width: 300, Sortable: true, Order: 3 },
+        { Key: "Discipline",   Label: "Discipline",                      IsVisible: false, IsLocked: false, Width: 110, Sortable: true,  Order: 4 },
+        { Key: "Priority",     Label: "Priority",                        IsVisible: true,  IsLocked: false, Width: 108, Sortable: true,  Order: 5 },
+        { Key: "Status",       Label: "Status",                          IsVisible: true,  IsLocked: false, Width: 100, Sortable: true,  Order: 6 },
+        { Key: "DueDateText",  Label: "Due Date",                        IsVisible: false, IsLocked: false, Width: 108, Sortable: false, Order: 7 },
+        { Key: "OwnerName",    Label: "Responsible",                     IsVisible: true,  IsLocked: false, Width: 240, Sortable: true,  Order: 8 },
+        { Key: "ProgressPct",  Label: "Progress",                        IsVisible: false, IsLocked: false, Width: 116, Sortable: false, Order: 9 }
+    )
+);
+
+// -----------------------------------------------------
+// 06) Executive grid state — Home-owned
+// -----------------------------------------------------
+If(IsBlank(varPunchExecutiveGridPage), Set(varPunchExecutiveGridPage, 1));
+If(IsBlank(varPunchExecutiveGridPageSize), Set(varPunchExecutiveGridPageSize, 25));
+If(IsBlank(varPunchExecutiveGridTotalRows), Set(varPunchExecutiveGridTotalRows, 0));
+If(IsBlank(varPunchExecutiveGridTotalPages), Set(varPunchExecutiveGridTotalPages, 0));
+If(IsBlank(varPunchExecutiveGridHasPreviousPage), Set(varPunchExecutiveGridHasPreviousPage, false));
+If(IsBlank(varPunchExecutiveGridHasNextPage), Set(varPunchExecutiveGridHasNextPage, false));
+If(IsBlank(varPunchExecutiveGridLoading), Set(varPunchExecutiveGridLoading, false));
+If(IsBlank(varPunchExecutiveGridError), Set(varPunchExecutiveGridError, ""));
+If(IsBlank(varPunchExecutiveGridMessage), Set(varPunchExecutiveGridMessage, ""));
+
+// -----------------------------------------------------
+// 07) Home/Hive semantic tokens — initialize once
+// -----------------------------------------------------
+If(IsBlank(varHiveColorExcellent), Set(varHiveColorExcellent, "#22C55E"));
+If(IsBlank(varHiveColorGood), Set(varHiveColorGood, "#F59E0B"));
+If(IsBlank(varHiveColorInProgress), Set(varHiveColorInProgress, "#00C8FF"));
+If(IsBlank(varHiveColorDelayed), Set(varHiveColorDelayed, "#EF4444"));
+If(IsBlank(varHiveColorNeutral), Set(varHiveColorNeutral, "#64748B"));
+If(IsBlank(varHiveColorSelected), Set(varHiveColorSelected, "#00C8FF"));
+If(IsBlank(varHiveColorCardBg), Set(varHiveColorCardBg, "#FFFFFF"));
+If(IsBlank(varHiveColorPageBg), Set(varHiveColorPageBg, "#F6F8FB"));
+If(IsBlank(varHiveColorBorder), Set(varHiveColorBorder, "#E2E8F0"));
+If(IsBlank(varHiveColorText), Set(varHiveColorText, "#0F172A"));
+If(IsBlank(varHiveColorMuted), Set(varHiveColorMuted, "#64748B"));
+
+// -----------------------------------------------------
+// 08) Home loading/runtime status only
+// Do not clear global/PHR/Config/Skyline state here.
+// -----------------------------------------------------
+If(
+    !Coalesce(varProjectSwitching, false) &&
+    !Coalesce(varGlobalLoadPending, false),
+    Set(varHomeLoading, false);
+    Set(varExecDashboardLoading, false)
+);
+
+If(IsBlank(varExecutiveDashboardStatus), Set(varExecutiveDashboardStatus, "IDLE"));
+If(IsBlank(varExecutiveDashboardError), Set(varExecutiveDashboardError, ""));
+If(IsBlank(varExecutiveDashboardRequestedAt), Set(varExecutiveDashboardRequestedAt, Blank()));
+If(IsBlank(varExecutiveDashboardCompletedAt), Set(varExecutiveDashboardCompletedAt, Blank()));
+If(IsBlank(varExecutiveAlertDismissed), Set(varExecutiveAlertDismissed, false));
+
+If(IsBlank(varHomeError), Set(varHomeError, ""));
+If(IsBlank(varHomePendingError), Set(varHomePendingError, ""));
+
+// -----------------------------------------------------
+// 09) Home/Hive UI defaults — preserve valid existing selections
+// -----------------------------------------------------
+If(IsBlank(varHiveCardWidth), Set(varHiveCardWidth, 330));
+If(IsBlank(varHiveCardHeight), Set(varHiveCardHeight, 215));
+If(IsBlank(varHiveRightPanelWidth), Set(varHiveRightPanelWidth, 326));
+
+If(IsBlank(varHomeShowOverview), Set(varHomeShowOverview, false));
+If(IsBlank(varHomeShowCards), Set(varHomeShowCards, false));
+If(IsBlank(varHomeShowRightPanel), Set(varHomeShowRightPanel, false));
+If(IsBlank(varHomeNoData), Set(varHomeNoData, false));
+
+If(
+    IsBlank(varSelectedHiveNode) || IsBlank(varSelectedHiveNode.NodeId),
+    Set(
+        varSelectedHiveNode,
+        {
+            NodeId: "",
+            NodeNo: "",
+            NodeTitle: "",
+            NodeSubtitle: "",
+            Discipline: "",
+            SubsystemCode: "",
+            Total: 0,
+            Done: 0,
+            Remaining: 0,
+            Progress: 0,
+            ProgressStatus: "",
+            ProgressColor: "",
+            SortOrder: 0
+        }
+    )
+);
+
+If(
+    IsBlank(varSelectedHiveSubsystem) || IsBlank(varSelectedHiveSubsystem.SubsystemCode),
+    Set(
+        varSelectedHiveSubsystem,
+        {
+            SubsystemCode: "",
+            Discipline: "",
+            Total: 0,
+            Done: 0,
+            Remaining: 0,
+            Progress: 0,
+            ProgressStatus: "",
+            ProgressColor: ""
+        }
+    )
+)
