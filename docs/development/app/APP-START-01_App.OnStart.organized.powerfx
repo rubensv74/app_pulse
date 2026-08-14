@@ -1,0 +1,682 @@
+// =====================================================
+// App.OnStart
+// APP-START-01 — organized global bootstrap
+// PENDING POWER APPS STUDIO VALIDATION
+// =====================================================
+
+// -----------------------------------------------------
+// 01) Runtime / responsive layout
+// -----------------------------------------------------
+Set(varProjectSwitching, false);
+Set(varW, App.Width);
+Set(varH, App.Height);
+Set(varRatio, varW / varH);
+Set(varCompactMode, App.Height < 850);
+Set(varBp, If(varW < 900, "S", If(varW < 1400, "M", "L")));
+Set(varBpH, If(varH < 700, "S", If(varH < 900, "M", "L")));
+Set(varFontBase, Switch(varBp, "S", 12, "M", 13, "L", 14, 13));
+Set(varH_Header, Switch(varBp, "S", 52, "M", 56, "L", 56, 56));
+Set(varH_Filters, Switch(varBp, "S", 104, "M", 88, "L", 88, 88));
+Set(varH_Status, 32);
+Set(varPad, Switch(varBp, "S", 10, "M", 12, "L", 12, 12));
+Set(varGap, Switch(varBp, "S", 8, "M", 10, "L", 10, 10));
+
+// -----------------------------------------------------
+// 02) Drawer responsive
+// -----------------------------------------------------
+Set(varDrawerMode, If(varW < 1100 || varH < 750, "Overlay", "Side"));
+Set(varDrawerMaxW, Switch(varDrawerMode, "Side", 640, "Overlay", Min(900, RoundDown(varW * 0.92, 0)), 640));
+Set(varDrawerMaxH, Switch(varDrawerMode, "Side", varH - varH_Header - varPad * 2, "Overlay", Min(820, RoundDown(varH * 0.9, 0)), varH - varH_Header - varPad * 2));
+
+// -----------------------------------------------------
+// 03) Global visual tokens
+// -----------------------------------------------------
+Set(
+    gblAppColors,
+    {
+        Primary: RGBA(95, 121, 151, 1),
+        PrimaryDark: RGBA(75, 95, 120, 1),
+        Background: RGBA(245, 247, 250, 1),
+        Surface: RGBA(255, 255, 255, 1),
+        Border: RGBA(0, 0, 0, 0.08),
+        TextPrimary: RGBA(30, 30, 30, 1),
+        TextSecondary: RGBA(100, 100, 100, 1),
+        Success: RGBA(24, 130, 84, 1),
+        Warning: RGBA(194, 120, 3, 1),
+        Danger: RGBA(200, 60, 60, 1),
+        TagBg: RGBA(95, 121, 151, 0.1)
+    }
+);
+Set(varTheme_NavBg, ColorValue("#07111F"));
+Set(varTheme_NavBg2, ColorValue("#0B1220"));
+Set(varTheme_TopBg, ColorValue("#FFFFFF"));
+Set(varTheme_PageBg, ColorValue("#F6F8FB"));
+Set(varTheme_Surface, ColorValue("#FFFFFF"));
+Set(varTheme_SurfaceAlt, ColorValue("#F8FAFC"));
+Set(varTheme_Border, ColorValue("#E2E8F0"));
+Set(varTheme_Text, ColorValue("#0F172A"));
+Set(varTheme_TextMuted, ColorValue("#64748B"));
+Set(varTheme_TextSoft, ColorValue("#94A3B8"));
+Set(varTheme_TextWhite, ColorValue("#FFFFFF"));
+Set(varTheme_PulseBlue, ColorValue("#00C8FF"));
+Set(varTheme_PulseBlueDark, ColorValue("#1677FF"));
+Set(varTheme_PulseSoft, ColorValue("#E0F7FF"));
+Set(varTheme_Green, ColorValue("#22C55E"));
+Set(varTheme_Amber, ColorValue("#F59E0B"));
+Set(varTheme_Red, ColorValue("#EF4444"));
+Set(varTheme_CardRadius, 16);
+Set(varTheme_ButtonRadius, 10);
+
+// -----------------------------------------------------
+// 04) User / session
+// SECURITY TODO: replace hardcoded manager with authoritative role source.
+// -----------------------------------------------------
+Set(varUserEmail, Lower(User().Email));
+Set(varUserName, User().FullName);
+Set(varUserRole, "manager");
+Set(varCurrentUserEmail, varUserEmail);
+Set(varCurrentUserName, varUserName);
+Set(varIsSuperAdmin, false);
+Set(varSA_IsSuperAdminText, "0");
+
+// -----------------------------------------------------
+// 05) Navigation / page defaults
+// -----------------------------------------------------
+Set(gblNavKey, "Home");
+Set(varAppView, "Home");
+Set(varSelectedKey, "Home");
+Set(varAppViewPrev, "Home");
+Set(varHomeViewMode, "DASHBOARD");
+Set(varOps_ViewMode, "OVERVIEW");
+Set(varOps_QuickFilter, "ALL");
+Set(varPageKey, "HOME");
+Set(varPageTitle, "Home");
+Set(varPageSubtitle, "Project command center");
+
+// -----------------------------------------------------
+// 06) Project context
+// -----------------------------------------------------
+Set(varProjectId, Blank());
+Set(varProjectCode, "");
+Set(varProjectName, "");
+Set(varProjectDescription, "");
+Set(varSelectedProject, Blank());
+Set(varProjectLoaded, false);
+Set(varApplySubsystemDefault, false);
+
+// -----------------------------------------------------
+// 07) Global security
+// -----------------------------------------------------
+Clear(colSecurity);
+IfError(
+    ClearCollect(colSecurity, WarRoom_Security_IsSuperAdmin.Run(varCurrentUserEmail)),
+    ClearCollect(colSecurity, {issuperadmin: "0"})
+);
+Set(varSA_IsSuperAdminText, Coalesce(Text(First(colSecurity).issuperadmin), "0"));
+Set(varIsSuperAdmin, varSA_IsSuperAdminText = "1");
+
+// -----------------------------------------------------
+// 08) Enabled projects
+// -----------------------------------------------------
+Clear(colEnabledProjectsRaw);
+Clear(colEnabledProjects);
+Clear(colEnabledProjectsUI);
+Set(varEnabledProjectsError, "");
+IfError(
+    Set(varEnabledProjectsRaw, WarRoom_EnabledProjects_GetActive.Run().result),
+    Set(varEnabledProjectsError, FirstError.Message);
+    Set(varEnabledProjectsRaw, "{}")
+);
+If(
+    IsBlank(varEnabledProjectsError),
+    ClearCollect(
+        colEnabledProjects,
+        ForAll(
+            Table(ParseJSON(Coalesce(varEnabledProjectsRaw, "{}")).Table1),
+            {
+                ProjectId: Value(Value.ProjectId),
+                ProjectCode: Text(Value.ProjectCode),
+                ProjectName: Text(Value.ProjectName),
+                ProjectDescription: Text(Value.ProjectDescription),
+                IsDefault: Boolean(Value.IsDefault)
+            }
+        )
+    )
+);
+ClearCollect(
+    colEnabledProjectsUI,
+    AddColumns(colEnabledProjects, ProjectDisplayName, ProjectCode & " · " & ProjectName)
+);
+
+// -----------------------------------------------------
+// 09) Sidebar navigation
+// -----------------------------------------------------
+ClearCollect(
+    colSidebarNavItems,
+    {Order: 10, Key: "Home", Label: "Home", IconKey: "home"},
+    {Order: 20, Key: "overview", Label: "Overview", IconKey: "overview"},
+    {Order: 30, Key: "punchreview", Label: "Punch Review", IconKey: "punch-review"},
+    {Order: 40, Key: "Punches", Label: "Punch List", IconKey: "punch-list"},
+    {Order: 41, Key: "Briefing", Label: "Briefing", IconKey: "briefing"},
+    {Order: 42, Key: "Skyline", Label: "Skyline", IconKey: "skyline"},
+    {Order: 50, Key: "Config", Label: "Config", IconKey: "config"}
+);
+If(varIsSuperAdmin, Collect(colSidebarNavItems, {Order: 90, Key: "SuperAdmin", Label: "Admin", IconKey: "admin"}));
+
+// -----------------------------------------------------
+// 10) Global loading / error / loaded flags
+// -----------------------------------------------------
+Set(varGlobalLoading, false);
+Set(varGlobalLoadingMsg, "");
+Set(varGlobalLoadingSubMsg, "");
+Set(varGlobalLoadingScope, "");
+Set(varGlobalLoadAction, "");
+Set(varGlobalLoadPending, false);
+Set(varLoading, false);
+Set(varLoadingMsg, "");
+Set(varHomeLoading, false);
+Set(varOps_IsLoading, false);
+Set(varPHR_IsLoading, false);
+Set(varPHR_IsRendering, false);
+Set(varDash_IsLoading, false);
+Set(varExecDashboardLoading, false);
+Set(varTasks_IsLoading, false);
+Set(varPunches_IsLoading, false);
+Set(varCfg_IsLoading, false);
+Set(varAppError, "");
+Set(varAppWarning, "");
+Set(varHomeError, "");
+Set(varHomePendingError, "");
+Set(varOps_Error, "");
+Set(varTasks_Error, "");
+Set(varPunches_Error, "");
+Set(varCfg_Error, "");
+Set(varPHR_LastError, "");
+Set(varPHR_LastErrorMessage, "");
+Set(varPHR_LastRawResult, "");
+Set(varHomeHiveLoaded, false);
+Set(varOperationsLoaded, false);
+Set(varPHR_OverviewLoaded, false);
+Set(varTasksLoaded, false);
+Set(varPunchesLoaded, false);
+Set(varConfigLoaded, false);
+Set(varBriefingLoaded, false);
+
+// -----------------------------------------------------
+// 11) PHR defaults
+// -----------------------------------------------------
+Set(varPHR_Page, 1);
+Set(varPHR_PageSize, 50);
+Set(varPHR_TotalCount, 0);
+Set(varPHR_HeaderH1, 26);
+Set(varPHR_HeaderH2, 24);
+Set(varPHR_HeaderH3, 24);
+Set(varPHR_HeaderH4, 24);
+Set(varPHR_RowH, 44);
+Set(varPHR_ColW, 50);
+Set(varPHR_StatusW, 52);
+Set(varPHR_SubsysW, 190);
+Set(varPHR_ActionsW, 90);
+Set(varPHR_LeftFixedW, varPHR_StatusW + varPHR_SubsysW + varPHR_ActionsW);
+Set(varPHR_SelectedL1NodeId, "");
+Set(varPHR_SelectedL1Label, "");
+Set(varPHR_StartTabTimer, false);
+Set(varPHR_TabSwitching, false);
+Set(varPHR_TabSwitchMsg, "");
+Set(varOverviewNoConfig, false);
+Set(varOverviewNoData, false);
+Set(varProjectHasPHRData, false);
+
+// -----------------------------------------------------
+// 12) Tasks defaults
+// -----------------------------------------------------
+Set(varTasks_Page, 1);
+Set(varTasks_PageSize, 50);
+Set(varTasks_TotalRows, 0);
+Set(varTasks_TotalPages, 0);
+Set(varTasks_AutoLoad, false);
+Set(varTasks_HasSearched, false);
+Set(varTasks_HasFilters, false);
+Set(varTasks_ViewReady, false);
+Set(varTasks_ReturnView, "Overview");
+Set(varTasks_ContextSource, "");
+Set(varTasks_Filter_Subsystem, "");
+Set(varFilter_ElementDiscipline, "");
+Set(varFilter_Subcontractor, "");
+Set(varFilter_TaskSubsystem, "");
+Set(varFilter_TaskDiscipline, "");
+Set(varFilter_TaskSubcontractor, "");
+Set(varFilter_TaskStatusId, "");
+Set(varOps_ToTasks_SubsystemCode, "");
+Set(varOps_ToTasks_L1NodeId, "");
+Set(varOps_ToTasks_L2NodeId, "");
+Set(varOps_ToTasks_L3NodeId, "");
+Set(varOps_ToTasks_L1DisplayName, "");
+Set(varOps_ToTasks_L2DisplayName, "");
+Set(varOps_ToTasks_L3DisplayName, "");
+
+// -----------------------------------------------------
+// 13) Punches defaults + Punch Review drill-through contract
+// -----------------------------------------------------
+Set(varPunches_Page, 1);
+Set(varPunches_PageSize, 50);
+Set(varPunches_TotalRows, 0);
+Set(varPunches_TotalPages, 0);
+Set(varPunches_AutoLoad, false);
+Set(varPunches_ViewReady, false);
+Set(varPunches_ReturnView, "Overview");
+Set(varPunches_FilterSource, "Manual");
+Set(varPunches_FocusPunchId, Blank());
+Set(varFilter_Subsystem, "");
+Set(varFilter_PunchDiscipline, "");
+
+// -----------------------------------------------------
+// 14) Drawer / detail / comments defaults
+// -----------------------------------------------------
+Set(varShowDetailDrawer, false);
+Set(varDrawerIsLoading, false);
+Set(varDrawerTab, "Overview");
+Set(tablistSelected, 1);
+Set(varDrawerProjectId, Blank());
+Set(varDrawerEntityType, "");
+Set(varDrawerRecordId, Blank());
+Set(varDrawerSelectedRecord, Blank());
+Set(
+    varDrawerNormalized,
+    {
+        EntityType: "",
+        ProjectId: Blank(),
+        RecordId: Blank(),
+        AreaCode: "",
+        UnitCode: "",
+        SystemCode: "",
+        SubsystemCode: "",
+        ElementCode: "",
+        TypeCode: "",
+        TitleLabel: "",
+        TitleValue: "",
+        DescLabel: "",
+        DescValue: "",
+        StatusLabel: "",
+        StatusValue: "",
+        DisciplineLabel: "",
+        DisciplineValue: "",
+        SecondaryLabel: "",
+        SecondaryValue: ""
+    }
+);
+Set(varCommentsPage, 1);
+Set(varCommentsPageSize, 20);
+Set(varCommentsTotalRows, 0);
+Set(varCommentsTotalPages, 0);
+Set(varIsLoadingComments, false);
+
+// -----------------------------------------------------
+// 15) Config defaults
+// -----------------------------------------------------
+Set(varNodeModalOpen, false);
+Set(varScopeModalOpen, false);
+Set(varScopeModalLoading, false);
+Set(varScopeModalMode, "assigned");
+Set(varScopeModalSearch, "");
+Set(varScopeModalFilterPhase, "");
+Set(varScopeModalFilterDiscipline, "");
+Set(varScopeModalFilterSCTOnly, false);
+Set(varSelectedNodeId, Blank());
+Set(varSelectedNode, Blank());
+Set(varSelectedNodeLevel, 0);
+Set(varSelectedNodeName, "");
+Set(varSelectedParentName, "");
+Set(varSelectedNodeIsActive, false);
+Set(varSelNodeId_L1, Blank());
+Set(varSelNodeId_L2, Blank());
+Set(varSelNodeId_L3, Blank());
+Set(varTargetSubsectionId, Blank());
+Set(varTargetSubsectionName, "");
+Set(varEditMode, "NEW");
+Set(varEditLevel, 1);
+Set(varEditParentNodeId, Blank());
+Set(varEditNodeId, Blank());
+Set(varTmp_DisplayName, "");
+Set(varTmp_Description, "");
+Set(varTmp_SqlKey, "");
+Set(varTmp_GridKey, "");
+Set(varTmp_SortOrder, 0);
+Set(varTmp_IsActive, true);
+Set(varLastSavedNodeId, "");
+Set(varPendingResolveSavedNode, false);
+
+// -----------------------------------------------------
+// 16) Super Admin defaults
+// -----------------------------------------------------
+Set(varSA_Tab, "Projects");
+Set(varSA_UsersLoading, false);
+Set(varSA_UsersError, "");
+Set(varSA_ProjectsLoading, false);
+Set(varSA_ProjectsError, "");
+
+// -----------------------------------------------------
+// 17) Briefing defaults
+// -----------------------------------------------------
+Set(varBriefingEmailVisible, false);
+
+// -----------------------------------------------------
+// 18) Skyline defaults — consolidated, single initialization
+// -----------------------------------------------------
+Set(varSkylineLoaded, false);
+Set(varSkylineLoading, false);
+Set(varSkylineError, "");
+Set(varSkylineFromDate, DateAdd(Today(), -7, TimeUnit.Days));
+Set(varSkylinePunchWeight, 3);
+Set(varSelectedSkylineWeek, Blank());
+Set(varSelectedSkylineMode, "DENSITY");
+Clear(colSkylineRaw);
+Clear(colSkylineWeeks);
+Clear(colSkylineSelectedWeek);
+
+// -----------------------------------------------------
+// 19) Typed empty collections
+// -----------------------------------------------------
+
+// PHR
+ClearCollect(colPHR_Groups, Table({GroupKey: "", GroupLabel: "", SortOrder: 0}));
+Clear(colPHR_Groups);
+ClearCollect(colPHR_Subsystems, Table({RowNo: 0, SubsystemCode: ""}));
+Clear(colPHR_Subsystems);
+ClearCollect(colPHR_Metrics, Table({SubsystemCode: "", MetricKey: "", MetricValue: 0}));
+Clear(colPHR_Metrics);
+ClearCollect(
+    colPHR_Headers,
+    Table(
+        {
+            L1NodeId: "", L1Label: "", L1SortOrder: 0,
+            L2NodeId: "", L2Label: "", L2SortOrder: 0,
+            L3NodeId: "", L3Label: "", L3SortOrder: 0,
+            MetricKey: "", MetricSqlKey: "", MetricLabel: "", MetricSortOrder: 0
+        }
+    )
+);
+Clear(colPHR_Headers);
+ClearCollect(colPHR_HeaderL4, FirstN(colPHR_Headers, 0));
+ClearCollect(colPHR_HeaderL4Indexed, FirstN(colPHR_Headers, 0));
+ClearCollect(colPHR_HeaderL3Base, FirstN(colPHR_Headers, 0));
+ClearCollect(colPHR_HeaderL2Base, FirstN(colPHR_Headers, 0));
+ClearCollect(colPHR_HeaderL1Base, FirstN(colPHR_Headers, 0));
+ClearCollect(colPHR_HeaderL4_Active, FirstN(colPHR_Headers, 0));
+ClearCollect(colPHR_HeaderL3_Active, FirstN(colPHR_Headers, 0));
+ClearCollect(colPHR_HeaderL2_Active, FirstN(colPHR_Headers, 0));
+ClearCollect(colPHR_HeaderL1_Active, FirstN(colPHR_Headers, 0));
+ClearCollect(colPHR_RowCells, Table({SubsystemCode: "", MetricKey: "", MetricLabel: "", CellValue: 0, RowNo: 0}));
+Clear(colPHR_RowCells);
+ClearCollect(colPHR_RowCells_Active, FirstN(colPHR_RowCells, 0));
+ClearCollect(colPHR_RowStatus, Table({SubsystemCode: "", MaxRemaining: 0, StatusColor: ColorValue("#16A34A"), StatusTooltip: ""}));
+Clear(colPHR_RowStatus);
+ClearCollect(colPHR_TabsL1, Table({L1NodeId: "", L1Label: "", L1SortOrder: 0, IsSelected: false}));
+Clear(colPHR_TabsL1);
+
+// Shared filters
+ClearCollect(colSubsystems, Table({Code: ""}));
+Clear(colSubsystems);
+ClearCollect(colSubcontractors, Table({Code: ""}));
+Clear(colSubcontractors);
+
+// Tasks
+ClearCollect(
+    colTasks,
+    Table(
+        {
+            InspectionTaskId: 0,
+            SubsystemCode: "",
+            ElementCode: "",
+            ElementDiscipline: "",
+            FormName: "",
+            FormDescription: "",
+            TaskStatus: "",
+            SubcontractorName: "",
+            TotalRows: 0,
+            TotalPages: 0,
+            PageNumber: 1,
+            PageSize: 50
+        }
+    )
+);
+Clear(colTasks);
+ClearCollect(colTasks_Staging, FirstN(colTasks, 0));
+
+// Punches — full loader schema
+ClearCollect(
+    colPunches,
+    Table(
+        {
+            AreaCode: "",
+            UnitCode: "",
+            SystemCode: "",
+            SubsystemCode: "",
+            ElementCode: "",
+            ElementDiscipline: "",
+            TypeCode: "",
+            ProjectId: Blank(),
+            TemplateId: Blank(),
+            PunchId: 0,
+            PunchCode: "",
+            PunchDescription: "",
+            PunchCoordinator: "",
+            Originator: "",
+            CategoryCode: "",
+            Category: "",
+            PunchDiscipline: "",
+            StatusCode: "",
+            PunchStatus: "",
+            InspectionCode: "",
+            InspectionName: "",
+            InspectionType: "",
+            EntryType: "",
+            EntryTypeColor: "",
+            Topic: "",
+            RejectCount: 0,
+            ElementCodeMapped: "",
+            SubcontractorId: Blank(),
+            SubcontractorCode: "",
+            SubcontractorName: "",
+            SubcontractorShortName: "",
+            DepartmentAction: "",
+            CustomJson: "{}",
+            CustomFlag1: false,
+            CustomFlag2: false,
+            CustomText1: "",
+            CustomText2: "",
+            CustomDate1: Blank(),
+            CustomNumber1: Blank(),
+            CustomLastUpdatedByEmail: "",
+            CustomLastUpdatedOn: Blank(),
+            LastCommentOn: Blank(),
+            LastCommentText: "",
+            LastCommentByEmail: "",
+            CommentCount: 0,
+            TotalRows: 0,
+            TotalPages: 0,
+            PageNumber: 1,
+            PageSize: 50
+        }
+    )
+);
+Clear(colPunches);
+ClearCollect(colPunches_Staging, FirstN(colPunches, 0));
+ClearCollect(colPunchesReviewFocus, FirstN(colPunches, 0));
+
+// Comments
+ClearCollect(
+    colComments,
+    Table(
+        {
+            CommentId: 0,
+            CommentText: "",
+            CommentType: "",
+            CreatedOn: Now(),
+            CreatedByEmail: "",
+            CreatedByName: "",
+            TotalRows: 0,
+            TotalPages: 0,
+            PageNumber: 1,
+            PageSize: 20
+        }
+    )
+);
+Clear(colComments);
+
+// Custom Fields values
+ClearCollect(
+    colCT_Merged,
+    Table(
+        {
+            FieldKey: "",
+            Label: "",
+            FieldType: "",
+            HelpText: "",
+            IsRequired: false,
+            IsPinned: false,
+            SortOrder: 0,
+            OptionsJson: "",
+            ValueText: "",
+            ValueNumber: Blank(),
+            ValueDate: Blank(),
+            ValueBool: false,
+            ValueJson: "",
+            LastUpdatedOn: Blank(),
+            LastUpdatedByEmail: ""
+        }
+    )
+);
+Clear(colCT_Merged);
+ClearCollect(colCT_Merged_UI, FirstN(colCT_Merged, 0));
+ClearCollect(colCT_Merged_Base, FirstN(colCT_Merged, 0));
+ClearCollect(colCT_Quick, FirstN(colCT_Merged, 0));
+ClearCollect(
+    colCT_Dirty,
+    Table(
+        {
+            FieldKey: "",
+            FieldType: "",
+            ValueText: "",
+            ValueNumber: Blank(),
+            ValueDate: Blank(),
+            ValueBool: false,
+            ValueJson: ""
+        }
+    )
+);
+Clear(colCT_Dirty);
+
+// Config
+ClearCollect(
+    colNodes,
+    Table(
+        {
+            NodeId: "", ProjectId: 0, LevelNo: 0, ParentNodeId: "",
+            DisplayName: "", Description: "", SqlKey: "", GridKey: "",
+            SortOrder: 0, IsActive: false
+        }
+    )
+);
+Clear(colNodes);
+ClearCollect(
+    colAssign,
+    Table(
+        {
+            AssignmentId: "", ProjectId: 0, GroupKey: "", NodeId: "",
+            CreatedOn: "", CreatedBy: ""
+        }
+    )
+);
+Clear(colAssign);
+ClearCollect(
+    colScope,
+    Table(
+        {
+            GroupKey: "", ElementDiscipline: "", ElementLevel: "", PhaseName: "",
+            FormName: "", FormDescription: "", Sct: false, MasterTask: false,
+            DossierTask: false, TotalInspections: 0
+        }
+    )
+);
+Clear(colScope);
+ClearCollect(colScopeModalAssigned, FirstN(colScope, 0));
+ClearCollect(colScopeModalAvailable, FirstN(colScope, 0));
+ClearCollect(colScopeModalAssignedElsewhere, FirstN(colScope, 0));
+ClearCollect(colScopeModalWorking, FirstN(colScope, 0));
+ClearCollect(colScopeModalSelected, FirstN(colScope, 0));
+ClearCollect(colAssignedForTarget, FirstN(colScope, 0));
+ClearCollect(colAssignedForTargetSummary, FirstN(colScope, 0));
+
+// Super Admin
+ClearCollect(
+    colSA_Users,
+    Table(
+        {
+            UserId: 0, Email: "", LoginEmail: "", DisplayName: "",
+            UserIsActive: false, UserProjectRoleId: Blank(), ProjectId: Blank(),
+            RoleId: Blank(), RoleCode: "", RoleName: "", RoleIsActive: false
+        }
+    )
+);
+Clear(colSA_Users);
+ClearCollect(
+    colSA_Roles,
+    Table({RoleId: 0, RoleCode: "", RoleName: "", Description: "", IsActive: false})
+);
+Clear(colSA_Roles);
+
+// Staging / derived collections
+ClearCollect(colHomePendingSubsystems_Staging, FirstN(colHomePendingSubsystems, 0));
+ClearCollect(colPHR_HeaderL4_Active_Base, FirstN(colPHR_Headers, 0));
+ClearCollect(colNodes_Staging, FirstN(colNodes, 0));
+ClearCollect(colAssign_Staging, FirstN(colAssign, 0));
+ClearCollect(colScope_Staging, FirstN(colScope, 0));
+ClearCollect(
+    colReportDictionary_Staging,
+    FirstN(
+        Table(
+            {
+                HeaderNodeId: "", Header: "", HeaderSort: 0,
+                SectionNodeId: "", Section: "", SectionSort: 0,
+                SubsectionNodeId: "", Subsection: "", SubsectionSort: 0,
+                SqlKey: "", GridKey: "", Total: 0,
+                Done: Blank(), Pending: Blank()
+            }
+        ),
+        0
+    )
+);
+ClearCollect(
+    colReportMapDebug_Staging,
+    FirstN(
+        Table(
+            {
+                GroupKey: "", ElementDiscipline: "", ElementLevel: "", PhaseName: "",
+                FormName: "", FormDescription: "", Sct: false, MasterTask: false,
+                DossierTask: false, TotalInspections: 0, Header: "", Section: "",
+                Subsection: "", SqlKey: "", GridKey: "", SubsectionNodeId: ""
+            }
+        ),
+        0
+    )
+);
+ClearCollect(colCT_Merged_Base_Staging, FirstN(colCT_Merged_Base, 0));
+ClearCollect(colCT_Merged_UI_Staging, FirstN(colCT_Merged_UI, 0));
+ClearCollect(colCT_Quick_Staging, FirstN(colCT_Quick, 0));
+
+// -----------------------------------------------------
+// 20) Legacy view flags — compatibility only
+// -----------------------------------------------------
+Set(varView_Home, true);
+Set(varView_Overview, false);
+Set(varView_Tasks, false);
+Set(varView_Punches, false);
+Set(varView_Briefing, false);
+Set(varView_Config, false);
+Set(varView_SuperAdmin, false);
+
+// -----------------------------------------------------
+// 21) Initialization completed
+// -----------------------------------------------------
+Set(varScrApp_Initialized, true);
