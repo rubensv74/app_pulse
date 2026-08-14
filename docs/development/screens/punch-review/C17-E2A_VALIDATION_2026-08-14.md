@@ -2,11 +2,11 @@
 
 **Date:** 2026-08-14  
 **Screen:** `scr_PunchReview`  
-**Status:** VISUAL PASS / FUNCTIONAL SUB-GATES PENDING
+**Status:** VISUAL PASS / NAVIGATION FIX PENDING
 
 ## Evidence reviewed
 
-Power Apps Studio screenshot supplied after DF-07B-FIX1 and DF-06E-FIX4 validation.
+Power Apps Studio screenshots supplied after DF-07B-FIX1, DF-06E-FIX4 and Session Activity scope correction.
 
 ## Visual gate — PASS
 
@@ -24,31 +24,30 @@ The current workspace composition is visually stable at the minimum desktop targ
 - no right-rail truncation is visible;
 - Custom Field value controls retain the compact density approved in C17-D-FIX2.
 
-## Functional sub-gates still pending
+## Session Activity accumulation — PASS
 
-### Session Activity accumulation
+The latest Studio evidence shows:
 
-The screenshot shows a single session event. This confirms rendering, but does not yet prove the session-wide accumulation contract.
+- badge = `2 events`;
+- previously recorded events remain visible after the current Punch changes;
+- Session Activity no longer collapses to the current Punch only.
 
-Required final check:
+This is sufficient to validate the session-wide retention behavior introduced by C17-E2A-FIX1.
 
-1. perform an action on Punch A;
-2. move to Punch B and perform a second action;
-3. move to Punch C;
-4. confirm both prior events remain in Session Activity;
-5. confirm the badge count equals the total session event count.
+## Contextual Back — FAIL / FIX REQUIRED
 
-### Contextual Back label
+Real navigation evidence confirms that Punch Review still returns to Home when the user expected to return to Punch List.
 
-The screenshot still renders `Back to Punches`.
+The source explains why:
 
-Before navigation can be marked PASS, validate the contextual contract:
+- Punch List correctly sets `varPunchReviewSource = "PUNCHES"` and `varPunchReviewReturnScreen = "PUNCHES"` before opening Punch Review;
+- `btnPR_Back.OnSelect` ignores that explicit return contract and calls `Back()`;
+- the Dirty Guard `BACK` continuation also calls `Back()`;
+- the visible button label is still fixed as `Back to Punches`.
 
-- origin Home -> `Back to Home`;
-- origin Punch List -> `Back to Punch List`;
-- fallback -> `Back`.
+Therefore navigation depends on Power Apps navigation history rather than the explicit functional origin.
 
-Do not reopen layout geometry to address either functional sub-gate.
+Correction: `C17-E2A-FIX2_explicit_return_navigation.property-guide.md`.
 
 ## Current C17-E2A status
 
@@ -61,10 +60,10 @@ CUSTOM FIELDS                  PASS
 RIGHT RAIL                     PASS
 REVIEW PROGRESS                PASS
 SESSION ACTIVITY VISUAL        PASS
+SESSION EVENT ACCUMULATION     PASS
 GLOBAL CLIPPING                PASS
 HORIZONTAL SCROLL              PASS
-SESSION EVENT ACCUMULATION     PENDING FINAL PROOF
-CONTEXTUAL BACK                PENDING FINAL PROOF
+CONTEXTUAL BACK                FAIL / FIX2 PENDING
 ```
 
-Once both functional sub-gates pass, C17-E2A can be closed and validation can continue with the next desktop size.
+After C17-E2A-FIX2 is validated from both Home and Punch List, C17-E2A can be closed and validation can continue with the next desktop size.
