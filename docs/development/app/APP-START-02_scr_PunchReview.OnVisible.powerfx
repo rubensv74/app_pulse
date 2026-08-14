@@ -1,0 +1,316 @@
+=// =====================================================
+// APP-START-02 — scr_PunchReview.OnVisible
+// Preserve review-session state. Remove duplicated global bootstrap.
+// =====================================================
+
+// -----------------------------------------------------
+// 01) Screen identity — screen-owned
+// -----------------------------------------------------
+Set(varAppView, "PunchReview");
+Set(varPageKey, "PUNCH_REVIEW");
+Set(varPageTitle, "Punch Review Workspace");
+Set(varPageSubtitle, "Sequential review, comments and custom fields");
+
+// -----------------------------------------------------
+// 02) Entry contract — caller wins; screen only supplies fallbacks
+// -----------------------------------------------------
+If(IsBlank(varPunchReviewSource), Set(varPunchReviewSource, "NAVIGATION"));
+If(IsBlank(varPunchReviewReturnScreen), Set(varPunchReviewReturnScreen, "HOME"));
+
+Set(
+    varPunchReviewTemplateId,
+    Switch(
+        Upper(Coalesce(varPunchReviewSource, "NAVIGATION")),
+        "HOME", Coalesce(varPunchDashboardTemplateId, varFilter_PunchTemplateId),
+        "PUNCHES", Coalesce(varFilter_PunchTemplateId, varPunchDashboardTemplateId),
+        Coalesce(varFilter_PunchTemplateId, varPunchDashboardTemplateId)
+    )
+);
+
+If(
+    IsBlank(varPunchReviewQueueScope),
+    Set(
+        varPunchReviewQueueScope,
+        Switch(
+            Upper(Coalesce(varPunchReviewSource, "NAVIGATION")),
+            "PUNCHES", "CURRENT_PAGE",
+            "HOME", "HOME_CONTEXT",
+            "NAVIGATION"
+        )
+    )
+);
+
+// -----------------------------------------------------
+// 03) Custom Field definition host state
+// Transient editor state may reset; review-session data must not.
+// -----------------------------------------------------
+If(IsBlank(varPunchReviewFieldDefsSaving), Set(varPunchReviewFieldDefsSaving, false));
+
+Set(varPunchReviewDef_FieldDefId, 0);
+If(IsBlank(varPunchReviewDef_FieldKey), Set(varPunchReviewDef_FieldKey, ""));
+If(IsBlank(varPunchReviewDef_Label), Set(varPunchReviewDef_Label, ""));
+If(IsBlank(varPunchReviewDef_FieldType), Set(varPunchReviewDef_FieldType, "Text"));
+If(IsBlank(varPunchReviewDef_HelpText), Set(varPunchReviewDef_HelpText, ""));
+If(IsBlank(varPunchReviewDef_IsRequired), Set(varPunchReviewDef_IsRequired, false));
+If(IsBlank(varPunchReviewDef_IsPinned), Set(varPunchReviewDef_IsPinned, true));
+If(IsBlank(varPunchReviewDef_IsActive), Set(varPunchReviewDef_IsActive, true));
+Set(varPunchReviewDef_SortOrder, 100);
+If(IsBlank(varPunchReviewDef_OptionsJson), Set(varPunchReviewDef_OptionsJson, "[]"));
+If(IsBlank(varPunchReviewDef_IsFilterable), Set(varPunchReviewDef_IsFilterable, false));
+If(IsBlank(varPunchReviewDef_ShowInQuickFilters), Set(varPunchReviewDef_ShowInQuickFilters, false));
+Set(varPunchReviewDef_FilterOrder, 100);
+If(IsBlank(varPunchReviewDef_FilterMode), Set(varPunchReviewDef_FilterMode, "Equals"));
+If(IsBlank(varPunchReviewDefDirty), Set(varPunchReviewDefDirty, false));
+
+If(IsBlank(varPunchReviewFieldDefToggleLoading), Set(varPunchReviewFieldDefToggleLoading, false));
+If(IsBlank(varPunchReviewFieldDefToggleError), Set(varPunchReviewFieldDefToggleError, ""));
+If(IsBlank(varPunchReviewFieldDefToggleKey), Set(varPunchReviewFieldDefToggleKey, ""));
+If(IsBlank(varPunchReviewFieldDefToggleActive), Set(varPunchReviewFieldDefToggleActive, false));
+
+If(IsBlank(varPunchReviewFieldDefsRefreshWarning), Set(varPunchReviewFieldDefsRefreshWarning, ""));
+If(IsBlank(varPunchReviewFieldDefsLastMutationSucceeded), Set(varPunchReviewFieldDefsLastMutationSucceeded, false));
+
+Set(varPunchReviewFieldDefsModalVisible, false);
+Set(varPunchReviewFieldDefsLastSavedId, 0);
+
+// -----------------------------------------------------
+// 04) Stable typed review-session collections — initialize once
+// -----------------------------------------------------
+If(
+    IsBlank(varPunchReviewCollectionsInitialized),
+
+    // Queue may already have been built by Home/Punch List before Navigate().
+    If(
+        CountRows(colPunchReviewQueue) = 0,
+        ClearCollect(
+            colPunchReviewQueue,
+            {
+                ReviewOrder: 0,
+                RowKey: "",
+                PunchIdNumber: 0,
+                PunchCode: "",
+                Description: "",
+                AreaCode: "",
+                UnitCode: "",
+                SystemCode: "",
+                SubsystemCode: "",
+                ElementCode: "",
+                Discipline: "",
+                Category: "",
+                StatusCode: "",
+                StatusLabel: "",
+                ResponsibleParty: "",
+                InspectionName: "",
+                Originator: "",
+                CommentCount: 0,
+                LastCommentOn: Blank(),
+                IsReviewedInSession: false,
+                IsDirty: false
+            }
+        );
+        Clear(colPunchReviewQueue)
+    );
+
+    ClearCollect(
+        colPunchReviewQueueView,
+        {
+            ReviewOrder: 0,
+            RowKey: "",
+            PunchIdNumber: 0,
+            PunchCode: "",
+            Description: "",
+            AreaCode: "",
+            UnitCode: "",
+            SystemCode: "",
+            SubsystemCode: "",
+            ElementCode: "",
+            Discipline: "",
+            Category: "",
+            StatusCode: "",
+            StatusLabel: "",
+            ResponsibleParty: "",
+            InspectionName: "",
+            Originator: "",
+            CommentCount: 0,
+            LastCommentOn: Blank(),
+            IsReviewedInSession: false,
+            IsDirty: false
+        }
+    );
+    Clear(colPunchReviewQueueView);
+
+    ClearCollect(
+        colPunchReviewComments,
+        {
+            CommentId: 0,
+            CommentType: "",
+            CreatedOn: Blank(),
+            CreatedByEmail: "",
+            CreatedByName: "",
+            ModifiedOn: Blank(),
+            ModifiedByEmail: "",
+            CommentText: "",
+            TotalRows: 0,
+            TotalPages: 0,
+            PageNumber: 1,
+            PageSize: 20
+        }
+    );
+    Clear(colPunchReviewComments);
+
+    ClearCollect(
+        colPunchReviewFieldsUI,
+        {
+            FieldKey: "",
+            FieldLabel: "",
+            FieldType: "",
+            HelpText: "",
+            IsRequired: false,
+            IsPinned: false,
+            IsEditable: true,
+            SortOrder: 0,
+            OptionsJson: "",
+            ValueText: "",
+            ValueNumber: Blank(),
+            ValueDate: Blank(),
+            ValueBool: false,
+            ValueJson: "",
+            LastUpdatedOn: Blank(),
+            LastUpdatedByEmail: ""
+        }
+    );
+    Clear(colPunchReviewFieldsUI);
+
+    ClearCollect(
+        colPunchReviewFieldsBase,
+        {
+            FieldKey: "",
+            FieldLabel: "",
+            FieldType: "",
+            HelpText: "",
+            IsRequired: false,
+            IsPinned: false,
+            IsEditable: true,
+            SortOrder: 0,
+            OptionsJson: "",
+            ValueText: "",
+            ValueNumber: Blank(),
+            ValueDate: Blank(),
+            ValueBool: false,
+            ValueJson: "",
+            LastUpdatedOn: Blank(),
+            LastUpdatedByEmail: ""
+        }
+    );
+    Clear(colPunchReviewFieldsBase);
+
+    ClearCollect(
+        colPunchReviewFieldsDirty,
+        {
+            FieldKey: "",
+            FieldType: "",
+            ValueText: "",
+            ValueNumber: Blank(),
+            ValueDate: Blank(),
+            ValueBool: false,
+            ValueJson: ""
+        }
+    );
+    Clear(colPunchReviewFieldsDirty);
+
+    ClearCollect(
+        colPunchReviewSessionEvents,
+        {
+            EventKey: "",
+            PunchIdNumber: 0,
+            EventLabel: "",
+            EventOn: Blank(),
+            EventBy: "",
+            EventType: ""
+        }
+    );
+    Clear(colPunchReviewSessionEvents);
+
+    Set(varPunchReviewCollectionsInitialized, true)
+);
+
+// -----------------------------------------------------
+// 05) Review-session runtime defaults — initialize only when blank
+// -----------------------------------------------------
+If(IsBlank(varPunchReviewSearch), Set(varPunchReviewSearch, ""));
+If(IsBlank(varPunchReviewCurrentIndex), Set(varPunchReviewCurrentIndex, 1));
+If(IsBlank(varPunchReviewCurrentId), Set(varPunchReviewCurrentId, Blank()));
+If(IsBlank(varPunchReviewDirty), Set(varPunchReviewDirty, false));
+If(IsBlank(varPunchReviewIsLoading), Set(varPunchReviewIsLoading, false));
+If(IsBlank(varPunchReviewError), Set(varPunchReviewError, ""));
+
+If(IsBlank(varPunchReviewCommentsLoading), Set(varPunchReviewCommentsLoading, false));
+If(IsBlank(varPunchReviewCommentsError), Set(varPunchReviewCommentsError, ""));
+If(IsBlank(varPunchReviewCommentsPage), Set(varPunchReviewCommentsPage, 1));
+If(IsBlank(varPunchReviewCommentsPageSize), Set(varPunchReviewCommentsPageSize, 20));
+
+If(IsBlank(varPunchReviewFieldsLoading), Set(varPunchReviewFieldsLoading, false));
+If(IsBlank(varPunchReviewFieldsSaving), Set(varPunchReviewFieldsSaving, false));
+If(IsBlank(varPunchReviewFieldsError), Set(varPunchReviewFieldsError, ""));
+
+If(IsBlank(varPunchReviewRequestedIndex), Set(varPunchReviewRequestedIndex, Blank()));
+Set(varPunchReviewPendingIndex, 0);
+If(IsBlank(varPunchReviewShowDirtyDialog), Set(varPunchReviewShowDirtyDialog, false));
+
+// Preserve help language during the app session; close the modal on re-entry.
+If(IsBlank(varPunchReviewHelpLanguage), Set(varPunchReviewHelpLanguage, "ES"));
+Set(varPunchReviewHelpVisible, false);
+
+// -----------------------------------------------------
+// 06) Queue projection — never clear the session queue on re-entry
+// -----------------------------------------------------
+ClearCollect(
+    colPunchReviewQueueView,
+    SortByColumns(
+        Filter(
+            colPunchReviewQueue,
+            IsBlank(varPunchReviewSearch) ||
+            Lower(varPunchReviewSearch) in
+                Lower(
+                    Coalesce(PunchCode, "") & " " &
+                    Coalesce(Description, "") & " " &
+                    Coalesce(SubsystemCode, "") & " " &
+                    Coalesce(Discipline, "")
+                )
+        ),
+        "ReviewOrder",
+        SortOrder.Ascending
+    )
+);
+
+// -----------------------------------------------------
+// 07) Resolve current record while preserving session position
+// -----------------------------------------------------
+If(
+    CountRows(colPunchReviewQueue) = 0,
+
+    Set(varPunchReviewCurrentIndex, 1);
+    Set(varPunchReviewCurrentId, Blank());
+    Set(varPunchReviewCurrent, Blank()),
+
+    Set(
+        varPunchReviewCurrentIndex,
+        Min(
+            Max(1, Coalesce(varPunchReviewCurrentIndex, 1)),
+            CountRows(colPunchReviewQueue)
+        )
+    );
+
+    Set(
+        varPunchReviewCurrent,
+        LookUp(
+            colPunchReviewQueue,
+            ReviewOrder = varPunchReviewCurrentIndex
+        )
+    );
+
+    Set(
+        varPunchReviewCurrentId,
+        varPunchReviewCurrent.PunchIdNumber
+    )
+)
