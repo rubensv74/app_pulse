@@ -2,80 +2,88 @@
 
 ## Status
 
-Baseline supplied and visually validated by the user in Power Apps Studio on 2026-08-11.
+Current baseline validated visually and functionally by the user in Power Apps Studio through **DF-07B-FIX1** on 2026-08-14.
 
-The component can be inserted as instances without Studio errors. From this point forward this current full component is the implementation baseline for all remaining corrections and DF work. Older incremental DF replacement artifacts are historical inputs only and must not be used as the starting source for new fixes.
+The component is insertable without Studio errors and its current three-column administration workflow is considered the authoritative implementation baseline for future fixes. Older DF replacement artifacts remain historical inputs only.
 
-## Mandatory construction playbook
+## Current validated state
 
-Before generating any new `.pa.yaml` for this component or its host screens, consult the current version of:
-
-`30-playbooks/power-platform/modular-power-apps-screen-construction.md`
-
-in `rubensv74/functional-engineering-knowledge-base`.
-
-Its rules are mandatory for remaining work:
-
-- Power Apps Studio is the primary implementation and validation environment;
-- use skeleton/placeholders before filling new structural zones;
-- freeze approved geometry and avoid incidental layout changes;
-- classify every new block as `S — Structural`, `C — Component` or `I — Integration`;
-- one dominant purpose per block;
-- declare target, operation, dependencies, scope, out-of-scope controls and validation before YAML;
-- repair a delivered increment with an isolated `FIX` block instead of silently modifying later blocks;
-- treat approved parts as frozen;
-- separate structure, behavior and color;
-- use shared semantic color roles/tokens and validate uncertain color/rendering in an isolated Design System Lab before propagation.
-
-This playbook is used together with the current PULSE Source Code compatibility register. Both gates must be consulted immediately before any new YAML delivery.
+- three-column architecture `Field catalog → Field configuration → Live preview`: **FROZEN**;
+- Internal Key generated/locked model: **VALIDATED**;
+- Save / Cancel footer: **VALIDATED**;
+- compact Behavior / Filtering controls: **VALIDATED**;
+- project context in modal header: **VALIDATED**;
+- host-owned definition load/save contract: **FUNCTIONAL_FROZEN**;
+- Active / Inactive persistence via host `DraftDefinition`: **VALIDATED**;
+- false `definition not present in loaded catalog` regression: **CLOSED** by DF-06E-FIX4;
+- readability floor: **VISUAL_APPROVED** by DF-07B-FIX1;
+- no text below the approved dense-editor minimum readability floor;
+- Live Preview balance and metadata readability: **PASS**;
+- catalog row typography/readability: **PASS**;
+- Filtering captions and actions: **PASS** in the validated Studio evidence.
 
 ## Source of truth
 
-User-supplied full `ComponentDefinitions > cmp_CustomFieldsEditorPro` source from the 2026-08-11 working Studio instance.
+The authoritative source is the latest user-supplied full `ComponentDefinitions > cmp_CustomFieldsEditorPro` from Power Apps Studio, together with subsequent property-only fixes validated in Studio.
 
-The current contract includes the established inputs/outputs/events, the project definition catalog, local definition draft state, Choice/MultiChoice line-based option editing, and the dynamic preview.
+The component contract includes:
 
-## Important structural finding
+- project definition catalog;
+- local definition draft state;
+- Choice/MultiChoice option editing;
+- dynamic Live Preview;
+- Active / Inactive host event;
+- host-owned backend persistence;
+- stable `DraftDefinition` output used as authoritative mutation context.
 
-The current working source also exposes the visual defect visible in the supplied screenshot: the refined editor introduced during DF-04B exists as `conCFDEPro_Editor_1` nested inside the previous `conCFDEPro_Editor > conCFDEPro_Form`, while the older editor controls remain present. This produces the second editor panel rendered on top of/inside the original center editor.
+## Active / Inactive lesson
 
-The same duplication pattern exists for the corresponding editor-empty state.
+The reliable host contract is:
 
-This is not an architecture change and does not require changing the component contract. The next cleanup must consolidate the center workspace so there is exactly one `conCFDEPro_Editor` and one `conCFDEPro_EditorEmpty`, preserving the refined DF-04B controls and the currently working component contract.
+```text
+component draft → DraftDefinition → host mutation service
+```
+
+Do not reintroduce a dependency on transient `ActiveChangeFieldKey` / `ActiveChangeTarget` outputs for persistence when `DraftDefinition` already contains the visible and stable `FieldKey` / `IsActive` pair.
+
+## Readability contract
+
+Dense administration layout must not be achieved by microtypography.
+
+Current visual contract:
+
+- no routine text below 7 pt;
+- 7 pt reserved for micro-status/meta only;
+- normal captions, body and secondary metadata around 8 pt;
+- panel titles around 10 pt;
+- modal title around 15 pt;
+- do not enlarge inputs/toggles solely to improve typography;
+- if text growth creates clipping, fix spacing rather than shrinking text again.
 
 ## Frozen scope
 
-Until explicitly reopened by a later requirement, the following are treated as approved/frozen for the structural cleanup:
+Unless a later requirement explicitly reopens it, preserve:
 
 - component custom-property contract;
-- header geometry and actions;
-- catalog geometry and behavior;
-- right preview slot geometry;
-- overall three-column workspace geometry;
-- host ownership of backend flows.
+- header geometry/actions;
+- catalog geometry;
+- center editor geometry;
+- right preview geometry;
+- host ownership of backend flows;
+- Active / Inactive `DraftDefinition` host pattern;
+- readability floor.
 
-The cleanup may touch only the duplicated center-editor subtree required to remove the regression.
+## Mandatory construction gates
 
-## Working rule from now on
+Before generating any new `.pa.yaml` for this component or its host screens, re-read:
 
-1. Start every remaining change from this current full working component, not from DF-01/02/03/04 fragments.
-2. Preserve all control types and component custom properties that already work in Studio unless a specific issue requires changing them.
-3. Prefer a complete consolidated component/control source when structural cleanup is required.
-4. Use `.property-guide.md` only for property-only adjustments.
-5. Power Apps Studio remains authoritative for validation.
-6. Do not start backend wiring from a structurally duplicated center editor; consolidate the working UI first.
-7. Do not use color-only concerns to reopen frozen structure or behavior.
+1. `docs/development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md` in `rubensv74/app_pulse`;
+2. `30-playbooks/power-platform/modular-power-apps-screen-construction.md` in `rubensv74/functional-engineering-knowledge-base`.
 
-## Next technical checkpoint
+Power Apps Studio remains authoritative for implementation and validation.
 
-### `DF-04D-FIX` — Type `C — Component`
+## Next checkpoint
 
-**Purpose:** remove the duplicated center editor introduced by the previous replacement while preserving the working component contract and approved surrounding geometry.
+The editor no longer blocks Punch Review responsive validation.
 
-**Touches:** duplicated `conCFDEPro_Editor` / `conCFDEPro_Editor_1` subtree and duplicated editor-empty state only.
-
-**Does not modify:** header, catalog, preview slot geometry, component custom properties, backend contracts or host integration.
-
-**Expected status after validation:** center editor `FUNCTIONAL_FROZEN`; color may remain independently pending.
-
-After Studio validates this FIX, continue with DF-05 as `I — Integration` for host-owned backend wiring.
+Resume **C17-E2A — 1366×768 responsive / final visual QA** for `scr_PunchReview`. Any new defect found there must be handled as an isolated C17-E2A FIX without reopening this validated editor architecture.
