@@ -1,6 +1,6 @@
 # APP-START-02 — Limpieza de ownership entre `App.OnStart` y `Screen.OnVisible`
 
-**Estado:** READY FOR POWER APPS STUDIO  
+**Estado:** HOME VALIDATED · PUNCH REVIEW PENDING  
 **Tipo:** property/formula guide  
 **Ámbito:** `App.OnStart`, `scr_Home.OnVisible`, `scr_PunchReview.OnVisible`.
 
@@ -13,6 +13,25 @@ Artefactos:
 - `APP-START-02_STATE_OWNERSHIP_MATRIX.md`
 - `APP-START-02_scr_Home.OnVisible.powerfx`
 - `APP-START-02_scr_PunchReview.OnVisible.powerfx`
+
+---
+
+## Estado de validación
+
+### Home — VALIDATED IN STUDIO
+
+Validado el 2026-08-14 después de aplicar `APP-START-02-FIX1_overview_navigation_guard.property-guide.md`.
+
+Resultado:
+
+- Home mantiene su estado propio sin volver a inicializar subsistemas ajenos.
+- Home → Overview funciona.
+- Home → Skyline y retorno funcionan.
+- El guard circular de Overview quedó eliminado: la navegación solo exige un proyecto activo y la pantalla destino resuelve su propio estado/configuración.
+
+### Punch Review — PENDING
+
+Siguiente gate: reemplazo completo de `scr_PunchReview.OnVisible` y validación aislada de persistencia de sesión.
 
 ---
 
@@ -86,7 +105,7 @@ Operación:
 
 ---
 
-## PASO 3 — Validación aislada de Home
+## PASO 3 — Validación aislada de Home — VALIDATED
 
 1. Entrar en Home con proyecto activo.
 2. Confirmar KPIs, heatmap, discipline distribution y grid.
@@ -97,7 +116,11 @@ Operación:
 7. Navegar a Skyline y volver a Home; volver a Skyline.
 8. Confirmar que Home no resetea Skyline.
 
-Si falla cualquiera de estos puntos, detener APP-START-02 antes de modificar Punch Review.
+Incidencia detectada y corregida durante este gate:
+
+`APP-START-02-FIX1 — Overview navigation guard`.
+
+El sidebar no debe consultar `varProjectHasPHRData` como prerrequisito para navegar a Overview, porque ese estado se determina en la propia pantalla destino.
 
 ---
 
