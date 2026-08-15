@@ -579,11 +579,23 @@ Screens:
                                         Properties:
                                           Align: =Align.Center
                                           AlignInContainer: =AlignInContainer.Center
+                                          Color: =varTheme_Text
+                                          FontWeight: =FontWeight.Semibold
                                           LayoutMinHeight: =16
                                           LayoutMinWidth: =16
                                           Text: |-
                                             =
-
+                                            If(
+                                                varOverviewNoConfig,
+                                                "Overview is not configured for this project",
+                                                !IsBlank(varPHR_LastErrorMessage),
+                                                "Overview could not be loaded",
+                                                varOverviewNoData,
+                                                "No report data is available",
+                                                "Overview is ready to load"
+                                            )
+                                          Visible: |-
+                                            =
 
                                             !varPHR_IsLoading &&
                                             !varPHR_IsRendering &&
@@ -593,13 +605,7 @@ Screens:
                                             ) &&
                                             !varPHR_OverviewLoaded &&
                                             !IsBlank(varProjectId)
-                                          Visible: |-
-                                            =
-
-                                            !varPHR_IsLoading &&
-                                            !varPHR_OverviewLoaded &&
-                                            !IsBlank(varProjectId)
-                                          Width: =200
+                                          Width: =520
                                           X: =40
                                           Y: =40
                                     - Text28_1:
@@ -610,13 +616,20 @@ Screens:
                                           LayoutMinWidth: =16
                                           Text: |-
                                             =
-
-                                            "Click Refresh to load the Project Handover Report matrix."
+                                            If(
+                                                varOverviewNoConfig,
+                                                "Publish a report configuration for this project before using Overview.",
+                                                !IsBlank(varPHR_LastErrorMessage),
+                                                "The latest report could not be read. Use Refresh to try again. Details: " & varPHR_LastErrorMessage,
+                                                varOverviewNoData,
+                                                "The report configuration exists, but it currently returns no subsystem data. Use Refresh after project data is available.",
+                                                "Use Refresh to generate and load the Project Handover Report matrix."
+                                            )
                                           Visible: |+
                                             =txtOverviewEmptyState_1.Visible
 
 
-                                          Width: =400
+                                          Width: =720
                                     - conOverview_MatrixHeader_1:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
@@ -2313,8 +2326,11 @@ Screens:
                   ),
 
                   Set(varPHR_LastErrorMessage, FirstError.Message);
-                  Set(varOverviewNoConfig, true);
-                  Set(varOverviewNoData, true);
+                  Set(
+                      varOverviewNoConfig,
+                      "no published report configuration" in Lower(varPHR_LastErrorMessage)
+                  );
+                  Set(varOverviewNoData, false);
                   Set(varProjectHasPHRData, false);
 
                   Clear(colPHR_Subsystems);
