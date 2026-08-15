@@ -1,5 +1,9 @@
 # OPDS-C01 — one-pass Studio package
 
+> Historical first-pass guide. The first Studio validation was executed on
+> 2026-08-15 and exposed component host-hydration failures. Do not repeat this guide.
+> Continue with `OPDS-C01-FIX_STUDIO_GUIDE.md`.
+
 This is the only manual intervention requested for OPDS-C01. It installs the complete
 visual candidate and validates all six synthetic states together.
 
@@ -132,4 +136,3 @@ Return one message containing:
 5. whether save/reopen preserved both component instances.
 
 Do not run the Overview flows for this validation.
-
