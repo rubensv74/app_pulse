@@ -13,6 +13,18 @@ Rules:
 5. Components are reused or created only through the PULSE component validation gate.
 6. Runtime evidence and repository state are recorded separately.
 
+Capability boundary:
+
+- Block 03 belongs to OPDS-C01 and constructs visual surfaces only. Its local test
+  selector is synthetic evidence of layout and exclusivity, never evidence of a real
+  project outcome.
+- Blocks 04–06 belong to OPDS-C02 and own flow connection, typed OPDS state and
+  classification from real responses.
+- No-configuration requires a stable structured producer discriminator. Parsing
+  `FirstError.Message` or any free-text error is prohibited.
+- A real case that cannot be reproduced or distinguished structurally is recorded as
+  `NOT_RUN`.
+
 Planned sequence:
 
 ```text
