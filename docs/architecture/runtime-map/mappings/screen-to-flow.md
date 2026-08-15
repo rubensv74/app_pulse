@@ -1,29 +1,58 @@
 # Pantalla → flow
 
-Baseline parcial: `baseline_pulse_1_0_0_5.zip`.
-
-## Configuración
-
-| Pantalla | Flow observado |
+| Pantalla | Flow |
 |---|---|
-| `scr_Config` | `WarRoom_ReportConfig_GetTree` |
+| `scr_Briefing` | `WarRoom_DailyBriefing_CreateDraft` |
+| `scr_Briefing` | `WarRoom_DailyBriefing_GetData` |
+| `scr_Config` | `WarRoom_ReportConfig_AssignGroups` |
 | `scr_Config` | `WarRoom_ReportConfig_GetAssignments` |
 | `scr_Config` | `WarRoom_ReportConfig_GetScope` |
-| `scr_Config` | `WarRoom_ReportConfig_AssignGroups` |
-| `scr_Config` | `Warroom_ReportConfig_GetAssignmentModalData` |
-| `scr_Config` | `Warroom_ReportConfig_UnassignGroups` |
+| `scr_Config` | `WarRoom_ReportConfig_GetTree` |
 | `scr_Config` | `Warroom_GetProjectPunchTemplates` |
 | `scr_Config` | `Warroom_GetPunchReportStatusConfig` |
-| `scr_Config` | `Warroom_SetPunchTemplateIncluded` |
+| `scr_Config` | `Warroom_ReportConfig_GetAssignmentModalData` |
+| `scr_Config` | `Warroom_ReportConfig_UnassignGroups` |
 | `scr_Config` | `Warroom_SetPunchReportStatusIncluded` |
+| `scr_Config` | `Warroom_SetPunchTemplateIncluded` |
 | `scr_Config` | `warroom_GenerateOverviewSnapshot` |
-
-## Overview actual
-
-| Pantalla | Flow observado |
-|---|---|
+| `scr_Home` | `WarRoom_GetCustomBundle` |
+| `scr_Home` | `WarRoom_ListCustomFieldDefs` |
+| `scr_Home` | `WarRoom_SetCustomFieldActive` |
+| `scr_Home` | `WarRoom_UpsertCustomFieldDef` |
+| `scr_Home` | `Warroom_GetHiveNodesByDiscipline` |
+| `scr_Home` | `Warroom_GetPendingSubsystemsByDiscipline` |
+| `scr_Home` | `Warroom_GetProjectPunchTemplates` |
+| `scr_Home` | `Warroom_GetTaskCommentsPaged` |
+| `scr_Home` | `warroom_GetPunchDashboardBundle` |
+| `scr_Home` | `warroom_GetPunchDashboardCellDetails` |
+| `scr_Overview` | `WarRoom_Operations_RefreshCellCache` |
 | `scr_Overview` | `Warroom_GetOverviewSnapshot` |
 | `scr_Overview` | `warroom_GenerateOverviewSnapshot` |
-| `scr_Overview` | `WarRoom_Operations_RefreshCellCache` |
-
-`scr_Overview_PDS` todavía no invoca flows en el baseline: OPDS-C01 contiene únicamente superficies visuales.
+| `scr_PunchReview` | `WarRoom_GetCustomBundle` |
+| `scr_PunchReview` | `WarRoom_ListCustomFieldDefs` |
+| `scr_PunchReview` | `WarRoom_SaveCustomBulk` |
+| `scr_PunchReview` | `WarRoom_SetCustomFieldActive` |
+| `scr_PunchReview` | `WarRoom_UpsertCustomFieldDef` |
+| `scr_PunchReview` | `Warroom_AddTaskComment` |
+| `scr_PunchReview` | `Warroom_GetTaskCommentsPaged` |
+| `scr_Punches` | `WarRoom_GetCustomBundle` |
+| `scr_Punches` | `WarRoom_ListCustomFieldDefs` |
+| `scr_Punches` | `WarRoom_SetCustomFieldActive` |
+| `scr_Punches` | `WarRoom_UpsertCustomFieldDef` |
+| `scr_Punches` | `Warroom_ExportPunchesToExcel_Codex` |
+| `scr_Punches` | `Warroom_GetTaskCommentsPaged` |
+| `scr_Punches` | `Warroom_Punches_Filtered_Paged` |
+| `scr_Punches` | `Warroom_Punches_GetFilterCatalogs` |
+| `scr_Skyline` | `Warroom_Pulse_GetSubsystemSkyline` |
+| `scr_SuperAdmin` | `WarRoom_Admin_Roles_Get` |
+| `scr_SuperAdmin` | `WarRoom_Admin_Users_Get` |
+| `scr_SuperAdmin` | `WarRoom_EnabledProjects_Enable` |
+| `scr_SuperAdmin` | `WarRoom_EnabledProjects_GetActive` |
+| `scr_SuperAdmin` | `WarRoom_Projects_Search` |
+| `scr_Tasks` | `WarRoom_GetCustomBundle` |
+| `scr_Tasks` | `WarRoom_ListCustomFieldDefs` |
+| `scr_Tasks` | `WarRoom_SetCustomFieldActive` |
+| `scr_Tasks` | `WarRoom_UpsertCustomFieldDef` |
+| `scr_Tasks` | `Warroom_GetTaskCommentsPaged` |
+| `scr_Tasks` | `Warroom_Tasks_Filtered_Paged` |
+| `scr_Tasks` | `Warroom_Tasks_GetFilterCatalogs` |
