@@ -168,7 +168,41 @@ SQL and Power Automate changes are outside the first reconstruction pass. If a p
 capability later needs a new field, that becomes a separate contract decision, not a
 silent screen assumption.
 
-## 7. Incremental capability sequence
+## 7. Validation result semantics
+
+Every criterion and executed scenario uses the same result vocabulary:
+
+| Result | Strict meaning |
+|---|---|
+| `PASS` | The criterion was executed, the expected result was observed and evidence was retained. |
+| `FAIL` | The criterion was executed and the observed result did not meet the expectation. |
+| `NOT_RUN` | The criterion can be implemented and validated safely, but it was not executed or no suitable real case was available. A mandatory criterion remains pending evidence unless it was explicitly declared conditional on case availability before validation. |
+| `GATED` | Safe implementation or validation is blocked by a missing material contract, permission, environment or dependency. The gate and its affected scope must be recorded. |
+| `NOT_APPLICABLE` | The criterion genuinely does not belong to the approved scope. An explicit justification is mandatory; it cannot replace a difficult, unavailable or blocked test. |
+
+These examples define classification behavior; they do not claim that any runtime
+test has been executed:
+
+| Situation | Expected result |
+|---|---|
+| The flow returns a stable code and the screen shows the correct state | `PASS` |
+| The flow returns a stable code but the screen shows a different state | `FAIL` |
+| The contract can identify the case, but no suitable project exists to test it | `NOT_RUN` |
+| The contract cannot identify the case reliably | `GATED` |
+| The scenario genuinely does not belong to the approved scope | `NOT_APPLICABLE`, with justification |
+
+A capability may be **partially validated** when independent criteria have evidence.
+It is **completely accepted** only when every mandatory criterion is `PASS` or has a
+justified `NOT_APPLICABLE` result. A mandatory `FAIL` or `GATED` result prevents
+complete acceptance. A mandatory `NOT_RUN` remains pending evidence, except where the
+criterion was explicitly conditional on real-case availability before execution.
+
+A gate stops only the affected scenario and any work that depends on it. Independent
+states and criteria may continue when their contracts and evidence are sufficient. A
+whole capability stops only when the missing dependency is shared by its mandatory
+outcomes or continuing would make the cumulative implementation unsafe.
+
+## 8. Incremental capability sequence
 
 Blocks are construction units inside capabilities. Each accepted block updates the
 complete cumulative `scr_Overview_PDS` snapshot.
@@ -196,7 +230,9 @@ error and ready states using controlled test-state selection.
 
 **Validation:** One grouped Studio visual validation using synthetic/local test
 states only. Confirm Source Code acceptance, component instantiation, layout and
-state exclusivity. Do not invoke or assess the Overview flows in C01.
+state exclusivity. Classify each visual criterion with the Section 7 vocabulary.
+These results can validate only visual construction; they cannot promote a synthetic
+surface into functional evidence. Do not invoke or assess the Overview flows in C01.
 
 | Block | Content | Validation |
 |---|---|---|
@@ -229,23 +265,31 @@ report families and subsystem scope.
    configuration produces no subsystem/report rows.
 6. “Error” is demonstrated only from a genuine failed call or returned error outcome;
    it is not simulated and is not created deliberately in a shared environment.
-7. When a real case is unavailable, its classification remains `NOT_RUN`; static
-   inspection or C01 visual-state switching cannot promote it to demonstrated.
+7. When a stable discriminator exists but no suitable real project is available, the
+   scenario is `NOT_RUN`; static inspection or C01 visual-state switching cannot
+   promote it to demonstrated. A mandatory case remains pending evidence unless its
+   criterion was explicitly conditional on case availability.
 8. If the current producer contract does not expose a stable discriminator for
-   no-configuration, that case remains `NOT_RUN` and the missing contract is recorded;
-   C02 must not compensate by parsing error prose.
+   no-configuration, that scenario is `GATED` and the missing contract is recorded;
+   C02 must not compensate by parsing error prose or conceal the gate as `NOT_RUN`.
 9. Refresh, freshness, tabs, filter and page reset use the connected response and
    leave the screen in a consistent state.
+10. A gate limited to no-configuration does not stop loaded, no-data or genuine error
+    states whose independent contracts permit safe implementation and validation.
+11. C02 may record partial validation per scenario, but it is not completely accepted
+    while any mandatory criterion is `FAIL` or `GATED`, or while mandatory evidence is
+    `NOT_RUN` unless that criterion was predeclared conditional on case availability.
 
 **Validation:** One grouped data/runtime validation. Record the project used, stable
 structured discriminator or response shape, raw classification evidence safe to
 retain, resulting OPDS state and visible surface for each executed case. Cases
-unavailable in the environment, or unsupported by a stable producer discriminator,
-must be listed explicitly as `NOT_RUN`.
+recognizable by contract but unavailable in the environment are `NOT_RUN`. Cases not
+recognizable through a stable producer discriminator are `GATED`. Record results per
+scenario so partial progress remains visible without implying complete acceptance.
 
 | Block | Content | Validation |
 |---|---|---|
-| 04 | Existing flow calls, typed OPDS collections and structured real-outcome classification | At least one real project loads; every demonstrable outcome maps through a stable discriminator to one state without changing `scr_Overview`; unavailable/ambiguous cases remain `NOT_RUN`. |
+| 04 | Existing flow calls, typed OPDS collections and structured real-outcome classification | At least one real project loads; every demonstrable outcome maps through a stable discriminator to one state without changing `scr_Overview`; a recognizable but unavailable case is `NOT_RUN`, while a case lacking a stable discriminator is `GATED`. |
 | 05 | Report context strip and freshness | Project, selected family, subsystem count and refresh time agree with response. |
 | 06 | L1 tabs, subsystem filter, clear and page reset | Controls rebuild the same loaded context predictably. |
 
@@ -289,7 +333,7 @@ Overview and either promoted or rejected without losing the original.
 | 15 | Help content and final visual polish | One complete user journey and screenshot set. |
 | 16 | Side-by-side parity and premium-value review | Explicit promote / continue / reject decision. |
 
-## 8. Validation cadence
+## 9. Validation cadence
 
 Do not validate every visual property independently.
 
@@ -305,7 +349,7 @@ A consolidated FIX is prepared after each capability only if real defects appear
 The target is one manual Studio round-trip per capability and no more than two when a
 FIX batch is necessary.
 
-## 9. Promotion rules
+## 10. Promotion rules
 
 `scr_Overview_PDS` must not replace the current route until all are true:
 
@@ -322,7 +366,7 @@ FIX batch is necessary.
 Until then, `scr_Overview` remains the operational route and rollback is simply to
 keep using it.
 
-## 10. First implementation package
+## 11. First implementation package
 
 The next delivery should implement **OPDS-C01 as one coherent package**, containing
 Blocks 01–03. Block 00 is this approved strategy.
