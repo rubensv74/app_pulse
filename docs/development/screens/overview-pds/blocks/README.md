@@ -21,9 +21,41 @@ Capability boundary:
 - Blocks 04–06 belong to OPDS-C02 and own flow connection, typed OPDS state and
   classification from real responses.
 - No-configuration requires a stable structured producer discriminator. Parsing
-  `FirstError.Message` or any free-text error is prohibited.
-- A real case that cannot be reproduced or distinguished structurally is recorded as
-  `NOT_RUN`.
+  `FirstError.Message`, substring searches, translated messages or any free-text error
+  is prohibited.
+- If that discriminator exists but no suitable real project is available, the
+  scenario is `NOT_RUN` and remains pending evidence when mandatory.
+- If no stable discriminator exists, the scenario is `GATED`; it must never be hidden
+  as `NOT_RUN`.
+- A gate limited to no-configuration stops only that scenario and its dependants.
+  Independent loaded, no-data and genuine error states may continue when safe.
+
+Validation result semantics:
+
+| Result | Use |
+|---|---|
+| `PASS` | Executed; expected result observed and evidenced. |
+| `FAIL` | Executed; observed result does not meet the expectation. |
+| `NOT_RUN` | Safely testable, but not executed or no suitable real case available. A mandatory criterion remains pending unless predeclared conditional on case availability. |
+| `GATED` | Missing material contract, permission, environment or dependency prevents safe implementation or validation. |
+| `NOT_APPLICABLE` | Genuinely outside approved scope, with an explicit justification. |
+
+The following are classification examples, not executed test results:
+
+| Situation | Expected result |
+|---|---|
+| Stable code returned and correct surface shown | `PASS` |
+| Stable code returned and wrong surface shown | `FAIL` |
+| Contract recognizes the case but no suitable project is available | `NOT_RUN` |
+| Contract cannot distinguish the case reliably | `GATED` |
+| Scenario genuinely outside approved scope | `NOT_APPLICABLE`, with justification |
+
+Capability results are recorded per criterion. Partial validation may continue, but
+complete acceptance requires every mandatory criterion to be `PASS` or justified
+`NOT_APPLICABLE`. A mandatory `FAIL` or `GATED` prevents complete acceptance. A
+mandatory `NOT_RUN` remains pending evidence unless the criterion was explicitly
+conditional on case availability before validation. A whole capability stops only
+when the gate affects a shared mandatory dependency or safe cumulative construction.
 
 Planned sequence:
 
