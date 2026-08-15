@@ -173,19 +173,37 @@ silent screen assumption.
 Blocks are construction units inside capabilities. Each accepted block updates the
 complete cumulative `scr_Overview_PDS` snapshot.
 
-### Capability OPDS-C01 — premium shell and truthful states
+### Capability OPDS-C01 — premium shell and visual state surfaces
 
-**User result:** The user can open a clearly branded Overview candidate, see the
-active project and understand whether it is loading, empty, blocked or ready.
+**User result:** The user can open a clearly branded Overview candidate and review
+the intended visual treatment for loading, no-project, no-configuration, no-data,
+error and ready states using controlled test-state selection.
 
 **Risk:** B.
+
+**Acceptance:**
+
+1. `scr_Overview_PDS` exists independently and `scr_Overview` remains unchanged.
+2. The application shell, sidebar and premium header render at the target viewport.
+3. Each planned state surface can be displayed deliberately through a local
+   `varOPDS_VisualTestState` selector or equivalent temporary test mechanism.
+4. Only one state surface is visible at a time and no surface obscures the shell when
+   its test state is inactive.
+5. Text hierarchy, spacing, actions and visual language are suitable for later data
+   binding.
+6. No C01 result is described as evidence that a real project has no configuration,
+   no data or a flow error.
+
+**Validation:** One grouped Studio visual validation using synthetic/local test
+states only. Confirm Source Code acceptance, component instantiation, layout and
+state exclusivity. Do not invoke or assess the Overview flows in C01.
 
 | Block | Content | Validation |
 |---|---|---|
 | 00 | Architecture, geometry and dependency contract | Repository review only. |
 | 01 | Empty `scr_Overview_PDS`, application shell and sidebar | Studio accepts complete screen; original screen unchanged. |
 | 02 | `cmp_PageHeaderPro` manual instance and Overview bindings | Header renders with project identity and Refresh/Help actions. |
-| 03 | Loading, no-project, no-configuration, no-data and error surfaces | Each reachable state is distinct and does not overlap. |
+| 03 | Visual loading, no-project, no-configuration, no-data, error and ready surfaces | Each synthetic test state is visually distinct and does not overlap; no data classification is claimed. |
 
 ### Capability OPDS-C02 — report snapshot workspace
 
@@ -194,9 +212,33 @@ report families and subsystem scope.
 
 **Risk:** B.
 
+**Acceptance:**
+
+1. The existing Generate and Get Overview flow contracts are connected without
+   changing their parameters.
+2. Flow responses populate typed `OPDS` collections without mutating the current
+   `scr_Overview` state.
+3. Classification rules map real outcomes to exactly one screen state: loaded,
+   no-configuration, no-data or error.
+4. “No configuration” is demonstrated only from an authoritative flow/SQL outcome
+   for a real project without a published report configuration.
+5. “No data” is demonstrated only from a successful real response whose published
+   configuration produces no subsystem/report rows.
+6. “Error” is demonstrated only from a genuine failed call or returned error outcome;
+   it is not simulated and is not created deliberately in a shared environment.
+7. When a real case is unavailable, its classification remains `NOT_RUN`; static
+   inspection or C01 visual-state switching cannot promote it to demonstrated.
+8. Refresh, freshness, tabs, filter and page reset use the connected response and
+   leave the screen in a consistent state.
+
+**Validation:** One grouped data/runtime validation. Record the project used, flow
+outcome, raw classification evidence safe to retain, resulting OPDS state and visible
+surface for each executed case. Cases unavailable in the environment must be listed
+explicitly as `NOT_RUN`.
+
 | Block | Content | Validation |
 |---|---|---|
-| 04 | Existing flow calls and typed OPDS collections | One project loads without changing `scr_Overview` state. |
+| 04 | Existing flow calls, typed OPDS collections and real-outcome classification | At least one real project loads; every available real outcome maps to one state without changing `scr_Overview`. |
 | 05 | Report context strip and freshness | Project, selected family, subsystem count and refresh time agree with response. |
 | 06 | L1 tabs, subsystem filter, clear and page reset | Controls rebuild the same loaded context predictably. |
 
@@ -245,8 +287,8 @@ Overview and either promoted or rejected without losing the original.
 Do not validate every visual property independently.
 
 ```text
-OPDS-C01 -> one Studio validation
-OPDS-C02 -> one data/runtime validation
+OPDS-C01 -> one Studio visual validation with synthetic/local states; no real-state proof
+OPDS-C02 -> one data/runtime validation with real classification evidence
 OPDS-C03 -> one matrix parity + visual validation
 OPDS-C04 -> one end-to-end navigation validation
 OPDS-C05 -> one final QA and promotion review
@@ -283,6 +325,11 @@ It must provide:
 - complete `scr_Overview_PDS.pa.yaml` candidate;
 - manual Studio insertion instructions for `cmp_PageHeaderPro` if required;
 - exact navigation entry used only for test access;
-- one grouped Studio validation;
+- temporary local visual-state selector for the six planned surfaces;
+- one grouped Studio visual validation without flow execution;
 - updated cumulative source after validation;
 - no changes to `scr_Overview`, SQL or Power Automate.
+
+The first package must label no-configuration, no-data and error as **visual
+candidates**, not demonstrated operational states. Their real classification and
+evidence belong exclusively to OPDS-C02.
