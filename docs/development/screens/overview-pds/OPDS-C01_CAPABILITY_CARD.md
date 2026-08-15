@@ -31,14 +31,14 @@ visual preparation.
 
 | Dependency | Repository evidence | Runtime evidence available | C01 decision |
 |---|---|---|---|
-| `cmp_SidebarNav` | Complete component source and several existing consumers | Positive PULSE instance evidence exists, but Home PDS proved that a screen-Source-created instance may not hydrate host inputs | Reuse through one manual Studio insertion inside `conOPDS_SidebarHost`. |
-| `cmp_PageHeaderPro` | Complete component source and documented public contract | `DEFINITION_ACCEPTED=PASS` and `INSTANCE_SAFE=PASS`; screen-Source host binding previously failed with `PA2108`/blank hydration | Reuse through the proven manual Studio insertion route inside `conOPDS_PageHeaderHost`. |
+| `cmp_SidebarNav` | Complete component source and several existing consumers | First C01 validation: body rendered, but default `Text` values remained because bindings were not applied | Keep reuse; configure its exposed public inputs in the consolidated FIX. |
+| `cmp_PageHeaderPro` | Complete component source and documented public contract | First C01 validation reproduced blank host hydration after manual insertion | Localized reuse gate: remove the instance from C01 and use a screen-native premium header. Do not alter the reusable component. |
 | `cmp_EmptyState` | Definition exists | No sufficient host-specific instance evidence was found for this capability | Do not gate C01 on it; use screen-native state surfaces. Reconsider after visual stabilization and a reusable contract decision. |
 | `cmp_SkeletonLoader` | Definition exists | Existing consumer found, but no separate current host validation for Overview PDS | Do not gate C01 on it; use a screen-native loading surface. |
 
-The two manual component insertions are grouped into the same Studio session as the
-screen paste and visual validation. This avoids known hydration failures without
-creating a chain of component microtests.
+The first grouped validation exhausted the safe reuse attempt. The consolidated FIX
+uses one manual Sidebar insertion and a source-native header; no further component
+microtests are authorized inside C01.
 
 ## Acceptance plan
 
@@ -47,7 +47,7 @@ All criteria are required for complete C01 acceptance.
 | ID | Required result | Evidence needed |
 |---|---|---|
 | C01-A01 | `scr_Overview_PDS` exists independently and `scr_Overview` remains unchanged | Studio tree plus comparison with the existing screen. |
-| C01-A02 | `cmp_SidebarNav` and `cmp_PageHeaderPro` render through their public contracts | Studio render, save/reopen and App Checker. |
+| C01-A02 | `cmp_SidebarNav` renders through its public contract and the native premium header renders inside its stable host | Studio render, save/reopen and App Checker. |
 | C01-A03 | Each of the six selector actions shows its intended visual surface | Grouped Studio walkthrough. |
 | C01-A04 | Exactly one surface is visible at a time | Visual walkthrough plus inspection of the six equality-based `Visible` formulas. |
 | C01-A05 | Shell, hierarchy, texts, actions and prepared content are visually usable at 1600×900 | Screenshot evidence and visual review. |
@@ -64,11 +64,11 @@ the current `scr_Overview` remains the fallback.
 
 ## Readiness conclusion
 
-`READY_WITH_ASSUMPTIONS`:
+After the first Studio validation: `READY_WITH_ASSUMPTIONS` for the consolidated FIX.
 
 - the source package is statically coherent;
-- both reusable components have a safe manual insertion path;
+- the Sidebar body renders and its public inputs are available for configuration;
+- the failed Page Header reuse path has been removed from the capability;
 - no remote contract is required;
 - the remaining assumption is Studio acceptance/rendering of the complete candidate,
-  which is exactly the single planned manual validation.
-
+  which is exactly the second and final planned Studio validation after one FIX batch.
