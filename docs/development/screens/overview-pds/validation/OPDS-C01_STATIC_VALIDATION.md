@@ -65,3 +65,18 @@ second and final grouped Studio validation:
 Because mandatory criteria remain `FAIL` or `NOT_RUN`, OPDS-C01 is not completely
 accepted. Its current state is `PARTIALLY_VALIDATED`, ready for one consolidated FIX
 validation.
+
+## Evidencia posterior al FIX — 2026-08-15
+
+- [Estado Ready con encabezado nativo](evidence/2026-08-15/OPDS-C01-native-header-ready.png).
+
+| Criterio | Obligación | Resultado | Evidencia / consecuencia |
+|---|---|---|---|
+| Encabezado premium nativo | Obligatorio | `PASS` | La captura muestra título, subtítulo, proyecto, estado visual, evidencia y las acciones Loading y Help. |
+| Superficie Ready después del FIX | Obligatorio | `PASS` | La superficie preparada continúa visible sin solapamientos en la captura. |
+| Propiedades públicas de `cmp_SidebarNav` | Obligatorio | `FAIL` | Continúan visibles Home y los literales `Text` / `Text`; todavía deben aplicarse las propiedades indicadas en la guía del FIX. |
+| Resto de superficies y recorrido de exclusividad | Obligatorio | `NOT_RUN` | Esta captura solo demuestra Ready; no documenta el recorrido conjunto de los seis selectores. |
+| Guardar y reabrir | Obligatorio | `NOT_RUN` | No se ha proporcionado confirmación explícita. |
+
+El FIX del encabezado queda demostrado visualmente. OPDS-C01 continúa
+`PARTIALLY_VALIDATED` hasta configurar el Sidebar y completar la validación conjunta.
