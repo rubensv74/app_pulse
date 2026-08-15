@@ -24,10 +24,12 @@ Power Apps Studio acceptance, runtime rendering or real functional-state evidenc
 
 Evidence received:
 
-- screenshot of the Loading surface;
-- screenshot of the Ready surface;
-- Formula/App Checker list showing 18 existing errors outside `scr_Overview_PDS`;
-- complete current `scr_Overview_PDS` Source Code after manual component insertion.
+- [Loading surface](evidence/2026-08-15/OPDS-C01-loading.png);
+- [Ready surface](evidence/2026-08-15/OPDS-C01-ready.png);
+- [Formula/App Checker list](evidence/2026-08-15/OPDS-C01-formula-errors.png)
+  showing 18 existing errors outside `scr_Overview_PDS`;
+- [complete current `scr_Overview_PDS` Source Code](evidence/2026-08-15/scr_Overview_PDS.after-first-studio.pa.yaml)
+  after manual component insertion.
 
 | Criterion | Obligation | Result | Evidence / consequence |
 |---|---|---|---|
