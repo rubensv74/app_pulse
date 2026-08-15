@@ -1,42 +1,44 @@
-# OPDS-C01-FIX — native header and Sidebar bindings
+# OPDS-C01-FIX — encabezado nativo y configuración del Sidebar
 
-## Why this FIX exists
+## Por qué existe este FIX
 
-The first Studio validation proved three useful facts:
+La primera validación en Studio demostró tres hechos útiles:
 
-- the complete screen Source Code is accepted;
-- the loading and ready visual surfaces render;
-- the two manually inserted reusable components did not hydrate as required.
+- Studio acepta el Source Code completo de la pantalla;
+- las superficies visuales `Loading` y `Ready` se presentan correctamente;
+- los dos componentes reutilizables insertados manualmente no cargaron sus
+  propiedades como se necesitaba.
 
-`cmp_SidebarNav` rendered with default `Text` values and only the default Home item.
-`cmp_PageHeaderPro` remained blank and its host instance exposed only a minimal generic
-contract. This reproduces the known host hydration boundary from Home PDS.
+`cmp_SidebarNav` mostró los valores predeterminados `Text` y únicamente el elemento
+Home. `cmp_PageHeaderPro` permaneció vacío y su instancia solo expuso un contrato
+genérico mínimo. Esto reproduce el límite de integración ya observado en Home PDS.
 
-The FIX stops only the failed reuse path. It keeps `cmp_SidebarNav`, whose body and
-public inputs are visible, and replaces the blank Page Header component with a native
-premium header inside the already validated host.
+El FIX detiene únicamente la vía de reutilización que ha fallado. Conserva
+`cmp_SidebarNav`, cuyo cuerpo y propiedades públicas están disponibles, y sustituye
+el Page Header vacío por un encabezado premium nativo dentro del alojamiento ya
+validado.
 
-## One consolidated Studio intervention
+## Una única intervención conjunta en Studio
 
-### 1. Replace the complete screen source
+### 1. Sustituir el código completo de la pantalla
 
-1. Select `scr_Overview_PDS`.
-2. Open **Source code** for the complete screen.
-3. Replace it with the current complete contents of:
+1. Selecciona `scr_Overview_PDS`.
+2. Abre **Source code** para la pantalla completa.
+3. Sustituye todo su contenido por la versión vigente de:
    `power-apps/screens/OverviewPDS/scr_Overview_PDS.pa.yaml`.
-4. Save and wait for Studio validation.
+4. Guarda y espera a que Studio termine de validar el código.
 
-This clean replacement removes both failed component instances and installs the
-screen-native premium header. The Sidebar host remains empty by design.
+Esta sustitución limpia elimina las dos instancias que fallaron e instala el
+encabezado premium nativo. El alojamiento del Sidebar queda vacío intencionadamente.
 
-### 2. Insert and configure only the Sidebar
+### 2. Insertar y configurar únicamente el Sidebar
 
-1. Use **Insert > Custom** and insert `cmp_SidebarNav`.
-2. Move it into `conOPDS_SidebarHost`.
-3. Rename it `cmpOPDS_Sidebar`.
-4. Configure all of these properties in the same pass:
+1. Usa **Insert > Custom** e inserta `cmp_SidebarNav`.
+2. Muévelo dentro de `conOPDS_SidebarHost`.
+3. Renómbralo como `cmpOPDS_Sidebar`.
+4. Configura todas estas propiedades en la misma operación:
 
-| Property | Formula |
+| Propiedad | Fórmula |
 |---|---|
 | `Width` | `Parent.Width` |
 | `Height` | `Parent.Height` |
@@ -50,26 +52,25 @@ screen-native premium header. The Sidebar host remains empty by design.
 | `ProjectCode` | `Coalesce(varSelectedProject.ProjectCode, "")` |
 | `ProjectName` | `Coalesce(varSelectedProject.ProjectName, "")` |
 | `UserRole` | `Coalesce(varUserRole, "reader")` |
-| `OnSelectItem` | `Notify("Overview PDS is in visual test mode.", NotificationType.Information)` |
+| `OnSelectItem` | `Notify("Overview PDS está en modo de prueba visual.", NotificationType.Information)` |
 
-If Studio does not expose one of these properties, report its exact name and stop the
-Sidebar integration. Do not accept the literal defaults `Text` / `Text`.
+Si Studio no muestra alguna de estas propiedades, devuelve su nombre exacto y detén
+solo la integración del Sidebar. No aceptes los valores literales `Text` / `Text`.
 
-### 3. Validate the complete visual capability
+### 3. Validar la capacidad visual completa
 
-Save, reopen the screen and check:
+Guarda, vuelve a abrir la pantalla y comprueba:
 
-| Check | Expected result |
+| Comprobación | Resultado esperado |
 |---|---|
-| Native premium header | Title, subtitle, project, visual state, evidence, Loading and Help render. |
-| Header interaction | Loading changes only the local test state; Help shows an informational message. |
-| Sidebar | Overview is active; no `Text` defaults remain; selecting an item does not navigate. |
-| Six surfaces | Loading, No project, No config, No data, Error and Ready each render alone. |
-| Visual quality | No overlap, clipping or accidental scrollbars at 1600×900. |
-| App Checker | No new blocking error under `scr_Overview_PDS`. Existing errors elsewhere are not attributed to C01. |
-| Save/reopen | Header, Sidebar bindings and all six states remain available. |
-| Isolation | No Overview flow runs and `scr_Overview` remains unchanged. |
+| Encabezado premium nativo | Se muestran título, subtítulo, proyecto, estado visual, evidencia y acciones Loading y Help. |
+| Interacción del encabezado | Loading cambia únicamente el estado local de prueba; Help muestra un mensaje informativo. |
+| Sidebar | Overview está activo, no quedan valores `Text` y seleccionar un elemento no navega. |
+| Seis superficies | Loading, No project, No config, No data, Error y Ready aparecen individualmente. |
+| Calidad visual | No hay solapamientos, recortes ni barras de desplazamiento accidentales a 1600×900. |
+| App Checker | No aparece ningún error bloqueante nuevo bajo `scr_Overview_PDS`. Los errores existentes en otros artefactos no se atribuyen a C01. |
+| Guardar y reabrir | El encabezado, las propiedades del Sidebar y los seis estados continúan disponibles. |
+| Aislamiento | No se ejecuta ningún flujo de Overview y `scr_Overview` permanece intacta. |
 
-Return one Ready screenshot, one screenshot of any defect and the result of every row.
-This is the second and final planned Studio round-trip for OPDS-C01.
-
+Devuelve una captura del estado Ready, una captura de cualquier defecto y el resultado
+de cada fila. Esta es la segunda y última validación de Studio prevista para OPDS-C01.
