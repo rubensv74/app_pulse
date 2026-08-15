@@ -19,8 +19,8 @@ Planned sequence:
 00 strategy and architecture
 01 screen shell
 02 page header integration
-03 operational states
-04 data load and typed collections
+03 visual state surfaces with local test selector
+04 data load, typed collections and real-outcome classification
 05 report context
 06 tabs and filters
 07 matrix geometry
