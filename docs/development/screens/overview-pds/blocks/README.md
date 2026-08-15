@@ -20,15 +20,15 @@ Capability boundary:
   project outcome.
 - Blocks 04–06 belong to OPDS-C02 and own flow connection, typed OPDS state and
   classification from real responses.
-- No-configuration requires a stable structured producer discriminator. Parsing
-  `FirstError.Message`, substring searches, translated messages or any free-text error
-  is prohibited.
-- If that discriminator exists but no suitable real project is available, the
-  scenario is `NOT_RUN` and remains pending evidence when mandatory.
-- If no stable discriminator exists, the scenario is `GATED`; it must never be hidden
-  as `NOT_RUN`.
-- A gate limited to no-configuration stops only that scenario and its dependants.
-  Independent loaded, no-data and genuine error states may continue when safe.
+- The authorized producer contract returns `NO_CONFIGURATION`, `SNAPSHOT_REQUIRED`,
+  `NO_DATA` or `READY`; genuine failed calls map to `ERROR` in Canvas.
+- Parsing `FirstError.Message`, substring searches, translated messages or any
+  free-text error is prohibited.
+- A `READY` project with zero matches for the active filter is `NO_RESULTS`; it must
+  not be reclassified as global `NO_DATA`.
+- If a stable outcome exists but no suitable real project is available, the scenario
+  is `NOT_RUN` and remains pending evidence when mandatory.
+- A gate limited to one data scenario stops only that scenario and its dependants.
 
 Validation result semantics:
 
@@ -64,7 +64,7 @@ Planned sequence:
 01 screen shell
 02 page header integration
 03 visual state surfaces with local test selector
-04 data load, typed collections and real-outcome classification
+04 SQL/Flow contract v2, data load, typed collections and real-outcome classification
 05 report context
 06 tabs and filters
 07 matrix geometry
