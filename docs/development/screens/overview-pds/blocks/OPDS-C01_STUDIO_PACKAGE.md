@@ -1,43 +1,44 @@
-# OPDS-C01 — one-pass Studio package
+# OPDS-C01 — paquete inicial de Studio en una sola intervención
 
-> Historical first-pass guide. The first Studio validation was executed on
-> 2026-08-15 and exposed component host-hydration failures. Do not repeat this guide.
-> Continue with `OPDS-C01-FIX_STUDIO_GUIDE.md`.
+> Guía histórica de la primera prueba. La validación se ejecutó el 15 de agosto de
+> 2026 y descubrió fallos de integración de los componentes dentro de la pantalla.
+> No repitas esta guía. Continúa con `OPDS-C01-FIX_STUDIO_GUIDE.md`.
 
-This is the only manual intervention requested for OPDS-C01. It installs the complete
-visual candidate and validates all six synthetic states together.
+Esta guía instalaba el candidato visual completo y permitía validar conjuntamente
+los seis estados sintéticos.
 
-## Before starting
+## Antes de comenzar
 
-Confirm that the app's component library already contains:
+Confirma que la biblioteca de componentes de la aplicación contiene:
 
 - `cmp_SidebarNav`;
 - `cmp_PageHeaderPro`.
 
-Do not edit either component definition. Do not open or modify `scr_Overview`.
+No edites la definición de ninguno de los componentes. No abras ni modifiques
+`scr_Overview`.
 
-## Part 1 — create and paste the screen
+## Parte 1 — crear y pegar la pantalla
 
-1. Open the PULSE app in Power Apps Studio.
-2. Add a new **blank** screen.
-3. Rename it exactly `scr_Overview_PDS`.
-4. Select the complete screen and open **Source code**.
-5. Replace the complete source with the contents of:
+1. Abre la aplicación PULSE en Power Apps Studio.
+2. Añade una pantalla **vacía**.
+3. Renómbrala exactamente como `scr_Overview_PDS`.
+4. Selecciona la pantalla completa y abre **Source code**.
+5. Sustituye todo el código por el contenido de
    `power-apps/screens/OverviewPDS/scr_Overview_PDS.pa.yaml`.
-6. Save and wait for Studio to finish checking the source.
+6. Guarda y espera a que Studio termine de comprobar el código.
 
-The dark Sidebar host and the white header host are intentionally empty at this
-point. This is not a missing block: it avoids a component hydration failure already
-demonstrated in PULSE.
+En esta versión, los alojamientos oscuros del Sidebar y blanco del encabezado estaban
+vacíos intencionadamente. No se trataba de bloques ausentes, sino de una precaución
+frente a un problema de integración ya observado en PULSE.
 
-## Part 2 — insert the Sidebar safely
+## Parte 2 — insertar el Sidebar de forma segura
 
-1. Use **Insert > Custom** and insert `cmp_SidebarNav`.
-2. Move the instance inside `conOPDS_SidebarHost`.
-3. Rename it `cmpOPDS_Sidebar`.
-4. Set these properties through the property selector/formula bar:
+1. Usa **Insert > Custom** e inserta `cmp_SidebarNav`.
+2. Mueve la instancia dentro de `conOPDS_SidebarHost`.
+3. Renómbrala como `cmpOPDS_Sidebar`.
+4. Configura estas propiedades desde el selector de propiedades y la barra de fórmulas:
 
-| Property | Formula |
+| Propiedad | Fórmula |
 |---|---|
 | `Width` | `Parent.Width` |
 | `Height` | `Parent.Height` |
@@ -51,19 +52,19 @@ demonstrated in PULSE.
 | `ProjectCode` | `Coalesce(varSelectedProject.ProjectCode, "")` |
 | `ProjectName` | `Coalesce(varSelectedProject.ProjectName, "")` |
 | `UserRole` | `Coalesce(varUserRole, "reader")` |
-| `OnSelectItem` | `Notify("Overview PDS is in visual test mode.", NotificationType.Information)` |
+| `OnSelectItem` | `Notify("Overview PDS está en modo de prueba visual.", NotificationType.Information)` |
 
-Leave operational navigation untouched. Selecting Sidebar items on this test screen
-must only show the information message.
+La navegación operativa debía permanecer intacta. Al seleccionar una opción del
+Sidebar en esta pantalla de prueba solo debía mostrarse el mensaje informativo.
 
-## Part 3 — insert the Page Header safely
+## Parte 3 — insertar el Page Header
 
-1. Use **Insert > Custom** and insert `cmp_PageHeaderPro`.
-2. Move the instance inside `conOPDS_PageHeaderHost`.
-3. Rename it `cmpOPDS_PageHeader`.
-4. Set these properties:
+1. Usa **Insert > Custom** e inserta `cmp_PageHeaderPro`.
+2. Mueve la instancia dentro de `conOPDS_PageHeaderHost`.
+3. Renómbrala como `cmpOPDS_PageHeader`.
+4. Configura estas propiedades:
 
-| Property | Formula |
+| Propiedad | Fórmula |
 |---|---|
 | `Width` | `Parent.Width` |
 | `Height` | `Parent.Height` |
@@ -86,7 +87,7 @@ must only show the information message.
 | `UtilityEnabled` | `true` |
 | `OnUtility` | `UpdateContext({varOPDS_VisualTestState: "LOADING"})` |
 | `ShowHelp` | `true` |
-| `OnHelp` | `Notify("OPDS-C01 validates presentation only. No Overview flow is connected.", NotificationType.Information)` |
+| `OnHelp` | `Notify("OPDS-C01 solo valida la presentación. No hay ningún flujo de Overview conectado.", NotificationType.Information)` |
 | `SurfaceColor` | `varTheme_Surface` |
 | `SurfaceAltColor` | `varTheme_SurfaceAlt` |
 | `BorderColor` | `varTheme_Border` |
@@ -95,44 +96,45 @@ must only show the information message.
 | `AccentColor` | `varTheme_PulseBlueDark` |
 | `AccentSoftColor` | `varTheme_PulseSoft` |
 
-If either manually inserted component is blank or does not expose these public
-properties, stop only that component integration and report the missing properties.
-The native visual surfaces can still be inspected; do not rewrite the component or
-try equivalent Source Code instances.
+Si alguno de los componentes insertados manualmente quedaba vacío o no mostraba sus
+propiedades públicas, debía detenerse únicamente esa integración. Las superficies
+nativas podían seguir revisándose sin reescribir el componente ni probar instancias
+equivalentes mediante Source Code.
 
-## Part 4 — one grouped validation
+## Parte 4 — validación conjunta
 
-Save the app, close/reopen the screen if necessary, and use the six buttons in the
-`Visual test state` bar.
+Había que guardar la aplicación, cerrar y volver a abrir la pantalla si era necesario,
+y utilizar los seis botones de la barra `Visual test state`.
 
-Record each required criterion with one result: `PASS`, `FAIL`, `NOT_RUN` or `GATED`.
+Cada criterio obligatorio debía clasificarse como `PASS`, `FAIL`, `NOT_RUN` o `GATED`.
 
-| Check | Expected observation |
+| Comprobación | Observación esperada |
 |---|---|
-| Independent screen | `scr_Overview_PDS` opens and `scr_Overview` remains unchanged. |
-| Shell | Sidebar, premium header and content stage render at 1600×900. |
-| Loading | Loading copy and skeleton matrix appear alone. |
-| No project | Project-selection surface appears alone. Its button only shows an informational message. |
-| No configuration | Configuration-guidance surface appears alone and says it is a visual candidate. |
-| No data | Empty-success surface appears alone; Preview refresh changes only to Loading. |
-| Error | Error surface appears alone; Preview retry changes only to Loading. |
-| Ready | Context strip, visual tabs, subsystem action and prepared matrix appear alone. |
-| Exclusivity | No two state surfaces overlap during the six-state walkthrough. |
-| App Checker | No new blocking error attributable to `scr_Overview_PDS`. |
-| Save/reopen | The screen and both manual component instances remain visible and configured. |
-| Isolation | No Overview flow runs and operational navigation remains unchanged. |
+| Pantalla independiente | `scr_Overview_PDS` se abre y `scr_Overview` permanece intacta. |
+| Shell | Sidebar, encabezado premium y superficie principal se muestran a 1600×900. |
+| Loading | El mensaje de carga y el esqueleto de la matriz aparecen solos. |
+| No project | Aparece únicamente la superficie de selección de proyecto y su botón solo muestra un mensaje. |
+| No configuration | Aparece únicamente la ayuda de configuración e indica que es un candidato visual. |
+| No data | Aparece la superficie vacía y Preview refresh cambia únicamente a Loading. |
+| Error | Aparece la superficie de error y Preview retry cambia únicamente a Loading. |
+| Ready | Aparecen el contexto, las pestañas visuales, la acción de subsistema y la matriz preparada. |
+| Exclusividad | No se solapan dos superficies durante el recorrido por los seis estados. |
+| App Checker | No aparece ningún error bloqueante nuevo atribuible a `scr_Overview_PDS`. |
+| Guardar y reabrir | La pantalla y las dos instancias permanecen visibles y configuradas. |
+| Aislamiento | No se ejecuta ningún flujo de Overview y la navegación operativa permanece intacta. |
 
-The no-configuration, no-data and error checks prove presentation only. They must not
-be reported as real project outcomes.
+Las comprobaciones de ausencia de configuración, ausencia de datos y error solo
+demostraban su presentación. No podían registrarse como situaciones funcionales
+reales de un proyecto.
 
-## What to return
+## Resultado que debía devolverse
 
-Return one message containing:
+La respuesta debía incluir:
 
 1. `OPDS-C01 STUDIO RESULT`;
-2. one result for every row in the validation table;
-3. the complete first Studio/App Checker error, if any;
-4. one screenshot of the Ready state and screenshots of any visual defect;
-5. whether save/reopen preserved both component instances.
+2. un resultado para cada fila de la tabla;
+3. el primer error completo de Studio o App Checker, si existía;
+4. una captura del estado Ready y de cualquier defecto visual;
+5. confirmación de si guardar y reabrir conservaba las dos instancias.
 
-Do not run the Overview flows for this validation.
+No debían ejecutarse los flujos de Overview durante esta validación.
