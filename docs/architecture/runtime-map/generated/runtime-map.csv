@@ -1,0 +1,12 @@
+source_type,source,target_type,target,relation,confidence,evidence,baseline
+screen,scr_Config,flow,warroom_GenerateOverviewSnapshot,CALLS,observed,app/Src/scr_Config.pa.yaml,baseline_pulse_1_0_0_5.zip
+screen,scr_Overview,flow,Warroom_GetOverviewSnapshot,CALLS,observed,app/Src/scr_Overview.pa.yaml,baseline_pulse_1_0_0_5.zip
+screen,scr_Overview,flow,warroom_GenerateOverviewSnapshot,CALLS,observed,app/Src/scr_Overview.pa.yaml,baseline_pulse_1_0_0_5.zip
+flow,Warroom_GetOverviewSnapshot,stored_procedure,warroom.usp_GetOverviewSnapshot,EXECUTES,observed,Workflows/Warroom_GetOverviewSnapshot-*.json,baseline_pulse_1_0_0_5.zip
+flow,warroom_GenerateOverviewSnapshot,stored_procedure,warroom.usp_GenerateOverviewSnapshot,EXECUTES,observed,Workflows/warroom_GenerateOverviewSnapshot-*.json,baseline_pulse_1_0_0_5.zip
+stored_procedure,warroom.usp_GetOverviewSnapshot,table,warroom.OverviewSnapshot,READS,observed,sql/schema/warroom/schema_warroom.csv,baseline_pulse_1_0_0_5.zip
+stored_procedure,warroom.usp_GetOverviewSnapshot,table,warroom.OverviewSnapshotHeader,READS,observed,sql/schema/warroom/schema_warroom.csv,baseline_pulse_1_0_0_5.zip
+stored_procedure,warroom.usp_GetOverviewSnapshot,table,warroom.OverviewSnapshotMetric,READS,observed,sql/schema/warroom/schema_warroom.csv,baseline_pulse_1_0_0_5.zip
+stored_procedure,warroom.usp_GenerateOverviewSnapshot,table,warroom.OverviewSnapshot,WRITES,observed,sql/schema/warroom/schema_warroom.csv,baseline_pulse_1_0_0_5.zip
+stored_procedure,warroom.usp_GenerateOverviewSnapshot,table,warroom.OverviewSnapshotHeader,WRITES,observed,sql/schema/warroom/schema_warroom.csv,baseline_pulse_1_0_0_5.zip
+stored_procedure,warroom.usp_GenerateOverviewSnapshot,table,warroom.OverviewSnapshotMetric,WRITES,observed,sql/schema/warroom/schema_warroom.csv,baseline_pulse_1_0_0_5.zip
