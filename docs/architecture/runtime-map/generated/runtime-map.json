@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0",
+  "product": "Pulse",
+  "baseline": {
+    "solution": "baseline_pulse_1_0_0_5.zip",
+    "analysedOn": "2026-08-15",
+    "coverage": "PARTIAL_BASELINE",
+    "scope": ["scr_Config", "scr_Overview", "configuration", "overview"]
+  },
+  "nodes": [
+    {"id":"screen:scr_Config","type":"screen","name":"scr_Config"},
+    {"id":"screen:scr_Overview","type":"screen","name":"scr_Overview"},
+    {"id":"flow:Warroom_GetOverviewSnapshot","type":"flow","name":"Warroom_GetOverviewSnapshot"},
+    {"id":"flow:warroom_GenerateOverviewSnapshot","type":"flow","name":"warroom_GenerateOverviewSnapshot"},
+    {"id":"sp:warroom.usp_GetOverviewSnapshot","type":"stored_procedure","name":"warroom.usp_GetOverviewSnapshot"},
+    {"id":"sp:warroom.usp_GenerateOverviewSnapshot","type":"stored_procedure","name":"warroom.usp_GenerateOverviewSnapshot"},
+    {"id":"table:warroom.ReportConfigVersion","type":"table","name":"warroom.ReportConfigVersion"},
+    {"id":"table:warroom.OverviewSnapshot","type":"table","name":"warroom.OverviewSnapshot"},
+    {"id":"table:warroom.OverviewSnapshotHeader","type":"table","name":"warroom.OverviewSnapshotHeader"},
+    {"id":"table:warroom.OverviewSnapshotMetric","type":"table","name":"warroom.OverviewSnapshotMetric"}
+  ],
+  "edges": [
+    {"source":"screen:scr_Config","target":"flow:warroom_GenerateOverviewSnapshot","relation":"CALLS","confidence":"observed","evidence":"app/Src/scr_Config.pa.yaml"},
+    {"source":"screen:scr_Overview","target":"flow:Warroom_GetOverviewSnapshot","relation":"CALLS","confidence":"observed","evidence":"app/Src/scr_Overview.pa.yaml"},
+    {"source":"screen:scr_Overview","target":"flow:warroom_GenerateOverviewSnapshot","relation":"CALLS","confidence":"observed","evidence":"app/Src/scr_Overview.pa.yaml"},
+    {"source":"flow:Warroom_GetOverviewSnapshot","target":"sp:warroom.usp_GetOverviewSnapshot","relation":"EXECUTES","confidence":"observed","evidence":"Workflows/Warroom_GetOverviewSnapshot-*.json"},
+    {"source":"flow:warroom_GenerateOverviewSnapshot","target":"sp:warroom.usp_GenerateOverviewSnapshot","relation":"EXECUTES","confidence":"observed","evidence":"Workflows/warroom_GenerateOverviewSnapshot-*.json"},
+    {"source":"sp:warroom.usp_GetOverviewSnapshot","target":"table:warroom.OverviewSnapshot","relation":"READS","confidence":"observed","evidence":"sql/schema/warroom/schema_warroom.csv"},
+    {"source":"sp:warroom.usp_GetOverviewSnapshot","target":"table:warroom.OverviewSnapshotHeader","relation":"READS","confidence":"observed","evidence":"sql/schema/warroom/schema_warroom.csv"},
+    {"source":"sp:warroom.usp_GetOverviewSnapshot","target":"table:warroom.OverviewSnapshotMetric","relation":"READS","confidence":"observed","evidence":"sql/schema/warroom/schema_warroom.csv"},
+    {"source":"sp:warroom.usp_GenerateOverviewSnapshot","target":"table:warroom.OverviewSnapshot","relation":"WRITES","confidence":"observed","evidence":"sql/schema/warroom/schema_warroom.csv"},
+    {"source":"sp:warroom.usp_GenerateOverviewSnapshot","target":"table:warroom.OverviewSnapshotHeader","relation":"WRITES","confidence":"observed","evidence":"sql/schema/warroom/schema_warroom.csv"},
+    {"source":"sp:warroom.usp_GenerateOverviewSnapshot","target":"table:warroom.OverviewSnapshotMetric","relation":"WRITES","confidence":"observed","evidence":"sql/schema/warroom/schema_warroom.csv"}
+  ]
+}
