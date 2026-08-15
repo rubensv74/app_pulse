@@ -248,7 +248,7 @@ surface into functional evidence. Do not invoke or assess the Overview flows in 
 **User result:** The user can load/refresh the Project Handover Report and see its
 report families and subsystem scope.
 
-**Risk:** B.
+**Risk:** C for the SQL/Flow contract extension; B for the reversible Canvas binding.
 
 **Acceptance:**
 
@@ -275,13 +275,12 @@ report families and subsystem scope.
    scenario is `NOT_RUN`; static inspection or C01 visual-state switching cannot
    promote it to demonstrated. A mandatory case remains pending evidence unless its
    criterion was explicitly conditional on case availability.
-9. If the current producer contract does not expose a stable discriminator for
-   no-configuration, that scenario is `GATED` and the missing contract is recorded;
-   C02 must not compensate by parsing error prose or conceal the gate as `NOT_RUN`.
+9. The producer contract must expose the approved stable discriminator before Canvas
+   binding is considered ready; C02 must not compensate by parsing error prose.
 10. Refresh, freshness, tabs, filter and page reset use the connected response and
    leave the screen in a consistent state.
-11. A gate limited to no-configuration does not stop loaded, no-data or genuine error
-    states whose independent contracts permit safe implementation and validation.
+11. A gate limited to one reproducible data scenario does not stop other states whose
+    independent contracts permit safe implementation and validation.
 12. C02 may record partial validation per scenario, but it is not completely accepted
     while any mandatory criterion is `FAIL` or `GATED`, or while mandatory evidence is
     `NOT_RUN` unless that criterion was predeclared conditional on case availability.
