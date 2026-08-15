@@ -2,23 +2,22 @@
 #
 # Engineering state: CANDIDATE / VISUAL_PREPARED
 # Operation: replace the complete Source Code of a new blank screen named scr_Overview_PDS.
-# Runtime validation: pending one grouped Power Apps Studio validation.
+# Runtime validation: pending the second grouped Studio validation after one FIX batch.
 #
 # Internal blocks consolidated in this complete snapshot:
 # - S01: independent shell and component hosts;
-# - C02: premium Page Header host;
+# - C02-FIX: screen-native premium Page Header inside its stable host;
 # - S03: local visual-state selector and six mutually exclusive surfaces.
 #
 # Material dependencies:
 # - cmp_SidebarNav already installed in the app;
-# - cmp_PageHeaderPro already installed in the app;
 # - colSidebarNavItems and the PULSE theme/project variables initialized by App.OnStart.
 #
 # Deliberate compatibility boundary:
-# The two component hosts remain empty in Source Code. Insert cmp_SidebarNav and
-# cmp_PageHeaderPro manually in Studio using OPDS-C01_STUDIO_PACKAGE.md. Existing PULSE
-# evidence shows that screen-Source-created component instances can fail to hydrate
-# their public properties, while manual Studio instances are safe.
+# The Sidebar host remains empty in Source Code. Insert cmp_SidebarNav manually in
+# Studio using OPDS-C01-FIX_STUDIO_GUIDE.md. The first Studio validation proved that
+# cmp_PageHeaderPro remained blank in this host even after manual insertion, so the
+# header is now screen-native and the component reuse gate is isolated from C01.
 #
 # Does not call Overview flows, SQL or Power Automate. Does not navigate to or modify
 # scr_Overview. Synthetic states are visual candidates only.
@@ -116,6 +115,217 @@ Screens:
                         RadiusTopLeft: =14
                         RadiusTopRight: =14
                         Width: =Parent.Width
+                      Children:
+                        - conOPDS_HeaderIdentity:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =Color.Transparent
+                              Height: =56
+                              RadiusBottomLeft: =0
+                              RadiusBottomRight: =0
+                              RadiusTopLeft: =0
+                              RadiusTopRight: =0
+                              Width: =Max(280,conOPDS_HeaderProject.X-32)
+                              X: =16
+                              Y: =11
+                            Children:
+                              - lblOPDS_HeaderTitle:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =true
+                                    Color: =varTheme_Text
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =30
+                                    Size: =20
+                                    Text: ="Overview"
+                                    Width: =Parent.Width
+                                    Wrap: =false
+                                    X: =0
+                                    Y: =0
+                              - lblOPDS_HeaderSubtitle:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =true
+                                    Color: =varTheme_TextMuted
+                                    Height: =20
+                                    Size: =10
+                                    Text: ="Project Handover Report · premium visual candidate"
+                                    Width: =Parent.Width
+                                    Wrap: =false
+                                    X: =0
+                                    Y: =32
+                        - conOPDS_HeaderProject:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_SurfaceAlt
+                              Height: =52
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Width: =250
+                              X: =Parent.Width-760
+                              Y: =13
+                            Children:
+                              - lblOPDS_HeaderProjectLabel:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =true
+                                    Color: =varTheme_TextMuted
+                                    Height: =16
+                                    Size: =8
+                                    Text: ="PROJECT"
+                                    Width: =Parent.Width-24
+                                    Wrap: =false
+                                    X: =12
+                                    Y: =6
+                              - lblOPDS_HeaderProjectValue:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =true
+                                    Color: =varTheme_Text
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =20
+                                    Size: =9
+                                    Text: =If(IsBlank(varProjectId),"No project selected",Coalesce(varSelectedProject.ProjectCode,Text(varProjectId)) & " · " & Coalesce(varSelectedProject.ProjectName,"Project"))
+                                    Width: =Parent.Width-24
+                                    Wrap: =false
+                                    X: =12
+                                    Y: =25
+                        - conOPDS_HeaderState:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_SurfaceAlt
+                              Height: =52
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Width: =156
+                              X: =Parent.Width-502
+                              Y: =13
+                            Children:
+                              - lblOPDS_HeaderStateLabel:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =true
+                                    Color: =varTheme_TextMuted
+                                    Height: =16
+                                    Size: =8
+                                    Text: ="VISUAL STATE"
+                                    Width: =Parent.Width-24
+                                    Wrap: =false
+                                    X: =12
+                                    Y: =6
+                              - lblOPDS_HeaderStateValue:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =true
+                                    Color: =varTheme_Text
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =20
+                                    Size: =9
+                                    Text: =Switch(varOPDS_VisualTestState,"LOADING","Loading","NO_PROJECT","No project","NO_CONFIGURATION","No configuration","NO_DATA","No data","ERROR","Error","READY","Ready","Visual test")
+                                    Width: =Parent.Width-24
+                                    Wrap: =false
+                                    X: =12
+                                    Y: =25
+                        - conOPDS_HeaderEvidence:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_SurfaceAlt
+                              Height: =52
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Width: =142
+                              X: =Parent.Width-338
+                              Y: =13
+                            Children:
+                              - lblOPDS_HeaderEvidenceLabel:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =true
+                                    Color: =varTheme_TextMuted
+                                    Height: =16
+                                    Size: =8
+                                    Text: ="EVIDENCE"
+                                    Width: =Parent.Width-24
+                                    Wrap: =false
+                                    X: =12
+                                    Y: =6
+                              - lblOPDS_HeaderEvidenceValue:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =true
+                                    Color: =varTheme_PulseBlueDark
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =20
+                                    Size: =9
+                                    Text: ="Visual only"
+                                    Width: =Parent.Width-24
+                                    Wrap: =false
+                                    X: =12
+                                    Y: =25
+                        - btnOPDS_HeaderLoading:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(0,0,0,0)
+                              BorderThickness: =0
+                              Color: =Color.White
+                              Fill: =varTheme_PulseBlueDark
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =36
+                              HoverFill: =varTheme_PulseBlueDark
+                              OnSelect: =UpdateContext({varOPDS_VisualTestState:"LOADING"})
+                              PressedFill: =varTheme_PulseBlueDark
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =9
+                              Text: ="Loading"
+                              Width: =94
+                              X: =Parent.Width-188
+                              Y: =21
+                        - btnOPDS_HeaderHelp:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =1
+                              Color: =varTheme_Text
+                              Fill: =varTheme_SurfaceAlt
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =36
+                              HoverFill: =varTheme_PulseSoft
+                              OnSelect: =Notify("OPDS-C01 validates presentation only. No Overview flow is connected.",NotificationType.Information)
+                              PressedFill: =varTheme_PulseSoft
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =9
+                              Text: ="Help"
+                              Width: =78
+                              X: =Parent.Width-86
+                              Y: =21
                   - conOPDS_TestSelector:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
