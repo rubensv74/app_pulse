@@ -220,25 +220,32 @@ report families and subsystem scope.
    `scr_Overview` state.
 3. Classification rules map real outcomes to exactly one screen state: loaded,
    no-configuration, no-data or error.
-4. “No configuration” is demonstrated only from an authoritative flow/SQL outcome
-   for a real project without a published report configuration.
+4. “No configuration” is demonstrated only from a stable structured discriminator
+   in the real producer contract, such as an explicit result code/field or a distinct
+   documented response shape, for a project without a published configuration.
+   `FirstError.Message`, substring searches, translated connector text and any other
+   free-text interpretation are forbidden as classification logic.
 5. “No data” is demonstrated only from a successful real response whose published
    configuration produces no subsystem/report rows.
 6. “Error” is demonstrated only from a genuine failed call or returned error outcome;
    it is not simulated and is not created deliberately in a shared environment.
 7. When a real case is unavailable, its classification remains `NOT_RUN`; static
    inspection or C01 visual-state switching cannot promote it to demonstrated.
-8. Refresh, freshness, tabs, filter and page reset use the connected response and
+8. If the current producer contract does not expose a stable discriminator for
+   no-configuration, that case remains `NOT_RUN` and the missing contract is recorded;
+   C02 must not compensate by parsing error prose.
+9. Refresh, freshness, tabs, filter and page reset use the connected response and
    leave the screen in a consistent state.
 
-**Validation:** One grouped data/runtime validation. Record the project used, flow
-outcome, raw classification evidence safe to retain, resulting OPDS state and visible
-surface for each executed case. Cases unavailable in the environment must be listed
-explicitly as `NOT_RUN`.
+**Validation:** One grouped data/runtime validation. Record the project used, stable
+structured discriminator or response shape, raw classification evidence safe to
+retain, resulting OPDS state and visible surface for each executed case. Cases
+unavailable in the environment, or unsupported by a stable producer discriminator,
+must be listed explicitly as `NOT_RUN`.
 
 | Block | Content | Validation |
 |---|---|---|
-| 04 | Existing flow calls, typed OPDS collections and real-outcome classification | At least one real project loads; every available real outcome maps to one state without changing `scr_Overview`. |
+| 04 | Existing flow calls, typed OPDS collections and structured real-outcome classification | At least one real project loads; every demonstrable outcome maps through a stable discriminator to one state without changing `scr_Overview`; unavailable/ambiguous cases remain `NOT_RUN`. |
 | 05 | Report context strip and freshness | Project, selected family, subsystem count and refresh time agree with response. |
 | 06 | L1 tabs, subsystem filter, clear and page reset | Controls rebuild the same loaded context predictably. |
 
