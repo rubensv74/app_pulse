@@ -1,18 +1,84 @@
-# Flow → procedimiento almacenado
+# Flow → procedimiento
 
-Baseline parcial: `baseline_pulse_1_0_0_5.zip`.
-
-| Flow | Procedimiento observado |
+| Flow | Procedimiento |
 |---|---|
-| `WarRoom_ReportConfig_GetTree` | `warroom.usp_ReportNode_GetTree` |
+| `DIM_MASTER_COMPANIES_LH` | `dbo.usp_Upsert_MasterCompany_FromLakehouse_Batch` |
+| `WarRoom_Admin_Roles_Get` | `warroom.usp_Admin_Roles_Get` |
+| `WarRoom_Admin_UserProjectRole_Upsert` | `warroom.usp_Admin_UserProjectRole_Upsert` |
+| `WarRoom_Admin_User_Upsert` | `warroom.usp_Admin_User_Upsert` |
+| `WarRoom_Admin_Users_Get` | `warroom.usp_Admin_Users_Get` |
+| `WarRoom_AttentionQueue_Add` | `warroom.usp_AttentionQueue_Add` |
+| `WarRoom_AttentionQueue_GetActive` | `warroom.usp_AttentionQueue_GetActive` |
+| `WarRoom_AttentionQueue_GetHistory` | `warroom.usp_AttentionQueue_GetHistory` |
+| `WarRoom_AttentionQueue_Move` | `warroom.usp_AttentionQueue_Move` |
+| `WarRoom_AttentionQueue_Remove` | `warroom.usp_AttentionQueue_Remove` |
+| `WarRoom_AttentionQueue_SearchSubsystems` | `warroom.usp_AttentionQueue_SearchSubsystems` |
+| `WarRoom_AttentionQueue_UpdateReason` | `warroom.usp_AttentionQueue_UpdateReason` |
+| `WarRoom_DailyBriefing_GetData` | `warroom.usp_DailyBriefing_GetEvents` |
+| `WarRoom_DailyBriefing_GetData` | `warroom.usp_DailyBriefing_GetKpis` |
+| `WarRoom_EnabledProjects_Enable` | `warroom.usp_EnabledProjects_Enable` |
+| `WarRoom_EnabledProjects_GetActive` | `warroom.usp_EnabledProjects_GetActive` |
+| `WarRoom_GetCustomBundle` | `warroom.usp_CustomBundle_GetJson` |
+| `WarRoom_Home_GetExecutiveDashboard` | `warroom.usp_Home_GetExecutiveDashboard` |
+| `WarRoom_Home_GetKPIs` | `warroom.usp_Home_GetKPIs` |
+| `WarRoom_Home_GetProgressByDiscipline` | `warroom.usp_Home_GetProgressByDiscipline` |
+| `WarRoom_Home_GetStatusSummary` | `warroom.usp_Home_GetStatusSummary` |
+| `WarRoom_Home_GetTopSubsystemsPending` | `warroom.usp_Home_GetTopSubsystemsPending` |
+| `WarRoom_ListCustomFieldDefs` | `warroom.usp_CustomField_ListJson` |
+| `WarRoom_Operations_GetCells` | `warroom.usp_Operations_GetCells` |
+| `WarRoom_Operations_RefreshCellCache` | `warroom.usp_Operations_RefreshCellCache` |
+| `WarRoom_Operations_UpsertCell` | `warroom.usp_Operations_UpsertCell` |
+| `WarRoom_Projects_Search` | `warroom.usp_Projects_Search` |
+| `WarRoom_ReportConfig_AssignGroups` | `warroom.usp_ReportAssignment_BulkUpsert` |
+| `WarRoom_ReportConfig_DeactivateNode` | `warroom.usp_ReportNode_Deactivate` |
 | `WarRoom_ReportConfig_GetAssignments` | `warroom.usp_ReportAssignment_Get` |
 | `WarRoom_ReportConfig_GetScope` | `warroom.usp_InspectionScope_GroupedTotals` |
-| `WarRoom_ReportConfig_AssignGroups` | `warroom.usp_ReportAssignment_BulkUpsert` |
+| `WarRoom_ReportConfig_GetTree` | `warroom.usp_ReportNode_GetTree` |
+| `WarRoom_ReportConfig_UpsertNode` | `warroom.usp_ReportNode_Upsert` |
+| `WarRoom_ReportDictionary_Get` | `warroom.usp_ReportDictionary_Get` |
+| `WarRoom_ReportDictionary_MapDebug` | `warroom.usp_ReportDictionary_MapDebug` |
+| `WarRoom_SaveCustomBulk` | `warroom.usp_CustomSaveBulk_GetJson` |
+| `WarRoom_Security_IsSuperAdmin` | `warroom.usp_Security_IsSuperAdmin` |
+| `WarRoom_SetCustomFieldActive` | `warroom.usp_CustomField_SetActive` |
+| `WarRoom_UpsertCustomFieldDef` | `warroom.usp_CustomField_Upsert_AndListJson` |
+| `Warroom_AddComment` | `warroom.usp_AddPunchComment` |
+| `Warroom_AddComment` | `warroom.usp_AddTaskComment` |
+| `Warroom_DeleteComment` | `warroom.usp_DeletePunchComment` |
+| `Warroom_DeleteComment` | `warroom.usp_DeleteTaskComment` |
+| `Warroom_ExportPunchesToExcel` | `warroom.usp_ExportProjectPunchesExtended_Pivoted` |
+| `Warroom_ExportPunchesToExcel` | `warroom.usp_GetPunchExportColumnMap` |
+| `Warroom_ExportPunchesToExcel` | `warroom.usp_PunchExportLog_Complete` |
+| `Warroom_ExportPunchesToExcel` | `warroom.usp_PunchExportLog_Start` |
+| `Warroom_ExportPunchesToExcel_Codex` | `warroom.usp_CompletePunchExportBatch` |
+| `Warroom_ExportPunchesToExcel_Codex` | `warroom.usp_ExportProjectPunchesExtended_Pivoted` |
+| `Warroom_ExportPunchesToExcel_Codex` | `warroom.usp_GetPunchExportColumnMap` |
+| `Warroom_ExportPunchesToExcel_Codex` | `warroom.usp_PunchExportLog_Complete` |
+| `Warroom_ExportPunchesToExcel_Codex` | `warroom.usp_PunchExportLog_Start` |
+| `Warroom_ExportPunchesToExcel_Codex` | `warroom.usp_RegisterPunchExportSnapshot` |
+| `Warroom_GetCommentsPaged` | `warroom.usp_GetPunchCommentsPaged` |
+| `Warroom_GetCommentsPaged` | `warroom.usp_GetTaskCommentsPaged` |
+| `Warroom_GetCustom` | `warroom.usp_GetPunchCustom` |
+| `Warroom_GetCustom` | `warroom.usp_GetTaskCustom` |
+| `Warroom_GetHiveNodesByDiscipline` | `warroom.usp_Home_GetHiveNodesByDiscipline` |
+| `Warroom_GetOverviewSnapshot` | `warroom.usp_GetOverviewSnapshot` |
+| `Warroom_GetPendingSubsystemsByDiscipline` | `warroom.usp_Home_GetPendingSubsystemsByDiscipline` |
+| `Warroom_GetProjectPunchTemplates` | `warroom.usp_GetProjectPunchTemplates` |
+| `Warroom_GetPunchReportStatusConfig` | `warroom.usp_GetPunchReportStatusConfig` |
+| `Warroom_GetTaskSummaryById` | `warroom.usp_GetTaskSummaryById` |
+| `Warroom_PHR_GetPage` | `warroom.usp_WarRoomReport_GetPage` |
+| `Warroom_Pulse_GetSubsystemSkyline` | `warroom.usp_GetPulseSubsystemSkyline` |
+| `Warroom_Punches_Filtered_Paged` | `warroom.usp_GetProjectPunchesExtended_FilteredPaged` |
+| `Warroom_Punches_GetFilterCatalogs` | `warroom.usp_GetProjectPunchFilterCatalogs` |
+| `Warroom_Punches_GetSubcontractors` | `warroom.usp_GetProjectPunchSubcontractors` |
+| `Warroom_Punches_GetSubsystems` | `warroom.usp_GetProjectPunchSubsystems` |
 | `Warroom_ReportConfig_GetAssignmentModalData` | `warroom.usp_ReportConfig_GetAssignmentModalData` |
 | `Warroom_ReportConfig_UnassignGroups` | `warroom.usp_ReportConfig_UnassignGroups` |
-| `Warroom_SetPunchTemplateIncluded` | `warroom.usp_SetPunchTemplateIncluded` |
 | `Warroom_SetPunchReportStatusIncluded` | `warroom.usp_SetPunchReportStatusIncluded` |
-| `Warroom_GetOverviewSnapshot` | `warroom.usp_GetOverviewSnapshot` |
+| `Warroom_SetPunchTemplateIncluded` | `warroom.usp_SetPunchTemplateIncluded` |
+| `Warroom_Tasks_Filtered_Paged` | `warroom.usp_GetProjectInspectionTasksExtended_FilteredPaged` |
+| `Warroom_Tasks_GetFilterCatalogs` | `warroom.usp_GetProjectTaskFilterCatalogs` |
+| `Warrrom_SaveCustom` | `warroom.usp_UpsertPunchCustom` |
+| `Warrrom_SaveCustom` | `warroom.usp_UpsertTaskCustom` |
 | `warroom_GenerateOverviewSnapshot` | `warroom.usp_GenerateOverviewSnapshot` |
-
-Las filas proceden directamente de las definiciones de los workflows exportados.
+| `warroom_GetPunchDashboardBundle` | `warroom.usp_GetOrRefreshPunchDashboardBundle` |
+| `warroom_GetPunchDashboardCellDetails` | `warroom.usp_GetPunchDashboardCellDetailsPaged` |
