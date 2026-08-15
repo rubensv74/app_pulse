@@ -57,6 +57,17 @@ mandatory `NOT_RUN` remains pending evidence unless the criterion was explicitly
 conditional on case availability before validation. A whole capability stops only
 when the gate affects a shared mandatory dependency or safe cumulative construction.
 
+Current OPDS-C01 package:
+
+- capability and dependency contract: `../OPDS-C01_CAPABILITY_CARD.md`;
+- complete cumulative screen candidate:
+  `../../../../../power-apps/screens/OverviewPDS/scr_Overview_PDS.pa.yaml`;
+- one-pass Studio application and validation guide: `OPDS-C01_STUDIO_PACKAGE.md`;
+- static evidence: `../validation/OPDS-C01_STATIC_VALIDATION.md`.
+
+Engineering state: `CANDIDATE / VISUAL_PREPARED`. Studio acceptance and visual
+approval remain `NOT_RUN`; no synthetic state is functional evidence.
+
 Planned sequence:
 
 ```text
