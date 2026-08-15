@@ -63,10 +63,13 @@ Current OPDS-C01 package:
 - complete cumulative screen candidate:
   `../../../../../power-apps/screens/OverviewPDS/scr_Overview_PDS.pa.yaml`;
 - one-pass Studio application and validation guide: `OPDS-C01_STUDIO_PACKAGE.md`;
+- consolidated component-hydration FIX: `OPDS-C01-FIX_STUDIO_GUIDE.md`;
 - static evidence: `../validation/OPDS-C01_STATIC_VALIDATION.md`.
 
-Engineering state: `CANDIDATE / VISUAL_PREPARED`. Studio acceptance and visual
-approval remain `NOT_RUN`; no synthetic state is functional evidence.
+Engineering state: `PARTIALLY_VALIDATED / VISUAL_PREPARED`. The first Studio pass
+validated Loading and Ready but failed both component host integrations. The
+consolidated FIX uses a native premium header and one configured Sidebar instance;
+no synthetic state is functional evidence.
 
 Planned sequence:
 
