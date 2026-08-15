@@ -38,7 +38,7 @@ The premium screen follows the same design quality target as Punch Review:
 
 - clear page identity and project context;
 - one dominant workspace rather than a collection of unrelated cards;
-- visible loading, empty, no-configuration and error states;
+- visible loading, empty, no-configuration, snapshot-required and error states;
 - compact but legible operational density;
 - actions adjacent to the context they affect;
 - restrained PULSE blue palette, neutral surfaces and no violet;
@@ -83,6 +83,7 @@ scr_Overview_PDS
         └── conOPDS_OverlayLayer
             ├── cmpOPDS_Skeleton
             ├── cmpOPDS_EmptyState
+            ├── conOPDS_SnapshotRequiredState
             ├── conOPDS_ErrorState
             └── conOPDS_HelpModal
 ```
@@ -157,16 +158,17 @@ varProjectId
 varSelectedProject
 ```
 
-The first data pass must consume the existing flow contracts without changing them:
+The data pass preserves the existing flow names and input parameters:
 
 ```text
 warroom_GenerateOverviewSnapshot(ProjectId)
 Warroom_GetOverviewSnapshot(ProjectId, SubsystemCode, Page, PageSize)
 ```
 
-SQL and Power Automate changes are outside the first reconstruction pass. If a premium
-capability later needs a new field, that becomes a separate contract decision, not a
-silent screen assumption.
+OPDS-C02 is authorized to extend the Get response without changing its inputs. The
+extension exposes the configuration and snapshot facts already persisted in SQL.
+The approved stable outcomes are `NO_CONFIGURATION`, `SNAPSHOT_REQUIRED`, `NO_DATA`
+and `READY`; genuine failed calls map separately to `ERROR` in Power Apps.
 
 ## 7. Validation result semantics
 
@@ -255,28 +257,32 @@ report families and subsystem scope.
 2. Flow responses populate typed `OPDS` collections without mutating the current
    `scr_Overview` state.
 3. Classification rules map real outcomes to exactly one screen state: loaded,
-   no-configuration, no-data or error.
+   no-configuration, snapshot-required, no-data or error.
 4. “No configuration” is demonstrated only from a stable structured discriminator
    in the real producer contract, such as an explicit result code/field or a distinct
    documented response shape, for a project without a published configuration.
    `FirstError.Message`, substring searches, translated connector text and any other
    free-text interpretation are forbidden as classification logic.
-5. “No data” is demonstrated only from a successful real response whose published
-   configuration produces no subsystem/report rows.
-6. “Error” is demonstrated only from a genuine failed call or returned error outcome;
+5. “Snapshot required” is demonstrated only when a published configuration exists
+   and no `OverviewSnapshot` row exists. The screen offers an explicit Generate/Refresh
+   action and does not generate automatically on entry.
+6. “No data” is demonstrated only from a successful real response with a snapshot
+   whose global configuration produces no usable subsystem/report rows. A READY project
+   with zero matches for the active filter is `NO_RESULTS`, not `NO_DATA`.
+7. “Error” is demonstrated only from a genuine failed call or returned error outcome;
    it is not simulated and is not created deliberately in a shared environment.
-7. When a stable discriminator exists but no suitable real project is available, the
+8. When a stable discriminator exists but no suitable real project is available, the
    scenario is `NOT_RUN`; static inspection or C01 visual-state switching cannot
    promote it to demonstrated. A mandatory case remains pending evidence unless its
    criterion was explicitly conditional on case availability.
-8. If the current producer contract does not expose a stable discriminator for
+9. If the current producer contract does not expose a stable discriminator for
    no-configuration, that scenario is `GATED` and the missing contract is recorded;
    C02 must not compensate by parsing error prose or conceal the gate as `NOT_RUN`.
-9. Refresh, freshness, tabs, filter and page reset use the connected response and
+10. Refresh, freshness, tabs, filter and page reset use the connected response and
    leave the screen in a consistent state.
-10. A gate limited to no-configuration does not stop loaded, no-data or genuine error
+11. A gate limited to no-configuration does not stop loaded, no-data or genuine error
     states whose independent contracts permit safe implementation and validation.
-11. C02 may record partial validation per scenario, but it is not completely accepted
+12. C02 may record partial validation per scenario, but it is not completely accepted
     while any mandatory criterion is `FAIL` or `GATED`, or while mandatory evidence is
     `NOT_RUN` unless that criterion was predeclared conditional on case availability.
 
@@ -289,7 +295,7 @@ scenario so partial progress remains visible without implying complete acceptanc
 
 | Block | Content | Validation |
 |---|---|---|
-| 04 | Existing flow calls, typed OPDS collections and structured real-outcome classification | At least one real project loads; every demonstrable outcome maps through a stable discriminator to one state without changing `scr_Overview`; a recognizable but unavailable case is `NOT_RUN`, while a case lacking a stable discriminator is `GATED`. |
+| 04 | Existing flow calls, contract v2, typed OPDS collections and structured real-outcome classification | At least one real project loads; `NO_CONFIGURATION`, `SNAPSHOT_REQUIRED`, `NO_DATA`, `READY` and genuine `ERROR` map exclusively without changing `scr_Overview`; a READY project with an empty filter result remains `NO_RESULTS`. |
 | 05 | Report context strip and freshness | Project, selected family, subsystem count and refresh time agree with response. |
 | 06 | L1 tabs, subsystem filter, clear and page reset | Controls rebuild the same loaded context predictably. |
 
@@ -358,7 +364,7 @@ FIX batch is necessary.
 3. the same project/page produces materially equivalent report values;
 4. Refresh, filter, tabs, paging and horizontal alignment work;
 5. Tasks and Punch List drill-through and return work;
-6. loading, empty, no-configuration and error states are proven;
+6. loading, empty, no-configuration, snapshot-required and error states are proven;
 7. 1600×900 visual QA is approved;
 8. cumulative source is synchronized to the repository;
 9. Rubén explicitly chooses promotion.
