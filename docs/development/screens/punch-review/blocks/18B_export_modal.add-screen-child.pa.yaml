@@ -1,0 +1,590 @@
+# BLOCK 18B — PREMIUM EXPORT MODAL
+#
+# Operation: ADD AS SCREEN CHILD.
+# Parent: scr_PunchReview > Children.
+# Exact location: after the existing top-level modal/guard layers so this layer
+# remains above the normal workspace when Visible=true.
+#
+# PRE-YAML GATE APPLIED:
+# docs/development/screens/punch-review/POWER_APPS_SOURCE_CODE_COMPATIBILITY.md
+# was consulted immediately before drafting this YAML.
+#
+# Dependencies:
+# - Apply 18A_export_entry_and_state.property-guide.md first.
+# - Existing theme variables: varTheme_Surface, varTheme_Border,
+#   varTheme_Text, varTheme_TextMuted, varTheme_PulseBlueDark.
+# - Existing runtime: varProjectId, varSelectedProject,
+#   varPunchReviewTemplateId, colPunchReviewQueue, colPunchReviewFieldsDirty.
+#
+# Scope of this block:
+# - Premium visual/configuration surface for Punch Review export.
+# - CLIENT vs INTERNAL profile selection.
+# - Project/template/review-queue context summary.
+# - Dirty-state warning.
+# - No Flow call yet. Generate is intentionally disabled until PR-EXP-C03/C04
+#   define and validate the exact Review Queue scope contract.
+#
+# Compatibility:
+# - No CanvasComponent introduced.
+# - No inline SVG.
+# - No Radius* on Label@2.5.1.
+# - No AccessibleLabel on Classic/Button@2.2.0.
+# - Uses only control types already present in Punch Review.
+#
+# Validation:
+# 1. Modal remains hidden while varPRExportOpen=false.
+# 2. Export action from Block 18A opens the modal.
+# 3. CLIENT / INTERNAL profile buttons switch visual selection.
+# 4. Project, template and queue context render correctly.
+# 5. Dirty warning appears when colPunchReviewFieldsDirty has rows.
+# 6. Close returns to Punch Review without changing queue/current Punch.
+
+- conPRExport_Layer:
+    Control: GroupContainer@1.5.0
+    Variant: ManualLayout
+    Properties:
+      DropShadow: =DropShadow.None
+      Fill: =Color.Transparent
+      Height: =Parent.Height
+      Visible: =Coalesce(varPRExportOpen, false)
+      Width: =Parent.Width
+    Children:
+      - rectPRExport_Backdrop:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(0,0,0,0)
+            BorderStyle: =BorderStyle.None
+            Fill: =RGBA(15,23,42,0.62)
+            Height: =Parent.Height
+            Width: =Parent.Width
+
+      - conPRExport_Dialog:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =varTheme_Border
+            BorderThickness: =1
+            DropShadow: =DropShadow.Bold
+            Fill: =varTheme_Surface
+            Height: =Min(610, Parent.Height - 64)
+            RadiusBottomLeft: =22
+            RadiusBottomRight: =22
+            RadiusTopLeft: =22
+            RadiusTopRight: =22
+            Width: =Min(820, Parent.Width - 64)
+            X: =(Parent.Width - Self.Width) / 2
+            Y: =(Parent.Height - Self.Height) / 2
+          Children:
+            - lblPRExport_Eyebrow:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_PulseBlueDark
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =8
+                  Text: ="PUNCH REVIEW  /  EXPORT"
+                  Width: =320
+                  X: =28
+                  Y: =22
+
+            - lblPRExport_Title:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_Text
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =34
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =18
+                  Text: ="Export review data"
+                  Width: =520
+                  X: =28
+                  Y: =42
+
+            - lblPRExport_Subtitle:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_TextMuted
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =38
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =9
+                  Text: ="Create a governed Excel package from the current Punch Review context. Choose the audience profile before generating the file."
+                  VerticalAlign: =VerticalAlign.Top
+                  Width: =Parent.Width - 116
+                  X: =28
+                  Y: =78
+
+            - btnPRExport_Close:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =varTheme_Border
+                  BorderThickness: =1
+                  Color: =varTheme_TextMuted
+                  Fill: =varTheme_Surface
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =36
+                  HoverBorderColor: =varTheme_PulseBlueDark
+                  HoverColor: =varTheme_PulseBlueDark
+                  HoverFill: =ColorValue("#F8FAFC")
+                  OnSelect: |-
+                    =Set(varPRExportOpen, false);
+                    Set(varPRExportState, "CONFIGURE");
+                    Set(varPRExportError, "")
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Size: =11
+                  Text: ="×"
+                  Width: =36
+                  X: =Parent.Width - 58
+                  Y: =24
+
+            - rectPRExport_HeaderDivider:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderStyle: =BorderStyle.None
+                  Fill: =varTheme_Border
+                  Height: =1
+                  Width: =Parent.Width - 56
+                  X: =28
+                  Y: =126
+
+            - lblPRExport_ScopeHeading:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_Text
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =10
+                  Text: ="Export scope"
+                  Width: =180
+                  X: =28
+                  Y: =146
+
+            - conPRExport_ProjectCard:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =varTheme_Border
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =ColorValue("#F8FAFC")
+                  Height: =70
+                  RadiusBottomLeft: =12
+                  RadiusBottomRight: =12
+                  RadiusTopLeft: =12
+                  RadiusTopRight: =12
+                  Width: =(Parent.Width - 76) / 3
+                  X: =28
+                  Y: =176
+                Children:
+                  - lblPRExport_ProjectLabel:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_TextMuted
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =18
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =7
+                        Text: ="PROJECT"
+                        Width: =Parent.Width - 24
+                        X: =12
+                        Y: =10
+                  - lblPRExport_ProjectValue:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_Text
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =28
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: |-
+                          =If(
+                              IsBlank(varProjectId),
+                              "No project selected",
+                              Coalesce(varSelectedProject.ProjectCode, Text(varProjectId))
+                          )
+                        Width: =Parent.Width - 24
+                        Wrap: =false
+                        X: =12
+                        Y: =30
+
+            - conPRExport_TemplateCard:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =varTheme_Border
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =ColorValue("#F8FAFC")
+                  Height: =70
+                  RadiusBottomLeft: =12
+                  RadiusBottomRight: =12
+                  RadiusTopLeft: =12
+                  RadiusTopRight: =12
+                  Width: =(Parent.Width - 76) / 3
+                  X: =conPRExport_ProjectCard.X + conPRExport_ProjectCard.Width + 10
+                  Y: =176
+                Children:
+                  - lblPRExport_TemplateLabel:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_TextMuted
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =18
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =7
+                        Text: ="TEMPLATE"
+                        Width: =Parent.Width - 24
+                        X: =12
+                        Y: =10
+                  - lblPRExport_TemplateValue:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_Text
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =28
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =If(IsBlank(varPunchReviewTemplateId), "All / inherited", Text(varPunchReviewTemplateId))
+                        Width: =Parent.Width - 24
+                        Wrap: =false
+                        X: =12
+                        Y: =30
+
+            - conPRExport_QueueCard:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#BFDBFE")
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =ColorValue("#EFF6FF")
+                  Height: =70
+                  RadiusBottomLeft: =12
+                  RadiusBottomRight: =12
+                  RadiusTopLeft: =12
+                  RadiusTopRight: =12
+                  Width: =(Parent.Width - 76) / 3
+                  X: =conPRExport_TemplateCard.X + conPRExport_TemplateCard.Width + 10
+                  Y: =176
+                Children:
+                  - lblPRExport_QueueLabel:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_PulseBlueDark
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =18
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =7
+                        Text: ="REVIEW QUEUE"
+                        Width: =Parent.Width - 24
+                        X: =12
+                        Y: =10
+                  - lblPRExport_QueueValue:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_PulseBlueDark
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =28
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =Text(CountRows(colPunchReviewQueue)) & " punches"
+                        Width: =Parent.Width - 24
+                        X: =12
+                        Y: =30
+
+            - lblPRExport_ProfileHeading:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_Text
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =24
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =10
+                  Text: ="Audience profile"
+                  Width: =180
+                  X: =28
+                  Y: =268
+
+            - btnPRExport_Client:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =If(varPRExportProfile = "CLIENT", varTheme_PulseBlueDark, varTheme_Border)
+                  BorderThickness: =If(varPRExportProfile = "CLIENT", 2, 1)
+                  Color: =If(varPRExportProfile = "CLIENT", varTheme_PulseBlueDark, varTheme_Text)
+                  Fill: =If(varPRExportProfile = "CLIENT", ColorValue("#EFF6FF"), varTheme_Surface)
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =52
+                  HoverBorderColor: =varTheme_PulseBlueDark
+                  HoverFill: =ColorValue("#EFF6FF")
+                  OnSelect: =Set(varPRExportProfile, "CLIENT")
+                  RadiusBottomLeft: =12
+                  RadiusBottomRight: =12
+                  RadiusTopLeft: =12
+                  RadiusTopRight: =12
+                  Size: =9
+                  Text: ="Client / external  ·  public fields"
+                  Width: =(Parent.Width - 66) / 2
+                  X: =28
+                  Y: =300
+
+            - btnPRExport_Internal:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =If(varPRExportProfile = "INTERNAL", varTheme_PulseBlueDark, varTheme_Border)
+                  BorderThickness: =If(varPRExportProfile = "INTERNAL", 2, 1)
+                  Color: =If(varPRExportProfile = "INTERNAL", varTheme_PulseBlueDark, varTheme_Text)
+                  Fill: =If(varPRExportProfile = "INTERNAL", ColorValue("#EFF6FF"), varTheme_Surface)
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =52
+                  HoverBorderColor: =varTheme_PulseBlueDark
+                  HoverFill: =ColorValue("#EFF6FF")
+                  OnSelect: =Set(varPRExportProfile, "INTERNAL")
+                  RadiusBottomLeft: =12
+                  RadiusBottomRight: =12
+                  RadiusTopLeft: =12
+                  RadiusTopRight: =12
+                  Size: =9
+                  Text: ="Internal / import-ready  ·  governed metadata"
+                  Width: =(Parent.Width - 66) / 2
+                  X: =btnPRExport_Client.X + btnPRExport_Client.Width + 10
+                  Y: =300
+
+            - conPRExport_PolicyCard:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =If(varPRExportProfile = "INTERNAL", ColorValue("#BFDBFE"), varTheme_Border)
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =If(varPRExportProfile = "INTERNAL", ColorValue("#F8FBFF"), ColorValue("#F8FAFC"))
+                  Height: =88
+                  RadiusBottomLeft: =12
+                  RadiusBottomRight: =12
+                  RadiusTopLeft: =12
+                  RadiusTopRight: =12
+                  Width: =Parent.Width - 56
+                  X: =28
+                  Y: =370
+                Children:
+                  - lblPRExport_PolicyTitle:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_Text
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =22
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =If(varPRExportProfile = "INTERNAL", "Import-ready workbook", "Client-safe workbook")
+                        Width: =Parent.Width - 28
+                        X: =14
+                        Y: =12
+                  - lblPRExport_PolicyBody:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =varTheme_TextMuted
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =42
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: |-
+                          =If(
+                              varPRExportProfile = "INTERNAL",
+                              "Business columns follow the governed allowlist. Protected export metadata are added automatically so the workbook can be validated before import.",
+                              "Sensitive/internal columns remain excluded by default. Use this profile when the workbook can leave the internal review workflow."
+                          )
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =Parent.Width - 28
+                        X: =14
+                        Y: =38
+
+            - conPRExport_DirtyWarning:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#FDE68A")
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.None
+                  Fill: =ColorValue("#FFFBEB")
+                  Height: =54
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Visible: =CountRows(colPunchReviewFieldsDirty) > 0
+                  Width: =Parent.Width - 56
+                  X: =28
+                  Y: =474
+                Children:
+                  - lblPRExport_DirtyWarning:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =ColorValue("#92400E")
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =Parent.Height
+                        PaddingBottom: =0
+                        PaddingLeft: =12
+                        PaddingRight: =12
+                        PaddingTop: =0
+                        Size: =8
+                        Text: ="Unsaved Custom Field changes are not part of the server snapshot. Save or discard them before generating the Excel file."
+                        VerticalAlign: =VerticalAlign.Middle
+                        Width: =Parent.Width
+
+            - rectPRExport_FooterDivider:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderStyle: =BorderStyle.None
+                  Fill: =varTheme_Border
+                  Height: =1
+                  Width: =Parent.Width - 56
+                  X: =28
+                  Y: =Parent.Height - 74
+
+            - lblPRExport_GateHint:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =varTheme_TextMuted
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  Height: =34
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: ="Visual validation block · generation is connected after the exact review-queue scope contract is validated."
+                  VerticalAlign: =VerticalAlign.Middle
+                  Width: =Parent.Width - 330
+                  X: =28
+                  Y: =Parent.Height - 58
+
+            - btnPRExport_Cancel:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =varTheme_Border
+                  BorderThickness: =1
+                  Color: =varTheme_Text
+                  Fill: =varTheme_Surface
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =40
+                  HoverBorderColor: =varTheme_PulseBlueDark
+                  HoverFill: =ColorValue("#F8FAFC")
+                  OnSelect: =Set(varPRExportOpen, false)
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Size: =9
+                  Text: ="Cancel"
+                  Width: =100
+                  X: =Parent.Width - 278
+                  Y: =Parent.Height - 57
+
+            - btnPRExport_Generate:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =varTheme_PulseBlueDark
+                  BorderThickness: =1
+                  Color: =Color.White
+                  DisplayMode: =DisplayMode.Disabled
+                  Fill: =varTheme_PulseBlueDark
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =40
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Size: =9
+                  Text: ="Generate Excel"
+                  Width: =150
+                  X: =Parent.Width - 168
+                  Y: =Parent.Height - 57
