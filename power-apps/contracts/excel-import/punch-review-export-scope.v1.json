@@ -1,0 +1,71 @@
+{
+  "contract": "PULSE.PunchReviewExactExportScope",
+  "version": 1,
+  "scope": "REVIEW_QUEUE",
+  "source": {
+    "screen": "scr_PunchReview",
+    "collection": "colPunchReviewQueue",
+    "sourceIdField": "PunchIdNumber",
+    "canonicalIdName": "WorkItemId"
+  },
+  "request": {
+    "ProjectId": { "type": "integer", "required": true, "minimum": 1 },
+    "TemplateId": { "type": "integer", "required": true, "minimum": 1 },
+    "WorkItemIdsJson": {
+      "type": "json-array",
+      "required": true,
+      "minItems": 1,
+      "itemSchema": {
+        "WorkItemId": { "type": "integer", "required": true, "minimum": 1 }
+      },
+      "uniqueBy": "WorkItemId"
+    },
+    "ExportProfile": {
+      "type": "string",
+      "required": true,
+      "enum": ["CLIENT", "INTERNAL"]
+    },
+    "SelectedColumnsJson": {
+      "type": "json-array",
+      "required": true
+    }
+  },
+  "invariants": [
+    "Every requested WorkItemId must belong to ProjectId.",
+    "Every requested WorkItemId must belong to TemplateId.",
+    "Every requested WorkItemId must satisfy the existing export eligibility rules.",
+    "Resolved row count must equal requested unique WorkItemId count.",
+    "A cardinality mismatch blocks the complete export; partial export is forbidden.",
+    "When WorkItemIdsJson is omitted from the legacy export procedure, existing Punch List export behavior remains unchanged."
+  ],
+  "ordering": {
+    "version1": "canonical-export-order",
+    "reviewQueueOrderGuaranteed": false
+  },
+  "recommendedFlow": {
+    "name": "Warroom_ExportPunchReviewToExcel",
+    "inputs": [
+      "ProjectId",
+      "TemplateId",
+      "WorkItemIdsJson",
+      "RequestedByEmail",
+      "RequestedByName",
+      "ExportProfile",
+      "SelectedColumnsJson"
+    ],
+    "outputs": [
+      "success",
+      "fileUrl",
+      "fileName",
+      "rowCount",
+      "exportBatchId",
+      "errorCode",
+      "errorMessage"
+    ]
+  },
+  "sql": {
+    "procedure": "warroom.usp_ExportProjectPunchesExtended_Pivoted",
+    "newOptionalParameter": "@WorkItemIdsJson NVARCHAR(MAX) = NULL",
+    "legacyNullBehavior": "unchanged"
+  }
+}
