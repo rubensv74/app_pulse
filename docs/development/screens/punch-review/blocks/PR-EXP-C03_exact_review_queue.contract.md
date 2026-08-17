@@ -5,6 +5,29 @@
 **Colección origen:** `colPunchReviewQueue`  
 **Objetivo:** garantizar que el Excel generado desde Punch Review contiene exactamente el conjunto de Punches de la Review Queue activa.
 
+## 0. Regla crítica de identidad de proyecto
+
+PULSE maneja dos identificadores distintos para un mismo proyecto y no deben confundirse:
+
+- `varProjectId` = **ProjectId interno** usado por SQL y por los flows. En el caso diagnosticado: `4049`.
+- `varSelectedProject.ProjectCode` = **código visible del proyecto** mostrado al usuario. En el mismo caso: `70200`.
+
+El modal de Export muestra deliberadamente `ProjectCode` mediante:
+
+```powerfx
+Coalesce(varSelectedProject.ProjectCode, Text(varProjectId))
+```
+
+Por tanto, ver `70200` en pantalla **no significa** que el backend deba recibir `ProjectId = 70200`.
+
+Para PR-EXP-C03 el parámetro técnico `ProjectId` debe recibir siempre:
+
+```powerfx
+Value(varProjectId)
+```
+
+El `ProjectCode` es informativo/visual y no participa en el filtro SQL de `wap_PunchPaged.ProjectId`.
+
 ## 1. Problema que resuelve
 
 El export actual de `scr_Punches` trabaja con filtros funcionales y no recibe una lista explícita de Punches. Una Review Queue puede ser un subconjunto ya construido por la pantalla origen y, por tanto, reconstruirla únicamente a partir de filtros puede producir un Excel distinto de lo que el usuario está revisando.
@@ -53,7 +76,7 @@ Formato v1:
 - No puede estar vacío cuando el export se ejecuta en modo `REVIEW_QUEUE`.
 - Cada `WorkItemId` debe ser entero positivo.
 - No se admiten duplicados.
-- Todos los IDs deben pertenecer al `ProjectId` solicitado.
+- Todos los IDs deben pertenecer al **ProjectId interno** solicitado (`varProjectId`).
 - Cuando exista `TemplateId`, todos los IDs deben pertenecer a ese template.
 - Todos los IDs deben ser elegibles según las reglas ya existentes del export (`StatusCode` informado y no `HOLD`/`VOID`).
 - La cardinalidad final debe coincidir exactamente con la cardinalidad solicitada.
@@ -89,7 +112,7 @@ Nombre propuesto:
 
 Entradas mínimas:
 
-1. `ProjectId` — Number
+1. `ProjectId` — Number. **ProjectId interno (`Value(varProjectId)`), no ProjectCode visible.**
 2. `TemplateId` — Number
 3. `WorkItemIdsJson` — Text
 4. `RequestedByEmail` — Text
@@ -126,7 +149,7 @@ Cuando tenga valor:
 1. validar JSON;
 2. cargar IDs en una tabla temporal;
 3. limitar `#BaseKey` a esos IDs;
-4. aplicar las validaciones de contexto existentes;
+4. aplicar las validaciones de contexto existentes usando el **ProjectId interno**;
 5. comparar `requestedCount` frente a `resolvedCount`;
 6. abortar si no coinciden;
 7. continuar con comments, custom fields, checksum, snapshot y workbook usando únicamente el conjunto validado.
@@ -149,12 +172,13 @@ La validación funcional mínima será:
 
 1. abrir Punch Review con una Review Queue conocida;
 2. registrar N = `CountRows(colPunchReviewQueue)`;
-3. ejecutar export;
-4. comprobar que la respuesta del backend declara `rowCount = N`;
-5. abrir el Excel y comprobar que contiene exactamente N filas de Punch;
-6. verificar por muestreo y por IDs que no aparece ningún Punch fuera de la Review Queue;
-7. eliminar temporalmente un ID válido del contexto esperado y confirmar que el backend bloquea el export en lugar de generar un fichero parcial;
-8. confirmar que el export existente de `scr_Punches` sigue funcionando sin `WorkItemIdsJson`.
+3. comprobar el **ProjectId interno** de la sesión (`varProjectId`);
+4. ejecutar export;
+5. comprobar que la respuesta del backend declara `rowCount = N`;
+6. abrir el Excel y comprobar que contiene exactamente N filas de Punch;
+7. verificar por muestreo y por IDs que no aparece ningún Punch fuera de la Review Queue;
+8. eliminar temporalmente un ID válido del contexto esperado y confirmar que el backend bloquea el export en lugar de generar un fichero parcial;
+9. confirmar que el export existente de `scr_Punches` sigue funcionando sin `WorkItemIdsJson`.
 
 ## 10. Gate real antes de conectar Generate Excel
 
