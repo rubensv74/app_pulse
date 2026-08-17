@@ -2,7 +2,11 @@
     PULSE — PR-EXP-C03B2 negative gate
 
     Purpose:
-    prove that the extended export refuses a partial Review Queue export.
+    prove that the extended ACTIVE export procedure refuses a partial
+    Review Queue export.
+
+    Confirmed active SQL procedure:
+      warroom.usp_ExportProjectPunchesExtended
 
     One valid WorkItemId from the validated queue is replaced with 999999999.
     Expected result: SQL error 52116 and NO partial result set.
@@ -26,7 +30,7 @@ DECLARE @WorkItemIdsJson NVARCHAR(MAX) = N'[
   {"WorkItemId":999999999}
 ]';
 
-EXEC [warroom].[usp_ExportProjectPunchesExtended_Pivoted]
+EXEC [warroom].[usp_ExportProjectPunchesExtended]
     @ProjectId = 4049,
     @TemplateId = 20,
     @WorkItemIdsJson = @WorkItemIdsJson;
