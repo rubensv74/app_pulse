@@ -1,19 +1,35 @@
 # PR-IMP-C04A — scr_PunchImport screen shell
 
 **Responsabilidad única:** crear la nueva pantalla y validar únicamente su shell base.  
-**Estado:** publicado; pendiente de validación en Power Apps Studio.  
+**Estado:** corregido tras incidente `PA1001`; pendiente de revalidación en Power Apps Studio.  
 **Idioma de operación:** español.  
 **UI de PULSE:** inglés.
 
 ## 1. Artefacto
 
-Usar el módulo completo:
+Usar exclusivamente el módulo completo:
 
 `docs/development/screens/punch-import/blocks/PR-IMP-C04A_scr_PunchImport_shell.pa.yaml`
 
-No insertar fragmentos parciales de este archivo.
+Raw copy:
 
-## 2. Qué contiene
+`https://raw.githubusercontent.com/rubensv74/app_pulse/feature/pr-exp-c03-exact-review-queue/docs/development/screens/punch-import/blocks/PR-IMP-C04A_scr_PunchImport_shell.pa.yaml`
+
+No insertar fragmentos parciales y no copiar el texto de esta guía ni un mensaje de error de Power Apps.
+
+## 2. Gate de copia antes de pegar
+
+Antes de sustituir el Source Code, verifica visualmente el contenido copiado:
+
+- puede comenzar por comentarios YAML que empiezan por `#`;
+- la primera clave real del esquema debe ser exactamente `Screens:`;
+- inmediatamente debajo debe aparecer `scr_PunchImport:`;
+- no debe existir una clave raíz `Details:`;
+- tampoco deben aparecer `Note:` o `Session ID:` procedentes de una salida de error de Studio.
+
+El incidente `PA1001` con Session ID `39c81a9f-7ef6-48b0-b4a3-ea42d9d50f89` indicó expresamente que Studio recibió `Details` como propiedad raíz de `PaModule`. El archivo fuente verificado del repositorio no contiene esa propiedad; por tanto, este gate protege el límite de copia/pegado.
+
+## 3. Qué contiene
 
 Solo contiene:
 
@@ -36,21 +52,24 @@ No contiene:
 - commit;
 - escritura de comentarios.
 
-## 3. Aplicación en Studio
+## 4. Aplicación en Studio
 
 1. Abre PULSE en Power Apps Studio.
 2. Crea una pantalla nueva vacía.
 3. Nómbrala `scr_PunchImport`.
 4. Abre el editor **Source Code** de esa pantalla.
-5. Sustituye el contenido por el módulo completo de C04A conforme al flujo de Source Code que estés utilizando para los bloques actuales.
-6. Guarda.
-7. Espera a que Studio termine de validar.
-8. Ejecuta App Checker.
-9. Navega temporalmente a `scr_PunchImport` para validar el render.
+5. Abre el enlace Raw del artefacto C04A.
+6. Copia todo el contenido del Raw.
+7. Comprueba que la primera clave real es `Screens:` y que no existe `Details:`.
+8. Sustituye completamente el contenido del editor Source Code por ese texto.
+9. Guarda.
+10. Espera a que Studio termine de validar.
+11. Ejecuta App Checker.
+12. Navega temporalmente a `scr_PunchImport` para validar el render.
 
-Si Studio espera únicamente el cuerpo de la pantalla en lugar de la raíz `Screens:`, no adaptes el archivo a mano: detente y devuelve el mensaje exacto. El artefacto se corregirá en el repositorio según el esquema real aceptado por Studio.
+Si Studio devuelve otro error, no adaptes el YAML a mano. Detente y devuelve el mensaje exacto y Session ID.
 
-## 4. Gate esperado
+## 5. Gate esperado
 
 Debe verse:
 
@@ -61,7 +80,7 @@ Debe verse:
 - título `Import comment updates`;
 - texto indicando que el shell está preparado.
 
-## 5. Criterios PASS
+## 6. Criterios PASS
 
 - no error `PA1001` / `YamlInvalidSyntax`;
 - no error `PA2108`;
@@ -70,7 +89,7 @@ Debe verse:
 - App Checker no introduce un error nuevo provocado por C04A;
 - sidebar y card se renderizan correctamente.
 
-## 6. Criterio de parada
+## 7. Criterio de parada
 
 Ante cualquier error, no implementar C04B.
 
@@ -80,8 +99,8 @@ Enviar:
 - texto exacto del error;
 - Session ID si Studio lo muestra.
 
-La corrección se hará primero sobre el archivo fuente del repositorio.
+La corrección se hará primero sobre el archivo fuente o el procedimiento de entrega del bloque, según la causa confirmada.
 
-## 7. Siguiente bloque tras PASS
+## 8. Siguiente bloque tras PASS
 
 `PR-IMP-C04B — Premium header + project/template/batch context + back action + Comments-only banner`.
