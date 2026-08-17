@@ -15,6 +15,52 @@ Antes de aplicar este bloque deben cumplirse estas condiciones:
 - Acción `SQL ExportPunchesPivoted` con su parámetro `WorkItemIdsJson` enlazado al input homónimo del trigger.
 - El flow debe añadirse a la app PULSE para que Power Apps Studio reconozca `Warroom_ExportPunchReviewToExcel.Run(...)`.
 
+## GATE C03C2B-0 — refrescar la firma del Flow en Power Apps
+
+Antes de pegar `OnSelect`, **guarda primero el Flow en Power Automate** después de haber añadido `WorkItemIdsJson`.
+
+Power Apps conserva en caché la firma de un Flow. Si la app añadió el Flow antes de incorporar el 13.º parámetro, Studio seguirá creyendo que `.Run(...)` tiene 12 argumentos y marcará en rojo toda la llamada aunque la fórmula sea correcta.
+
+Si al pegar el bloque ves subrayada en rojo toda la llamada:
+
+```powerfx
+Warroom_ExportPunchReviewToExcel.Run(...)
+```
+
+haz exactamente esto:
+
+1. En Power Automate, confirma que `Warroom_ExportPunchReviewToExcel` está **guardado** y que el trigger muestra los 13 inputs, terminando en `WorkItemIdsJson`.
+2. En Power Apps Studio, elimina **solo la referencia/conexión** `Warroom_ExportPunchReviewToExcel` de la app. No elimines el Flow en Power Automate.
+3. Guarda la app.
+4. Vuelve a añadir `Warroom_ExportPunchReviewToExcel` desde Power Automate/Data.
+5. Vuelve al botón `btnPRExport_Generate` y pega el `OnSelect` completo de esta guía.
+
+No modifiques `Warroom_ExportPunchesToExcel_Codex`.
+
+### Prueba mínima de firma
+
+Antes de pegar el bloque grande, si quieres aislar el problema, prueba temporalmente en `btnPRExport_Generate.OnSelect`:
+
+```powerfx
+=Warroom_ExportPunchReviewToExcel.Run(
+    Value(varProjectId),
+    "",
+    Value(varPunchReviewTemplateId),
+    "",
+    "",
+    "",
+    "",
+    "[]",
+    User().Email,
+    User().FullName,
+    Upper(Coalesce(varPRExportProfile, "CLIENT")),
+    "[]",
+    varPRExportWorkItemIdsJson
+)
+```
+
+Si esta llamada sigue completamente en rojo después de quitar y volver a añadir el Flow, **detén el gate** y revisa la firma que Power Apps expone; no intentes corregir los argumentos uno a uno a ciegas.
+
 ## Contrato de llamada
 
 Orden exacto de los 13 argumentos del flow:
@@ -37,21 +83,19 @@ Orden exacto de los 13 argumentos del flow:
 
 ---
 
-# 1. Añadir el flow a PULSE
+# 1. Añadir/refrescar el flow en PULSE
 
-En Power Apps Studio, añade el flow **`Warroom_ExportPunchReviewToExcel`** a la app.
+En Power Apps Studio, añade el flow **`Warroom_ExportPunchReviewToExcel`** a la app **después de guardar su contrato final de 13 inputs**.
 
 No sustituyas ni elimines `Warroom_ExportPunchesToExcel_Codex`; ese flow sigue siendo el consumidor productivo de `scr_Punches`.
 
-Después de añadirlo, Studio debe reconocer:
+Studio debe reconocer:
 
 ```powerfx
 Warroom_ExportPunchReviewToExcel.Run(
     ...
 )
 ```
-
-Si Studio mantiene en caché una firma anterior, elimina **solo la referencia del flow dedicado** de la app y vuelve a añadirla. No modifiques el flow productivo de Punch List.
 
 ---
 
@@ -70,18 +114,6 @@ Si Studio mantiene en caché una firma anterior, elimina **solo la referencia de
     DisplayMode.Edit
 )
 ```
-
-### Comportamiento
-
-`Generate Excel` queda habilitado únicamente cuando:
-
-- existe proyecto interno;
-- existe template;
-- el scope exacto está validado;
-- no hay Custom Fields sin guardar;
-- no hay otra generación en curso.
-
-Los Custom Fields dirty bloquean el botón porque el Excel se genera desde backend y no debe aparentar contener cambios que todavía solo existen en la UI.
 
 ---
 
@@ -153,11 +185,11 @@ IfError(
                     "",
                     "",
                     "[]",
-                    Text(User().Email),
-                    Text(User().FullName),
+                    User().Email,
+                    User().FullName,
                     Upper(Coalesce(varPRExportProfile, "CLIENT")),
-                    Text(varPRExportSelectedColumnsJson),
-                    Text(varPRExportWorkItemIdsJson)
+                    varPRExportSelectedColumnsJson,
+                    varPRExportWorkItemIdsJson
                 )
         },
 
@@ -212,14 +244,16 @@ IfError(
 )
 ```
 
+### Cambio respecto al primer borrador
+
+Se eliminan conversiones `Text(...)` innecesarias alrededor de inputs que ya son texto (`User().Email`, `User().FullName`, `varPRExportSelectedColumnsJson`, `varPRExportWorkItemIdsJson`). No eran la causa principal del subrayado completo de `.Run(...)`, pero simplifican el contrato y reducen ruido de tipado.
+
 ## Por qué `SelectedColumnsJson` funciona distinto según perfil
 
 El Office Script `BuildPunchExport.ts` gobierna los perfiles de forma distinta:
 
 - `CLIENT`: usa `selectedColumnsJson` para limitar explícitamente las columnas públicas.
 - `INTERNAL`: ignora esa selección y construye el workbook completo/import-ready, incluyendo metadata y hojas técnicas gobernadas.
-
-Por eso este bloque envía una allowlist explícita para CLIENT y `[]` para INTERNAL.
 
 ---
 
@@ -262,18 +296,17 @@ Por eso este bloque envía una allowlist explícita para CLIENT y `[]` para INTE
 
 # Gate de validación en Studio — CLIENT primero
 
-Usa la misma Review Queue real validada durante C03A/C03C1.
-
-1. Abre `Export`.
-2. Mantén `Client / external`.
-3. Confirma que `Generate Excel` está habilitado.
-4. Pulsa `Generate Excel` una sola vez.
-5. Mientras corre, el botón debe mostrar `Generating...` y quedar deshabilitado.
-6. El flow debe terminar `Succeeded`.
-7. Debe abrirse el enlace del Excel.
-8. El pie del modal debe indicar `Export ready` y el mismo número de Punches que la Review Queue.
-9. El Excel CLIENT debe contener únicamente los Punches de la Review Queue y no debe exponer las hojas técnicas de importación.
-10. App Checker no debe introducir errores nuevos.
+1. Guarda el Flow de 13 inputs.
+2. Refresca la referencia del Flow en la app como indica `C03C2B-0`.
+3. Confirma que la llamada `.Run(...)` ya no aparece subrayada en rojo.
+4. Abre `Export`.
+5. Mantén `Client / external`.
+6. Confirma que `Generate Excel` está habilitado.
+7. Pulsa `Generate Excel` una sola vez.
+8. El flow debe terminar `Succeeded`.
+9. Debe abrirse el enlace del Excel.
+10. El pie debe indicar `Export ready` y el mismo número de Punches que la Review Queue.
+11. El Excel CLIENT debe contener únicamente la Review Queue y no exponer hojas técnicas de importación.
 
 ## Resultado esperado para la cola de referencia
 
@@ -292,8 +325,8 @@ Profile               = CLIENT
 Cuando el CLIENT pase end-to-end:
 
 1. validar `INTERNAL / import-ready` con la misma cola;
-2. comprobar que el workbook contiene metadata de importación y hojas técnicas gobernadas;
+2. comprobar metadata y hojas técnicas;
 3. capturar/versionar la definición real del nuevo flow;
 4. actualizar `power-automate/FLOW_COVERAGE.md`;
 5. cerrar `PR-EXP-C03C2`;
-6. pasar a `PR-EXP-C03D` para la selección premium/gobernada de columnas y estados finales del modal.
+6. pasar a `PR-EXP-C03D`.
