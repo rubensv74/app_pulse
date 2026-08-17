@@ -1,0 +1,339 @@
+# PR-IMP-C04E — PREMIUM UPLOAD SURFACE
+# Operation: replace from `- conPI_WorkspaceMarker:` through EOF.
+# C04D OnVisible must remain unchanged.
+# Visual/synthetic only: no Flow, SQL or real file ingestion yet.
+
+                  - conPI_Workspace:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =varTheme_Border
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.Semilight
+                        Fill: =varTheme_Surface
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =12
+                        LayoutMinHeight: =360
+                        LayoutMinWidth: =480
+                        PaddingBottom: =16
+                        PaddingLeft: =16
+                        PaddingRight: =16
+                        PaddingTop: =16
+                        RadiusBottomLeft: =14
+                        RadiusBottomRight: =14
+                        RadiusTopLeft: =14
+                        RadiusTopRight: =14
+                        Width: =Parent.Width
+                      Children:
+                        - conPI_UploadHeading:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =Color.Transparent
+                              FillPortions: =0
+                              Height: =58
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutJustifyContent: =LayoutJustifyContent.Center
+                              LayoutMinHeight: =58
+                              LayoutMinWidth: =360
+                              Width: =Parent.Width
+                            Children:
+                              - lblPI_UploadEyebrow:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =true
+                                    Color: =varTheme_PulseBlueDark
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =16
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =8
+                                    Text: ="STEP 1  /  UPLOAD"
+                                    Width: =Parent.Width
+                              - lblPI_UploadTitle:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =true
+                                    Color: =varTheme_Text
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =25
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =17
+                                    Text: ="Choose an import-ready Excel file"
+                                    Width: =Parent.Width
+                              - lblPI_UploadSubtitle:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =true
+                                    Color: =varTheme_TextMuted
+                                    Font: =Font.'Segoe UI'
+                                    Height: =16
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    Text: ="Only governed INTERNAL workbooks exported from PULSE can continue to validation."
+                                    Width: =Parent.Width
+                        - conPI_UploadBody:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =Color.Transparent
+                              FillPortions: =1
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =12
+                              LayoutMinHeight: =250
+                              LayoutMinWidth: =440
+                              Width: =Parent.Width
+                            Children:
+                              - conPI_FileCard:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    BorderColor: =If(varPunchImportHasFile, ColorValue("#93C5FD"), varTheme_Border)
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =If(varPunchImportHasFile, ColorValue("#F8FBFF"), varTheme_SurfaceAlt)
+                                    FillPortions: =2
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =10
+                                    LayoutJustifyContent: =LayoutJustifyContent.Center
+                                    LayoutMinHeight: =240
+                                    LayoutMinWidth: =420
+                                    PaddingBottom: =20
+                                    PaddingLeft: =24
+                                    PaddingRight: =24
+                                    PaddingTop: =20
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                  Children:
+                                    - conPI_XlsxBadge:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: ManualLayout
+                                        Properties:
+                                          BorderColor: =ColorValue("#BBF7D0")
+                                          BorderThickness: =1
+                                          DropShadow: =DropShadow.None
+                                          Fill: =ColorValue("#F0FDF4")
+                                          FillPortions: =0
+                                          Height: =48
+                                          LayoutMinHeight: =48
+                                          LayoutMinWidth: =72
+                                          RadiusBottomLeft: =12
+                                          RadiusBottomRight: =12
+                                          RadiusTopLeft: =12
+                                          RadiusTopRight: =12
+                                          Width: =72
+                                        Children:
+                                          - lblPI_XlsxBadge:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Align: =Align.Center
+                                                BorderColor: =RGBA(0,0,0,0)
+                                                Color: =ColorValue("#15803D")
+                                                Fill: =Color.Transparent
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =48
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =10
+                                                Text: ="XLSX"
+                                                Width: =72
+                                    - lblPI_FileCardTitle:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Align: =Align.Center
+                                          AutoHeight: =true
+                                          Color: =varTheme_Text
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =24
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =13
+                                          Text: =If(varPunchImportHasFile, "Workbook selected", "Select the INTERNAL workbook")
+                                          Width: =Min(560, Parent.Width - 40)
+                                    - lblPI_FileCardHint:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Align: =Align.Center
+                                          AutoHeight: =true
+                                          Color: =varTheme_TextMuted
+                                          Font: =Font.'Segoe UI'
+                                          Height: =36
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =9
+                                          Text: =If(varPunchImportHasFile, varPunchImportFileName & " · " & Text(Round(varPunchImportFileSize / 1000, 0)) & " KB", "Real file ingestion is connected in C05. C04E validates the selected-file experience only.")
+                                          Width: =Min(620, Parent.Width - 40)
+                                    - btnPI_SelectFile:
+                                        Control: ModernButton@1.0.0
+                                        Properties:
+                                          BasePaletteColor: =varTheme_PulseBlueDark
+                                          Height: =40
+                                          LayoutMinHeight: =40
+                                          LayoutMinWidth: =160
+                                          OnSelect: |-
+                                            =Set(varPunchImportFileName, "PULSE_Punches_INTERNAL_sample.xlsx");
+                                            Set(varPunchImportFileSize, 184000);
+                                            Set(varPunchImportHasFile, true);
+                                            Set(varPunchImportError, "");
+                                            Set(varPunchImportMessage, "Synthetic workbook selected for C04E visual validation only.")
+                                          Text: =If(varPunchImportHasFile, "Choose another file", "Choose Excel file")
+                                          Width: =180
+                              - conPI_PolicyCard:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    BorderColor: =varTheme_Border
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_Surface
+                                    FillPortions: =1
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =10
+                                    LayoutMinHeight: =240
+                                    LayoutMinWidth: =300
+                                    PaddingBottom: =18
+                                    PaddingLeft: =18
+                                    PaddingRight: =18
+                                    PaddingTop: =18
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                  Children:
+                                    - lblPI_PolicyTitle:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_Text
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =22
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =12
+                                          Text: ="Before you continue"
+                                          Width: =Parent.Width
+                                    - lblPI_PolicyIntro:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_TextMuted
+                                          Font: =Font.'Segoe UI'
+                                          Height: =34
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =9
+                                          Text: ="The workbook will be staged and checked before any comment can reach production."
+                                          Width: =Parent.Width
+                                    - lblPI_PolicyRules:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_Text
+                                          Font: =Font.'Segoe UI'
+                                          Height: =112
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =9
+                                          Text: ="1. INTERNAL / import-ready only." & Char(10) & Char(10) & "2. Blank New Comment means no change." & Char(10) & Char(10) & "3. Upload never applies changes automatically." & Char(10) & Char(10) & "4. Errors or conflicts block Commit."
+                                          Width: =Parent.Width
+                        - conPI_UploadFooter:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =Color.Transparent
+                              FillPortions: =0
+                              Height: =54
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =10
+                              LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                              LayoutMinHeight: =54
+                              LayoutMinWidth: =360
+                              Width: =Parent.Width
+                            Children:
+                              - conPI_UploadFooterText:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =Color.Transparent
+                                    FillPortions: =1
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutJustifyContent: =LayoutJustifyContent.Center
+                                    LayoutMinHeight: =44
+                                    LayoutMinWidth: =260
+                                  Children:
+                                    - lblPI_UploadStatus:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =If(varPunchImportHasFile, varTheme_Text, varTheme_TextMuted)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =If(varPunchImportHasFile, FontWeight.Semibold, FontWeight.Normal)
+                                          Height: =18
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =9
+                                          Text: =If(varPunchImportHasFile, "Workbook ready for validation", "No workbook selected")
+                                          Width: =Parent.Width
+                                    - lblPI_UploadMessage:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_TextMuted
+                                          Font: =Font.'Segoe UI'
+                                          Height: =16
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =8
+                                          Text: =If(IsBlank(varPunchImportMessage), "Validation is connected in the next increment.", varPunchImportMessage)
+                                          Width: =Parent.Width
+                              - btnPI_ValidateFile:
+                                  Control: ModernButton@1.0.0
+                                  Properties:
+                                    BasePaletteColor: =varTheme_PulseBlueDark
+                                    DisplayMode: =If(varPunchImportHasFile && !varPunchImportBusy, DisplayMode.Edit, DisplayMode.Disabled)
+                                    Height: =40
+                                    LayoutMinHeight: =40
+                                    LayoutMinWidth: =140
+                                    OnSelect: =Set(varPunchImportMessage, "Stage/Validate backend connection arrives in PR-IMP-C05.")
+                                    Text: ="Validate file"
+                                    Width: =150
