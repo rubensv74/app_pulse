@@ -129,9 +129,6 @@ BEGIN
         IF NOT EXISTS (SELECT 1 FROM #BatchItems)
             THROW 52335, 'PR-IMP-C03: the ImportBatch contains no valid WorkItems.', 1;
 
-        /* ------------------------------------------------------------------
-           1. Rebuild the same standard canonical snapshot used by export.
-           ------------------------------------------------------------------ */
         DROP TABLE IF EXISTS #CurrentBase;
 
         ;WITH PunchBase AS
@@ -142,7 +139,6 @@ BEGIN
                 h.SystemCode,
                 SubsystemCode = COALESCE(NULLIF(LTRIM(RTRIM(h.SubsystemCode)), ''), 'NO SUBSYSTEM'),
                 h.ItemCode AS ElementCode,
-
                 p.ProjectId,
                 CONVERT(bigint, p.Id) AS PunchId,
                 p.TemplateID AS TemplateId,
@@ -164,13 +160,10 @@ BEGIN
                 p.RejectCount,
                 p.Items AS ItemsRaw,
                 p.SubcontractorId,
-
                 SubcontractorCode = CONVERT(nvarchar(50), mc.ID_COMPANY),
                 SubcontractorName = mc.DS_COMPANY,
                 SubcontractorShortName = mc.DS_SHORT_COMPANY,
-
                 p.DepartmentAction,
-
                 rn = ROW_NUMBER() OVER
                 (
                     PARTITION BY p.Id
@@ -300,9 +293,6 @@ BEGIN
             FOR JSON PATH, WITHOUT_ARRAY_WRAPPER, INCLUDE_NULL_VALUES
         ) AS snapshot(StandardValuesJson);
 
-        /* ------------------------------------------------------------------
-           2. Rebuild the canonical exportable Custom Field snapshot.
-           ------------------------------------------------------------------ */
         DROP TABLE IF EXISTS #CustomFlat;
         CREATE TABLE #CustomFlat
         (
@@ -317,31 +307,14 @@ BEGIN
             ColumnName = CONCAT
             (
                 N'CF__',
-                REPLACE
-                (
-                    REPLACE
-                    (
-                        REPLACE
-                        (
-                            REPLACE(d.FieldKey, ' ', '_'),
-                            '-', '_'
-                        ),
-                        '.', '_'
-                    ),
-                    ']', '_'
-                )
+                REPLACE(REPLACE(REPLACE(REPLACE(d.FieldKey, ' ', '_'), '-', '_'), '.', '_'), ']', '_')
             ),
             FieldValue =
                 CASE d.FieldType
                     WHEN 'Text' THEN v.ValueText
                     WHEN 'Number' THEN CONVERT(nvarchar(100), v.ValueNumber)
                     WHEN 'Date' THEN CONVERT(nvarchar(30), v.ValueDate, 126)
-                    WHEN 'YesNo' THEN
-                        CASE
-                            WHEN v.ValueBool = 1 THEN 'true'
-                            WHEN v.ValueBool = 0 THEN 'false'
-                            ELSE NULL
-                        END
+                    WHEN 'YesNo' THEN CASE WHEN v.ValueBool = 1 THEN 'true' WHEN v.ValueBool = 0 THEN 'false' ELSE NULL END
                     WHEN 'Choice' THEN v.ValueText
                     WHEN 'MultiChoice' THEN v.ValueJson
                     WHEN 'Json' THEN v.ValueJson
@@ -375,24 +348,13 @@ BEGIN
             SELECT
                 cb.PunchId,
                 canonical.CurrentValuesJson,
-                CONVERT
-                (
-                    char(64),
-                    CONVERT
-                    (
-                        nvarchar(64),
-                        HASHBYTES('SHA2_256', CONVERT(varbinary(max), canonical.CurrentValuesJson)),
-                        2
-                    )
-                )
+                CONVERT(char(64), CONVERT(nvarchar(64), HASHBYTES('SHA2_256', CONVERT(varbinary(max), canonical.CurrentValuesJson)), 2))
             FROM #CurrentBase AS cb
             CROSS APPLY
             (
                 SELECT CustomHashSource =
                 (
-                    SELECT
-                        cf.ColumnName,
-                        cf.FieldValue
+                    SELECT cf.ColumnName, cf.FieldValue
                     FROM #CustomFlat AS cf
                     WHERE cf.PunchId = cb.PunchId
                     ORDER BY cf.ColumnName
@@ -401,12 +363,7 @@ BEGIN
             ) AS hs
             CROSS APPLY
             (
-                SELECT CurrentValuesJson = JSON_MODIFY
-                (
-                    cb.StandardValuesJson,
-                    '$.CustomValuesCanonical',
-                    ISNULL(hs.CustomHashSource, '')
-                )
+                SELECT CurrentValuesJson = JSON_MODIFY(cb.StandardValuesJson, '$.CustomValuesCanonical', ISNULL(hs.CustomHashSource, ''))
             ) AS canonical;
         END
         ELSE
@@ -415,75 +372,41 @@ BEGIN
             SELECT
                 cb.PunchId,
                 cb.StandardValuesJson,
-                CONVERT
-                (
-                    char(64),
-                    CONVERT
-                    (
-                        nvarchar(64),
-                        HASHBYTES('SHA2_256', CONVERT(varbinary(max), cb.StandardValuesJson)),
-                        2
-                    )
-                )
+                CONVERT(char(64), CONVERT(nvarchar(64), HASHBYTES('SHA2_256', CONVERT(varbinary(max), cb.StandardValuesJson)), 2))
             FROM #CurrentBase AS cb;
         END;
 
-        /* ------------------------------------------------------------------
-           3. Reclassify staged rows. Existing ERROR rows remain ERROR.
-           ------------------------------------------------------------------ */
         UPDATE ibr
         SET
             CurrentValuesJson = COALESCE
             (
                 cc.CurrentValuesJson,
-                (
-                    SELECT
-                        WorkItemId = ibr.WorkItemId,
-                        CurrentRecordMissing = CAST(1 AS bit)
-                    FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
-                )
+                (SELECT WorkItemId = ibr.WorkItemId, CurrentRecordMissing = CAST(1 AS bit) FOR JSON PATH, WITHOUT_ARRAY_WRAPPER)
             ),
-            ValidationStatus =
-                CASE
-                    WHEN ibr.ValidationStatus = 'ERROR' THEN 'ERROR'
-                    WHEN bi.HasIncomingChange = 0 THEN 'UNCHANGED'
-                    WHEN cc.WorkItemId IS NULL THEN 'CONFLICT'
-                    WHEN UPPER(CONVERT(varchar(64), cc.CurrentRowChecksum)) <> UPPER(CONVERT(varchar(64), ebr.RowChecksum)) THEN 'CONFLICT'
-                    ELSE 'READY'
-                END,
-            ValidationWarningsJson =
-                CASE
-                    WHEN ibr.ValidationStatus = 'ERROR' THEN ibr.ValidationWarningsJson
-                    WHEN bi.HasIncomingChange = 0 THEN N'[]'
-                    WHEN cc.WorkItemId IS NULL THEN
-                        (
-                            SELECT
-                                ConflictCode = N'CURRENT_RECORD_MISSING',
-                                [Message] = N'The Punch can no longer be reconstructed from the current governed data sources.'
-                            FOR JSON PATH
-                        )
-                    WHEN UPPER(CONVERT(varchar(64), cc.CurrentRowChecksum)) <> UPPER(CONVERT(varchar(64), ebr.RowChecksum)) THEN
-                        (
-                            SELECT
-                                ConflictCode = N'CURRENT_STATE_CHANGED',
-                                [Message] = N'The Punch changed in PULSE after this workbook was exported. Re-export before applying the comment.'
-                            FOR JSON PATH
-                        )
-                    ELSE N'[]'
-                END
+            ValidationStatus = CASE
+                WHEN ibr.ValidationStatus = 'ERROR' THEN 'ERROR'
+                WHEN bi.HasIncomingChange = 0 THEN 'UNCHANGED'
+                WHEN cc.WorkItemId IS NULL THEN 'CONFLICT'
+                WHEN UPPER(CONVERT(varchar(64), cc.CurrentRowChecksum)) <> UPPER(CONVERT(varchar(64), ebr.RowChecksum)) THEN 'CONFLICT'
+                ELSE 'READY'
+            END,
+            ValidationWarningsJson = CASE
+                WHEN ibr.ValidationStatus = 'ERROR' THEN ibr.ValidationWarningsJson
+                WHEN bi.HasIncomingChange = 0 THEN N'[]'
+                WHEN cc.WorkItemId IS NULL THEN
+                    (SELECT ConflictCode = N'CURRENT_RECORD_MISSING', [Message] = N'The Punch can no longer be reconstructed from the current governed data sources.' FOR JSON PATH)
+                WHEN UPPER(CONVERT(varchar(64), cc.CurrentRowChecksum)) <> UPPER(CONVERT(varchar(64), ebr.RowChecksum)) THEN
+                    (SELECT ConflictCode = N'CURRENT_STATE_CHANGED', [Message] = N'The Punch changed in PULSE after this workbook was exported. Re-export before applying the comment.' FOR JSON PATH)
+                ELSE N'[]'
+            END
         FROM warroom.ImportBatchRow AS ibr
-        INNER JOIN #BatchItems AS bi
-            ON bi.WorkItemId = ibr.WorkItemId
-        LEFT JOIN #CurrentCanonical AS cc
-            ON cc.WorkItemId = ibr.WorkItemId
+        INNER JOIN #BatchItems AS bi ON bi.WorkItemId = ibr.WorkItemId
+        LEFT JOIN #CurrentCanonical AS cc ON cc.WorkItemId = ibr.WorkItemId
         LEFT JOIN warroom.ExportBatchRow AS ebr
             ON ebr.ExportBatchId = @ExportBatchId
            AND ebr.WorkItemId = ibr.WorkItemId
         WHERE ibr.ImportBatchId = @ImportBatchId;
 
-        /* ------------------------------------------------------------------
-           4. Recompute batch summary.
-           ------------------------------------------------------------------ */
         DECLARE @TotalRows int;
         DECLARE @ChangedRows int;
         DECLARE @UnchangedRows int;
@@ -527,6 +450,7 @@ BEGIN
             ConflictRows = @ConflictRows,
             ErrorMessage = CASE
                 WHEN @ConflictRows > 0 THEN N'One or more changed rows conflict with the current PULSE state.'
+                WHEN @ErrorRows = 0 THEN NULL
                 ELSE ErrorMessage
             END
         WHERE ImportBatchId = @ImportBatchId;
@@ -542,17 +466,7 @@ BEGIN
             warningRows = @WarningRows,
             errorRows = @ErrorRows,
             conflictRows = @ConflictRows,
-            canCommit = CONVERT
-            (
-                bit,
-                CASE
-                    WHEN @FinalStatus = 'READY'
-                     AND @ChangedRows > 0
-                     AND @ErrorRows = 0
-                     AND @ConflictRows = 0
-                    THEN 1 ELSE 0
-                END
-            ),
+            canCommit = CONVERT(bit, CASE WHEN @FinalStatus = 'READY' AND @ChangedRows > 0 AND @ErrorRows = 0 AND @ConflictRows = 0 THEN 1 ELSE 0 END),
             [message] = CASE
                 WHEN @ConflictRows > 0 THEN N'The workbook contains conflicts with the current PULSE state.'
                 WHEN @ErrorRows > 0 THEN N'The workbook contains blocking validation errors.'
@@ -567,12 +481,17 @@ END;
 GO
 
 /* Deployment verification only. */
+DECLARE @Definition nvarchar(max) = OBJECT_DEFINITION(OBJECT_ID(N'warroom.usp_RevalidatePunchCommentImportConflicts', N'P'));
+
 SELECT
     ProcedureName = N'warroom.usp_RevalidatePunchCommentImportConflicts',
     ExistsAsProcedure = CONVERT(bit, CASE WHEN OBJECT_ID(N'warroom.usp_RevalidatePunchCommentImportConflicts', N'P') IS NOT NULL THEN 1 ELSE 0 END),
     WritesPunchComment = CONVERT(bit, CASE
-        WHEN OBJECT_DEFINITION(OBJECT_ID(N'warroom.usp_RevalidatePunchCommentImportConflicts', N'P')) LIKE '%INSERT%PunchComment%'
-          OR OBJECT_DEFINITION(OBJECT_ID(N'warroom.usp_RevalidatePunchCommentImportConflicts', N'P')) LIKE '%UPDATE%PunchComment%'
-          OR OBJECT_DEFINITION(OBJECT_ID(N'warroom.usp_RevalidatePunchCommentImportConflicts', N'P')) LIKE '%DELETE%PunchComment%'
+        WHEN @Definition LIKE '%INSERT INTO [warroom].[PunchComment]%'
+          OR @Definition LIKE '%INSERT INTO warroom.PunchComment%'
+          OR @Definition LIKE '%UPDATE [warroom].[PunchComment]%'
+          OR @Definition LIKE '%UPDATE warroom.PunchComment%'
+          OR @Definition LIKE '%DELETE FROM [warroom].[PunchComment]%'
+          OR @Definition LIKE '%DELETE FROM warroom.PunchComment%'
         THEN 1 ELSE 0 END);
 GO
