@@ -94,8 +94,7 @@ BEGIN
 
     CREATE TABLE #Requested
     (
-        WorkItemId  BIGINT NOT NULL,
-        CONSTRAINT PK_PRExportScope_Requested PRIMARY KEY CLUSTERED (WorkItemId)
+        WorkItemId  BIGINT NOT NULL PRIMARY KEY CLUSTERED
     );
 
     INSERT INTO #Requested (WorkItemId)
@@ -114,12 +113,11 @@ BEGIN
     ---------------------------------------------------------------------
     CREATE TABLE #Resolved
     (
-        WorkItemId      BIGINT          NOT NULL,
-        PunchCode       NVARCHAR(255)   NULL,
+        WorkItemId      BIGINT          NOT NULL PRIMARY KEY CLUSTERED,
+        PunchCode       NVARCHAR(500)   NULL,
         StatusCode      NVARCHAR(50)    NULL,
         PunchDiscipline NVARCHAR(100)   NULL,
-        TemplateId      BIGINT          NULL,
-        CONSTRAINT PK_PRExportScope_Resolved PRIMARY KEY CLUSTERED (WorkItemId)
+        TemplateId      BIGINT          NULL
     );
 
     INSERT INTO #Resolved
@@ -163,11 +161,11 @@ BEGIN
     ---------------------------------------------------------------------
     IF @ResolvedCount <> @RequestedCount
     BEGIN
-        DECLARE @UnresolvedIds NVARCHAR(1400);
+        DECLARE @UnresolvedIds NVARCHAR(MAX);
         DECLARE @ErrorMessage NVARCHAR(2048);
 
         SELECT
-            @UnresolvedIds = STRING_AGG(CONVERT(NVARCHAR(30), r.WorkItemId), N', ')
+            @UnresolvedIds = STRING_AGG(CONVERT(NVARCHAR(MAX), r.WorkItemId), N', ')
         FROM #Requested r
         LEFT JOIN #Resolved x
             ON x.WorkItemId = r.WorkItemId
@@ -180,7 +178,7 @@ BEGIN
             N'; Resolved=',
             @ResolvedCount,
             N'; Unresolved/Ineligible WorkItemIds=',
-            COALESCE(@UnresolvedIds, N'(not available)'),
+            LEFT(COALESCE(@UnresolvedIds, N'(not available)'), 1200),
             N'. Partial export is forbidden.'
         );
 
