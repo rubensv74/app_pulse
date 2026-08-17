@@ -1,0 +1,157 @@
+# PR-IMP-C04D — TYPED RUNTIME STATE
+#
+# Operation: REPLACE PROPERTY COMPLETELY.
+# Target: scr_PunchImport > Properties > OnVisible
+# Replace the complete OnVisible property from C04C with the property below.
+# Dependencies: C04A, C04B and C04C validated.
+#
+# Responsibility:
+# - establish typed local runtime state;
+# - establish typed empty summary/preview collections;
+# - preserve Project/Template context;
+# - keep the stepper at Upload on screen entry.
+#
+# This block DOES NOT call Flow, SQL, stage, preview or commit.
+
+OnVisible: |-
+  =
+  // =====================================================
+  // PR-IMP-C04D — PUNCH IMPORT TYPED RUNTIME STATE
+  // Client state only. No Flow or SQL calls in this block.
+  // =====================================================
+
+  // -----------------------------------------------------
+  // 1. Theme safety and page identity
+  // -----------------------------------------------------
+
+  If(IsBlank(varTheme_PageBg), Set(varTheme_PageBg, ColorValue("#F6F8FB")));
+  If(IsBlank(varTheme_Surface), Set(varTheme_Surface, ColorValue("#FFFFFF")));
+  If(IsBlank(varTheme_SurfaceAlt), Set(varTheme_SurfaceAlt, ColorValue("#F8FAFC")));
+  If(IsBlank(varTheme_Border), Set(varTheme_Border, ColorValue("#E2E8F0")));
+  If(IsBlank(varTheme_Text), Set(varTheme_Text, ColorValue("#0F172A")));
+  If(IsBlank(varTheme_TextMuted), Set(varTheme_TextMuted, ColorValue("#64748B")));
+  If(IsBlank(varTheme_PulseBlueDark), Set(varTheme_PulseBlueDark, ColorValue("#1677FF")));
+  If(IsBlank(varTheme_NavBg), Set(varTheme_NavBg, ColorValue("#07111F")));
+
+  Set(varAppView, "PunchReview");
+  Set(varPageKey, "PUNCH_IMPORT");
+  Set(varPageTitle, "Import comment updates");
+  Set(varPageSubtitle, "Validate every Excel change before applying it to PULSE.");
+
+  // -----------------------------------------------------
+  // 2. Functional context inherited from Punch Review
+  // -----------------------------------------------------
+
+  Set(
+      varPunchImportTemplateLabel,
+      Coalesce(
+          LookUp(
+              colPunchTemplates_Filter,
+              Text(TemplateId) = Text(varPunchReviewTemplateId),
+              TemplateLabel
+          ),
+          If(
+              IsBlank(varPunchReviewTemplateId),
+              "No template selected",
+              Text(varPunchReviewTemplateId)
+          )
+      )
+  );
+
+  // -----------------------------------------------------
+  // 3. Typed runtime variables
+  // Numeric variables receive an explicit numeric first value.
+  // -----------------------------------------------------
+
+  Set(varPunchImportStep, 1);
+  Set(varPunchImportBusy, false);
+
+  Set(varPunchImportBatchId, "");
+  Set(varPunchImportBatchStatus, "NOT_STARTED");
+
+  Set(varPunchImportFileName, "");
+  Set(varPunchImportFileSize, 0);
+  Set(varPunchImportHasFile, false);
+
+  Set(varPunchImportCanCommit, false);
+  Set(varPunchImportFilter, "ALL");
+  Set(varPunchImportSearch, "");
+  Set(varPunchImportPage, 1);
+  Set(varPunchImportPageSize, 50);
+
+  Set(varPunchImportError, "");
+  Set(varPunchImportMessage, "");
+
+  Set(varPunchImportTotalRows, 0);
+  Set(varPunchImportChangedRows, 0);
+  Set(varPunchImportUnchangedRows, 0);
+  Set(varPunchImportValidRows, 0);
+  Set(varPunchImportWarningRows, 0);
+  Set(varPunchImportErrorRows, 0);
+  Set(varPunchImportConflictRows, 0);
+  Set(varPunchImportAppliedRows, 0);
+  Set(varPunchImportFailedRows, 0);
+
+  Set(varPunchImportSelectedRowId, 0);
+
+  // -----------------------------------------------------
+  // 4. Stable typed collections
+  // SQL remains the authority once integration begins.
+  // These collections are client projections only.
+  // -----------------------------------------------------
+
+  ClearCollect(
+      colPunchImportSummary,
+      {
+          ImportBatchId: "",
+          ExportBatchId: 0,
+          ProjectId: 0,
+          TemplateId: 0,
+          Status: "",
+          FileName: "",
+          TotalRows: 0,
+          ChangedRows: 0,
+          UnchangedRows: 0,
+          ValidRows: 0,
+          WarningRows: 0,
+          ErrorRows: 0,
+          ConflictRows: 0,
+          AppliedRows: 0,
+          FailedRows: 0,
+          CanCommit: false,
+          Message: ""
+      }
+  );
+  Clear(colPunchImportSummary);
+
+  ClearCollect(
+      colPunchImportPreview,
+      {
+          ImportBatchRowId: 0,
+          ImportBatchId: "",
+          ExportBatchId: 0,
+          ExcelRowNumber: 0,
+          WorkItemId: 0,
+          PunchCode: "",
+          Description: "",
+          ValidationStatus: "",
+          IncomingValuesJson: "",
+          OriginalValuesJson: "",
+          CurrentValuesJson: "",
+          ChangedColumnsJson: "",
+          ValidationErrorsJson: "[]",
+          ValidationWarningsJson: "[]",
+          ApplyStatus: "",
+          ApplyError: "",
+          TotalRows: 0,
+          PageNumber: 1,
+          PageSize: 50
+      }
+  );
+  Clear(colPunchImportPreview);
+
+  // -----------------------------------------------------
+  // 5. Runtime marker
+  // -----------------------------------------------------
+
+  Set(varPunchImportRuntimeReady, true)
