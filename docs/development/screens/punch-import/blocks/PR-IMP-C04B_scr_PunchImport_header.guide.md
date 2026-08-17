@@ -19,6 +19,18 @@
 
 `varPunchImportTemplateLabel` se resuelve desde `colPunchTemplates_Filter` usando `varPunchReviewTemplateId`, para mostrar al usuario la etiqueta funcional del template y no el ID técnico.
 
+## Revisión FIX2 — contexto siempre visible
+
+La primera versión compilaba, pero el bloque de Project / Template / Batch / Back podía quedar fuera del área visible del header en el viewport efectivo de Studio. Aumentar únicamente la altura no resolvió el problema.
+
+La versión actual usa tres filas explícitas dentro del header:
+
+1. `conPI_HeaderIdentityRow` — identidad y título;
+2. `conPI_HeaderContextRow` — Project, Punch template, Batch status y Back;
+3. `conPI_SafetyBanner` — política `COMMENTS ONLY · V1`.
+
+`conPI_HeaderContextRow` tiene altura propia y scroll horizontal de seguridad, de modo que el contexto obligatorio no depende de una conmutación responsive del mismo contenedor que la identidad.
+
 ## Aplicación en Power Apps Studio
 
 1. Abre `scr_PunchImport`.
@@ -43,11 +55,12 @@ Debe verse el sidebar PULSE, header blanco premium, eyebrow, Project funcional, 
 - No `PA2301` para `cmp_SidebarNav`.
 - App Checker no introduce un error nuevo por C04B.
 - Project y template muestran contexto funcional.
+- `Project`, `Punch template`, `Batch status` y `Back to Punch Review` son visibles simultáneamente en la fila de contexto.
 - Back vuelve correctamente a Punch Review.
 
 ## STOP
 
-Ante cualquier error, no avanzar a C04C. Enviar el mensaje exacto y Session ID si aparece.
+Ante cualquier error o si falta alguna de las cuatro superficies de contexto, no avanzar a C04C.
 
 ## Siguiente bloque tras PASS
 
