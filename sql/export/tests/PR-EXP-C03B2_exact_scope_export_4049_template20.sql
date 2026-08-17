@@ -4,6 +4,9 @@
     Run ONLY after:
       sql/export/004_pr_exp_c03b2_extend_export_sp_exact_scope.sql
 
+    Confirmed active SQL procedure:
+      warroom.usp_ExportProjectPunchesExtended
+
     Context:
     - Visible PULSE project code: 70200
     - Internal ProjectId used by wap_PunchPaged: 4049
@@ -33,7 +36,7 @@ DECLARE @WorkItemIdsJson NVARCHAR(MAX) = N'[
   {"WorkItemId":1267968}
 ]';
 
-EXEC [warroom].[usp_ExportProjectPunchesExtended_Pivoted]
+EXEC [warroom].[usp_ExportProjectPunchesExtended]
     @ProjectId = 4049,
     @SubsystemCode = NULL,
     @TemplateId = 20,
