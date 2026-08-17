@@ -1,5 +1,5 @@
 /*
-    PULSE — PR-IMP-C02
+    PULSE — PR-IMP-C02A FIX1
     Stage + Validate SQL for Comments-only v1.
 
     Contract
@@ -10,6 +10,13 @@
     - NewComment is the only business value interpreted as a change.
     - Blank NewComment means UNCHANGED.
     - This procedure NEVER writes to warroom.PunchComment.
+
+    FIX1 — 2026-08-17
+    -----------------
+    ValidationErrorsJson is NOT NULL in warroom.ImportBatchRow. The first C02A
+    build could propagate NULL from the validation expression into that column.
+    This version normalizes every validation JSON payload with COALESCE(...,'[]')
+    before classification and INSERT.
 
     Retry model in C02
     ------------------
@@ -334,21 +341,24 @@ BEGIN
             NULL,
             CASE
                 WHEN s.NewComment IS NULL THEN N'[]'
-                ELSE
+                ELSE COALESCE
                 (
-                    SELECT
-                        ColumnName = N'NewComment',
-                        OldValue = CONVERT(nvarchar(max), NULL),
-                        NewValue = s.NewComment
-                    FOR JSON PATH
+                    (
+                        SELECT
+                            ColumnName = N'NewComment',
+                            OldValue = CONVERT(nvarchar(max), NULL),
+                            NewValue = s.NewComment
+                        FOR JSON PATH
+                    ),
+                    N'[]'
                 )
             END,
             CASE
-                WHEN validation.ValidationErrorsJson <> N'[]' THEN 'ERROR'
+                WHEN COALESCE(validation.ValidationErrorsJson, N'[]') <> N'[]' THEN 'ERROR'
                 WHEN s.NewComment IS NULL THEN 'UNCHANGED'
                 ELSE 'READY'
             END,
-            validation.ValidationErrorsJson,
+            COALESCE(validation.ValidationErrorsJson, N'[]'),
             N'[]',
             'NOT_APPLIED',
             NULL
@@ -358,81 +368,84 @@ BEGIN
            AND ebr.WorkItemId = s.WorkItemId
         CROSS APPLY
         (
-            SELECT ValidationErrorsJson =
+            SELECT ValidationErrorsJson = COALESCE
             (
-                SELECT
-                    ErrorCode = errors.ErrorCode,
-                    [Message] = errors.[Message]
-                FROM
                 (
                     SELECT
-                        ErrorCode = N'INVALID_EXPORT_BATCH_ID',
-                        [Message] = N'The row does not contain the expected Export Batch ID.'
-                    WHERE s.PunchExportLogId IS NULL
-                       OR s.PunchExportLogId <= 0
-                       OR s.PunchExportLogId <> @PunchExportLogId
+                        ErrorCode = errors.ErrorCode,
+                        [Message] = errors.[Message]
+                    FROM
+                    (
+                        SELECT
+                            ErrorCode = N'INVALID_EXPORT_BATCH_ID',
+                            [Message] = N'The row does not contain the expected Export Batch ID.'
+                        WHERE s.PunchExportLogId IS NULL
+                           OR s.PunchExportLogId <= 0
+                           OR s.PunchExportLogId <> @PunchExportLogId
 
-                    UNION ALL
+                        UNION ALL
 
-                    SELECT
-                        N'PROJECT_MISMATCH',
-                        N'The row ProjectId does not match the export snapshot.'
-                    WHERE s.RowProjectId IS NULL
-                       OR s.RowProjectId <> @ProjectId
+                        SELECT
+                            N'PROJECT_MISMATCH',
+                            N'The row ProjectId does not match the export snapshot.'
+                        WHERE s.RowProjectId IS NULL
+                           OR s.RowProjectId <> @ProjectId
 
-                    UNION ALL
+                        UNION ALL
 
-                    SELECT
-                        N'TEMPLATE_MISMATCH',
-                        N'The row TemplateId does not match the export snapshot.'
-                    WHERE s.RowTemplateId IS NULL
-                       OR s.RowTemplateId <> @TemplateId
+                        SELECT
+                            N'TEMPLATE_MISMATCH',
+                            N'The row TemplateId does not match the export snapshot.'
+                        WHERE s.RowTemplateId IS NULL
+                           OR s.RowTemplateId <> @TemplateId
 
-                    UNION ALL
+                        UNION ALL
 
-                    SELECT
-                        N'INVALID_WORKITEM',
-                        N'The Work Item ID is missing or invalid.'
-                    WHERE s.WorkItemId IS NULL
-                       OR s.WorkItemId <= 0
+                        SELECT
+                            N'INVALID_WORKITEM',
+                            N'The Work Item ID is missing or invalid.'
+                        WHERE s.WorkItemId IS NULL
+                           OR s.WorkItemId <= 0
 
-                    UNION ALL
+                        UNION ALL
 
-                    SELECT
-                        N'DUPLICATE_WORKITEM',
-                        N'The Work Item ID appears more than once in the workbook.'
-                    WHERE s.DuplicateCount > 1
+                        SELECT
+                            N'DUPLICATE_WORKITEM',
+                            N'The Work Item ID appears more than once in the workbook.'
+                        WHERE s.DuplicateCount > 1
 
-                    UNION ALL
+                        UNION ALL
 
-                    SELECT
-                        N'WORKITEM_NOT_IN_EXPORT',
-                        N'The Work Item ID is not part of the immutable export snapshot.'
-                    WHERE s.WorkItemId IS NOT NULL
-                      AND ebr.WorkItemId IS NULL
+                        SELECT
+                            N'WORKITEM_NOT_IN_EXPORT',
+                            N'The Work Item ID is not part of the immutable export snapshot.'
+                        WHERE s.WorkItemId IS NOT NULL
+                          AND ebr.WorkItemId IS NULL
 
-                    UNION ALL
+                        UNION ALL
 
-                    SELECT
-                        N'INVALID_CHECKSUM',
-                        N'The Row Checksum is missing or malformed.'
-                    WHERE s.RowChecksum IS NULL
-                       OR LEN(s.RowChecksum) <> 64
-                       OR s.RowChecksum LIKE '%[^0-9A-F]%'
+                        SELECT
+                            N'INVALID_CHECKSUM',
+                            N'The Row Checksum is missing or malformed.'
+                        WHERE s.RowChecksum IS NULL
+                           OR LEN(s.RowChecksum) <> 64
+                           OR s.RowChecksum LIKE '%[^0-9A-F]%'
 
-                    UNION ALL
+                        UNION ALL
 
-                    SELECT
-                        N'CHECKSUM_MISMATCH',
-                        N'The Row Checksum does not match the immutable export snapshot.'
-                    WHERE ebr.WorkItemId IS NOT NULL
-                      AND
-                      (
-                          s.RowChecksum IS NULL
-                          OR UPPER(CONVERT(varchar(64), ebr.RowChecksum)) <> s.RowChecksum
-                      )
-                ) AS errors
-                FOR JSON PATH
+                        SELECT
+                            N'CHECKSUM_MISMATCH',
+                            N'The Row Checksum does not match the immutable export snapshot.'
+                        WHERE ebr.WorkItemId IS NOT NULL
+                          AND
+                          (
+                              s.RowChecksum IS NULL
+                              OR UPPER(CONVERT(varchar(64), ebr.RowChecksum)) <> s.RowChecksum
+                          )
+                    ) AS errors
+                    FOR JSON PATH
+                ),
+                N'[]'
             )
         ) AS validation;
 
@@ -499,17 +512,20 @@ BEGIN
         /* ------------------------------------------------------------------
            6. Contract response
            ------------------------------------------------------------------ */
-        DECLARE @ErrorsJson nvarchar(max) =
+        DECLARE @ErrorsJson nvarchar(max) = COALESCE
         (
-            SELECT
-                ExcelRowNumber,
-                WorkItemId,
-                errors = JSON_QUERY(ValidationErrorsJson)
-            FROM [warroom].[ImportBatchRow]
-            WHERE ImportBatchId = @ImportBatchId
-              AND ValidationStatus = 'ERROR'
-            ORDER BY ExcelRowNumber
-            FOR JSON PATH
+            (
+                SELECT
+                    ExcelRowNumber,
+                    WorkItemId,
+                    errors = JSON_QUERY(COALESCE(ValidationErrorsJson, N'[]'))
+                FROM [warroom].[ImportBatchRow]
+                WHERE ImportBatchId = @ImportBatchId
+                  AND ValidationStatus = 'ERROR'
+                ORDER BY ExcelRowNumber
+                FOR JSON PATH
+            ),
+            N'[]'
         );
 
         IF @GlobalError IS NOT NULL
