@@ -5,11 +5,14 @@
     prove that callers which do NOT send @WorkItemIdsJson still execute the
     stored procedure through the previous FILTERED_LIST path.
 
+    Confirmed active SQL procedure:
+      warroom.usp_ExportProjectPunchesExtended
+
     @StatusCode = 'HOLD' is used deliberately so the current global export
     eligibility rule returns no business rows and the smoke test stays small.
 */
 
-EXEC [warroom].[usp_ExportProjectPunchesExtended_Pivoted]
+EXEC [warroom].[usp_ExportProjectPunchesExtended]
     @ProjectId = 4049,
     @SubsystemCode = NULL,
     @TemplateId = 20,
