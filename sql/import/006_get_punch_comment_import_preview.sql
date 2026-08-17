@@ -1,10 +1,11 @@
 /*
-    PULSE — PR-IMP-C02B
+    PULSE — PR-IMP-C02B / PR-IMP-C03
     Read-only preview for Comments-only v1 import batches.
 
     Purpose
     -------
-    Feed the future scr_PunchImport preview grid with staged rows before Commit.
+    Feed scr_PunchImport with staged rows before Commit, including the immutable
+    export snapshot, the revalidated current PULSE state and conflict details.
 
     Safety
     ------
@@ -79,16 +80,24 @@ BEGIN
         ibr.WorkItemId,
         PunchCode = COALESCE(p.PunchCode, CONVERT(nvarchar(50), ibr.WorkItemId)),
         PunchDescription = COALESCE(p.PunchDescription, N''),
+
+        OriginalLastCommentText = COALESCE(JSON_VALUE(ibr.OriginalValuesJson, '$.LastCommentText'), N''),
+        CurrentLastCommentText = COALESCE(JSON_VALUE(ibr.CurrentValuesJson, '$.LastCommentText'), N''),
         NewComment = COALESCE
         (
             JSON_VALUE(ibr.IncomingValuesJson, '$."New Comment"'),
             JSON_VALUE(ibr.IncomingValuesJson, '$.NewComment'),
             N''
         ),
+
         ibr.ValidationStatus,
+        ConflictCode = JSON_VALUE(ibr.ValidationWarningsJson, '$[0].ConflictCode'),
+        ConflictMessage = JSON_VALUE(ibr.ValidationWarningsJson, '$[0].Message'),
         ibr.ChangedColumnsJson,
         ibr.ValidationErrorsJson,
         ibr.ValidationWarningsJson,
+        ibr.OriginalValuesJson,
+        ibr.CurrentValuesJson,
         ibr.ApplyStatus,
         ibr.ApplyError,
 
@@ -124,5 +133,8 @@ SELECT
         WHEN OBJECT_DEFINITION(OBJECT_ID(N'warroom.usp_GetPunchCommentImportPreview', N'P')) LIKE '%INSERT%PunchComment%'
           OR OBJECT_DEFINITION(OBJECT_ID(N'warroom.usp_GetPunchCommentImportPreview', N'P')) LIKE '%UPDATE%PunchComment%'
           OR OBJECT_DEFINITION(OBJECT_ID(N'warroom.usp_GetPunchCommentImportPreview', N'P')) LIKE '%DELETE%PunchComment%'
+        THEN 1 ELSE 0 END),
+    ExposesCurrentValues = CONVERT(bit, CASE
+        WHEN OBJECT_DEFINITION(OBJECT_ID(N'warroom.usp_GetPunchCommentImportPreview', N'P')) LIKE '%CurrentValuesJson%'
         THEN 1 ELSE 0 END);
 GO
