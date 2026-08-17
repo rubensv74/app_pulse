@@ -53,7 +53,48 @@ Para todo bloque completo pegable de Punch Import:
 ### Estado
 
 ```text
-CORREGIDO EN REPOSITORIO — pendiente de revalidación en Power Apps Studio.
+RESUELTO — C04A/C04B aceptados por Power Apps Studio el 2026-08-17.
+```
+
+---
+
+## PR-IMP-UX-001 — Contexto del header oculto por altura insuficiente en breakpoint apilado
+
+**Fecha:** 2026-08-17  
+**Bloque:** `PR-IMP-C04B_scr_PunchImport_header.pa.yaml`
+
+### Síntoma
+
+Power Apps Studio aceptó el YAML y renderizó el header, pero en un ancho inferior a 1400 px solo se veía la identidad de la pantalla y el banner `COMMENTS ONLY · V1`. Las tarjetas de Project, Punch template, Batch status y el botón Back quedaban ocultos.
+
+### Causa
+
+`conPI_HeaderMain` cambia a `LayoutDirection.Vertical` cuando `App.Width < 1400`. Sus hijos necesitan aproximadamente:
+
+```text
+68 px  HeaderIdentity
+58 px  HeaderContext
+10 px  LayoutGap
+= 136 px mínimos
+```
+
+La primera versión asignaba `Height = 128`, de modo que el segundo hijo quedaba recortado. El contenedor padre `conPI_HeaderCard` también quedaba demasiado justo para sumar header apilado, banner, gap y paddings.
+
+### Corrección
+
+```powerfx
+conPI_HeaderMain.Height = If(App.Width < 1400, 142, 78)
+conPI_HeaderCard.Height = If(App.Width < 1400, 206, 136)
+```
+
+### Regla preventiva
+
+Cuando un AutoLayout cambie de horizontal a vertical por breakpoint, calcular explícitamente la altura mínima como suma de las alturas de sus hijos + gaps + paddings. No reutilizar una altura pensada para layout horizontal.
+
+### Estado
+
+```text
+CORREGIDO EN REPOSITORIO — pendiente de revalidación visual en Studio.
 ```
 
 ---
@@ -65,4 +106,5 @@ CORREGIDO EN REPOSITORIO — pendiente de revalidación en Power Apps Studio.
 - [ ] Raíz Source Code verificada para el contexto real de Studio.
 - [ ] Enlace Raw preparado si el artefacto se entrega por copy/paste.
 - [ ] No hay propiedades incompatibles heredadas del registro maestro.
+- [ ] Si un AutoLayout cambia de dirección por breakpoint, su altura cubre hijos + gaps + paddings.
 - [ ] No se avanza sobre un bloque con error abierto.
