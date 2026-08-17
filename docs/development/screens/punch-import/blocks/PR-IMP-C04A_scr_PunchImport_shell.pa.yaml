@@ -1,0 +1,969 @@
+Screens:
+  scr_PunchImport:
+    Properties:
+      Fill: =varTheme_PageBg
+      LoadingSpinnerColor: =varTheme_PulseBlueDark
+      OnVisible: |-
+        =
+        // =====================================================
+        // PR-IMP-C04A — PREMIUM SHELL + SYNTHETIC STATE ONLY
+        // No Flow calls. No SQL calls. No production writes.
+        // =====================================================
+
+        If(IsBlank(varTheme_PageBg), Set(varTheme_PageBg, ColorValue("#F6F8FB")));
+        If(IsBlank(varTheme_Surface), Set(varTheme_Surface, ColorValue("#FFFFFF")));
+        If(IsBlank(varTheme_SurfaceAlt), Set(varTheme_SurfaceAlt, ColorValue("#F8FAFC")));
+        If(IsBlank(varTheme_Border), Set(varTheme_Border, ColorValue("#E2E8F0")));
+        If(IsBlank(varTheme_Text), Set(varTheme_Text, ColorValue("#0F172A")));
+        If(IsBlank(varTheme_TextMuted), Set(varTheme_TextMuted, ColorValue("#64748B")));
+        If(IsBlank(varTheme_PulseBlueDark), Set(varTheme_PulseBlueDark, ColorValue("#1677FF")));
+        If(IsBlank(varTheme_NavBg), Set(varTheme_NavBg, ColorValue("#07111F")));
+
+        Set(varAppView, "PunchReview");
+        Set(varPageKey, "PUNCH_IMPORT");
+        Set(varPageTitle, "Import comment updates");
+        Set(varPageSubtitle, "Validate every Excel change before applying it to PULSE.");
+
+        If(IsBlank(varPunchImportStep), Set(varPunchImportStep, "UPLOAD"));
+        If(IsBlank(varPunchImportBusy), Set(varPunchImportBusy, false));
+        If(IsBlank(varPunchImportBatchId), Set(varPunchImportBatchId, ""));
+        If(IsBlank(varPunchImportBatchStatus), Set(varPunchImportBatchStatus, "NOT_STARTED"));
+        If(IsBlank(varPunchImportFileName), Set(varPunchImportFileName, ""));
+        If(IsBlank(varPunchImportCanCommit), Set(varPunchImportCanCommit, false));
+        If(IsBlank(varPunchImportFilter), Set(varPunchImportFilter, "ALL"));
+        If(IsBlank(varPunchImportSearch), Set(varPunchImportSearch, ""));
+        If(IsBlank(varPunchImportError), Set(varPunchImportError, ""));
+        If(IsBlank(varPunchImportPage), Set(varPunchImportPage, 1));
+        If(IsBlank(varPunchImportPageSize), Set(varPunchImportPageSize, 50));
+        If(IsBlank(varPunchImportTotalRows), Set(varPunchImportTotalRows, 0));
+        If(IsBlank(varPunchImportChangedRows), Set(varPunchImportChangedRows, 0));
+        If(IsBlank(varPunchImportErrorRows), Set(varPunchImportErrorRows, 0));
+        If(IsBlank(varPunchImportConflictRows), Set(varPunchImportConflictRows, 0));
+
+        Set(
+            varPunchImportTemplateLabel,
+            Coalesce(
+                LookUp(
+                    colPunchTemplates_Filter,
+                    Text(TemplateId) = Text(varPunchReviewTemplateId),
+                    TemplateLabel
+                ),
+                If(
+                    IsBlank(varPunchReviewTemplateId),
+                    "No template selected",
+                    Text(varPunchReviewTemplateId)
+                )
+            )
+        )
+    Children:
+      - conPI_ScreenRoot:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =varTheme_PageBg
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Horizontal
+            Width: =Parent.Width
+          Children:
+            - cmpPI_Sidebar:
+                Control: CanvasComponent
+                ComponentName: cmp_SidebarNav
+                Properties:
+                  ActiveKey: ="PunchReview"
+                  AppVersion: ="PULSE"
+                  EnvironmentLabel: ="ENV.PRE.TR.162"
+                  Fill: =varTheme_NavBg
+                  Height: =Parent.Height
+                  IsCollapsed: =true
+                  Items: =colSidebarNavItems
+                  NavItems: =colSidebarNavItems
+                  OnSelectItem: =
+                  OnToggleCollapse: =
+                  ProjectCode: =Coalesce(varSelectedProject.ProjectCode, "")
+                  ProjectName: =Coalesce(varSelectedProject.ProjectName, "")
+                  UserRole: =Coalesce(varUserRole, "reader")
+                  Width: =154
+            - conPI_ContentShell:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =varTheme_PageBg
+                  Height: =Parent.Height
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =10
+                  LayoutMinHeight: =420
+                  LayoutMinWidth: =540
+                  LayoutOverflowY: =LayoutOverflow.Scroll
+                  PaddingBottom: =10
+                  PaddingLeft: =10
+                  PaddingRight: =10
+                  PaddingTop: =10
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                Children:
+                  - conPI_HeaderCard:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =varTheme_Border
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.Semilight
+                        Fill: =varTheme_Surface
+                        FillPortions: =0
+                        Height: =If(App.Width < 1400, 182, 132)
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =8
+                        LayoutMinHeight: =132
+                        LayoutMinWidth: =500
+                        PaddingBottom: =10
+                        PaddingLeft: =14
+                        PaddingRight: =14
+                        PaddingTop: =10
+                        RadiusBottomLeft: =14
+                        RadiusBottomRight: =14
+                        RadiusTopLeft: =14
+                        RadiusTopRight: =14
+                        Width: =Parent.Width
+                      Children:
+                        - conPI_HeaderMain:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =Color.Transparent
+                              FillPortions: =0
+                              Height: =If(App.Width < 1400, 126, 76)
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =If(App.Width < 1400, LayoutDirection.Vertical, LayoutDirection.Horizontal)
+                              LayoutGap: =10
+                              LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                              LayoutMinHeight: =76
+                              LayoutMinWidth: =460
+                              RadiusBottomLeft: =0
+                              RadiusBottomRight: =0
+                              RadiusTopLeft: =0
+                              RadiusTopRight: =0
+                              Width: =Parent.Width
+                            Children:
+                              - conPI_HeaderIdentity:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =Color.Transparent
+                                    Height: =68
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutJustifyContent: =LayoutJustifyContent.Center
+                                    LayoutMinHeight: =64
+                                    LayoutMinWidth: =330
+                                    PaddingLeft: =4
+                                    Width: =If(App.Width < 1400, Parent.Width, 480)
+                                  Children:
+                                    - lblPI_Eyebrow:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_PulseBlueDark
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =16
+                                          LayoutMinHeight: =15
+                                          LayoutMinWidth: =220
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =8
+                                          Text: ="PUNCH REVIEW  /  DATA EXCHANGE"
+                                          Width: =Parent.Width
+                                    - lblPI_Title:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_Text
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =28
+                                          LayoutMinHeight: =26
+                                          LayoutMinWidth: =280
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =18
+                                          Text: ="Import comment updates"
+                                          Width: =Parent.Width
+                                    - lblPI_Subtitle:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_TextMuted
+                                          Font: =Font.'Segoe UI'
+                                          Height: =18
+                                          LayoutMinHeight: =18
+                                          LayoutMinWidth: =300
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =9
+                                          Text: ="Validate every Excel change before applying it to PULSE."
+                                          Width: =Parent.Width
+                              - conPI_HeaderContext:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =Color.Transparent
+                                    FillPortions: =0
+                                    Height: =58
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =8
+                                    LayoutJustifyContent: =LayoutJustifyContent.End
+                                    LayoutMinHeight: =54
+                                    LayoutMinWidth: =440
+                                    LayoutOverflowX: =LayoutOverflow.Scroll
+                                    Width: =If(App.Width < 1400, Parent.Width, Min(820, Parent.Width * 0.58))
+                                  Children:
+                                    - conPI_ProjectContext:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: ManualLayout
+                                        Properties:
+                                          BorderColor: =varTheme_Border
+                                          BorderThickness: =1
+                                          DropShadow: =DropShadow.None
+                                          Fill: =varTheme_Surface
+                                          Height: =48
+                                          LayoutMinHeight: =48
+                                          LayoutMinWidth: =230
+                                          RadiusBottomLeft: =9
+                                          RadiusBottomRight: =9
+                                          RadiusTopLeft: =9
+                                          RadiusTopRight: =9
+                                          Width: =250
+                                        Children:
+                                          - lblPI_ProjectLabel:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                BorderColor: =RGBA(0,0,0,0)
+                                                Color: =varTheme_TextMuted
+                                                Fill: =Color.Transparent
+                                                Font: =Font.'Segoe UI'
+                                                Height: =15
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =8
+                                                Text: ="Project"
+                                                Width: =Parent.Width - 20
+                                                X: =10
+                                                Y: =3
+                                          - lblPI_ProjectValue:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                BorderColor: =RGBA(0,0,0,0)
+                                                Color: =varTheme_Text
+                                                Fill: =Color.Transparent
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =22
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =9
+                                                Text: |-
+                                                  =If(
+                                                      IsBlank(varProjectId),
+                                                      "No project selected",
+                                                      Coalesce(varSelectedProject.ProjectCode, Text(varProjectId)) &
+                                                      " · " &
+                                                      Coalesce(varSelectedProject.ProjectName, "Project")
+                                                  )
+                                                Width: =Parent.Width - 20
+                                                Wrap: =false
+                                                X: =10
+                                                Y: =20
+                                    - conPI_TemplateContext:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: ManualLayout
+                                        Properties:
+                                          BorderColor: =varTheme_Border
+                                          BorderThickness: =1
+                                          DropShadow: =DropShadow.None
+                                          Fill: =varTheme_Surface
+                                          Height: =48
+                                          LayoutMinHeight: =48
+                                          LayoutMinWidth: =200
+                                          RadiusBottomLeft: =9
+                                          RadiusBottomRight: =9
+                                          RadiusTopLeft: =9
+                                          RadiusTopRight: =9
+                                          Width: =220
+                                        Children:
+                                          - lblPI_TemplateLabel:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                BorderColor: =RGBA(0,0,0,0)
+                                                Color: =varTheme_TextMuted
+                                                Fill: =Color.Transparent
+                                                Font: =Font.'Segoe UI'
+                                                Height: =15
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =8
+                                                Text: ="Punch template"
+                                                Width: =Parent.Width - 20
+                                                X: =10
+                                                Y: =3
+                                          - lblPI_TemplateValue:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                BorderColor: =RGBA(0,0,0,0)
+                                                Color: =varTheme_Text
+                                                Fill: =Color.Transparent
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =22
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =9
+                                                Text: =varPunchImportTemplateLabel
+                                                Width: =Parent.Width - 20
+                                                Wrap: =false
+                                                X: =10
+                                                Y: =20
+                                    - conPI_BatchContext:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: ManualLayout
+                                        Properties:
+                                          BorderColor: =varTheme_Border
+                                          BorderThickness: =1
+                                          DropShadow: =DropShadow.None
+                                          Fill: =varTheme_Surface
+                                          Height: =48
+                                          LayoutMinHeight: =48
+                                          LayoutMinWidth: =120
+                                          RadiusBottomLeft: =9
+                                          RadiusBottomRight: =9
+                                          RadiusTopLeft: =9
+                                          RadiusTopRight: =9
+                                          Width: =130
+                                        Children:
+                                          - lblPI_BatchLabel:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                BorderColor: =RGBA(0,0,0,0)
+                                                Color: =varTheme_TextMuted
+                                                Fill: =Color.Transparent
+                                                Font: =Font.'Segoe UI'
+                                                Height: =15
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =8
+                                                Text: ="Batch status"
+                                                Width: =Parent.Width - 20
+                                                X: =10
+                                                Y: =3
+                                          - lblPI_BatchValue:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                BorderColor: =RGBA(0,0,0,0)
+                                                Color: |-
+                                                  =Switch(
+                                                      Upper(varPunchImportBatchStatus),
+                                                      "READY", ColorValue("#15803D"),
+                                                      "BLOCKED", ColorValue("#B91C1C"),
+                                                      "COMMITTED", ColorValue("#15803D"),
+                                                      varTheme_Text
+                                                  )
+                                                Fill: =Color.Transparent
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =22
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =9
+                                                Text: =Upper(Substitute(varPunchImportBatchStatus, "_", " "))
+                                                Width: =Parent.Width - 20
+                                                Wrap: =false
+                                                X: =10
+                                                Y: =20
+                                    - btnPI_Back:
+                                        Control: ModernButton@1.0.0
+                                        Properties:
+                                          Appearance: =Appearance.Secondary
+                                          BasePaletteColor: =varTheme_PulseBlueDark
+                                          Height: =40
+                                          Icon: ="ChevronLeft"
+                                          IconStyle: =IconStyle.Filled
+                                          LayoutMinHeight: =40
+                                          LayoutMinWidth: =160
+                                          OnSelect: =Back()
+                                          Text: ="Back to Punch Review"
+                                          Width: =170
+                        - conPI_SafetyBanner:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =ColorValue("#BFDBFE")
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =ColorValue("#EFF6FF")
+                              Height: =32
+                              LayoutMinHeight: =32
+                              LayoutMinWidth: =460
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Width: =Parent.Width
+                            Children:
+                              - lblPI_SafetyBadge:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_PulseBlueDark
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =24
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =8
+                                    Text: ="COMMENTS ONLY · V1"
+                                    Width: =125
+                                    X: =10
+                                    Y: =4
+                              - lblPI_SafetyText:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_TextMuted
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    Height: =24
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =8
+                                    Text: ="Upload never applies changes. Every new comment is validated and previewed before Commit."
+                                    Width: =Parent.Width - 145
+                                    X: =137
+                                    Y: =4
+                  - conPI_StepperCard:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =varTheme_Border
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =varTheme_Surface
+                        FillPortions: =0
+                        Height: =92
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =92
+                        LayoutMinWidth: =500
+                        PaddingBottom: =10
+                        PaddingLeft: =10
+                        PaddingRight: =10
+                        PaddingTop: =10
+                        RadiusBottomLeft: =12
+                        RadiusBottomRight: =12
+                        RadiusTopLeft: =12
+                        RadiusTopRight: =12
+                        Width: =Parent.Width
+                      Children:
+                        - conPI_StepUpload:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =If(varPunchImportStep = "UPLOAD", varTheme_PulseBlueDark, varTheme_Border)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =If(varPunchImportStep = "UPLOAD", ColorValue("#EFF6FF"), varTheme_SurfaceAlt)
+                              FillPortions: =1
+                              Height: =70
+                              LayoutMinHeight: =70
+                              LayoutMinWidth: =145
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                            Children:
+                              - conPI_StepUploadNumber:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =If(varPunchImportStep = "UPLOAD", varTheme_PulseBlueDark, ColorValue("#E2E8F0"))
+                                    Height: =26
+                                    RadiusBottomLeft: =13
+                                    RadiusBottomRight: =13
+                                    RadiusTopLeft: =13
+                                    RadiusTopRight: =13
+                                    Width: =26
+                                    X: =12
+                                    Y: =12
+                                  Children:
+                                    - lblPI_StepUploadNumber:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          Color: =If(varPunchImportStep = "UPLOAD", Color.White, varTheme_TextMuted)
+                                          Fill: =Color.Transparent
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =26
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =9
+                                          Text: ="1"
+                                          Width: =26
+                              - lblPI_StepUploadTitle:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_Text
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =20
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    Text: ="Upload"
+                                    Width: =Parent.Width - 58
+                                    X: =48
+                                    Y: =12
+                              - lblPI_StepUploadHint:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_TextMuted
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    Height: =18
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =8
+                                    Text: ="Choose workbook"
+                                    Width: =Parent.Width - 58
+                                    X: =48
+                                    Y: =34
+                        - conPI_StepPreview:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =If(varPunchImportStep = "PREVIEW", varTheme_PulseBlueDark, varTheme_Border)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =If(varPunchImportStep = "PREVIEW", ColorValue("#EFF6FF"), varTheme_SurfaceAlt)
+                              FillPortions: =1
+                              Height: =70
+                              LayoutMinHeight: =70
+                              LayoutMinWidth: =145
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                            Children:
+                              - lblPI_StepPreviewNumber:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_TextMuted
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =26
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    Text: ="2"
+                                    Width: =26
+                                    X: =12
+                                    Y: =12
+                              - lblPI_StepPreviewTitle:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_Text
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =20
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    Text: ="Preview"
+                                    Width: =Parent.Width - 58
+                                    X: =48
+                                    Y: =12
+                              - lblPI_StepPreviewHint:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_TextMuted
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    Height: =18
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =8
+                                    Text: ="Validate + diff"
+                                    Width: =Parent.Width - 58
+                                    X: =48
+                                    Y: =34
+                        - conPI_StepConfirm:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =If(varPunchImportStep = "CONFIRM", varTheme_PulseBlueDark, varTheme_Border)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =If(varPunchImportStep = "CONFIRM", ColorValue("#EFF6FF"), varTheme_SurfaceAlt)
+                              FillPortions: =1
+                              Height: =70
+                              LayoutMinHeight: =70
+                              LayoutMinWidth: =145
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                            Children:
+                              - lblPI_StepConfirmNumber:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_TextMuted
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =26
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    Text: ="3"
+                                    Width: =26
+                                    X: =12
+                                    Y: =12
+                              - lblPI_StepConfirmTitle:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_Text
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =20
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    Text: ="Confirm"
+                                    Width: =Parent.Width - 58
+                                    X: =48
+                                    Y: =12
+                              - lblPI_StepConfirmHint:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_TextMuted
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    Height: =18
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =8
+                                    Text: ="Review decision"
+                                    Width: =Parent.Width - 58
+                                    X: =48
+                                    Y: =34
+                        - conPI_StepResult:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =If(varPunchImportStep = "RESULT", varTheme_PulseBlueDark, varTheme_Border)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =If(varPunchImportStep = "RESULT", ColorValue("#EFF6FF"), varTheme_SurfaceAlt)
+                              FillPortions: =1
+                              Height: =70
+                              LayoutMinHeight: =70
+                              LayoutMinWidth: =145
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                            Children:
+                              - lblPI_StepResultNumber:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_TextMuted
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =26
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    Text: ="4"
+                                    Width: =26
+                                    X: =12
+                                    Y: =12
+                              - lblPI_StepResultTitle:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_Text
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =20
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    Text: ="Result"
+                                    Width: =Parent.Width - 58
+                                    X: =48
+                                    Y: =12
+                              - lblPI_StepResultHint:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_TextMuted
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    Height: =18
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =8
+                                    Text: ="Audit outcome"
+                                    Width: =Parent.Width - 58
+                                    X: =48
+                                    Y: =34
+                  - conPI_UploadSurface:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =varTheme_Border
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.Semilight
+                        Fill: =varTheme_Surface
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =10
+                        LayoutJustifyContent: =LayoutJustifyContent.Center
+                        LayoutMinHeight: =300
+                        LayoutMinWidth: =500
+                        PaddingBottom: =28
+                        PaddingLeft: =28
+                        PaddingRight: =28
+                        PaddingTop: =28
+                        RadiusBottomLeft: =14
+                        RadiusBottomRight: =14
+                        RadiusTopLeft: =14
+                        RadiusTopRight: =14
+                        Visible: =varPunchImportStep = "UPLOAD"
+                        Width: =Parent.Width
+                      Children:
+                        - conPI_UploadMark:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =ColorValue("#BFDBFE")
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =ColorValue("#EFF6FF")
+                              Height: =56
+                              LayoutMinHeight: =56
+                              LayoutMinWidth: =56
+                              RadiusBottomLeft: =18
+                              RadiusBottomRight: =18
+                              RadiusTopLeft: =18
+                              RadiusTopRight: =18
+                              Width: =56
+                            Children:
+                              - lblPI_UploadMark:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_PulseBlueDark
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =56
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =15
+                                    Text: ="XLSX"
+                                    Width: =56
+                        - lblPI_UploadTitle:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Align: =Align.Center
+                              AutoHeight: =true
+                              Color: =varTheme_Text
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =30
+                              LayoutMinHeight: =28
+                              LayoutMinWidth: =320
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =16
+                              Text: ="Choose an import-ready Excel file"
+                              Width: =Min(620, Parent.Width - 40)
+                        - lblPI_UploadDescription:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Align: =Align.Center
+                              AutoHeight: =true
+                              Color: =varTheme_TextMuted
+                              Font: =Font.'Segoe UI'
+                              Height: =42
+                              LayoutMinHeight: =40
+                              LayoutMinWidth: =320
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =9
+                              Text: ="Use an INTERNAL workbook generated from Punch Review. C04A is visual only: file selection and validation are connected in the next increment."
+                              Width: =Min(680, Parent.Width - 40)
+                        - conPI_FileState:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_SurfaceAlt
+                              Height: =58
+                              LayoutMinHeight: =58
+                              LayoutMinWidth: =360
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                              Width: =Min(560, Parent.Width - 40)
+                            Children:
+                              - lblPI_FileStateLabel:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_TextMuted
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    Height: =17
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =8
+                                    Text: ="Workbook"
+                                    Width: =Parent.Width - 24
+                                    X: =12
+                                    Y: =8
+                              - lblPI_FileStateValue:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_Text
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =22
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    Text: =If(IsBlank(varPunchImportFileName), "No file selected", varPunchImportFileName)
+                                    Width: =Parent.Width - 24
+                                    Wrap: =false
+                                    X: =12
+                                    Y: =28
+                        - btnPI_ChooseFilePlaceholder:
+                            Control: ModernButton@1.0.0
+                            Properties:
+                              BasePaletteColor: =varTheme_PulseBlueDark
+                              DisplayMode: =DisplayMode.Disabled
+                              Height: =42
+                              LayoutMinHeight: =42
+                              LayoutMinWidth: =180
+                              Text: ="Choose Excel file"
+                              Width: =190
+                        - lblPI_UploadGate:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Align: =Align.Center
+                              AutoHeight: =true
+                              Color: =varTheme_TextMuted
+                              Font: =Font.'Segoe UI'
+                              Height: =20
+                              LayoutMinHeight: =20
+                              LayoutMinWidth: =320
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =8
+                              Text: ="Visual gate · No Flow or SQL call is connected in this block."
+                              Width: =Min(620, Parent.Width - 40)
