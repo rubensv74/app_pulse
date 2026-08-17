@@ -1,17 +1,34 @@
 /*
     PULSE — PR-EXP-C03B2
-    Extend warroom.usp_ExportProjectPunchesExtended_Pivoted with an optional
-    exact Review Queue scope without changing the legacy caller contract.
+    Extend the ACTIVE export procedure
+    warroom.usp_ExportProjectPunchesExtended
+    with an optional exact Review Queue scope without changing the legacy
+    caller contract.
+
+    DISCOVERY CONFIRMED 2026-08-17
+    ------------------------------
+    The development database db-homeoffice-dev contains:
+
+        warroom.usp_ExportProjectPunchesExtended
+
+    and does NOT contain:
+
+        warroom.usp_ExportProjectPunchesExtended_Pivoted
+
+    Therefore this deployment intentionally targets the active non-pivoted
+    procedure. The previous C03B2 script stopped safely before modifying SQL.
 
     IMPORTANT
     ---------
     - This is an incremental deployment script for the validation gate.
     - It modifies only the stored procedure definition.
-    - It does not modify data.
+    - It does not modify Punch, Comment or Custom Field business data.
     - Existing callers remain valid because @WorkItemIdsJson is an OPTIONAL
       trailing parameter.
     - When @WorkItemIdsJson IS NULL the legacy FILTERED_LIST behaviour remains.
-    - When @WorkItemIdsJson has a JSON array, exact cardinality is mandatory.
+    - When @WorkItemIdsJson contains a JSON array, exact cardinality is mandatory.
+    - The deployment is anchor-guarded: if the live definition differs from the
+      expected active baseline, it stops before ALTER PROCEDURE is executed.
 
     Project identifier rule
     -----------------------
@@ -22,15 +39,18 @@
 SET NOCOUNT ON;
 SET XACT_ABORT ON;
 
-DECLARE @ProcedureName SYSNAME = N'warroom.usp_ExportProjectPunchesExtended_Pivoted';
+DECLARE @ProcedureName SYSNAME = N'warroom.usp_ExportProjectPunchesExtended';
 DECLARE @ObjectId INT = OBJECT_ID(@ProcedureName, N'P');
 DECLARE @Definition NVARCHAR(MAX);
 DECLARE @OriginalDefinition NVARCHAR(MAX);
 DECLARE @Anchor NVARCHAR(MAX);
 DECLARE @Replacement NVARCHAR(MAX);
+DECLARE @CreatePos INT;
+DECLARE @ProcedurePos INT;
+DECLARE @SourceHash VARCHAR(64);
 
 IF @ObjectId IS NULL
-    THROW 52100, 'PR-EXP-C03B2: target export procedure was not found.', 1;
+    THROW 52100, 'PR-EXP-C03B2: active target export procedure was not found.', 1;
 
 SELECT @Definition = sm.definition
 FROM sys.sql_modules sm
@@ -43,14 +63,38 @@ IF @Definition IS NULL
 SET @Definition = REPLACE(@Definition, CHAR(13) + CHAR(10), CHAR(10));
 SET @OriginalDefinition = @Definition;
 
+SET @SourceHash = CONVERT
+(
+    VARCHAR(64),
+    HASHBYTES
+    (
+        'SHA2_256',
+        CONVERT(VARBINARY(MAX), @OriginalDefinition)
+    ),
+    2
+);
+
+/* ================================================================
+   Idempotency / inconsistent-state guard
+   ================================================================ */
 IF CHARINDEX(N'@WorkItemIdsJson', @Definition) > 0
 BEGIN
-    PRINT 'PR-EXP-C03B2: @WorkItemIdsJson already exists. No deployment change applied.';
+    IF CHARINDEX(N'THROW 52116', @Definition) = 0
+        THROW 52118, 'PR-EXP-C03B2: @WorkItemIdsJson exists but the exact-scope guard is missing. Manual review required.', 1;
+
+    SELECT
+        ProcedureName = @ProcedureName,
+        Deployment = CAST(N'PR-EXP-C03B2_ALREADY_PRESENT' AS NVARCHAR(40)),
+        SourceDefinitionHash = @SourceHash,
+        WorkItemIdsParameterPresent = CAST(1 AS BIT),
+        LegacyCallSignaturePreserved = CAST(1 AS BIT),
+        ExactScopeGuardInstalled = CAST(1 AS BIT);
+
     RETURN;
 END;
 
 /* ================================================================
-   PATCH 1 — append optional parameter
+   PATCH 1 — append optional trailing parameter
    ================================================================ */
 SET @Anchor =
     N'    @PunchExportLogId    BIGINT = NULL,' + CHAR(10) +
@@ -64,12 +108,13 @@ SET @Replacement =
     N')';
 
 IF CHARINDEX(@Anchor, @Definition) = 0
-    THROW 52102, 'PR-EXP-C03B2: procedure signature anchor was not found. Deployment stopped.', 1;
+    THROW 52102, 'PR-EXP-C03B2: active procedure signature anchor was not found. Deployment stopped.', 1;
 
 SET @Definition = REPLACE(@Definition, @Anchor, @Replacement);
 
 /* ================================================================
    PATCH 2 — stage and validate exact Review Queue ids
+   Contract: JSON array of objects {"WorkItemId": <positive integer>}
    ================================================================ */
 SET @Anchor =
     N'    IF @CustomFiltersJson IS NULL OR @CustomFiltersJson = ''[]''' + CHAR(10) +
@@ -111,7 +156,15 @@ SET @Replacement = @Anchor + N'
         )
         SELECT
             TRY_CONVERT(INT, src.[key]),
-            TRY_CONVERT(BIGINT, JSON_VALUE(src.[value], ''$.WorkItemId''))
+            TRY_CONVERT
+            (
+                BIGINT,
+                CASE
+                    WHEN src.[type] = 5
+                    THEN JSON_VALUE(src.[value], ''$.WorkItemId'')
+                    ELSE src.[value]
+                END
+            )
         FROM OPENJSON(@WorkItemIdsJson) AS src;
 
         IF NOT EXISTS (SELECT 1 FROM #RequestedReviewStage)
@@ -148,7 +201,7 @@ SET @Replacement = @Anchor + N'
 ';
 
 IF CHARINDEX(@Anchor, @Definition) = 0
-    THROW 52103, 'PR-EXP-C03B2: initialisation anchor was not found. Deployment stopped.', 1;
+    THROW 52103, 'PR-EXP-C03B2: active procedure initialisation anchor was not found. Deployment stopped.', 1;
 
 SET @Definition = REPLACE(@Definition, @Anchor, @Replacement);
 
@@ -175,16 +228,17 @@ SET @Replacement =
     N'            AND NULLIF(LTRIM(RTRIM(p.StatusCode)), '''') IS NOT NULL';
 
 IF CHARINDEX(@Anchor, @Definition) = 0
-    THROW 52104, 'PR-EXP-C03B2: PunchBase WHERE anchor was not found. Deployment stopped.', 1;
+    THROW 52104, 'PR-EXP-C03B2: active PunchBase WHERE anchor was not found. Deployment stopped.', 1;
 
 SET @Definition = REPLACE(@Definition, @Anchor, @Replacement);
 
 /* ================================================================
    PATCH 4 — exact cardinality invariant after every existing filter
+   The active procedure uses an unnumbered "Safety limit" section.
    ================================================================ */
 SET @Anchor =
     N'    ---------------------------------------------------------------------' + CHAR(10) +
-    N'    -- 3) Safety limit' + CHAR(10) +
+    N'    -- Safety limit' + CHAR(10) +
     N'    ---------------------------------------------------------------------';
 
 SET @Replacement = N'
@@ -230,12 +284,12 @@ SET @Replacement = N'
 ' + @Anchor;
 
 IF CHARINDEX(@Anchor, @Definition) = 0
-    THROW 52105, 'PR-EXP-C03B2: safety-limit anchor was not found. Deployment stopped.', 1;
+    THROW 52105, 'PR-EXP-C03B2: active safety-limit anchor was not found. Deployment stopped.', 1;
 
 SET @Definition = REPLACE(@Definition, @Anchor, @Replacement);
 
 /* ================================================================
-   Guard: every expected modification must be present exactly once enough
+   Guard — every expected modification must be present
    ================================================================ */
 IF @Definition = @OriginalDefinition
     THROW 52106, 'PR-EXP-C03B2: no changes were generated. Deployment stopped.', 1;
@@ -250,9 +304,33 @@ IF CHARINDEX(N'THROW 52116', @Definition) = 0
     THROW 52109, 'PR-EXP-C03B2: exact cardinality guard was not generated.', 1;
 
 /* ================================================================
+   Convert the live CREATE PROCEDURE definition into ALTER PROCEDURE.
+   sys.sql_modules.definition for the confirmed active baseline begins with
+   CREATE ... PROCEDURE. Do NOT execute CREATE against an existing object.
+   ================================================================ */
+SET @CreatePos = CHARINDEX(N'CREATE', UPPER(@Definition));
+SET @ProcedurePos = CHARINDEX(N'PROCEDURE', UPPER(@Definition));
+
+IF @CreatePos = 0
+   OR @ProcedurePos = 0
+   OR @CreatePos > @ProcedurePos
+    THROW 52119, 'PR-EXP-C03B2: CREATE PROCEDURE prefix could not be located safely. Deployment stopped.', 1;
+
+IF UPPER(SUBSTRING(@Definition, @CreatePos, 15)) = N'CREATE OR ALTER'
+BEGIN
+    SET @Definition = STUFF(@Definition, @CreatePos, 15, N'ALTER');
+END
+ELSE
+BEGIN
+    SET @Definition = STUFF(@Definition, @CreatePos, 6, N'ALTER');
+END;
+
+IF CHARINDEX(N'ALTER', UPPER(@Definition)) = 0
+    THROW 52120, 'PR-EXP-C03B2: ALTER PROCEDURE deployment batch was not generated.', 1;
+
+/* ================================================================
    Deploy altered definition.
-   CREATE OR ALTER / ALTER inside the dynamic batch is the first statement
-   of that batch, which is valid SQL Server syntax.
+   ALTER PROCEDURE remains the first statement of the dynamic module batch.
    ================================================================ */
 EXEC sys.sp_executesql @Definition;
 
@@ -265,39 +343,35 @@ IF NOT EXISTS
     FROM sys.parameters p
     WHERE p.object_id = OBJECT_ID(@ProcedureName, N'P')
       AND p.name = N'@WorkItemIdsJson'
-      AND p.has_default_value = 1
 )
-BEGIN
-    -- SQL Server metadata can report has_default_value differently for T-SQL
-    -- procedure parameters. Therefore verify existence separately before failing.
-    IF NOT EXISTS
+    THROW 52117, 'PR-EXP-C03B2: deployment completed but @WorkItemIdsJson was not found.', 1;
+
+DECLARE @DeployedDefinition NVARCHAR(MAX);
+DECLARE @DeployedHash VARCHAR(64);
+
+SELECT @DeployedDefinition = REPLACE(sm.definition, CHAR(13) + CHAR(10), CHAR(10))
+FROM sys.sql_modules sm
+WHERE sm.object_id = OBJECT_ID(@ProcedureName, N'P');
+
+IF CHARINDEX(N'THROW 52116', @DeployedDefinition) = 0
+    THROW 52121, 'PR-EXP-C03B2: deployment completed but the exact cardinality guard was not found.', 1;
+
+SET @DeployedHash = CONVERT
+(
+    VARCHAR(64),
+    HASHBYTES
     (
-        SELECT 1
-        FROM sys.parameters p
-        WHERE p.object_id = OBJECT_ID(@ProcedureName, N'P')
-          AND p.name = N'@WorkItemIdsJson'
-    )
-        THROW 52117, 'PR-EXP-C03B2: deployment completed but @WorkItemIdsJson was not found.', 1;
-END;
+        'SHA2_256',
+        CONVERT(VARBINARY(MAX), @DeployedDefinition)
+    ),
+    2
+);
 
 SELECT
     ProcedureName = @ProcedureName,
     Deployment = CAST(N'PR-EXP-C03B2' AS NVARCHAR(30)),
-    WorkItemIdsParameterPresent =
-        CAST
-        (
-            CASE
-                WHEN EXISTS
-                (
-                    SELECT 1
-                    FROM sys.parameters p
-                    WHERE p.object_id = OBJECT_ID(@ProcedureName, N'P')
-                      AND p.name = N'@WorkItemIdsJson'
-                )
-                THEN 1
-                ELSE 0
-            END
-            AS BIT
-        ),
+    SourceDefinitionHash = @SourceHash,
+    DeployedDefinitionHash = @DeployedHash,
+    WorkItemIdsParameterPresent = CAST(1 AS BIT),
     LegacyCallSignaturePreserved = CAST(1 AS BIT),
     ExactScopeGuardInstalled = CAST(1 AS BIT);
