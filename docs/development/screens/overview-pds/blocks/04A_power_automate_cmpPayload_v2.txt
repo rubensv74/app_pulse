@@ -1,0 +1,22 @@
+Sustituir únicamente la expresión Inputs de la acción cmpPayload del flow
+Warroom_GetOverviewSnapshot por esta expresión:
+
+@json(
+  concat(
+    '{',
+      '"statusCode":"', string(coalesce(outputs('cmpRow')?['StatusCode'], 'ERROR')), '",',
+      '"hasPublishedConfig":', if(equals(outputs('cmpRow')?['HasPublishedConfig'], true), 'true', 'false'), ',',
+      '"publishedVersionId":', if(empty(outputs('cmpRow')?['PublishedVersionId']), 'null', string(outputs('cmpRow')?['PublishedVersionId'])), ',',
+      '"publishedVersionNo":', if(empty(outputs('cmpRow')?['PublishedVersionNo']), 'null', string(outputs('cmpRow')?['PublishedVersionNo'])), ',',
+      '"hasSnapshot":', if(equals(outputs('cmpRow')?['HasSnapshot'], true), 'true', 'false'), ',',
+      '"subsystems":', string(json(coalesce(outputs('cmpRow')?['SubsystemsJson'], '[]'))), ',',
+      '"headers":', string(json(coalesce(outputs('cmpRow')?['HeadersJson'], '[]'))), ',',
+      '"metrics":', string(json(coalesce(outputs('cmpRow')?['MetricsJson'], '[]'))), ',',
+      '"totalCount":', string(int(coalesce(outputs('cmpRow')?['TotalCount'], 0))), ',',
+      '"generatedOn":"', string(coalesce(outputs('cmpRow')?['GeneratedOn'], '')), '"',
+    '}'
+  )
+)
+
+No cambian el trigger, sus cuatro parámetros ni la salida result del flow.
+
