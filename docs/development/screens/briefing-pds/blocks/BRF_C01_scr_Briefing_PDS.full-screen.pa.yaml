@@ -1,0 +1,2835 @@
+# BRIEFING_PDS — BRF-C01 — PREMIUM SHELL AND VISUAL STATES
+#
+# Status: PUBLISHED — PENDING POWER APPS STUDIO VALIDATION
+# Operation: REPLACE COMPLETE SOURCE OF AN EMPTY scr_Briefing_PDS
+# Target screen: scr_Briefing_PDS
+# Dependencies: cmp_SidebarNav must already exist in the app.
+#
+# Scope:
+# - PULSE shell + Sidebar
+# - native premium header and synthetic session context
+# - synthetic state selector
+# - KPI strip
+# - Briefing / Meeting Notes / Email local tabs
+# - Executive Summary, Review Quality, Decisions, Progress, Blockers, Open Items
+# - synthetic Action Register
+# - Source Activity and lifecycle rail
+# - Evidence Drawer
+# - mutually exclusive NO_SESSION / READY / GENERATING / DRAFT / NEEDS_REVIEW /
+#   APPROVED / STALE / SENT / ERROR visual states
+#
+# OUT OF SCOPE:
+# - SQL / Power Automate / Outlook / Teams
+# - real Review Session persistence
+# - real Session Delta or evidence
+# - real AI generation
+# - real Meeting Notes generation
+# - real email send
+# - navigation changes
+#
+# Synthetic data only. Nothing in this block is functional evidence.
+
+Screens:
+  scr_Briefing_PDS:
+    Properties:
+      Fill: =varTheme_PageBg
+      LoadingSpinnerColor: =varTheme_ActionPrimary
+      OnVisible: |-
+        =
+        // =====================================================
+        // BRF-C01 — SYNTHETIC VISUAL WORKSPACE INITIALIZATION
+        // No flows. No SQL. No backend contracts. No real AI.
+        // =====================================================
+
+        // PDS-safe fallbacks.
+        If(IsBlank(varTheme_PageBg), Set(varTheme_PageBg, ColorValue("#F6F8FB")));
+        If(IsBlank(varTheme_Surface), Set(varTheme_Surface, ColorValue("#FFFFFF")));
+        If(IsBlank(varTheme_SurfaceAlt), Set(varTheme_SurfaceAlt, ColorValue("#F8FAFC")));
+        If(IsBlank(varTheme_Border), Set(varTheme_Border, ColorValue("#E2E8F0")));
+        If(IsBlank(varTheme_BorderStrong), Set(varTheme_BorderStrong, ColorValue("#CBD5E1")));
+        If(IsBlank(varTheme_Text), Set(varTheme_Text, ColorValue("#0F172A")));
+        If(IsBlank(varTheme_TextMuted), Set(varTheme_TextMuted, ColorValue("#64748B")));
+        If(IsBlank(varTheme_ActionPrimary), Set(varTheme_ActionPrimary, ColorValue("#1677FF")));
+        If(IsBlank(varTheme_ActionSoft), Set(varTheme_ActionSoft, ColorValue("#EFF6FF")));
+        If(IsBlank(varTheme_ActionBorderSoft), Set(varTheme_ActionBorderSoft, ColorValue("#BFDBFE")));
+        If(IsBlank(varTheme_BrandDark), Set(varTheme_BrandDark, ColorValue("#07111F")));
+        If(IsBlank(varTheme_BrandAccent), Set(varTheme_BrandAccent, ColorValue("#00C8FF")));
+
+        Set(varAppView, "Briefing");
+        Set(varPageKey, "BRIEFING_PDS");
+        Set(varPageTitle, "Briefing");
+        Set(varPageSubtitle, "Turn Punch Review activity into approved meeting outputs");
+
+        If(IsBlank(varBRF_TestState), Set(varBRF_TestState, "DRAFT"));
+        If(IsBlank(varBRF_ActiveTab), Set(varBRF_ActiveTab, "BRIEFING"));
+        Set(varBRF_ShowEvidence, false);
+    Children:
+      - conBRF_ScreenRoot:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =varTheme_PageBg
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutGap: =0
+            Width: =Parent.Width
+          Children:
+            - cmpBRF_Sidebar:
+                Control: CanvasComponent
+                ComponentName: cmp_SidebarNav
+                Properties:
+                  ActiveKey: ="PunchReview"
+                  AppVersion: ="PULSE"
+                  EnvironmentLabel: ="ENV.PRE.TR.162"
+                  Fill: =varTheme_BrandDark
+                  Height: =Parent.Height
+                  IsCollapsed: =true
+                  Items: =colSidebarNavItems
+                  NavItems: =colSidebarNavItems
+                  ProjectCode: =Coalesce(varSelectedProject.ProjectCode, "")
+                  ProjectName: =Coalesce(varSelectedProject.ProjectName, "")
+                  UserRole: =Coalesce(varUserRole, "reader")
+                  Width: =154
+            - conBRF_ContentShell:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.Stretch
+                  DropShadow: =DropShadow.None
+                  Fill: =varTheme_PageBg
+                  FillPortions: =1
+                  Height: =Parent.Height
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =10
+                  LayoutMinHeight: =480
+                  LayoutMinWidth: =680
+                  PaddingBottom: =12
+                  PaddingLeft: =12
+                  PaddingRight: =12
+                  PaddingTop: =12
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                Children:
+                  - conBRF_Header:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =varTheme_Border
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =varTheme_Surface
+                        FillPortions: =0
+                        Height: =136
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =8
+                        LayoutMinHeight: =136
+                        LayoutMinWidth: =640
+                        PaddingBottom: =10
+                        PaddingLeft: =14
+                        PaddingRight: =14
+                        PaddingTop: =10
+                        RadiusBottomLeft: =12
+                        RadiusBottomRight: =12
+                        RadiusTopLeft: =12
+                        RadiusTopRight: =12
+                      Children:
+                        - conBRF_HeaderTop:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =Color.Transparent
+                              FillPortions: =0
+                              Height: =48
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =12
+                              LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                              LayoutMinHeight: =48
+                              LayoutMinWidth: =600
+                            Children:
+                              - conBRF_Identity:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =Color.Transparent
+                                    FillPortions: =1
+                                    Height: =46
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =1
+                                    LayoutJustifyContent: =LayoutJustifyContent.Center
+                                    LayoutMinHeight: =44
+                                    LayoutMinWidth: =300
+                                  Children:
+                                    - txtBRF_Title:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_Text
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Size: =20
+                                          Text: ="Briefing"
+                                          Wrap: =false
+                                          Width: =Parent.Width
+                                    - txtBRF_Subtitle:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_TextMuted
+                                          Font: =Font.'Segoe UI'
+                                          Size: =10
+                                          Text: ="Turn Punch Review activity into approved meeting outputs"
+                                          Wrap: =false
+                                          Width: =Parent.Width
+                              - conBRF_TestControls:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =Color.Transparent
+                                    FillPortions: =0
+                                    Height: =40
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =8
+                                    LayoutMinHeight: =40
+                                    LayoutMinWidth: =330
+                                    Width: =390
+                                  Children:
+                                    - lblBRF_TestMode:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          Color: =varTheme_TextMuted
+                                          Fill: =Color.Transparent
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =32
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =8
+                                          Text: ="BRF-C01 · SYNTHETIC"
+                                          Width: =120
+                                    - cmbBRF_TestState:
+                                        Control: ModernCombobox@1.1.1
+                                        Properties:
+                                          Appearance: =Appearance.Outline
+                                          DefaultSelectedItems: |-
+                                            =Filter(
+                                                Table(
+                                                    {Key:"NO_SESSION", Label:"No session"},
+                                                    {Key:"READY", Label:"Ready"},
+                                                    {Key:"GENERATING", Label:"Generating"},
+                                                    {Key:"DRAFT", Label:"Draft"},
+                                                    {Key:"NEEDS_REVIEW", Label:"Needs review"},
+                                                    {Key:"APPROVED", Label:"Approved"},
+                                                    {Key:"STALE", Label:"Stale"},
+                                                    {Key:"SENT", Label:"Sent"},
+                                                    {Key:"ERROR", Label:"Error"}
+                                                ),
+                                                Key = Coalesce(varBRF_TestState, "DRAFT")
+                                            )
+                                          Height: =32
+                                          InputTextPlaceholder: ="Visual state"
+                                          ItemDisplayText: =ThisItem.Label
+                                          Items: |-
+                                            =Table(
+                                                {Key:"NO_SESSION", Label:"No session"},
+                                                {Key:"READY", Label:"Ready"},
+                                                {Key:"GENERATING", Label:"Generating"},
+                                                {Key:"DRAFT", Label:"Draft"},
+                                                {Key:"NEEDS_REVIEW", Label:"Needs review"},
+                                                {Key:"APPROVED", Label:"Approved"},
+                                                {Key:"STALE", Label:"Stale"},
+                                                {Key:"SENT", Label:"Sent"},
+                                                {Key:"ERROR", Label:"Error"}
+                                            )
+                                          OnChange: |-
+                                            =Set(varBRF_TestState, cmbBRF_TestState.Selected.Key);
+                                            Set(varBRF_ShowEvidence, false)
+                                          SelectMultiple: =false
+                                          Width: =220
+                        - conBRF_ContextRow:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =Color.Transparent
+                              FillPortions: =0
+                              Height: =58
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              LayoutMinHeight: =58
+                              LayoutMinWidth: =600
+                              LayoutOverflowX: =LayoutOverflow.Scroll
+                            Children:
+                              - conBRF_ProjectContext:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: =varTheme_Border
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_Surface
+                                    Height: =48
+                                    LayoutMinHeight: =48
+                                    LayoutMinWidth: =210
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    Width: =235
+                                  Children:
+                                    - lblBRF_ProjectLabel:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          Color: =varTheme_TextMuted
+                                          Fill: =Color.Transparent
+                                          Font: =Font.'Segoe UI'
+                                          Height: =16
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =8
+                                          Text: ="PROJECT · SYNTHETIC"
+                                          Width: =Parent.Width - 20
+                                          X: =10
+                                          Y: =4
+                                    - lblBRF_ProjectValue:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          Color: =varTheme_Text
+                                          Fill: =Color.Transparent
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =22
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =9
+                                          Text: ="10490 · Bilbao LNG Project"
+                                          Width: =Parent.Width - 20
+                                          Wrap: =false
+                                          X: =10
+                                          Y: =21
+                              - conBRF_SessionContext:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: =varTheme_Border
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_Surface
+                                    Height: =48
+                                    LayoutMinHeight: =48
+                                    LayoutMinWidth: =220
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    Width: =270
+                                  Children:
+                                    - lblBRF_SessionLabel:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          Color: =varTheme_TextMuted
+                                          Fill: =Color.Transparent
+                                          Font: =Font.'Segoe UI'
+                                          Height: =16
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =8
+                                          Text: ="REVIEW SESSION"
+                                          Width: =Parent.Width - 20
+                                          X: =10
+                                          Y: =4
+                                    - lblBRF_SessionValue:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          Color: =varTheme_Text
+                                          Fill: =Color.Transparent
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =22
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =9
+                                          Text: ="Weekly Punch Review · #PR-2026-0816"
+                                          Width: =Parent.Width - 20
+                                          Wrap: =false
+                                          X: =10
+                                          Y: =21
+                              - conBRF_DateContext:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: =varTheme_Border
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_Surface
+                                    Height: =48
+                                    LayoutMinHeight: =48
+                                    LayoutMinWidth: =170
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    Width: =190
+                                  Children:
+                                    - lblBRF_DateLabel:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          Color: =varTheme_TextMuted
+                                          Fill: =Color.Transparent
+                                          Font: =Font.'Segoe UI'
+                                          Height: =16
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =8
+                                          Text: ="MEETING DATE"
+                                          Width: =Parent.Width - 20
+                                          X: =10
+                                          Y: =4
+                                    - lblBRF_DateValue:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          Color: =varTheme_Text
+                                          Fill: =Color.Transparent
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =22
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =9
+                                          Text: ="16 Aug 2026 · 09:00–10:15"
+                                          Width: =Parent.Width - 20
+                                          Wrap: =false
+                                          X: =10
+                                          Y: =21
+                              - conBRF_StatusContext:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: |-
+                                      =Switch(
+                                          varBRF_TestState,
+                                          "APPROVED", ColorValue("#86EFAC"),
+                                          "SENT", ColorValue("#86EFAC"),
+                                          "NEEDS_REVIEW", ColorValue("#FCD34D"),
+                                          "STALE", ColorValue("#FCD34D"),
+                                          "ERROR", ColorValue("#FCA5A5"),
+                                          varTheme_ActionBorderSoft
+                                      )
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: |-
+                                      =Switch(
+                                          varBRF_TestState,
+                                          "APPROVED", ColorValue("#DCFCE7"),
+                                          "SENT", ColorValue("#DCFCE7"),
+                                          "NEEDS_REVIEW", ColorValue("#FEF3C7"),
+                                          "STALE", ColorValue("#FEF3C7"),
+                                          "ERROR", ColorValue("#FEE2E2"),
+                                          varTheme_ActionSoft
+                                      )
+                                    Height: =48
+                                    LayoutMinHeight: =48
+                                    LayoutMinWidth: =110
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    Width: =128
+                                  Children:
+                                    - lblBRF_StatusLabel:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          Color: =varTheme_TextMuted
+                                          Fill: =Color.Transparent
+                                          Font: =Font.'Segoe UI'
+                                          Height: =16
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =8
+                                          Text: ="STATUS"
+                                          Width: =Parent.Width - 20
+                                          X: =10
+                                          Y: =4
+                                    - lblBRF_StatusValue:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          Color: |-
+                                            =Switch(
+                                                varBRF_TestState,
+                                                "APPROVED", ColorValue("#15803D"),
+                                                "SENT", ColorValue("#15803D"),
+                                                "NEEDS_REVIEW", ColorValue("#B45309"),
+                                                "STALE", ColorValue("#B45309"),
+                                                "ERROR", ColorValue("#B91C1C"),
+                                                varTheme_ActionPrimary
+                                            )
+                                          Fill: =Color.Transparent
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =22
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =9
+                                          Text: =Upper(Coalesce(varBRF_TestState, "DRAFT"))
+                                          Width: =Parent.Width - 20
+                                          Wrap: =false
+                                          X: =10
+                                          Y: =21
+                              - btnBRF_Refresh:
+                                  Control: ModernButton@1.0.0
+                                  Properties:
+                                    BasePaletteColor: =varTheme_ActionPrimary
+                                    Height: =40
+                                    OnSelect: |-
+                                      =If(varBRF_TestState = "STALE", Set(varBRF_TestState, "DRAFT"));
+                                      If(varBRF_TestState = "ERROR", Set(varBRF_TestState, "READY"));
+                                      Set(varBRF_ShowEvidence, false)
+                                    Text: ="Refresh"
+                                    Width: =104
+                              - btnBRF_PrimaryAction:
+                                  Control: ModernButton@1.0.0
+                                  Properties:
+                                    BasePaletteColor: =varTheme_ActionPrimary
+                                    DisplayMode: |-
+                                      =If(
+                                          varBRF_TestState = "NO_SESSION" ||
+                                          varBRF_TestState = "GENERATING" ||
+                                          varBRF_TestState = "SENT",
+                                          DisplayMode.Disabled,
+                                          DisplayMode.Edit
+                                      )
+                                    Height: =40
+                                    OnSelect: |-
+                                      =Switch(
+                                          varBRF_TestState,
+                                          "READY", Set(varBRF_TestState, "DRAFT"),
+                                          "DRAFT", Set(varBRF_TestState, "APPROVED"),
+                                          "NEEDS_REVIEW", Set(varBRF_ShowEvidence, true),
+                                          "APPROVED", Set(varBRF_ActiveTab, "MEETING_NOTES"),
+                                          "STALE", Set(varBRF_TestState, "DRAFT"),
+                                          "ERROR", Set(varBRF_TestState, "READY")
+                                      )
+                                    Text: |-
+                                      =Switch(
+                                          varBRF_TestState,
+                                          "NO_SESSION", "Select session",
+                                          "READY", "Generate briefing",
+                                          "GENERATING", "Generating...",
+                                          "DRAFT", "Approve Briefing",
+                                          "NEEDS_REVIEW", "Review issues",
+                                          "APPROVED", "Open Meeting Notes",
+                                          "STALE", "Refresh from session",
+                                          "SENT", "Sent snapshot",
+                                          "ERROR", "Retry",
+                                          "Approve Briefing"
+                                      )
+                                    Width: =176
+                  - conBRF_KpiStrip:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =varTheme_Border
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =varTheme_Surface
+                        FillPortions: =0
+                        Height: =84
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =0
+                        LayoutMinHeight: =84
+                        LayoutMinWidth: =620
+                        LayoutOverflowX: =LayoutOverflow.Scroll
+                        RadiusBottomLeft: =12
+                        RadiusBottomRight: =12
+                        RadiusTopLeft: =12
+                        RadiusTopRight: =12
+                        Visible: =varBRF_TestState <> "NO_SESSION"
+                      Children:
+                        - conBRF_KpiReviewed:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =0
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_Surface
+                              FillPortions: =1
+                              Height: =Parent.Height
+                              LayoutMinHeight: =82
+                              LayoutMinWidth: =150
+                              Width: =200
+                            Children:
+                              - lblBRF_KpiReviewedValue:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_Text
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =34
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =24
+                                    Text: =If(varBRF_TestState = "ERROR", "—", "63")
+                                    Width: =Parent.Width - 28
+                                    X: =14
+                                    Y: =12
+                              - lblBRF_KpiReviewedLabel:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_TextMuted
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =20
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    Text: ="Reviewed punches"
+                                    Width: =Parent.Width - 28
+                                    X: =14
+                                    Y: =48
+                        - conBRF_KpiChanged:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =0
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_Surface
+                              FillPortions: =1
+                              Height: =Parent.Height
+                              LayoutMinHeight: =82
+                              LayoutMinWidth: =150
+                              Width: =200
+                            Children:
+                              - lblBRF_KpiChangedValue:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_Text
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =34
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =24
+                                    Text: =If(varBRF_TestState = "ERROR", "—", "21")
+                                    Width: =Parent.Width - 28
+                                    X: =14
+                                    Y: =12
+                              - lblBRF_KpiChangedLabel:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_TextMuted
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =20
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    Text: ="Changed punches"
+                                    Width: =Parent.Width - 28
+                                    X: =14
+                                    Y: =48
+                        - conBRF_KpiComments:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =0
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_Surface
+                              FillPortions: =1
+                              Height: =Parent.Height
+                              LayoutMinHeight: =82
+                              LayoutMinWidth: =150
+                              Width: =200
+                            Children:
+                              - lblBRF_KpiCommentsValue:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_Text
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =34
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =24
+                                    Text: =If(varBRF_TestState = "ERROR", "—", "34")
+                                    Width: =Parent.Width - 28
+                                    X: =14
+                                    Y: =12
+                              - lblBRF_KpiCommentsLabel:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_TextMuted
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =20
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    Text: ="Comments added"
+                                    Width: =Parent.Width - 28
+                                    X: =14
+                                    Y: =48
+                        - conBRF_KpiActions:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =0
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_Surface
+                              FillPortions: =1
+                              Height: =Parent.Height
+                              LayoutMinHeight: =82
+                              LayoutMinWidth: =150
+                              Width: =200
+                            Children:
+                              - lblBRF_KpiActionsValue:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_Text
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =34
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =24
+                                    Text: =If(varBRF_TestState = "ERROR", "—", "7")
+                                    Width: =Parent.Width - 28
+                                    X: =14
+                                    Y: =12
+                              - lblBRF_KpiActionsLabel:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_TextMuted
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =20
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    Text: ="Actions identified"
+                                    Width: =Parent.Width - 28
+                                    X: =14
+                                    Y: =48
+                        - conBRF_KpiBlockers:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =varTheme_Border
+                              BorderThickness: =0
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_Surface
+                              FillPortions: =1
+                              Height: =Parent.Height
+                              LayoutMinHeight: =82
+                              LayoutMinWidth: =150
+                              Width: =200
+                            Children:
+                              - lblBRF_KpiBlockersValue:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =If(varBRF_TestState = "ERROR", varTheme_TextMuted, ColorValue("#B91C1C"))
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =34
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =24
+                                    Text: =If(varBRF_TestState = "ERROR", "—", "4")
+                                    Width: =Parent.Width - 28
+                                    X: =14
+                                    Y: =12
+                              - lblBRF_KpiBlockersLabel:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =varTheme_TextMuted
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =20
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    Text: ="Blockers identified"
+                                    Width: =Parent.Width - 28
+                                    X: =14
+                                    Y: =48
+                  - conBRF_TabBar:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =varTheme_Border
+                        BorderThickness: =0
+                        DropShadow: =DropShadow.None
+                        Fill: =Color.Transparent
+                        FillPortions: =0
+                        Height: =38
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =4
+                        LayoutMinHeight: =38
+                        LayoutMinWidth: =420
+                        Visible: |-
+                          =varBRF_TestState = "DRAFT" ||
+                           varBRF_TestState = "NEEDS_REVIEW" ||
+                           varBRF_TestState = "APPROVED" ||
+                           varBRF_TestState = "STALE" ||
+                           varBRF_TestState = "SENT"
+                      Children:
+                        - lblBRF_TabBriefing:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =If(varBRF_ActiveTab = "BRIEFING", varTheme_ActionPrimary, varTheme_Border)
+                              BorderThickness: =If(varBRF_ActiveTab = "BRIEFING", 2, 1)
+                              Color: =If(varBRF_ActiveTab = "BRIEFING", varTheme_ActionPrimary, varTheme_TextMuted)
+                              Fill: =If(varBRF_ActiveTab = "BRIEFING", varTheme_ActionSoft, varTheme_Surface)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =If(varBRF_ActiveTab = "BRIEFING", FontWeight.Semibold, FontWeight.Normal)
+                              Height: =36
+                              OnSelect: =Set(varBRF_ActiveTab, "BRIEFING"); Set(varBRF_ShowEvidence, false)
+                              PaddingBottom: =0
+                              PaddingLeft: =12
+                              PaddingRight: =12
+                              PaddingTop: =0
+                              Size: =9
+                              Text: ="Briefing"
+                              Width: =128
+                        - lblBRF_TabMeetingNotes:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =If(varBRF_ActiveTab = "MEETING_NOTES", varTheme_ActionPrimary, varTheme_Border)
+                              BorderThickness: =If(varBRF_ActiveTab = "MEETING_NOTES", 2, 1)
+                              Color: =If(varBRF_ActiveTab = "MEETING_NOTES", varTheme_ActionPrimary, varTheme_TextMuted)
+                              Fill: =If(varBRF_ActiveTab = "MEETING_NOTES", varTheme_ActionSoft, varTheme_Surface)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =If(varBRF_ActiveTab = "MEETING_NOTES", FontWeight.Semibold, FontWeight.Normal)
+                              Height: =36
+                              OnSelect: =Set(varBRF_ActiveTab, "MEETING_NOTES"); Set(varBRF_ShowEvidence, false)
+                              PaddingBottom: =0
+                              PaddingLeft: =12
+                              PaddingRight: =12
+                              PaddingTop: =0
+                              Size: =9
+                              Text: ="Meeting Notes"
+                              Width: =148
+                        - lblBRF_TabEmail:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =If(varBRF_ActiveTab = "EMAIL", varTheme_ActionPrimary, varTheme_Border)
+                              BorderThickness: =If(varBRF_ActiveTab = "EMAIL", 2, 1)
+                              Color: =If(varBRF_ActiveTab = "EMAIL", varTheme_ActionPrimary, varTheme_TextMuted)
+                              Fill: =If(varBRF_ActiveTab = "EMAIL", varTheme_ActionSoft, varTheme_Surface)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =If(varBRF_ActiveTab = "EMAIL", FontWeight.Semibold, FontWeight.Normal)
+                              Height: =36
+                              OnSelect: =Set(varBRF_ActiveTab, "EMAIL"); Set(varBRF_ShowEvidence, false)
+                              PaddingBottom: =0
+                              PaddingLeft: =12
+                              PaddingRight: =12
+                              PaddingTop: =0
+                              Size: =9
+                              Text: ="Email"
+                              Width: =110
+                  - conBRF_BodyHost:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        Fill: =Color.Transparent
+                        FillPortions: =1
+                        LayoutMinHeight: =360
+                        LayoutMinWidth: =620
+                        RadiusBottomLeft: =0
+                        RadiusBottomRight: =0
+                        RadiusTopLeft: =0
+                        RadiusTopRight: =0
+                      Children:
+                        - conBRF_State_NoSession:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =Color.Transparent
+                              Height: =Parent.Height
+                              Visible: =varBRF_TestState = "NO_SESSION"
+                              Width: =Parent.Width
+                            Children:
+                              - conBRF_NoSessionCard:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: =varTheme_Border
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_Surface
+                                    Height: =220
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Width: =Min(620, Parent.Width - 48)
+                                    X: =(Parent.Width - Self.Width) / 2
+                                    Y: =Max(24, (Parent.Height - Self.Height) / 2)
+                                  Children:
+                                    - txtBRF_NoSessionTitle:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_Text
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Size: =16
+                                          Text: ="No review session selected"
+                                          Wrap: =false
+                                          Width: =Parent.Width - 48
+                                          X: =24
+                                          Y: =38
+                                    - txtBRF_NoSessionBody:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_TextMuted
+                                          Font: =Font.'Segoe UI'
+                                          Size: =10
+                                          Text: ="Select a completed Punch Review session to prepare its briefing. BRF-C01 does not connect a real session selector yet."
+                                          Wrap: =true
+                                          Width: =Parent.Width - 48
+                                          X: =24
+                                          Y: =78
+                                    - lblBRF_NoSessionNote:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =varTheme_ActionBorderSoft
+                                          BorderThickness: =1
+                                          Color: =varTheme_ActionPrimary
+                                          Fill: =varTheme_ActionSoft
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =34
+                                          PaddingLeft: =10
+                                          Size: =8
+                                          Text: ="Visual state only · no backend call is executed"
+                                          Width: =Parent.Width - 48
+                                          X: =24
+                                          Y: =150
+                        - conBRF_State_Ready:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =Color.Transparent
+                              Height: =Parent.Height
+                              Visible: =varBRF_TestState = "READY"
+                              Width: =Parent.Width
+                            Children:
+                              - conBRF_ReadyCard:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: =varTheme_ActionBorderSoft
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_Surface
+                                    Height: =245
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Width: =Min(680, Parent.Width - 48)
+                                    X: =(Parent.Width - Self.Width) / 2
+                                    Y: =Max(24, (Parent.Height - Self.Height) / 2)
+                                  Children:
+                                    - txtBRF_ReadyTitle:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_Text
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Size: =16
+                                          Text: ="Ready to prepare briefing"
+                                          Wrap: =false
+                                          Width: =Parent.Width - 48
+                                          X: =24
+                                          Y: =30
+                                    - txtBRF_ReadyBody:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_TextMuted
+                                          Font: =Font.'Segoe UI'
+                                          Size: =10
+                                          Text: ="63 reviewed punches and 84 synthetic session events are available for the visual test. Generate does not call AI or persist data."
+                                          Wrap: =true
+                                          Width: =Parent.Width - 48
+                                          X: =24
+                                          Y: =68
+                                    - lblBRF_ReadyStats:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =varTheme_Border
+                                          BorderThickness: =1
+                                          Color: =varTheme_Text
+                                          Fill: =varTheme_SurfaceAlt
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =42
+                                          PaddingLeft: =12
+                                          Size: =9
+                                          Text: ="63 reviewed  ·  21 changed  ·  34 comments  ·  7 actions  ·  4 blockers"
+                                          Width: =Parent.Width - 48
+                                          X: =24
+                                          Y: =128
+                                    - lblBRF_ReadyHint:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          Color: =varTheme_ActionPrimary
+                                          Fill: =Color.Transparent
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =24
+                                          PaddingLeft: =0
+                                          Size: =8
+                                          Text: ="Use the primary action or the test-state selector to continue."
+                                          Width: =Parent.Width - 48
+                                          X: =24
+                                          Y: =186
+                        - conBRF_State_Generating:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =Color.Transparent
+                              Height: =Parent.Height
+                              Visible: =varBRF_TestState = "GENERATING"
+                              Width: =Parent.Width
+                            Children:
+                              - conBRF_GeneratingCard:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: =varTheme_ActionBorderSoft
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_Surface
+                                    Height: =220
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Width: =Min(620, Parent.Width - 48)
+                                    X: =(Parent.Width - Self.Width) / 2
+                                    Y: =Max(24, (Parent.Height - Self.Height) / 2)
+                                  Children:
+                                    - txtBRF_GeneratingTitle:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_Text
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Size: =16
+                                          Text: ="Preparing briefing…"
+                                          Wrap: =false
+                                          Width: =Parent.Width - 48
+                                          X: =24
+                                          Y: =38
+                                    - txtBRF_GeneratingBody:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_TextMuted
+                                          Font: =Font.'Segoe UI'
+                                          Size: =10
+                                          Text: ="Visual loading surface. A later capability will connect the real generation contract."
+                                          Wrap: =true
+                                          Width: =Parent.Width - 48
+                                          X: =24
+                                          Y: =78
+                                    - conBRF_GeneratingBar:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: ManualLayout
+                                        Properties:
+                                          BorderColor: =varTheme_ActionBorderSoft
+                                          BorderThickness: =1
+                                          DropShadow: =DropShadow.None
+                                          Fill: =varTheme_ActionSoft
+                                          Height: =12
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Width: =Parent.Width - 48
+                                          X: =24
+                                          Y: =148
+                                        Children:
+                                          - conBRF_GeneratingBarFill:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                Fill: =varTheme_ActionPrimary
+                                                Height: =Parent.Height
+                                                RadiusBottomLeft: =8
+                                                RadiusBottomRight: =8
+                                                RadiusTopLeft: =8
+                                                RadiusTopRight: =8
+                                                Width: =Parent.Width * 0.62
+                        - conBRF_State_Error:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =Color.Transparent
+                              Height: =Parent.Height
+                              Visible: =varBRF_TestState = "ERROR"
+                              Width: =Parent.Width
+                            Children:
+                              - conBRF_ErrorCard:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: =ColorValue("#FCA5A5")
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_Surface
+                                    Height: =230
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    Width: =Min(620, Parent.Width - 48)
+                                    X: =(Parent.Width - Self.Width) / 2
+                                    Y: =Max(24, (Parent.Height - Self.Height) / 2)
+                                  Children:
+                                    - txtBRF_ErrorTitle:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =ColorValue("#B91C1C")
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Size: =16
+                                          Text: ="Briefing could not be prepared"
+                                          Wrap: =false
+                                          Width: =Parent.Width - 48
+                                          X: =24
+                                          Y: =36
+                                    - txtBRF_ErrorBody:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_TextMuted
+                                          Font: =Font.'Segoe UI'
+                                          Size: =10
+                                          Text: ="Synthetic recoverable error surface. No real service failed and no error text is being classified."
+                                          Wrap: =true
+                                          Width: =Parent.Width - 48
+                                          X: =24
+                                          Y: =78
+                                    - lblBRF_ErrorHint:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =ColorValue("#FCA5A5")
+                                          BorderThickness: =1
+                                          Color: =ColorValue("#B91C1C")
+                                          Fill: =ColorValue("#FEE2E2")
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =40
+                                          PaddingLeft: =10
+                                          Size: =8
+                                          Text: ="Retry returns to READY in this local visual test."
+                                          Width: =Parent.Width - 48
+                                          X: =24
+                                          Y: =152
+                        - conBRF_Workspace:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =Color.Transparent
+                              Height: =Parent.Height
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =If(App.Width < 1180, LayoutDirection.Vertical, LayoutDirection.Horizontal)
+                              LayoutGap: =10
+                              LayoutMinHeight: =340
+                              LayoutMinWidth: =600
+                              Visible: |-
+                                =varBRF_TestState = "DRAFT" ||
+                                 varBRF_TestState = "NEEDS_REVIEW" ||
+                                 varBRF_TestState = "APPROVED" ||
+                                 varBRF_TestState = "STALE" ||
+                                 varBRF_TestState = "SENT"
+                              Width: =Parent.Width
+                            Children:
+                              - conBRF_MainColumn:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =Color.Transparent
+                                    FillPortions: =1
+                                    Height: =If(App.Width < 1180, Max(520, Parent.Height - 300), Parent.Height)
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =10
+                                    LayoutMinHeight: =420
+                                    LayoutMinWidth: =580
+                                    LayoutOverflowY: =LayoutOverflow.Scroll
+                                    Width: =If(App.Width < 1180, Parent.Width, Parent.Width - 310)
+                                  Children:
+                                    - conBRF_WorkspaceStateBanner:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: ManualLayout
+                                        Properties:
+                                          BorderColor: |-
+                                            =Switch(
+                                                varBRF_TestState,
+                                                "APPROVED", ColorValue("#86EFAC"),
+                                                "SENT", ColorValue("#86EFAC"),
+                                                "NEEDS_REVIEW", ColorValue("#FCD34D"),
+                                                "STALE", ColorValue("#FCD34D"),
+                                                varTheme_ActionBorderSoft
+                                            )
+                                          BorderThickness: =1
+                                          DropShadow: =DropShadow.None
+                                          Fill: |-
+                                            =Switch(
+                                                varBRF_TestState,
+                                                "APPROVED", ColorValue("#DCFCE7"),
+                                                "SENT", ColorValue("#DCFCE7"),
+                                                "NEEDS_REVIEW", ColorValue("#FEF3C7"),
+                                                "STALE", ColorValue("#FEF3C7"),
+                                                varTheme_ActionSoft
+                                            )
+                                          FillPortions: =0
+                                          Height: =42
+                                          LayoutMinHeight: =42
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Width: =Parent.Width
+                                        Children:
+                                          - lblBRF_WorkspaceState:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                BorderColor: =RGBA(0,0,0,0)
+                                                Color: |-
+                                                  =Switch(
+                                                      varBRF_TestState,
+                                                      "APPROVED", ColorValue("#15803D"),
+                                                      "SENT", ColorValue("#15803D"),
+                                                      "NEEDS_REVIEW", ColorValue("#B45309"),
+                                                      "STALE", ColorValue("#B45309"),
+                                                      varTheme_ActionPrimary
+                                                  )
+                                                Fill: =Color.Transparent
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =30
+                                                PaddingLeft: =12
+                                                Size: =8
+                                                Text: |-
+                                                  =Switch(
+                                                      varBRF_TestState,
+                                                      "DRAFT", "Draft briefing · synthetic interpretation awaiting manager review",
+                                                      "NEEDS_REVIEW", "Review required · 8 items need attention before approval",
+                                                      "APPROVED", "Approved briefing · synthetic outputs may now be previewed",
+                                                      "STALE", "Briefing out of date · 3 source changes occurred after this synthetic draft",
+                                                      "SENT", "Sent snapshot · visual state only; no email was actually sent",
+                                                      "Synthetic visual state"
+                                                  )
+                                                Width: =Parent.Width - 16
+                                                X: =8
+                                                Y: =6
+                                    - conBRF_BriefingTab:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          Fill: =Color.Transparent
+                                          FillPortions: =0
+                                          Height: =If(App.Width < 1280, 1220, 760)
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =10
+                                          LayoutMinHeight: =680
+                                          LayoutMinWidth: =560
+                                          Visible: =varBRF_ActiveTab = "BRIEFING"
+                                          Width: =Parent.Width
+                                        Children:
+                                          - conBRF_SummaryQualityRow:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: AutoLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                Fill: =Color.Transparent
+                                                FillPortions: =0
+                                                Height: =If(App.Width < 1280, 430, 210)
+                                                LayoutAlignItems: =LayoutAlignItems.Stretch
+                                                LayoutDirection: =If(App.Width < 1280, LayoutDirection.Vertical, LayoutDirection.Horizontal)
+                                                LayoutGap: =10
+                                                LayoutMinHeight: =210
+                                                LayoutMinWidth: =560
+                                                Width: =Parent.Width
+                                              Children:
+                                                - conBRF_ExecutiveSummary:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: ManualLayout
+                                                    Properties:
+                                                      BorderColor: =varTheme_Border
+                                                      BorderThickness: =1
+                                                      DropShadow: =DropShadow.None
+                                                      Fill: =varTheme_Surface
+                                                      FillPortions: =2
+                                                      Height: =210
+                                                      LayoutMinHeight: =210
+                                                      LayoutMinWidth: =360
+                                                      RadiusBottomLeft: =12
+                                                      RadiusBottomRight: =12
+                                                      RadiusTopLeft: =12
+                                                      RadiusTopRight: =12
+                                                    Children:
+                                                      - lblBRF_SummaryTitle:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            BorderColor: =RGBA(0,0,0,0)
+                                                            Color: =varTheme_Text
+                                                            Fill: =Color.Transparent
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =28
+                                                            PaddingBottom: =0
+                                                            PaddingLeft: =0
+                                                            PaddingRight: =0
+                                                            PaddingTop: =0
+                                                            Size: =12
+                                                            Text: ="Executive Summary"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =14
+                                                      - lblBRF_SummaryMeta:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            BorderColor: =RGBA(0,0,0,0)
+                                                            Color: =varTheme_ActionPrimary
+                                                            Fill: =Color.Transparent
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =20
+                                                            PaddingBottom: =0
+                                                            PaddingLeft: =0
+                                                            PaddingRight: =0
+                                                            PaddingTop: =0
+                                                            Size: =8
+                                                            Text: ="AI-assisted draft · Evidence available"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =42
+                                                      - txtBRF_SummaryBody:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            AutoHeight: =true
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            Size: =9
+                                                            Text: ="The review covered 63 punches across Mechanical, Piping and Electrical disciplines. Twenty-one punches were updated during the session. Documentation remains the main constraint for Vendor A, while four items require engineering clarification before closure."
+                                                            Wrap: =true
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =70
+                                                      - lblBRF_SummarySources:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            BorderColor: =RGBA(0,0,0,0)
+                                                            Color: =varTheme_TextMuted
+                                                            Fill: =Color.Transparent
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =20
+                                                            OnSelect: =Set(varBRF_ShowEvidence, true)
+                                                            PaddingBottom: =0
+                                                            PaddingLeft: =0
+                                                            PaddingRight: =0
+                                                            PaddingTop: =0
+                                                            Size: =8
+                                                            Text: ="63 punches  ·  84 source events  ·  View evidence"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =176
+                                                - conBRF_ReviewQuality:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: ManualLayout
+                                                    Properties:
+                                                      BorderColor: =varTheme_Border
+                                                      BorderThickness: =1
+                                                      DropShadow: =DropShadow.None
+                                                      Fill: =varTheme_Surface
+                                                      FillPortions: =1
+                                                      Height: =210
+                                                      LayoutMinHeight: =210
+                                                      LayoutMinWidth: =280
+                                                      RadiusBottomLeft: =12
+                                                      RadiusBottomRight: =12
+                                                      RadiusTopLeft: =12
+                                                      RadiusTopRight: =12
+                                                    Children:
+                                                      - lblBRF_QualityTitle:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            BorderColor: =RGBA(0,0,0,0)
+                                                            Color: =varTheme_Text
+                                                            Fill: =Color.Transparent
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =28
+                                                            PaddingBottom: =0
+                                                            PaddingLeft: =0
+                                                            PaddingRight: =0
+                                                            PaddingTop: =0
+                                                            Size: =12
+                                                            Text: ="Review Quality"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =14
+                                                      - lblBRF_Quality1:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =ColorValue("#B45309")
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =24
+                                                            Size: =9
+                                                            Text: ="8   items need review"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =52
+                                                      - lblBRF_Quality2:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =ColorValue("#B45309")
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =24
+                                                            Size: =9
+                                                            Text: ="2   actions missing owner"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =80
+                                                      - lblBRF_Quality3:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =ColorValue("#B45309")
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =24
+                                                            Size: =9
+                                                            Text: ="1   action missing due date"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =108
+                                                      - lblBRF_Quality4:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =ColorValue("#15803D")
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =24
+                                                            Size: =9
+                                                            Text: ="0   unsupported statements"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =136
+                                                      - lblBRF_Quality5:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =ColorValue("#15803D")
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =24
+                                                            Size: =9
+                                                            Text: ="84 / 84   source events processed"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =164
+                                          - conBRF_InsightRow:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: AutoLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                Fill: =Color.Transparent
+                                                FillPortions: =0
+                                                Height: =If(App.Width < 1280, 660, 220)
+                                                LayoutAlignItems: =LayoutAlignItems.Stretch
+                                                LayoutDirection: =If(App.Width < 1280, LayoutDirection.Vertical, LayoutDirection.Horizontal)
+                                                LayoutGap: =10
+                                                LayoutMinHeight: =220
+                                                LayoutMinWidth: =560
+                                                Width: =Parent.Width
+                                              Children:
+                                                - conBRF_KeyDecisions:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: ManualLayout
+                                                    Properties:
+                                                      BorderColor: =varTheme_Border
+                                                      BorderThickness: =1
+                                                      DropShadow: =DropShadow.None
+                                                      Fill: =varTheme_Surface
+                                                      FillPortions: =1
+                                                      Height: =220
+                                                      LayoutMinHeight: =220
+                                                      LayoutMinWidth: =260
+                                                      RadiusBottomLeft: =12
+                                                      RadiusBottomRight: =12
+                                                      RadiusTopLeft: =12
+                                                      RadiusTopRight: =12
+                                                    Children:
+                                                      - lblBRF_DecisionsTitle:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =28
+                                                            Size: =12
+                                                            Text: ="Key Decisions · 4"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =14
+                                                      - txtBRF_DecisionBody:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            AutoHeight: =true
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Size: =9
+                                                            Text: ="Engineering clarification required before closure"
+                                                            Wrap: =true
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =54
+                                                      - lblBRF_DecisionRefs:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_ActionPrimary
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =22
+                                                            OnSelect: =Set(varBRF_ShowEvidence, true)
+                                                            Size: =8
+                                                            Text: ="P-1043, P-1188 · 2 sources · View evidence"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =105
+                                                      - lblBRF_DecisionActions:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            BorderColor: =varTheme_ActionBorderSoft
+                                                            BorderThickness: =1
+                                                            Color: =varTheme_ActionPrimary
+                                                            Fill: =varTheme_ActionSoft
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =34
+                                                            PaddingLeft: =10
+                                                            Size: =8
+                                                            Text: ="Accept   ·   Edit   ·   Exclude"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =150
+                                                - conBRF_ProgressChanges:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: ManualLayout
+                                                    Properties:
+                                                      BorderColor: =varTheme_Border
+                                                      BorderThickness: =1
+                                                      DropShadow: =DropShadow.None
+                                                      Fill: =varTheme_Surface
+                                                      FillPortions: =1
+                                                      Height: =220
+                                                      LayoutMinHeight: =220
+                                                      LayoutMinWidth: =260
+                                                      RadiusBottomLeft: =12
+                                                      RadiusBottomRight: =12
+                                                      RadiusTopLeft: =12
+                                                      RadiusTopRight: =12
+                                                    Children:
+                                                      - lblBRF_ProgressTitle:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =28
+                                                            Size: =12
+                                                            Text: ="Progress & Changes"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =14
+                                                      - lblBRF_ProgressMechanical:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =34
+                                                            Size: =9
+                                                            Text: ="Mechanical   18 reviewed · 7 updated · 3 status changes"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =52
+                                                      - lblBRF_ProgressPiping:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =34
+                                                            Size: =9
+                                                            Text: ="Piping          27 reviewed · 8 updated · 9 status changes"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =92
+                                                      - lblBRF_ProgressElectrical:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =34
+                                                            Size: =9
+                                                            Text: ="Electrical     18 reviewed · 6 updated · 2 status changes"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =132
+                                                      - lblBRF_ProgressLink:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_ActionPrimary
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =24
+                                                            Size: =8
+                                                            Text: ="View all changes"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =180
+                                                - conBRF_Blockers:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: ManualLayout
+                                                    Properties:
+                                                      BorderColor: =ColorValue("#FCD34D")
+                                                      BorderThickness: =1
+                                                      DropShadow: =DropShadow.None
+                                                      Fill: =varTheme_Surface
+                                                      FillPortions: =1
+                                                      Height: =220
+                                                      LayoutMinHeight: =220
+                                                      LayoutMinWidth: =260
+                                                      RadiusBottomLeft: =12
+                                                      RadiusBottomRight: =12
+                                                      RadiusTopLeft: =12
+                                                      RadiusTopRight: =12
+                                                    Children:
+                                                      - lblBRF_BlockersTitle:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =28
+                                                            Size: =12
+                                                            Text: ="Blockers & Risks · 4"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =14
+                                                      - txtBRF_Blocker1:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            AutoHeight: =true
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Size: =9
+                                                            Text: ="Vendor documentation"
+                                                            Wrap: =false
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =52
+                                                      - txtBRF_Blocker1Body:
+                                                          Control: ModernText@1.0.0
+                                                          Properties:
+                                                            AutoHeight: =true
+                                                            Color: =varTheme_TextMuted
+                                                            Font: =Font.'Segoe UI'
+                                                            Size: =8
+                                                            Text: ="5 punches remain dependent on updated vendor documentation."
+                                                            Wrap: =true
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =78
+                                                      - lblBRF_BlockerRefs:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_ActionPrimary
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =24
+                                                            OnSelect: =Set(varBRF_ShowEvidence, true)
+                                                            Size: =8
+                                                            Text: ="P-3812, P-4104, P-4120 +2 · 5 sources"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =126
+                                                      - lblBRF_Blocker2:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =28
+                                                            Size: =8
+                                                            Text: ="Engineering clarification · 2 punches"
+                                                            Width: =Parent.Width - 32
+                                                            X: =16
+                                                            Y: =164
+                                          - conBRF_OpenItems:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =varTheme_Border
+                                                BorderThickness: =1
+                                                DropShadow: =DropShadow.None
+                                                Fill: =varTheme_Surface
+                                                FillPortions: =0
+                                                Height: =108
+                                                LayoutMinHeight: =108
+                                                RadiusBottomLeft: =12
+                                                RadiusBottomRight: =12
+                                                RadiusTopLeft: =12
+                                                RadiusTopRight: =12
+                                                Width: =Parent.Width
+                                              Children:
+                                                - lblBRF_OpenItemsTitle:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =varTheme_Text
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =28
+                                                      Size: =12
+                                                      Text: ="Outstanding from this review"
+                                                      Width: =Parent.Width - 32
+                                                      X: =16
+                                                      Y: =12
+                                                - lblBRF_OpenItemsBody:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =varTheme_TextMuted
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =44
+                                                      Size: =9
+                                                      Text: ="Documentation to be received  5    ·    Site verification pending  3    ·    Engineering response pending  2    ·    Ready for follow-up  7"
+                                                      Width: =Parent.Width - 32
+                                                      X: =16
+                                                      Y: =48
+                                          - conBRF_ActionRegister:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =varTheme_Border
+                                                BorderThickness: =1
+                                                DropShadow: =DropShadow.None
+                                                Fill: =varTheme_Surface
+                                                FillPortions: =0
+                                                Height: =248
+                                                LayoutMinHeight: =248
+                                                RadiusBottomLeft: =12
+                                                RadiusBottomRight: =12
+                                                RadiusTopLeft: =12
+                                                RadiusTopRight: =12
+                                                Width: =Parent.Width
+                                              Children:
+                                                - lblBRF_ActionsTitle:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =varTheme_Text
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =28
+                                                      Size: =12
+                                                      Text: ="Actions · 7"
+                                                      Width: =Parent.Width - 32
+                                                      X: =16
+                                                      Y: =10
+                                                - conBRF_ActionHeader:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: ManualLayout
+                                                    Properties:
+                                                      BorderColor: =varTheme_Border
+                                                      BorderThickness: =1
+                                                      DropShadow: =DropShadow.None
+                                                      Fill: =varTheme_SurfaceAlt
+                                                      Height: =30
+                                                      Width: =Parent.Width - 32
+                                                      X: =16
+                                                      Y: =42
+                                                    Children:
+                                                      - lblBRF_AH_Action:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_TextMuted
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =28
+                                                            Size: =8
+                                                            Text: ="ACTION"
+                                                            Width: =Parent.Width * 0.30
+                                                            X: =8
+                                                      - lblBRF_AH_Owner:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_TextMuted
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =28
+                                                            Size: =8
+                                                            Text: ="OWNER"
+                                                            Width: =Parent.Width * 0.16
+                                                            X: =Parent.Width * 0.32
+                                                      - lblBRF_AH_Due:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_TextMuted
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =28
+                                                            Size: =8
+                                                            Text: ="DUE DATE"
+                                                            Width: =Parent.Width * 0.16
+                                                            X: =Parent.Width * 0.49
+                                                      - lblBRF_AH_Source:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_TextMuted
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =28
+                                                            Size: =8
+                                                            Text: ="SOURCE PUNCHES"
+                                                            Width: =Parent.Width * 0.18
+                                                            X: =Parent.Width * 0.66
+                                                      - lblBRF_AH_Status:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_TextMuted
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =28
+                                                            Size: =8
+                                                            Text: ="STATUS"
+                                                            Width: =Parent.Width * 0.13
+                                                            X: =Parent.Width * 0.85
+                                                - conBRF_ActionRow1:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: ManualLayout
+                                                    Properties:
+                                                      BorderColor: =varTheme_Border
+                                                      BorderThickness: =1
+                                                      DropShadow: =DropShadow.None
+                                                      Fill: =varTheme_Surface
+                                                      Height: =38
+                                                      Width: =Parent.Width - 32
+                                                      X: =16
+                                                      Y: =72
+                                                    Children:
+                                                      - lblBRF_AR1_Action:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =36
+                                                            Size: =8
+                                                            Text: ="Submit updated certificate"
+                                                            Width: =Parent.Width * 0.30
+                                                            X: =8
+                                                      - lblBRF_AR1_Owner:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =36
+                                                            Size: =8
+                                                            Text: ="Vendor A"
+                                                            Width: =Parent.Width * 0.16
+                                                            X: =Parent.Width * 0.32
+                                                      - lblBRF_AR1_Due:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =36
+                                                            Size: =8
+                                                            Text: ="21 Aug 2026"
+                                                            Width: =Parent.Width * 0.16
+                                                            X: =Parent.Width * 0.49
+                                                      - lblBRF_AR1_Source:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_ActionPrimary
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =36
+                                                            OnSelect: =Set(varBRF_ShowEvidence, true)
+                                                            Size: =8
+                                                            Text: ="P-3812"
+                                                            Width: =Parent.Width * 0.18
+                                                            X: =Parent.Width * 0.66
+                                                      - lblBRF_AR1_Status:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_ActionPrimary
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =36
+                                                            Size: =8
+                                                            Text: ="Proposed"
+                                                            Width: =Parent.Width * 0.13
+                                                            X: =Parent.Width * 0.85
+                                                - conBRF_ActionRow2:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: ManualLayout
+                                                    Properties:
+                                                      BorderColor: =varTheme_Border
+                                                      BorderThickness: =1
+                                                      DropShadow: =DropShadow.None
+                                                      Fill: =varTheme_Surface
+                                                      Height: =38
+                                                      Width: =Parent.Width - 32
+                                                      X: =16
+                                                      Y: =110
+                                                    Children:
+                                                      - lblBRF_AR2_Action:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =36
+                                                            Size: =8
+                                                            Text: ="Confirm acceptance criteria"
+                                                            Width: =Parent.Width * 0.30
+                                                            X: =8
+                                                      - lblBRF_AR2_Owner:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =ColorValue("#B45309")
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =36
+                                                            Size: =8
+                                                            Text: ="Owner missing"
+                                                            Width: =Parent.Width * 0.16
+                                                            X: =Parent.Width * 0.32
+                                                      - lblBRF_AR2_Due:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =ColorValue("#B45309")
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =36
+                                                            Size: =8
+                                                            Text: ="Due date missing"
+                                                            Width: =Parent.Width * 0.16
+                                                            X: =Parent.Width * 0.49
+                                                      - lblBRF_AR2_Source:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_ActionPrimary
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =36
+                                                            OnSelect: =Set(varBRF_ShowEvidence, true)
+                                                            Size: =8
+                                                            Text: ="P-4104, P-4120"
+                                                            Width: =Parent.Width * 0.18
+                                                            X: =Parent.Width * 0.66
+                                                      - lblBRF_AR2_Status:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =ColorValue("#B45309")
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =36
+                                                            Size: =8
+                                                            Text: ="Needs info"
+                                                            Width: =Parent.Width * 0.13
+                                                            X: =Parent.Width * 0.85
+                                                - conBRF_ActionRow3:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: ManualLayout
+                                                    Properties:
+                                                      BorderColor: =varTheme_Border
+                                                      BorderThickness: =1
+                                                      DropShadow: =DropShadow.None
+                                                      Fill: =varTheme_Surface
+                                                      Height: =38
+                                                      Width: =Parent.Width - 32
+                                                      X: =16
+                                                      Y: =148
+                                                    Children:
+                                                      - lblBRF_AR3_Action:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =36
+                                                            Size: =8
+                                                            Text: ="Verify installation on site"
+                                                            Width: =Parent.Width * 0.30
+                                                            X: =8
+                                                      - lblBRF_AR3_Owner:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =36
+                                                            Size: =8
+                                                            Text: ="Mike Smith"
+                                                            Width: =Parent.Width * 0.16
+                                                            X: =Parent.Width * 0.32
+                                                      - lblBRF_AR3_Due:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =36
+                                                            Size: =8
+                                                            Text: ="18 Aug 2026"
+                                                            Width: =Parent.Width * 0.16
+                                                            X: =Parent.Width * 0.49
+                                                      - lblBRF_AR3_Source:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_ActionPrimary
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =36
+                                                            OnSelect: =Set(varBRF_ShowEvidence, true)
+                                                            Size: =8
+                                                            Text: ="P-4228"
+                                                            Width: =Parent.Width * 0.18
+                                                            X: =Parent.Width * 0.66
+                                                      - lblBRF_AR3_Status:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_ActionPrimary
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =36
+                                                            Size: =8
+                                                            Text: ="Proposed"
+                                                            Width: =Parent.Width * 0.13
+                                                            X: =Parent.Width * 0.85
+                                                - conBRF_ActionRow4:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: ManualLayout
+                                                    Properties:
+                                                      BorderColor: =varTheme_Border
+                                                      BorderThickness: =1
+                                                      DropShadow: =DropShadow.None
+                                                      Fill: =varTheme_Surface
+                                                      Height: =38
+                                                      Width: =Parent.Width - 32
+                                                      X: =16
+                                                      Y: =186
+                                                    Children:
+                                                      - lblBRF_AR4_Action:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =36
+                                                            Size: =8
+                                                            Text: ="Provide updated datasheet"
+                                                            Width: =Parent.Width * 0.30
+                                                            X: =8
+                                                      - lblBRF_AR4_Owner:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =36
+                                                            Size: =8
+                                                            Text: ="Vendor B"
+                                                            Width: =Parent.Width * 0.16
+                                                            X: =Parent.Width * 0.32
+                                                      - lblBRF_AR4_Due:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_Text
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =36
+                                                            Size: =8
+                                                            Text: ="22 Aug 2026"
+                                                            Width: =Parent.Width * 0.16
+                                                            X: =Parent.Width * 0.49
+                                                      - lblBRF_AR4_Source:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_ActionPrimary
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =36
+                                                            OnSelect: =Set(varBRF_ShowEvidence, true)
+                                                            Size: =8
+                                                            Text: ="P-4301"
+                                                            Width: =Parent.Width * 0.18
+                                                            X: =Parent.Width * 0.66
+                                                      - lblBRF_AR4_Status:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =varTheme_ActionPrimary
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =36
+                                                            Size: =8
+                                                            Text: ="Proposed"
+                                                            Width: =Parent.Width * 0.13
+                                                            X: =Parent.Width * 0.85
+                                    - conBRF_MeetingNotesTab:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          Fill: =Color.Transparent
+                                          FillPortions: =0
+                                          Height: =620
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =10
+                                          LayoutMinHeight: =560
+                                          LayoutMinWidth: =560
+                                          Visible: =varBRF_ActiveTab = "MEETING_NOTES"
+                                          Width: =Parent.Width
+                                        Children:
+                                          - conBRF_NotesGate:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =If(varBRF_TestState = "APPROVED" || varBRF_TestState = "SENT", ColorValue("#86EFAC"), ColorValue("#FCD34D"))
+                                                BorderThickness: =1
+                                                DropShadow: =DropShadow.None
+                                                Fill: =If(varBRF_TestState = "APPROVED" || varBRF_TestState = "SENT", ColorValue("#DCFCE7"), ColorValue("#FEF3C7"))
+                                                FillPortions: =0
+                                                Height: =58
+                                                RadiusBottomLeft: =8
+                                                RadiusBottomRight: =8
+                                                RadiusTopLeft: =8
+                                                RadiusTopRight: =8
+                                              Children:
+                                                - lblBRF_NotesGate:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =If(varBRF_TestState = "APPROVED" || varBRF_TestState = "SENT", ColorValue("#15803D"), ColorValue("#B45309"))
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =48
+                                                      PaddingLeft: =12
+                                                      Size: =9
+                                                      Text: =If(varBRF_TestState = "APPROVED" || varBRF_TestState = "SENT", "Derived from approved Briefing · synthetic Meeting Notes preview", "Approve the Briefing before Meeting Notes can become a controlled output")
+                                                      Width: =Parent.Width - 12
+                                                      X: =6
+                                                      Y: =5
+                                          - conBRF_NotesDocument:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =varTheme_Border
+                                                BorderThickness: =1
+                                                DropShadow: =DropShadow.None
+                                                Fill: =varTheme_Surface
+                                                FillPortions: =0
+                                                Height: =520
+                                                RadiusBottomLeft: =12
+                                                RadiusBottomRight: =12
+                                                RadiusTopLeft: =12
+                                                RadiusTopRight: =12
+                                              Children:
+                                                - lblBRF_NotesTitle:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =varTheme_Text
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =30
+                                                      Size: =14
+                                                      Text: ="Weekly Punch Review — Meeting Notes"
+                                                      Width: =Parent.Width - 40
+                                                      X: =20
+                                                      Y: =18
+                                                - lblBRF_NotesMeta:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =varTheme_TextMuted
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =24
+                                                      Size: =8
+                                                      Text: ="10490 · Bilbao LNG Project    ·    16 Aug 2026    ·    Synthetic BRF-C01 preview"
+                                                      Width: =Parent.Width - 40
+                                                      X: =20
+                                                      Y: =52
+                                                - txtBRF_NotesBody:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      AutoHeight: =true
+                                                      Color: =varTheme_Text
+                                                      Font: =Font.'Segoe UI'
+                                                      Size: =9
+                                                      Text: |-
+                                                        ="1. Executive Summary" & Char(10) &
+                                                        "The review covered 63 punches across Mechanical, Piping and Electrical disciplines." & Char(10) & Char(10) &
+                                                        "2. Key Decisions" & Char(10) &
+                                                        "Engineering clarification is required before closure of P-1043 and P-1188." & Char(10) & Char(10) &
+                                                        "3. Actions" & Char(10) &
+                                                        "Seven actions were identified. Two still require an owner and one requires a due date." & Char(10) & Char(10) &
+                                                        "4. Outstanding Items" & Char(10) &
+                                                        "Vendor documentation and engineering clarification remain the main follow-up areas."
+                                                      Wrap: =true
+                                                      Width: =Parent.Width - 40
+                                                      X: =20
+                                                      Y: =96
+                                                - lblBRF_NotesFooter:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      BorderColor: =varTheme_Border
+                                                      BorderThickness: =1
+                                                      Color: =varTheme_TextMuted
+                                                      Fill: =varTheme_SurfaceAlt
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =40
+                                                      PaddingLeft: =10
+                                                      Size: =8
+                                                      Text: ="BRF-C01 preview only · no document is generated or persisted"
+                                                      Width: =Parent.Width - 40
+                                                      X: =20
+                                                      Y: =458
+                                    - conBRF_EmailTab:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          Fill: =Color.Transparent
+                                          FillPortions: =0
+                                          Height: =620
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =10
+                                          LayoutMinHeight: =560
+                                          LayoutMinWidth: =560
+                                          Visible: =varBRF_ActiveTab = "EMAIL"
+                                          Width: =Parent.Width
+                                        Children:
+                                          - conBRF_EmailGate:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =If(varBRF_TestState = "APPROVED", ColorValue("#86EFAC"), If(varBRF_TestState = "STALE", ColorValue("#FCA5A5"), varTheme_Border))
+                                                BorderThickness: =1
+                                                DropShadow: =DropShadow.None
+                                                Fill: =If(varBRF_TestState = "APPROVED", ColorValue("#DCFCE7"), If(varBRF_TestState = "STALE", ColorValue("#FEE2E2"), varTheme_SurfaceAlt))
+                                                FillPortions: =0
+                                                Height: =58
+                                                RadiusBottomLeft: =8
+                                                RadiusBottomRight: =8
+                                                RadiusTopLeft: =8
+                                                RadiusTopRight: =8
+                                              Children:
+                                                - lblBRF_EmailGate:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =If(varBRF_TestState = "APPROVED", ColorValue("#15803D"), If(varBRF_TestState = "STALE", ColorValue("#B91C1C"), varTheme_TextMuted))
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =48
+                                                      PaddingLeft: =12
+                                                      Size: =9
+                                                      Text: |-
+                                                        =If(
+                                                            varBRF_TestState = "APPROVED",
+                                                            "Approved Briefing · Send is enabled only as a local visual transition",
+                                                            If(
+                                                                varBRF_TestState = "STALE",
+                                                                "Send blocked · source changes must be refreshed before distribution",
+                                                                If(varBRF_TestState = "SENT", "Sent snapshot · visual state only", "Approve the Briefing before email distribution")
+                                                            )
+                                                        )
+                                                      Width: =Parent.Width - 12
+                                                      X: =6
+                                                      Y: =5
+                                          - conBRF_EmailComposer:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =varTheme_Border
+                                                BorderThickness: =1
+                                                DropShadow: =DropShadow.None
+                                                Fill: =varTheme_Surface
+                                                FillPortions: =0
+                                                Height: =520
+                                                RadiusBottomLeft: =12
+                                                RadiusBottomRight: =12
+                                                RadiusTopLeft: =12
+                                                RadiusTopRight: =12
+                                              Children:
+                                                - lblBRF_EmailTitle:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =varTheme_Text
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =30
+                                                      Size: =14
+                                                      Text: ="Follow-up email"
+                                                      Width: =Parent.Width - 40
+                                                      X: =20
+                                                      Y: =16
+                                                - lblBRF_EmailToLabel:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =varTheme_TextMuted
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =20
+                                                      Size: =8
+                                                      Text: ="TO"
+                                                      Width: =70
+                                                      X: =20
+                                                      Y: =58
+                                                - lblBRF_EmailToValue:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      BorderColor: =varTheme_Border
+                                                      BorderThickness: =1
+                                                      Color: =varTheme_Text
+                                                      Fill: =varTheme_SurfaceAlt
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =34
+                                                      PaddingLeft: =10
+                                                      Size: =9
+                                                      Text: ="Meeting participants · synthetic distribution list"
+                                                      Width: =Parent.Width - 110
+                                                      X: =90
+                                                      Y: =52
+                                                - lblBRF_EmailSubjectLabel:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =varTheme_TextMuted
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =20
+                                                      Size: =8
+                                                      Text: ="SUBJECT"
+                                                      Width: =70
+                                                      X: =20
+                                                      Y: =102
+                                                - lblBRF_EmailSubjectValue:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      BorderColor: =varTheme_Border
+                                                      BorderThickness: =1
+                                                      Color: =varTheme_Text
+                                                      Fill: =varTheme_SurfaceAlt
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =34
+                                                      PaddingLeft: =10
+                                                      Size: =9
+                                                      Text: ="PULSE | Weekly Punch Review | Bilbao LNG | 16 Aug 2026"
+                                                      Width: =Parent.Width - 110
+                                                      X: =90
+                                                      Y: =96
+                                                - txtBRF_EmailBody:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      AutoHeight: =true
+                                                      Color: =varTheme_Text
+                                                      Font: =Font.'Segoe UI'
+                                                      Size: =9
+                                                      Text: |-
+                                                        ="Dear all," & Char(10) & Char(10) &
+                                                        "Please find below the key outcomes from today's Punch Review." & Char(10) & Char(10) &
+                                                        "Summary" & Char(10) &
+                                                        "63 punches were reviewed and 21 were updated during the session." & Char(10) & Char(10) &
+                                                        "Key actions" & Char(10) &
+                                                        "Seven actions were identified; two still require an owner." & Char(10) & Char(10) &
+                                                        "Outstanding items" & Char(10) &
+                                                        "Vendor documentation and engineering clarification remain the main follow-up areas." & Char(10) & Char(10) &
+                                                        "Regards"
+                                                      Wrap: =true
+                                                      Width: =Parent.Width - 40
+                                                      X: =20
+                                                      Y: =154
+                                                - btnBRF_SendSynthetic:
+                                                    Control: ModernButton@1.0.0
+                                                    Properties:
+                                                      BasePaletteColor: =varTheme_ActionPrimary
+                                                      DisplayMode: =If(varBRF_TestState = "APPROVED", DisplayMode.Edit, DisplayMode.Disabled)
+                                                      Height: =40
+                                                      OnSelect: =Set(varBRF_TestState, "SENT")
+                                                      Text: =If(varBRF_TestState = "SENT", "Sent snapshot", "Send")
+                                                      Width: =120
+                                                      X: =Parent.Width - 140
+                                                      Y: =458
+                                                - lblBRF_EmailFooter:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =varTheme_TextMuted
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =34
+                                                      Size: =8
+                                                      Text: ="Local BRF-C01 transition only · no Outlook operation is executed"
+                                                      Width: =Parent.Width - 190
+                                                      X: =20
+                                                      Y: =462
+                              - conBRF_RightRail:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =Color.Transparent
+                                    FillPortions: =0
+                                    Height: =If(App.Width < 1180, 290, Parent.Height)
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =10
+                                    LayoutMinHeight: =280
+                                    LayoutMinWidth: =280
+                                    LayoutOverflowY: =LayoutOverflow.Scroll
+                                    Width: =If(App.Width < 1180, Parent.Width, 300)
+                                  Children:
+                                    - conBRF_Lifecycle:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: ManualLayout
+                                        Properties:
+                                          BorderColor: =varTheme_Border
+                                          BorderThickness: =1
+                                          DropShadow: =DropShadow.None
+                                          Fill: =varTheme_Surface
+                                          FillPortions: =0
+                                          Height: =166
+                                          LayoutMinHeight: =166
+                                          RadiusBottomLeft: =12
+                                          RadiusBottomRight: =12
+                                          RadiusTopLeft: =12
+                                          RadiusTopRight: =12
+                                        Children:
+                                          - lblBRF_LifecycleTitle:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =varTheme_Text
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =28
+                                                Size: =12
+                                                Text: ="Briefing lifecycle"
+                                                Width: =Parent.Width - 28
+                                                X: =14
+                                                Y: =12
+                                          - lblBRF_Lifecycle1:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =ColorValue("#15803D")
+                                                Font: =Font.'Segoe UI'
+                                                Height: =24
+                                                Size: =8
+                                                Text: ="✓  Session captured"
+                                                Width: =Parent.Width - 28
+                                                X: =14
+                                                Y: =48
+                                          - lblBRF_Lifecycle2:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =If(varBRF_TestState = "READY", varTheme_TextMuted, varTheme_ActionPrimary)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =24
+                                                Size: =8
+                                                Text: ="2  Briefing draft"
+                                                Width: =Parent.Width - 28
+                                                X: =14
+                                                Y: =74
+                                          - lblBRF_Lifecycle3:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =If(varBRF_TestState = "APPROVED" || varBRF_TestState = "SENT", ColorValue("#15803D"), varTheme_TextMuted)
+                                                Font: =Font.'Segoe UI'
+                                                Height: =24
+                                                Size: =8
+                                                Text: ="3  Approved"
+                                                Width: =Parent.Width - 28
+                                                X: =14
+                                                Y: =100
+                                          - lblBRF_Lifecycle4:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =If(varBRF_TestState = "SENT", ColorValue("#15803D"), varTheme_TextMuted)
+                                                Font: =Font.'Segoe UI'
+                                                Height: =24
+                                                Size: =8
+                                                Text: ="4  Sent / archived"
+                                                Width: =Parent.Width - 28
+                                                X: =14
+                                                Y: =126
+                                    - conBRF_SourceActivity:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: ManualLayout
+                                        Properties:
+                                          BorderColor: =varTheme_Border
+                                          BorderThickness: =1
+                                          DropShadow: =DropShadow.None
+                                          Fill: =varTheme_Surface
+                                          FillPortions: =0
+                                          Height: =360
+                                          LayoutMinHeight: =340
+                                          RadiusBottomLeft: =12
+                                          RadiusBottomRight: =12
+                                          RadiusTopLeft: =12
+                                          RadiusTopRight: =12
+                                        Children:
+                                          - lblBRF_SourceActivityTitle:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =varTheme_Text
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =28
+                                                Size: =12
+                                                Text: ="Source Activity"
+                                                Width: =Parent.Width - 28
+                                                X: =14
+                                                Y: =12
+                                          - lblBRF_Activity1:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =varTheme_Text
+                                                Font: =Font.'Segoe UI'
+                                                Height: =40
+                                                Size: =8
+                                                Text: ="10:21   Review session started · John Miller"
+                                                Width: =Parent.Width - 28
+                                                X: =14
+                                                Y: =50
+                                          - lblBRF_Activity2:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =varTheme_Text
+                                                Font: =Font.'Segoe UI'
+                                                Height: =40
+                                                Size: =8
+                                                Text: ="10:24   Punch reviewed · P-3801"
+                                                Width: =Parent.Width - 28
+                                                X: =14
+                                                Y: =92
+                                          - lblBRF_Activity3:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =varTheme_Text
+                                                Font: =Font.'Segoe UI'
+                                                Height: =40
+                                                OnSelect: =Set(varBRF_ShowEvidence, true)
+                                                Size: =8
+                                                Text: ="10:27   Comment added · P-3812 · Jane Smith"
+                                                Width: =Parent.Width - 28
+                                                X: =14
+                                                Y: =134
+                                          - lblBRF_Activity4:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =varTheme_Text
+                                                Font: =Font.'Segoe UI'
+                                                Height: =40
+                                                Size: =8
+                                                Text: ="10:32   Field updated · P-3910 · OPEN → HOLD"
+                                                Width: =Parent.Width - 28
+                                                X: =14
+                                                Y: =176
+                                          - lblBRF_Activity5:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =varTheme_Text
+                                                Font: =Font.'Segoe UI'
+                                                Height: =40
+                                                OnSelect: =Set(varBRF_ShowEvidence, true)
+                                                Size: =8
+                                                Text: ="10:37   Status changed · P-4104 · Alex Brown"
+                                                Width: =Parent.Width - 28
+                                                X: =14
+                                                Y: =218
+                                          - lblBRF_Activity6:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =varTheme_Text
+                                                Font: =Font.'Segoe UI'
+                                                Height: =40
+                                                Size: =8
+                                                Text: ="11:04   Review session ended · 84 events recorded"
+                                                Width: =Parent.Width - 28
+                                                X: =14
+                                                Y: =260
+                                          - lblBRF_ActivityLink:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =varTheme_ActionPrimary
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =26
+                                                OnSelect: =Set(varBRF_ShowEvidence, true)
+                                                Size: =8
+                                                Text: ="Open source evidence"
+                                                Width: =Parent.Width - 28
+                                                X: =14
+                                                Y: =314
+                        - conBRF_EvidenceDrawer:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =varTheme_BorderStrong
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.Semilight
+                              Fill: =varTheme_Surface
+                              Height: =Parent.Height - 8
+                              RadiusBottomLeft: =16
+                              RadiusBottomRight: =16
+                              RadiusTopLeft: =16
+                              RadiusTopRight: =16
+                              Visible: =varBRF_ShowEvidence
+                              Width: =Min(390, Parent.Width - 24)
+                              X: =Parent.Width - Self.Width - 4
+                              Y: =4
+                            Children:
+                              - lblBRF_EvidenceTitle:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =varTheme_Text
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =30
+                                    Size: =13
+                                    Text: ="Evidence"
+                                    Width: =Parent.Width - 110
+                                    X: =18
+                                    Y: =16
+                              - btnBRF_CloseEvidence:
+                                  Control: ModernButton@1.0.0
+                                  Properties:
+                                    BasePaletteColor: =varTheme_ActionPrimary
+                                    Height: =32
+                                    OnSelect: =Set(varBRF_ShowEvidence, false)
+                                    Text: ="Close"
+                                    Width: =78
+                                    X: =Parent.Width - 94
+                                    Y: =14
+                              - conBRF_EvidenceClaim:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: =varTheme_ActionBorderSoft
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_ActionSoft
+                                    Height: =92
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    Width: =Parent.Width - 36
+                                    X: =18
+                                    Y: =62
+                                  Children:
+                                    - txtBRF_EvidenceClaim:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_Text
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Size: =9
+                                          Text: ="Five punches remain dependent on Vendor A documentation."
+                                          Wrap: =true
+                                          Width: =Parent.Width - 24
+                                          X: =12
+                                          Y: =14
+                                    - lblBRF_EvidenceClaimMeta:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =varTheme_ActionPrimary
+                                          Font: =Font.'Segoe UI'
+                                          Height: =24
+                                          Size: =8
+                                          Text: ="5 sources · synthetic evidence preview"
+                                          Width: =Parent.Width - 24
+                                          X: =12
+                                          Y: =60
+                              - lblBRF_EvidenceSourcesTitle:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =varTheme_Text
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =26
+                                    Size: =10
+                                    Text: ="Sources"
+                                    Width: =Parent.Width - 36
+                                    X: =18
+                                    Y: =170
+                              - lblBRF_Evidence1:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =varTheme_Border
+                                    BorderThickness: =1
+                                    Color: =varTheme_Text
+                                    Fill: =varTheme_SurfaceAlt
+                                    Font: =Font.'Segoe UI'
+                                    Height: =58
+                                    PaddingLeft: =10
+                                    Size: =8
+                                    Text: ="P-3812" & Char(10) & "Comment added · 10:34 · Vendor to provide revised certificate"
+                                    Width: =Parent.Width - 36
+                                    X: =18
+                                    Y: =204
+                              - lblBRF_Evidence2:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =varTheme_Border
+                                    BorderThickness: =1
+                                    Color: =varTheme_Text
+                                    Fill: =varTheme_SurfaceAlt
+                                    Font: =Font.'Segoe UI'
+                                    Height: =58
+                                    PaddingLeft: =10
+                                    Size: =8
+                                    Text: ="P-4104" & Char(10) & "Responsible changed · 10:42 · ABC → Vendor A"
+                                    Width: =Parent.Width - 36
+                                    X: =18
+                                    Y: =270
+                              - lblBRF_Evidence3:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =varTheme_Border
+                                    BorderThickness: =1
+                                    Color: =varTheme_Text
+                                    Fill: =varTheme_SurfaceAlt
+                                    Font: =Font.'Segoe UI'
+                                    Height: =58
+                                    PaddingLeft: =10
+                                    Size: =8
+                                    Text: ="P-4120" & Char(10) & "Status changed · 10:51 · OPEN → HOLD"
+                                    Width: =Parent.Width - 36
+                                    X: =18
+                                    Y: =336
+                              - lblBRF_Evidence4:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =varTheme_Border
+                                    BorderThickness: =1
+                                    Color: =varTheme_Text
+                                    Fill: =varTheme_SurfaceAlt
+                                    Font: =Font.'Segoe UI'
+                                    Height: =58
+                                    PaddingLeft: =10
+                                    Size: =8
+                                    Text: ="P-4199" & Char(10) & "Status changed · 10:58 · source event"
+                                    Width: =Parent.Width - 36
+                                    X: =18
+                                    Y: =402
+                              - lblBRF_Evidence5:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =varTheme_Border
+                                    BorderThickness: =1
+                                    Color: =varTheme_Text
+                                    Fill: =varTheme_SurfaceAlt
+                                    Font: =Font.'Segoe UI'
+                                    Height: =58
+                                    PaddingLeft: =10
+                                    Size: =8
+                                    Text: ="P-4211" & Char(10) & "Comment added · 11:02 · source event"
+                                    Width: =Parent.Width - 36
+                                    X: =18
+                                    Y: =468
+                              - lblBRF_EvidenceFooter:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =varTheme_TextMuted
+                                    Font: =Font.'Segoe UI'
+                                    Height: =40
+                                    Size: =8
+                                    Text: ="BRF-C01 only demonstrates the evidence interaction. These are not real Punch records."
+                                    Width: =Parent.Width - 36
+                                    X: =18
+                                    Y: =542
