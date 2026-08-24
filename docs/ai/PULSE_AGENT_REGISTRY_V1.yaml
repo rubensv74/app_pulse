@@ -1,0 +1,201 @@
+schema_version: 1
+registry_id: PULSE-AI-AGENTS-V1
+product: PULSE
+status: PILOT_ACTIVE
+
+transversal_contracts:
+  knowledge_base: rubensv74/functional-engineering-knowledge-base
+  concept: 10-concepts/ai-assisted-engineering/ai-engineering-agent-team.md
+  agent_contract_standard: 15-standards/ai-assisted-engineering/ai-agent-contract-standard.md
+  runtime_routing_standard: 15-standards/ai-assisted-engineering/ai-runtime-capability-routing-standard.md
+  runtime_routing_reference: 50-reference/ai-assisted-engineering/AI_RUNTIME_ROUTING_MATRIX_V1.md
+  routing_pattern: 20-patterns/ai-assisted-engineering/orchestrator-led-specialist-agent-routing.md
+  team_playbook: 30-playbooks/ai-assisted-engineering/run-ai-engineering-agent-team.md
+
+local_delivery_contracts:
+  incremental_protocol: docs/development/PROTOCOLO_IMPLEMENTACION_INCREMENTAL_ASISTIDA.md
+  modular_power_apps_protocol: docs/development/PROTOCOLO_CONSTRUCCION_MODULAR_PANTALLAS_POWER_APPS.md
+  preserve_existing_method: true
+
+local_runtime_profile:
+  path: docs/ai/PULSE_RUNTIME_ROUTING_V1.yaml
+  status: PILOT_ACTIVE
+
+technology_policy:
+  preferred_business_app_platform: POWER_APPS
+  preferred_automation_platform: POWER_AUTOMATE
+  preferred_data_platform: SQL
+  exception_requires_architecture_rationale: true
+  principle: POWER_APPS_FIRST_NOT_POWER_APPS_ONLY
+
+routing_policy:
+  orchestrator_required_for_material_work: true
+  knowledge_navigation_before_material_design: true
+  select_minimum_agent_set: true
+  build_review_separation: true
+  human_gate_only_when_material: true
+  runtime_routing_profile_required: true
+  use_lowest_sufficient_capability: true
+  escalate_reasoning_only_when_needed: true
+  demote_after_complex_decision_closes: true
+  execution_governor: PILOT_CONDITIONAL
+
+source_precedence:
+  - real_runtime_evidence
+  - current_repository_and_contracts
+  - current_incremental_protocol_and_design_system
+  - current_implementation
+  - historical_docs
+  - agent_hypothesis
+
+agents:
+  - id: ORCHESTRATOR
+    family: COORDINATION
+    status: ACTIVE
+    purpose: Route material PULSE work to the minimum necessary agents and runtime capabilities while preserving the current incremental method.
+
+  - id: KNOWLEDGE_NAVIGATOR
+    family: COORDINATION
+    status: ACTIVE
+    default_runtime: R1_FAST_WITH_CONNECTED_SOURCES
+    purpose: Resolve PULSE canonical context before design or implementation.
+    required_sources:
+      - AGENTS.md
+      - docs/ai/README.md
+      - docs/development/PROTOCOLO_IMPLEMENTACION_INCREMENTAL_ASISTIDA.md
+      - docs/ai/PULSE_RUNTIME_ROUTING_V1.yaml
+
+  - id: EXECUTION_GOVERNOR
+    family: COORDINATION
+    status: PILOT_CONDITIONAL
+    default_runtime: R2_STANDARD
+    purpose: Avoid unnecessary new WIP when current Issues/PRs/gates already define the correct lane.
+    triggers: [new_material_issue_branch_pr, reactivate_parked_work, explicit_priority_change]
+
+  - id: FUNCTIONAL_REQUIREMENTS
+    family: BUILD_SPECIALIST
+    status: ACTIVE
+    default_runtime: R2_STANDARD
+    purpose: Convert project-controls needs into clear requirements, states, acceptance and traceability.
+
+  - id: ARCHITECTURE
+    family: BUILD_SPECIALIST
+    status: ACTIVE
+    default_runtime: R3_DEEP
+    purpose: Protect application, integration and data boundaries and justify any exception to the preferred Power Platform stack.
+
+  - id: DATABASE
+    family: BUILD_SPECIALIST
+    status: ACTIVE
+    default_runtime: R2_STANDARD
+    escalate_to: R3_DEEP_FOR_COMPLEX_PERFORMANCE_CONCURRENCY_MIGRATION_OR_HIGH_RISK_DATA_CHANGE
+    purpose: Design/review SQL, schema, integrity, permissions, transactions and performance.
+
+  - id: POWER_PLATFORM
+    family: BUILD_SPECIALIST
+    status: ACTIVE
+    default_runtime: R2_STANDARD_CODE
+    purpose: Design/review Power Apps and Power Automate implementation, delegation, state and runtime contracts.
+
+  - id: UI_UX
+    family: BUILD_SPECIALIST
+    status: ACTIVE
+    default_runtime: R2_STANDARD
+    purpose: Design information architecture, interaction and premium visual composition using the existing PULSE design system and component catalog.
+    required_sources:
+      - docs/design-system/PULSE_DESIGN_SYSTEM.md
+      - docs/design-system/PULSE_PREMIUM_SCREEN_STANDARD_V1.md
+      - docs/design-system/PULSE_PAGE_HEADER_HIERARCHY_V1.md
+      - docs/design-system/POWER_APPS_VISUAL_QA_GUARDRAILS.md
+      - docs/design-system/COMPONENT_CATALOG.md
+
+  - id: TEST_QUALITY
+    family: BUILD_SPECIALIST
+    status: ACTIVE
+    default_runtime: R2_STANDARD_CODE
+    purpose: Derive tests/evidence from requirements and detect regression gaps.
+
+  - id: SECURITY
+    family: BUILD_SPECIALIST
+    status: ACTIVE
+    default_runtime: R3_DEEP_WHEN_MATERIAL
+    purpose: Review identity, permissions, exposure, secrets and trust boundaries.
+
+  - id: DOCUMENTATION_KNOWLEDGE
+    family: BUILD_SPECIALIST
+    status: ACTIVE
+    default_runtime: R1_FAST_OR_R2_STANDARD
+    purpose: Keep development docs, contracts, AI catalog and reusable learning current.
+
+  - id: PROJECT_CONTROLS_DOMAIN
+    family: DOMAIN_SPECIALIST
+    status: ACTIVE
+    default_runtime: R2_STANDARD
+    purpose: Apply construction/project-controls semantics without replacing technical specialists.
+
+  - id: REQUIREMENTS_GUARDIAN
+    family: GUARDIAN
+    status: ACTIVE
+    default_runtime: R2_STANDARD
+    purpose: Try to falsify requirement coverage, status honesty and gate compliance.
+
+  - id: ARCHITECTURE_GUARDIAN
+    family: GUARDIAN
+    status: ACTIVE
+    default_runtime: R3_DEEP
+    purpose: Try to detect architectural drift, invalid dependencies and duplicated authority.
+
+  - id: DATABASE_GUARDIAN
+    family: GUARDIAN
+    status: ACTIVE
+    default_runtime: R2_STANDARD
+    escalate_to: R3_DEEP_WHEN_MATERIAL
+    purpose: Try to detect data integrity, idempotency, concurrency, permission and performance risks.
+
+  - id: UI_GUARDIAN
+    family: GUARDIAN
+    status: ACTIVE
+    default_runtime: R2_STANDARD
+    purpose: Try to detect misleading states, design-system drift and avoidable component duplication.
+
+  - id: ASYNC_ACTION_GUARDIAN
+    family: GUARDIAN
+    status: ACTIVE
+    default_runtime: R2_STANDARD
+    purpose: Try to detect duplicate-execution exposure in async, transactional or non-repeatable actions.
+
+  - id: SECURITY_GUARDIAN
+    family: GUARDIAN
+    status: ACTIVE
+    default_runtime: R3_DEEP_WHEN_MATERIAL
+    purpose: Adversarially review security boundaries independently from the builder.
+
+  - id: RED_TEAM
+    family: GUARDIAN
+    status: ACTIVE
+    default_runtime: R3_DEEP
+    purpose: Combine plausible data, user, runtime, concurrency, integration and recovery failures before material closeout.
+
+human_gate_policy:
+  valid_gate_types:
+    - BUSINESS_DECISION
+    - VISUAL_APPROVAL
+    - MANUAL_RUNTIME_EVIDENCE
+    - EXTERNAL_INPUT
+    - RISK_APPROVAL
+    - PRIORITY_OVERRIDE
+  do_not_escalate_for:
+    - repository_context_not_searched
+    - standard_not_read
+    - technical_question_resolvable_by_evidence
+    - agent_preference
+    - model_selection
+
+common_output_contract:
+  - result_or_verdict
+  - evidence
+  - assumptions
+  - risks_or_open_questions
+  - changes_made_or_proposed
+  - next_action
+  - gate_status
