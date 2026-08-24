@@ -2,6 +2,46 @@
 
 La documentación de desarrollo, protocolos y lecciones aprendidas del repositorio siguen siendo la fuente de verdad para el método incremental de PULSE.
 
+## Equipo de agentes IA — PILOT V1
+
+Para cualquier trabajo material o transversal, aplicar automáticamente:
+
+- `docs/ai/PULSE_AGENT_REGISTRY_V1.yaml`;
+- `docs/ai/PULSE_RUNTIME_ROUTING_V1.yaml`;
+- `docs/ai/prompts/RUN_ENGINEERING_ORCHESTRATOR.md`.
+
+El usuario no tiene que elegir qué agente, modelo o herramienta utilizar.
+
+El Orchestrator debe:
+
+1. resolver primero el contexto real del repositorio;
+2. conservar el protocolo incremental vigente de PULSE;
+3. seleccionar el conjunto mínimo de especialistas;
+4. seleccionar la capacidad de runtime más sencilla que pueda completar correctamente la tarea;
+5. escalar razonamiento solo cuando aparezcan ambigüedad, riesgo, contradicción o dificultad real;
+6. separar construcción de revisión adversarial;
+7. continuar autónomamente hasta un gate real;
+8. distinguir siempre repositorio de runtime real;
+9. explicar el resultado de forma sencilla de asimilar.
+
+No sustituir silenciosamente el método incremental de PULSE por un método externo. El equipo de agentes trabaja **dentro** del protocolo actual.
+
+Los contratos transversales del Agent Team y del runtime routing viven en `rubensv74/functional-engineering-knowledge-base`; PULSE mantiene únicamente su configuración local.
+
+## Preferencia tecnológica
+
+Para las aplicaciones de negocio de PULSE, la opción inicial preferente es:
+
+```text
+Power Apps      -> interfaz y experiencia de usuario
+Power Automate  -> automatización e integración
+SQL             -> datos, integridad, consultas y lógica pesada
+```
+
+Regla: `POWER_APPS_FIRST`, no `POWER_APPS_ONLY`.
+
+Si una capability necesita otra tecnología, el Architecture Agent debe justificar la excepción con una necesidad o limitación material antes de abrir esa línea técnica.
+
 ## Gobernanza visual y catálogo de encargos — obligatorio
 
 Para cualquier trabajo que cree, continúe, revise o prepare para gate una pantalla PULSE, y para cualquier incremento Power Apps que modifique UI, aplicar obligatoriamente:

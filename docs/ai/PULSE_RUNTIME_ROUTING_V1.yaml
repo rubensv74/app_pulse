@@ -1,0 +1,82 @@
+schema_version: 1
+profile_id: PULSE-AI-RUNTIME-ROUTING-V1
+product: PULSE
+status: PILOT_ACTIVE
+
+transversal_standard:
+  repository: rubensv74/functional-engineering-knowledge-base
+  path: 15-standards/ai-assisted-engineering/ai-runtime-capability-routing-standard.md
+
+product_delivery_method:
+  preserve_existing_incremental_protocol: true
+  canonical_protocol: docs/development/PROTOCOLO_IMPLEMENTACION_INCREMENTAL_ASISTIDA.md
+  power_apps_modular_protocol: docs/development/PROTOCOLO_CONSTRUCCION_MODULAR_PANTALLAS_POWER_APPS.md
+  do_not_silently_replace_with_external_delivery_method: true
+  continue_until_real_gate: true
+  repository_runtime_separation: true
+
+technology_preference:
+  mode: PREFERRED_NOT_MANDATORY
+  ui_business_app: power-apps
+  workflow_integration: power-automate
+  data_integrity_heavy_logic: sql-server
+  exception_requires_architecture_justification: true
+  principle: POWER_APPS_FIRST_NOT_POWER_APPS_ONLY
+
+source_binding:
+  repository_state: CONNECTED_SOURCE_REQUIRED
+  power_apps_runtime_state: CONNECTED_SOURCE_REQUIRED_WHEN_AVAILABLE
+  sql_runtime_state: CONNECTED_SOURCE_REQUIRED_WHEN_AVAILABLE
+  current_public_information: SEARCH_CURRENT_PUBLIC
+  supplied_content: LOCAL_CONTEXT_SUFFICIENT
+  do_not_substitute_memory_for_real_source: true
+
+reasoning_defaults:
+  repository_lookup: R1_FAST
+  classification_and_extraction: R1_FAST
+  normal_functional_analysis: R2_STANDARD
+  normal_power_apps_implementation: R2_STANDARD
+  normal_power_automate_implementation: R2_STANDARD
+  normal_sql_implementation: R2_STANDARD
+  ui_using_existing_design_system: R2_STANDARD
+  architecture_change: R3_DEEP
+  high_risk_data_or_permission_change: R3_DEEP
+  complex_root_cause: R3_DEEP
+  red_team: R3_DEEP
+
+execution_policy:
+  analysis_only: READ_ONLY
+  repository_change: REPOSITORY_WRITE
+  runtime_validation: RUNTIME_EXECUTION
+  irreversible_or_high_risk_write: HUMAN_GATE_OR_EXPLICIT_AUTHORIZATION
+
+modalities:
+  implementation: CODE
+  mockup_or_image: VISUAL
+  spreadsheet_or_dataset: DATA_ANALYSIS
+  current_public_information: SEARCH_CURRENT_PUBLIC
+  private_system_state: CONNECTED_BUSINESS_SYSTEM
+
+escalation:
+  enabled: true
+  ladder: [R1_FAST, R2_STANDARD, R3_DEEP]
+  triggers:
+    - unresolved_ambiguity
+    - canonical_source_contradiction
+    - high_risk_change
+    - difficult_root_cause
+    - multi_layer_material_change
+    - expensive_to_reverse_decision
+  demote_after_complex_decision_closes: true
+
+runtime_truth:
+  repository_equals_runtime: false
+  power_apps_studio_is_runtime_evidence: true
+  sql_execution_is_runtime_evidence: true
+  generated_yaml_is_runtime_evidence: false
+  merged_pr_is_runtime_evidence: false
+  no_runtime_access_status: WAITING_MANUAL_RUNTIME_EVIDENCE
+
+communication:
+  expose_routing_to_user: ONLY_WHEN_MATERIAL
+  explain_in_simple_language: true
