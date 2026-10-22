@@ -19,11 +19,17 @@ The screen export contains 256 controls and 12 Canvas Component instances across
 | Medium | Several toolbar choices are placeholders or do not perform their label's action. | `MORE` displays “Additional actions will be added here.” `COMMENTS` only notifies that the punch will open in the review workspace. `COLUMNS` only tells the user to use the grid gear. These controls add dead-end steps and duplicate the table's own affordances. |
 | Medium | Four KPI instances pass an empty `AccessibleLabel`. | The cards are clickable for Total/Open/Closed and visual-only for Completion, but the instance labels are blank. Screen-level scan found 51 controls with an `OnSelect`/`OnChange` and no `AccessibleLabel` or `Tooltip`; this is a candidate count because some are internal or sortable labels, not necessarily standalone keyboard targets. |
 | Medium | Studio screenshot and formula disagree on the Open KPI trend tone. | The screenshot shows the positive Open delta in green. The current Home instance sets `TrendTone` to `danger` when the Open delta is positive. Confirm that both artifacts are the same revision and decide the intended meaning of an increase in open punches. |
-| Medium | The shown KPI totals leave a count unexplained. | Screenshot: Total 13,719; Open 6,766; Closed 6,904. Open + Closed = 13,670, leaving 49 punches outside those two labels. This may be valid if other statuses exist; the dashboard does not explain them in the visible KPI summary. |
+| Medium | The visible KPI summary omits the `CLEARED` status. | The recorded bundle returns OPEN 6,785; CLEARED 63; CLOSED 6,975; total 13,823. The three statuses reconcile exactly. The KPI strip shows Total/Open/Closed only, leaving users unable to reconcile the 63 CLEARED punches. Decide whether to add a CLEARED KPI or clarify the Total card's composition. |
 | Medium | The supplied YAML copy contains a raw control character in a status string. | A raw U+008F occurs in the `In Progress` text formula (source line 1566), and a standard YAML parser rejects the supplied file. This may be copy/encoding corruption rather than the actual Studio source; inspect the source in Studio before importing or editing this text. |
 | Low | Home retains a Tasks dashboard branch while its tabs are hidden. | The screen contains separate `TASKS` and `PUNCHES` surfaces, but the selector container has `Visible=false`. Confirm whether the Tasks branch is intentionally retired or has lost its entry point. |
 
-### Visual risks from the screenshot
+### Runtime evidence — 2026-10-22
+
+A captured execution of `warroom_GetPunchDashboardBundle` returned `success=true`, `hasSnapshot=true`, and DataVersion `3.0`. It generated snapshot 54 from previous snapshot 53 in 5.384 seconds. The response reports a source count of 13,823 and status counts OPEN 6,785, CLEARED 63, CLOSED 6,975; these sum exactly to the source count.
+
+This successful run does not reproduce the Studio “division by zero” notification seen in the recording. It rules out this specific bundle execution as the source of that notification, but does not rule out another execution, a separate flow, or a Canvas formula error. Static inspection of Home and its used component formulas found no unguarded dynamic divisor; the remaining error needs the Power Apps Monitor/App Checker event or a repeatable formula trace to identify its control.
+
+## Visual risks from the screenshot
 
 - The screen is very dense: filters, four KPI cards, two analytics panels, an action toolbar and a data table share one view.
 - Heatmap, discipline panel and table each have their own scrolling region. This divides attention and makes the relationship between the selected cell, chart and rows harder to follow.
@@ -60,5 +66,5 @@ The repository source for `cmp_SidebarNav` is not byte-equivalent to the supplie
 
 - Static source inspection: completed for this first Home pass.
 - Studio/App Checker and interaction validation: `NOT_RUN` (manual runtime gate).
-- Flow-contract validation: `GATED` on real exported flow definitions/response contracts.
+- Flow-contract validation: one successful bundle response captured; full contract remains `GATED` on active Flow and SQL definitions.
 - Redesign/reference-image work: deferred until the findings and functional contract are settled.
