@@ -661,79 +661,24 @@ Screens:
           Children:
             - comp_DetailDrawer_5:
                 Control: CanvasComponent
-                ComponentName: cmp_DetailDrawer_Premium
+                ComponentName: cmp_DetailDrawer_old
                 Properties:
                   AppColors: =gblAppColors
                   CloseAction: =Set(varShowDetailDrawer, false)
                   EntityType: =varDrawerEntityType
-                  Fill: =RGBA(0,0,0,0)
-                  Height: =App.Height
                   HostHeight: =App.Height
                   HostWidth: =App.Width
                   IsLoading: =varDrawerIsLoading
                   IsOpen: =varShowDetailDrawer
                   NormalizedRecord: =varDrawerNormalized
-                  OnDeleteComment: =Set(varDrawerSelectedCommentId, 0)
                   OnManageFieldsRequested: |-
                     =
                     Set(varCT_ShowManageFields, true);
-
                     Set(varCT_DefsSearch, "");
-
                     Set(varCT_DefsError, "");
-
                     Select(btnCT_LoadDefs_5)
-                  OnPostComment: |-
-                    =
-                    If(
-                        IsBlank(Trim(varDrawerCommentDraft)),
-                        Notify("Comment is required.", NotificationType.Warning),
-                        Set(varIsLoadingComments, true);
-                        Set(varDrawerIsLoading, true);
-                        IfError(
-                            Warroom_AddTaskComment.Run(
-                                varProjectId,
-                                varDrawerRecordId,
-                                varDrawerCommentDraft,
-                                varUserEmail,
-                                varDrawerEntityType,
-                                varUserName,
-                                "Comment"
-                            );
-                            Set(varDrawerCommentDraft, "");
-                            Select(btnDrawerLoad_Comments_5);
-                            Set(varDrawerIsLoading, false),
-                            Set(varIsLoadingComments, false);
-                            Set(varDrawerIsLoading, false);
-                            Notify("The comment could not be saved.", NotificationType.Error)
-                        )
-                    )
-                  OnRefreshRequested: =Select(btnDrawerLoad_2)
-                  OnSaveFields: |-
-                    =
-                    If(
-                        CountRows(colCT_Dirty) = 0,
-                        Notify("There are no changes to save.", NotificationType.Information),
-                        Set(varCT_IsSaving, true);
-                        Set(varCT_Error, "");
-                        IfError(
-                            WarRoom_SaveCustomBulk.Run(
-                                varProjectId,
-                                varDrawerEntityType,
-                                varDrawerRecordId,
-                                JSON(colCT_Dirty, JSONFormat.Compact),
-                                varUserEmail
-                            );
-                            Clear(colCT_Dirty);
-                            Select(btnDrawerLoad_Custom_5);
-                            Set(varCT_IsSaving, false);
-                            Notify("Custom fields saved.", NotificationType.Success),
-                            Set(varCT_IsSaving, false);
-                            Set(varCT_Error, "The custom fields could not be saved.");
-                            Notify(varCT_Error, NotificationType.Error)
-                        )
-                    )
-                  OnTabChanged: =Select(btnDrawerLoad_2)
+                  OnSaveCustomField: =Select(btnCT_SaveFieldDef_5)
+                  OnToggleFieldActiveRequested: =Select(btnCT_SetActive_5)
                   ProjectId: =varProjectId
                   RecordId: =varDrawerRecordId
                   SelectedRecord: =varDrawerSelectedRecord
