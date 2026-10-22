@@ -1243,11 +1243,9 @@ Screens:
                                           ItemDisplayText: =ThisItem.ProjectDisplayName
                                           Items: =colEnabledProjectsUI
                                           OnChange: |-
-                                            =
-
-
-                                            If(
-                                                !IsBlank(Self.Selected.ProjectId),
+                                            =If(
+                                                !IsBlank(Self.Selected.ProjectId) &&
+                                                Value(Self.Selected.ProjectId) <> Value(Coalesce(varProjectId, 0)),
 
                                                 Set(varPendingProjectId, Value(Self.Selected.ProjectId));
 
@@ -1342,36 +1340,21 @@ Screens:
                                                 IsBlank(varPunchDashboardTemplateId),
                                                 [],
                                                 Filter(
-                                                    AddColumns(
-                                                        colPunchTemplates_Filter,
-                                                        TemplateDisplayText,
-                                                        Coalesce(
-                                                            TemplateDisplayName,
-                                                            TemplateName,
-                                                            TemplateCode,
-                                                            Text(TemplateId)
-                                                        )
-                                                    ),
-                                                    Value(TemplateId) =
-                                                        Value(varPunchDashboardTemplateId)
+                                                    colPunchTemplates_Filter,
+                                                    Value(TemplateId) = Value(varPunchDashboardTemplateId)
                                                 )
                                             )
                                           Fill: =varTheme_Surface
                                           FontWeight: =FontWeight.Semibold
                                           InputTextPlaceholder: ="Select template"
                                           IsSearchable: =false
-                                          ItemDisplayText: =ThisItem.TemplateDisplayText
-                                          Items: |-
-                                            =AddColumns(
-                                                colPunchTemplates_Filter,
-                                                TemplateDisplayText,
-                                                Coalesce(
-                                                    TemplateDisplayName,
-                                                    TemplateName,
-                                                    TemplateCode,
-                                                    Text(TemplateId)
-                                                )
-                                            )
+                                          ItemDisplayText: =Coalesce(
+                                              ThisItem.TemplateDisplayName,
+                                              ThisItem.TemplateName,
+                                              ThisItem.TemplateCode,
+                                              Text(ThisItem.TemplateId)
+                                          )
+                                          Items: =colPunchTemplates_Filter
                                           OnChange: |-
                                             =If(
                                                 !IsBlank(Self.Selected.TemplateId) &&
