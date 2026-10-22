@@ -1,0 +1,1435 @@
+=
+If(
+    IsBlank(varProjectId),
+        Notify(
+                "Please select a project first.",
+                NotificationType.Warning
+            );
+
+            Set(varPunchDashboardLoading, false);
+            Set(varGlobalLoading, false);
+            Set(varGlobalLoadingMsg, "");
+            Set(varGlobalLoadingSubMsg, "");
+            Set(varGlobalLoadingScope, "");
+            Set(varGlobalLoadAction, "");
+            Set(varGlobalLoadPending, false),
+    If(
+        varPunchDashboardLoading,
+        Blank(),
+        Set(
+            varPunchDashboardForceRefreshRequest,
+            Coalesce(
+                varPunchDashboardForceRefresh,
+                false
+            )
+        );
+
+        Set(
+            varPunchDashboardForceRefresh,
+            false
+        );
+
+        Set(varPunchDashboardLoading, true);
+        Set(varPunchDashboardError, "");
+        Set(varPunchDashboardHasSnapshot, false);
+
+        Clear(colPunchDashboardSnapshotInfo);
+        Clear(colPunchDashboardSummary);
+        Clear(colPunchDashboardMatrix);
+        Clear(colPunchDashboardTimeline);
+        Clear(colPunchDashboardInsights);
+        Clear(colPunchDashboardSubsystems);
+        Clear(colPunchDashboardSubcontractors);
+        Clear(colPunchDashboardPunches);
+
+        Clear(colPunchExecutiveHeatmapRows);
+        Clear(colPunchExecutiveHeatmapColumns);
+        Clear(colPunchExecutiveHeatmapCells);
+        Clear(colPunchExecutiveDistribution);
+        Clear(colPunchExecutiveSelection);
+
+        Set(varPunchDrillSubsystemCode, "");
+        Set(varPunchDrillCategoryCode, "");
+        Set(varPunchDrillSubcontractorId, -1);
+        Set(varPunchDrillSubcontractorName, "");
+        Set(varPunchDrillStatusCode, "");
+        Set(varPunchDrillDisciplineCode, "");
+
+        Set(varPunchExecutiveGridPage, 1);
+        Set(
+            varPunchExecutiveGridPageSize,
+            Coalesce(
+                varPunchExecutiveGridPageSize,
+                25
+            )
+        );
+        Set(
+            varPunchExecutiveGridSortColumn,
+            Coalesce(
+                varPunchExecutiveGridSortColumn,
+                "SourceOrder"
+            )
+        );
+        Set(
+            varPunchExecutiveGridSortDirection,
+            Coalesce(
+                varPunchExecutiveGridSortDirection,
+                SortOrder.Ascending
+            )
+        );
+        Set(varPunchExecutiveGridSelectedId, Blank());
+
+        Clear(colHomePunchTimelineSorted);
+        Clear(colHomePunchKpiTrendTotal);
+        Clear(colHomePunchKpiTrendOpen);
+        Clear(colHomePunchKpiTrendClosed);
+        Clear(colHomePunchKpiTrendCompletion);
+        Clear(colHomePunchDonutItems);
+
+        Set(varHomePunchKpiTotal, 0);
+        Set(varHomePunchKpiOpen, 0);
+        Set(varHomePunchKpiClosed, 0);
+        Set(varHomePunchKpiCompletion, 0);
+
+        // =====================================================
+        // LOAD PROJECT PUNCH TEMPLATES
+        // Only load when the local catalog is empty.
+        // =====================================================
+
+        If(
+            CountRows(colPunchTemplates_Filter) = 0,
+
+            IfError(
+                With(
+                    {
+                        _templatesResp:
+                            Warroom_GetProjectPunchTemplates.Run(
+                                Value(varProjectId)
+                            )
+                    },
+
+                    ClearCollect(
+                        colPunchTemplates_Filter,
+
+                        SortByColumns(
+                            Filter(
+                                ForAll(
+                                    Table(
+                                        ParseJSON(
+                                            Coalesce(
+                                                _templatesResp.result,
+                                                "[]"
+                                            )
+                                        )
+                                    ),
+
+                                    {
+                                        ProjectId:
+                                            Value(
+                                                Text(Value.ProjectId)
+                                            ),
+
+                                        TemplateId:
+                                            Value(
+                                                Text(Value.TemplateId)
+                                            ),
+
+                                        TemplateCode:
+                                            Text(Value.TemplateCode),
+
+                                        TemplateName:
+                                            Text(Value.TemplateName),
+
+                                        TemplateDisplayName:
+                                            Coalesce(
+                                                Text(Value.TemplateDisplayName),
+                                                Text(Value.TemplateName),
+                                                Text(Value.TemplateCode)
+                                            ),
+
+                                        IsIncluded:
+                                            Lower(
+                                                Text(Value.IsIncluded)
+                                            ) = "true" ||
+                                            Text(Value.IsIncluded) = "1",
+
+                                        DisplayOrder:
+                                            If(
+                                                IsBlank(
+                                                    Text(Value.DisplayOrder)
+                                                ) ||
+                                                Text(Value.DisplayOrder) = "null",
+
+                                                9999,
+
+                                                Value(
+                                                    Text(Value.DisplayOrder)
+                                                )
+                                            )
+                                    }
+                                ),
+
+                                IsIncluded
+                            ),
+
+                            "DisplayOrder",
+                            SortOrder.Ascending
+                        )
+                    );
+
+                    true
+                ),
+
+                Set(
+                    varPunchDashboardError,
+                    FirstError.Message
+                );
+
+                false
+            )
+        );
+
+        // =====================================================
+        // DEFAULT TEMPLATE
+        // =====================================================
+
+        If(
+            IsBlank(varPunchDashboardTemplateId) &&
+            CountRows(colPunchTemplates_Filter) > 0,
+
+            Set(
+                varPunchDashboardTemplateId,
+                Value(
+                    First(colPunchTemplates_Filter).TemplateId
+                )
+            )
+        );
+
+        // =====================================================
+        // LOAD DASHBOARD BUNDLE
+        // =====================================================
+
+        If(
+            IsBlank(varPunchDashboardError) &&
+            !IsBlank(varPunchDashboardTemplateId),
+
+            IfError(
+                With(
+                    {
+                        _resp:
+                            warroom_GetPunchDashboardBundle.Run(
+            Value(varProjectId),
+            Value(varPunchDashboardTemplateId),
+            If(
+                varPunchDashboardForceRefreshRequest,
+                1,
+                0
+            )
+        )
+                    },
+
+                    With(
+                        {
+                            _bundle:
+                                ParseJSON(
+                                    Coalesce(
+                                        _resp.result,
+                                        "{}"
+                                    )
+                                )
+                        },
+
+                        // =====================================================
+                        // BUNDLE STATUS
+                        // =====================================================
+
+                        Set(
+                            varPunchDashboardHasSnapshot,
+
+                            Lower(
+                                Text(_bundle.hasSnapshot)
+                            ) = "true" ||
+                            Text(_bundle.hasSnapshot) = "1"
+                        );
+
+                        Set(
+                            varPunchDashboardMessage,
+                            Coalesce(
+                                Text(_bundle.message),
+                                ""
+                            )
+                        );
+
+         // =====================================================
+        // CONTRACT VERSION
+        // =====================================================
+
+        Set(
+            varPunchDashboardContractVersion,
+            Coalesce(
+                Text(_bundle.contractVersion),
+                ""
+            )
+        );
+
+        If(
+            !IsBlank(varPunchDashboardContractVersion) &&
+            !StartsWith(
+                varPunchDashboardContractVersion,
+                "3."
+            ),
+
+            Set(
+                varPunchDashboardError,
+                "Unsupported Punch Dashboard contract version: " &
+                varPunchDashboardContractVersion
+            )
+        );
+
+        // =====================================================
+        // SNAPSHOT INFO
+        // Contract v3 property: snapshotInfo
+        // =====================================================
+
+        ClearCollect(
+            colPunchDashboardSnapshotInfo,
+
+            ForAll(
+                Table(_bundle.snapshotInfo),
+
+                {
+                    SnapshotRunId:
+                        If(
+                            IsBlank(Text(Value.SnapshotRunId)) ||
+                            Lower(Text(Value.SnapshotRunId)) = "null",
+
+                            Blank(),
+
+                            Value(
+                                Text(Value.SnapshotRunId)
+                            )
+                        ),
+
+                    PreviousSnapshotRunId:
+                        If(
+                            IsBlank(Text(Value.PreviousSnapshotRunId)) ||
+                            Lower(Text(Value.PreviousSnapshotRunId)) = "null",
+
+                            Blank(),
+
+                            Value(
+                                Text(Value.PreviousSnapshotRunId)
+                            )
+                        ),
+
+                    GeneratedOn:
+                        If(
+                            IsBlank(Text(Value.GeneratedOn)) ||
+                            Lower(Text(Value.GeneratedOn)) = "null",
+
+                            Blank(),
+
+                            DateTimeValue(
+                                Text(Value.GeneratedOn)
+                            )
+                        ),
+
+                    SourcePunchCount:
+                        Value(
+                            Coalesce(
+                                Text(Value.SourcePunchCount),
+                                "0"
+                            )
+                        ),
+
+                    DurationMs:
+                        Value(
+                            Coalesce(
+                                Text(Value.DurationMs),
+                                "0"
+                            )
+                        ),
+
+                    DataVersion:
+                        Coalesce(
+                            Text(Value.DataVersion),
+                            varPunchDashboardContractVersion,
+                            ""
+                        )
+                }
+            )
+        );
+
+        // =====================================================
+        // KPI SUMMARY
+        // Contract v3 property: summary
+        // =====================================================
+
+        ClearCollect(
+            colPunchDashboardSummary,
+
+            ForAll(
+                Table(_bundle.summary),
+
+                {
+                    StatusCode:
+                        Upper(
+                            Trim(
+                                Coalesce(
+                                    Text(Value.StatusCode),
+                                    ""
+                                )
+                            )
+                        ),
+
+                    StatusName:
+                        Coalesce(
+                            Text(Value.StatusName),
+                            Text(Value.StatusCode),
+                            "Unknown"
+                        ),
+
+                    StatusOrder:
+                        Value(
+                            Coalesce(
+                                Text(Value.StatusOrder),
+                                "9999"
+                            )
+                        ),
+
+                    StatusColor:
+                        Coalesce(
+                            Text(Value.StatusColor),
+                            "#64748B"
+                        ),
+
+                    PunchCount:
+                        Value(
+                            Coalesce(
+                                Text(Value.PunchCount),
+                                "0"
+                            )
+                        ),
+
+                    PreviousPunchCount:
+                        Value(
+                            Coalesce(
+                                Text(Value.PreviousPunchCount),
+                                Text(Value.PunchCount),
+                                "0"
+                            )
+                        ),
+
+                    Delta:
+                        Value(
+                            Coalesce(
+                                Text(Value.Delta),
+                                "0"
+                            )
+                        ),
+
+                    DeltaPercent:
+                        Value(
+                            Coalesce(
+                                Text(Value.DeltaPercent),
+                                "0"
+                            )
+                        ),
+
+                    Trend:
+                        Coalesce(
+                            Text(Value.Trend),
+                            "Neutral"
+                        )
+                }
+            )
+        );
+
+                        // =====================================================
+                        // CATEGORY / STATUS MATRIX
+                        // =====================================================
+
+                        ClearCollect(
+                            colPunchDashboardMatrix,
+
+                            ForAll(
+                                Table(_bundle.matrix),
+
+                                {
+                                    CategoryCode:
+                                        Text(Value.CategoryCode),
+
+                                    CategoryName:
+                                        Text(Value.CategoryName),
+
+                                    CategoryOrder:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.CategoryOrder),
+                                                "0"
+                                            )
+                                        ),
+
+                                    StatusCode:
+                                        Text(Value.StatusCode),
+
+                                    StatusName:
+                                        Text(Value.StatusName),
+
+                                    StatusOrder:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.StatusOrder),
+                                                "0"
+                                            )
+                                        ),
+
+                                    StatusColor:
+                                        Coalesce(
+                                            Text(Value.StatusColor),
+                                            "#64748B"
+                                        ),
+
+                                    PunchCount:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.PunchCount),
+                                                "0"
+                                            )
+                                        ),
+
+                                    Intensity:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.Intensity),
+                                                "0"
+                                            )
+                                        ),
+
+                                    IntensityBand:
+                                        Coalesce(
+                                            Text(Value.IntensityBand),
+                                            "NONE"
+                                        )
+                                }
+                            )
+                        );
+
+                        // =====================================================
+                        // TIMELINE
+                        // =====================================================
+
+                        ClearCollect(
+                            colPunchDashboardTimeline,
+
+                            ForAll(
+                                Table(_bundle.timeline),
+
+                                {
+                                    SnapshotRunId:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.SnapshotRunId),
+                                                "0"
+                                            )
+                                        ),
+
+                                    SnapshotDate:
+                                        If(
+                                            IsBlank(
+                                                Text(Value.SnapshotDate)
+                                            ) ||
+                                            Text(Value.SnapshotDate) = "null",
+
+                                            Blank(),
+
+                                            DateTimeValue(
+                                                Text(Value.SnapshotDate)
+                                            )
+                                        ),
+
+                                    SnapshotSequence:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.SnapshotSequence),
+                                                "0"
+                                            )
+                                        ),
+
+                                    OpenCount:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.Open),
+                                                "0"
+                                            )
+                                        ),
+
+                                    ClearedCount:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.Cleared),
+                                                "0"
+                                            )
+                                        ),
+
+                                    ClosedCount:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.Closed),
+                                                "0"
+                                            )
+                                        ),
+
+                                    TotalCount:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.Total),
+                                                "0"
+                                            )
+                                        ),
+
+                                    OpenDelta:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.OpenDelta),
+                                                "0"
+                                            )
+                                        ),
+
+                                    OpenDeltaPercent:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.OpenDeltaPercent),
+                                                "0"
+                                            )
+                                        )
+                                }
+                            )
+                        );
+
+                        // =====================================================
+                        // INSIGHTS
+                        // =====================================================
+
+                        ClearCollect(
+                            colPunchDashboardInsights,
+
+                            ForAll(
+                                Table(_bundle.insights),
+
+                                {
+                                    InsightId:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.InsightId),
+                                                "0"
+                                            )
+                                        ),
+
+                                    Priority:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.Priority),
+                                                "99"
+                                            )
+                                        ),
+
+                                    Severity:
+                                        Coalesce(
+                                            Text(Value.Severity),
+                                            "INFO"
+                                        ),
+
+                                    InsightType:
+                                        Coalesce(
+                                            Text(Value.InsightType),
+                                            "GENERAL"
+                                        ),
+
+                                    Title:
+                                        Coalesce(
+                                            Text(Value.Title),
+                                            "Executive insight"
+                                        ),
+
+                                    Message:
+                                        Coalesce(
+                                            Text(Value.Message),
+                                            ""
+                                        ),
+
+                                    MetricValue:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.MetricValue),
+                                                "0"
+                                            )
+                                        ),
+
+                                    MetricLabel:
+                                        Coalesce(
+                                            Text(Value.MetricLabel),
+                                            ""
+                                        ),
+
+                                    StatusCode:
+                                        Coalesce(
+                                            Text(Value.StatusCode),
+                                            ""
+                                        ),
+
+                                    CategoryCode:
+                                        Coalesce(
+                                            Text(Value.CategoryCode),
+                                            ""
+                                        ),
+
+                                    SubsystemCode:
+                                        Coalesce(
+                                            Text(Value.SubsystemCode),
+                                            ""
+                                        ),
+
+                                    SubcontractorId:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.SubcontractorId),
+                                                "-1"
+                                            )
+                                        ),
+
+                                    DisciplineCode:
+                                        Coalesce(
+                                            Text(Value.DisciplineCode),
+                                            ""
+                                        )
+                                }
+                            )
+                        );
+
+                        // =====================================================
+                        // SUBSYSTEM AGGREGATES
+                        // =====================================================
+
+                        ClearCollect(
+                            colPunchDashboardSubsystems,
+
+                            ForAll(
+                                Table(_bundle.subsystems),
+
+                                {
+                                    SubsystemCode:
+                                        Text(Value.SubsystemCode),
+
+                                    SubsystemName:
+                                        Text(Value.SubsystemName),
+
+                                    CategoryCode:
+                                        Text(Value.CategoryCode),
+
+                                    CategoryName:
+                                        Text(Value.CategoryName),
+
+                                    StatusCode:
+                                        Text(Value.StatusCode),
+
+                                    StatusName:
+                                        Text(Value.StatusName),
+
+                                    StatusOrder:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.StatusOrder),
+                                                "0"
+                                            )
+                                        ),
+
+                                    StatusColor:
+                                        Coalesce(
+                                            Text(Value.StatusColor),
+                                            "#64748B"
+                                        ),
+
+                                    PunchCount:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.PunchCount),
+                                                "0"
+                                            )
+                                        )
+                                }
+                            )
+                        );
+
+                        // =====================================================
+                        // SUBCONTRACTOR AGGREGATES
+                        // Source for the executive heatmap.
+                        // =====================================================
+
+                        ClearCollect(
+                            colPunchDashboardSubcontractors,
+
+                            ForAll(
+                                Table(_bundle.subcontractors),
+
+                                {
+                                    SubcontractorId:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.SubcontractorId),
+                                                "-1"
+                                            )
+                                        ),
+
+                                    SubcontractorName:
+                                        Coalesce(
+                                            Text(Value.SubcontractorName),
+                                            "No subcontractor"
+                                        ),
+
+                                    DisciplineCode:
+                                        Coalesce(
+                                            Text(Value.DisciplineCode),
+                                            ""
+                                        ),
+
+                                    DisciplineName:
+                                        Coalesce(
+                                            Text(Value.DisciplineName),
+                                            ""
+                                        ),
+
+                                    CategoryCode:
+                                        Coalesce(
+                                            Text(Value.CategoryCode),
+                                            "NO_CATEGORY"
+                                        ),
+
+                                    CategoryName:
+                                        Coalesce(
+                                            Text(Value.CategoryName),
+                                            Text(Value.CategoryCode),
+                                            "No category"
+                                        ),
+
+                                    StatusCode:
+                                        Coalesce(
+                                            Text(Value.StatusCode),
+                                            ""
+                                        ),
+
+                                    StatusName:
+                                        Coalesce(
+                                            Text(Value.StatusName),
+                                            Text(Value.StatusCode),
+                                            ""
+                                        ),
+
+                                    StatusOrder:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.StatusOrder),
+                                                "0"
+                                            )
+                                        ),
+
+                                    StatusColor:
+                                        Coalesce(
+                                            Text(Value.StatusColor),
+                                            "#64748B"
+                                        ),
+
+                                    PunchCount:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.PunchCount),
+                                                "0"
+                                            )
+                                        )
+                                }
+                            )
+                        );
+
+                        // =====================================================
+                        // EXECUTIVE PUNCH ROWS
+                        // Subcontractor fields are parsed when supplied by Bundle v4.
+                        // =====================================================
+
+                        ClearCollect(
+                            colPunchDashboardPunches,
+
+                            ForAll(
+                                Table(_bundle.punches),
+
+                                {
+                                    PunchId:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.PunchId),
+                                                "0"
+                                            )
+                                        ),
+
+                                    PunchCode:
+                                        Coalesce(
+                                            Text(Value.PunchCode),
+                                            ""
+                                        ),
+
+                                    PunchDescription:
+                                        Coalesce(
+                                            Text(Value.PunchDescription),
+                                            ""
+                                        ),
+
+                                    StatusCode:
+                                        Coalesce(
+                                            Text(Value.StatusCode),
+                                            ""
+                                        ),
+
+                                    PunchStatus:
+                                        Coalesce(
+                                            Text(Value.PunchStatus),
+                                            ""
+                                        ),
+
+                                    CategoryCode:
+                                        Coalesce(
+                                            Text(Value.CategoryCode),
+                                            ""
+                                        ),
+
+                                    CategoryName:
+                                        Coalesce(
+                                            Text(Value.CategoryName),
+                                            ""
+                                        ),
+
+                                    SubsystemCode:
+                                        Coalesce(
+                                            Text(Value.SubsystemCode),
+                                            ""
+                                        ),
+
+                                    DisciplineCode:
+                                        Coalesce(
+                                            Text(Value.DisciplineCode),
+                                            ""
+                                        ),
+
+                                    SubcontractorId:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.SubcontractorId),
+                                                "-1"
+                                            )
+                                        ),
+
+                                    SubcontractorName:
+                                        Coalesce(
+                                            Text(Value.SubcontractorName),
+                                            "No subcontractor"
+                                        ),
+
+                                    ResponsibleCompany:
+                                        Coalesce(
+                                            Text(Value.ResponsibleCompany),
+                                            "Unassigned"
+                                        ),
+
+                                    ResponsiblePerson:
+                                        Coalesce(
+                                            Text(Value.ResponsiblePerson),
+                                            "Unassigned"
+                                        ),
+
+                                    DueDate:
+                                        If(
+                                            IsBlank(
+                                                Text(Value.DueDate)
+                                            ) ||
+                                            Text(Value.DueDate) = "null",
+
+                                            Blank(),
+
+                                            DateValue(
+                                                Text(Value.DueDate)
+                                            )
+                                        ),
+
+                                    PriorityCode:
+                                        Coalesce(
+                                            Text(Value.PriorityCode),
+                                            "Normal"
+                                        ),
+
+                                    PriorityColor:
+                                        Coalesce(
+                                            Text(Value.PriorityColor),
+                                            "#64748B"
+                                        ),
+
+                                    SourceOrder:
+                                        Value(
+                                            Coalesce(
+                                                Text(Value.SourceOrder),
+                                                "0"
+                                            )
+                                        )
+                                }
+                            )
+                        );
+
+                        // =====================================================
+                        // EXECUTIVE GRID DEFAULTS
+                        // =====================================================
+
+                        Set(varPunchExecutiveGridPage, 1);
+
+                        Set(
+                            varPunchExecutiveGridPageSize,
+                            Coalesce(
+                                varPunchExecutiveGridPageSize,
+                                25
+                            )
+                        );
+
+                        Set(
+                            varPunchExecutiveGridSortColumn,
+                            Coalesce(
+                                varPunchExecutiveGridSortColumn,
+                                "SourceOrder"
+                            )
+                        );
+
+                        Set(
+                            varPunchExecutiveGridSortDirection,
+                            Coalesce(
+                                varPunchExecutiveGridSortDirection,
+                                SortOrder.Ascending
+                            )
+                        );
+
+                        Set(
+                            varPunchExecutiveGridSelectedId,
+                            Blank()
+                        );
+
+                        // =====================================================
+        // EXECUTIVE HEATMAP
+        // X axis: Categories
+        // Y axis: Subcontractors
+        // Cell: OPEN punches for subcontractor × category
+        // =====================================================
+
+        // -----------------------------------------------------
+        // SOURCE — OPEN PUNCHES ONLY
+        // -----------------------------------------------------
+
+        ClearCollect(
+            colPunchExecutiveHeatmapSource,
+
+            Filter(
+                colPunchDashboardSubcontractors,
+
+                Upper(
+                    Trim(
+                        Coalesce(
+                            StatusCode,
+                            ""
+                        )
+                    )
+                ) in [
+                    "OPEN",
+                    "O"
+                ] ||
+
+                Upper(
+                    Trim(
+                        Coalesce(
+                            StatusName,
+                            ""
+                        )
+                    )
+                ) = "OPEN"
+            )
+        );
+
+        // -----------------------------------------------------
+        // X AXIS — CATEGORIES WITH OPEN PUNCHES
+        // -----------------------------------------------------
+
+        ClearCollect(
+            colPunchExecutiveHeatmapColumns,
+
+            SortByColumns(
+                AddColumns(
+                    GroupBy(
+                        colPunchExecutiveHeatmapSource,
+                        CategoryCode,
+                        CategoryRows
+                    ),
+
+                    CategoryName,
+                        Coalesce(
+                            First(CategoryRows).CategoryName,
+                            CategoryCode,
+                            "No category"
+                        ),
+
+                    PunchCount,
+                        Sum(
+                            CategoryRows,
+                            PunchCount
+                        )
+                ),
+
+                "CategoryCode",
+                SortOrder.Ascending
+            )
+        );
+
+        // -----------------------------------------------------
+        // Y AXIS — SUBCONTRACTORS WITH OPEN PUNCHES
+        // -----------------------------------------------------
+
+        ClearCollect(
+            colPunchExecutiveHeatmapRows,
+
+            SortByColumns(
+                AddColumns(
+                    GroupBy(
+                        colPunchExecutiveHeatmapSource,
+                        SubcontractorId,
+                        SubcontractorName,
+                        SubcontractorRows
+                    ),
+
+                    PunchCount,
+                        Sum(
+                            SubcontractorRows,
+                            PunchCount
+                        )
+                ),
+
+                "PunchCount",
+                SortOrder.Descending
+            )
+        );
+
+        // -----------------------------------------------------
+        // COMPLETE OPEN-PUNCH MATRIX
+        // -----------------------------------------------------
+
+        Clear(
+            colPunchExecutiveHeatmapCells
+        );
+
+        ForAll(
+            colPunchExecutiveHeatmapRows As _subcontractor,
+
+            ForAll(
+                colPunchExecutiveHeatmapColumns As _category,
+
+                Collect(
+                    colPunchExecutiveHeatmapCells,
+
+                    {
+                        SubcontractorId:
+                            Value(
+                                _subcontractor.SubcontractorId
+                            ),
+
+                        SubcontractorName:
+                            Coalesce(
+                                Text(
+                                    _subcontractor.SubcontractorName
+                                ),
+                                "No subcontractor"
+                            ),
+
+                        CategoryCode:
+                            Text(
+                                _category.CategoryCode
+                            ),
+
+                        CategoryName:
+                            Coalesce(
+                                Text(
+                                    _category.CategoryName
+                                ),
+                                Text(
+                                    _category.CategoryCode
+                                ),
+                                "No category"
+                            ),
+
+                        PunchCount:
+                            Sum(
+                                Filter(
+                                    colPunchExecutiveHeatmapSource,
+
+                                    Value(SubcontractorId) =
+                                        Value(
+                                            _subcontractor.SubcontractorId
+                                        ) &&
+
+                                    CategoryCode =
+                                        _category.CategoryCode
+                                ),
+
+                                PunchCount
+                            )
+                    }
+                )
+            )
+        );
+
+        // -----------------------------------------------------
+        // INITIAL OPEN-PUNCH CONTEXT
+        // -----------------------------------------------------
+
+        ClearCollect(
+            colPunchExecutiveSelection,
+
+            {
+                SelectedRow:
+                    "All subcontractors",
+
+                SelectedColumn:
+                    "All categories",
+
+                PunchCount:
+                    Sum(
+                        colPunchExecutiveHeatmapCells,
+                        PunchCount
+                    ),
+
+                PercentOfTotal:
+                    100,
+
+                PercentOfRow:
+                    100,
+
+                IsSelection:
+                    false
+            }
+        );
+
+        Select(btnHome_BuildPunchPresentationModel);
+
+        // -----------------------------------------------------
+        // INITIAL STATUS DISTRIBUTION
+        // Heatmap scope is OPEN only.
+        // -----------------------------------------------------
+
+        ClearCollect(
+            colPunchExecutiveDistribution,
+
+            {
+                StatusCode:
+                    "OPEN",
+
+                StatusName:
+                    "OPEN",
+
+                StatusOrder:
+                    1,
+
+                StatusColor:
+                    Coalesce(
+                        LookUp(
+                            colPunchExecutiveHeatmapSource,
+                            !IsBlank(StatusColor),
+                            StatusColor
+                        ),
+                        "#64748B"
+                    ),
+
+                PunchCount:
+                    Sum(
+                        colPunchExecutiveHeatmapSource,
+                        PunchCount
+                    )
+            }
+        );
+
+                        // =====================================================
+                        // DEFAULT STATUS DISTRIBUTION
+                        //
+                        // Before selecting a heatmap cell, the donut shows
+                        // the complete dashboard distribution by status.
+                        // =====================================================
+
+                        ClearCollect(
+                            colPunchExecutiveDistribution,
+
+                            SortByColumns(
+                                AddColumns(
+                                    GroupBy(
+                                        colPunchDashboardSubcontractors,
+                                        StatusCode,
+                                        StatusRows
+                                    ),
+
+                                    StatusName,
+                                        First(StatusRows).StatusName,
+
+                                    StatusOrder,
+                                        First(StatusRows).StatusOrder,
+
+                                    StatusColor,
+                                        First(StatusRows).StatusColor,
+
+                                    PunchCount,
+                                        Sum(
+                                            StatusRows,
+                                            PunchCount
+                                        )
+                                ),
+
+                                "StatusOrder",
+                                SortOrder.Ascending
+                            )
+                        );
+
+                        // =====================================================
+                        // DEFAULT ANALYTICAL SELECTION
+                        // =====================================================
+
+                        ClearCollect(
+                            colPunchExecutiveSelection,
+
+                            {
+                                SelectedRow:
+                                    "All subcontractors",
+
+                                SelectedColumn:
+                                    "All categories",
+
+                                PunchCount:
+                                    Sum(
+                                        colPunchExecutiveHeatmapCells,
+                                        PunchCount
+                                    ),
+
+                                PercentOfTotal:
+                                    100,
+
+                                PercentOfRow:
+                                    100,
+
+                                IsSelection:
+                                    false
+                            }
+                        )
+                    );
+
+                    true
+                ),
+
+                Set(
+                    varPunchDashboardError,
+                    FirstError.Message
+                );
+
+                false
+            )
+        );
+
+        // =====================================================
+        // FINAL SNAPSHOT STATE
+        // =====================================================
+
+        Set(
+            varPunchDashboardSnapshotId,
+
+            If(
+                CountRows(
+                    colPunchDashboardSnapshotInfo
+                ) > 0,
+
+                First(
+                    colPunchDashboardSnapshotInfo
+                ).SnapshotRunId,
+
+                Blank()
+            )
+        );
+
+        Set(
+            varPunchDashboardLastRefresh,
+
+            If(
+                CountRows(
+                    colPunchDashboardSnapshotInfo
+                ) > 0,
+
+                First(
+                    colPunchDashboardSnapshotInfo
+                ).GeneratedOn,
+
+                Blank()
+            )
+        );
+
+        Set(
+            varPunchDashboardLoaded,
+            IsBlank(varPunchDashboardError)
+        );
+
+        Set(
+            varPunchDashboardLoading,
+            false
+        );
+
+        Set(
+            varExecutiveDashboardCompletedAt,
+            Now()
+        );
+
+        Set(
+            varExecutiveDashboardStatus,
+
+            If(
+                IsBlank(varPunchDashboardError),
+                "READY",
+                "ERROR"
+            )
+        );
+
+        Set(
+            varExecutiveDashboardError,
+            Coalesce(
+                varPunchDashboardError,
+                ""
+            )
+        );
+
+        If(
+            !IsBlank(varPunchDashboardError),
+
+            Notify(
+                "Punch Dashboard could not be loaded: " &
+                varPunchDashboardError,
+
+                NotificationType.Error
+            )
+        );
+
+        // =====================================================
+        // RELEASE GLOBAL LOADING STATE
+        // =====================================================
+
+        Set(varGlobalLoading, false);
+        Set(varGlobalLoadingMsg, "");
+        Set(varGlobalLoadingSubMsg, "");
+        Set(varGlobalLoadingScope, "");
+        Set(varGlobalLoadAction, "");
+        Set(varGlobalLoadPending, false);
+
+        Set(varPunchDashboardLoading, false);
+        Set(varProjectSwitching, false);
+    )
+)
