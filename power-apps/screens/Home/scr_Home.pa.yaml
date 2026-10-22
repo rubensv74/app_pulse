@@ -1348,12 +1348,7 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           InputTextPlaceholder: ="Select template"
                                           IsSearchable: =false
-                                          ItemDisplayText: =Coalesce(
-                                              ThisItem.TemplateDisplayName,
-                                              ThisItem.TemplateName,
-                                              ThisItem.TemplateCode,
-                                              Text(ThisItem.TemplateId)
-                                          )
+                                          ItemDisplayText: =Coalesce(ThisItem.TemplateDisplayName, ThisItem.TemplateName, ThisItem.TemplateCode, Text(ThisItem.TemplateId))
                                           Items: =colPunchTemplates_Filter
                                           OnChange: |-
                                             =If(
