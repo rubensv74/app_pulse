@@ -7011,49 +7011,35 @@ Screens:
           Control: ModernButton@1.0.0
           Properties:
             OnSelect: |-
-              =
-              Set(
-                  varPunchDashboardForceRefreshRequest,
-                  Coalesce(
-                      varPunchDashboardForceRefresh,
-                      false
-                  )
-              );
-
-              Set(
-                  varPunchDashboardForceRefresh,
-                  false
-              );
-
-
-              If(
+              =If(
                   IsBlank(varProjectId),
-
-                  Notify(
-                      "Please select a project first.",
-                      NotificationType.Warning
-                  );
-
+                  Notify("Please select a project first.", NotificationType.Warning);
                   Set(varPunchDashboardLoading, false);
                   Set(varGlobalLoading, false);
                   Set(varGlobalLoadingMsg, "");
                   Set(varGlobalLoadingSubMsg, "");
                   Set(varGlobalLoadingScope, "");
                   Set(varGlobalLoadAction, "");
-                  Set(varGlobalLoadPending, false);
-
-                  Exit()
+                  Set(varGlobalLoadPending, false),
+                  If(
+                      varPunchDashboardLoading,
+                      Blank(),
+                      Set(
+                  varPunchDashboardForceRefreshRequest,
+                  Coalesce(
+                      varPunchDashboardForceRefresh,
+                      false
+                  )
               );
-
-              If(
-                  varPunchDashboardLoading,
-                  Exit()
-              );
-
-              Set(varPunchDashboardLoading, true);
+              
+              Set(
+                  varPunchDashboardForceRefresh,
+                  false
+              );;
+                      Set(varPunchDashboardLoading, true);
               Set(varPunchDashboardError, "");
               Set(varPunchDashboardHasSnapshot, false);
-
+              
               Clear(colPunchDashboardSnapshotInfo);
               Clear(colPunchDashboardSummary);
               Clear(colPunchDashboardMatrix);
@@ -7062,20 +7048,20 @@ Screens:
               Clear(colPunchDashboardSubsystems);
               Clear(colPunchDashboardSubcontractors);
               Clear(colPunchDashboardPunches);
-
+              
               Clear(colPunchExecutiveHeatmapRows);
               Clear(colPunchExecutiveHeatmapColumns);
               Clear(colPunchExecutiveHeatmapCells);
               Clear(colPunchExecutiveDistribution);
               Clear(colPunchExecutiveSelection);
-
+              
               Set(varPunchDrillSubsystemCode, "");
               Set(varPunchDrillCategoryCode, "");
               Set(varPunchDrillSubcontractorId, -1);
               Set(varPunchDrillSubcontractorName, "");
               Set(varPunchDrillStatusCode, "");
               Set(varPunchDrillDisciplineCode, "");
-
+              
               Set(varPunchExecutiveGridPage, 1);
               Set(
                   varPunchExecutiveGridPageSize,
@@ -7099,28 +7085,28 @@ Screens:
                   )
               );
               Set(varPunchExecutiveGridSelectedId, Blank());
-
+              
               Clear(colHomePunchTimelineSorted);
               Clear(colHomePunchKpiTrendTotal);
               Clear(colHomePunchKpiTrendOpen);
               Clear(colHomePunchKpiTrendClosed);
               Clear(colHomePunchKpiTrendCompletion);
               Clear(colHomePunchDonutItems);
-
+              
               Set(varHomePunchKpiTotal, 0);
               Set(varHomePunchKpiOpen, 0);
               Set(varHomePunchKpiClosed, 0);
               Set(varHomePunchKpiCompletion, 0);
-
-
+              
+              
               // =====================================================
               // LOAD PROJECT PUNCH TEMPLATES
               // Only load when the local catalog is empty.
               // =====================================================
-
+              
               If(
                   CountRows(colPunchTemplates_Filter) = 0,
-
+              
                   IfError(
                       With(
                           {
@@ -7129,10 +7115,10 @@ Screens:
                                       Value(varProjectId)
                                   )
                           },
-
+              
                           ClearCollect(
                               colPunchTemplates_Filter,
-
+              
                               SortByColumns(
                                   Filter(
                                       ForAll(
@@ -7144,82 +7130,82 @@ Screens:
                                                   )
                                               )
                                           ),
-
+              
                                           {
                                               ProjectId:
                                                   Value(
                                                       Text(Value.ProjectId)
                                                   ),
-
+              
                                               TemplateId:
                                                   Value(
                                                       Text(Value.TemplateId)
                                                   ),
-
+              
                                               TemplateCode:
                                                   Text(Value.TemplateCode),
-
+              
                                               TemplateName:
                                                   Text(Value.TemplateName),
-
+              
                                               TemplateDisplayName:
                                                   Coalesce(
                                                       Text(Value.TemplateDisplayName),
                                                       Text(Value.TemplateName),
                                                       Text(Value.TemplateCode)
                                                   ),
-
+              
                                               IsIncluded:
                                                   Lower(
                                                       Text(Value.IsIncluded)
                                                   ) = "true" ||
                                                   Text(Value.IsIncluded) = "1",
-
+              
                                               DisplayOrder:
                                                   If(
                                                       IsBlank(
                                                           Text(Value.DisplayOrder)
                                                       ) ||
                                                       Text(Value.DisplayOrder) = "null",
-
+              
                                                       9999,
-
+              
                                                       Value(
                                                           Text(Value.DisplayOrder)
                                                       )
                                                   )
                                           }
                                       ),
-
+              
                                       IsIncluded
                                   ),
-
+              
                                   "DisplayOrder",
                                   SortOrder.Ascending
                               )
                           );
-
+              
                           true
                       ),
-
+              
                       Set(
                           varPunchDashboardError,
                           FirstError.Message
                       );
-
+              
                       false
                   )
               );
-
-
+              
+              
               // =====================================================
               // DEFAULT TEMPLATE
               // =====================================================
-
+              
               If(
                   IsBlank(varPunchDashboardTemplateId) &&
                   CountRows(colPunchTemplates_Filter) > 0,
-
+              
                   Set(
                       varPunchDashboardTemplateId,
                       Value(
@@ -7227,16 +7213,16 @@ Screens:
                       )
                   )
               );
-
-
+              
+              
               // =====================================================
               // LOAD DASHBOARD BUNDLE
               // =====================================================
-
+              
               If(
                   IsBlank(varPunchDashboardError) &&
                   !IsBlank(varPunchDashboardTemplateId),
-
+              
                   IfError(
                       With(
                           {
@@ -7251,7 +7237,7 @@ Screens:
                   )
               )
                           },
-
+              
                           With(
                               {
                                   _bundle:
@@ -7262,21 +7248,21 @@ Screens:
                                           )
                                       )
                               },
-
-
+              
+              
                               // =====================================================
                               // BUNDLE STATUS
                               // =====================================================
-
+              
                               Set(
                                   varPunchDashboardHasSnapshot,
-
+              
                                   Lower(
                                       Text(_bundle.hasSnapshot)
                                   ) = "true" ||
                                   Text(_bundle.hasSnapshot) = "1"
                               );
-
+              
                               Set(
                                   varPunchDashboardMessage,
                                   Coalesce(
@@ -7284,12 +7270,12 @@ Screens:
                                       ""
                                   )
                               );
-
-
+              
+              
                // =====================================================
               // CONTRACT VERSION
               // =====================================================
-
+              
               Set(
                   varPunchDashboardContractVersion,
                   Coalesce(
@@ -7297,70 +7283,70 @@ Screens:
                       ""
                   )
               );
-
+              
               If(
                   !IsBlank(varPunchDashboardContractVersion) &&
                   !StartsWith(
                       varPunchDashboardContractVersion,
                       "3."
                   ),
-
+              
                   Set(
                       varPunchDashboardError,
                       "Unsupported Punch Dashboard contract version: " &
                       varPunchDashboardContractVersion
                   )
               );
-
-
+              
+              
               // =====================================================
               // SNAPSHOT INFO
               // Contract v3 property: snapshotInfo
               // =====================================================
-
+              
               ClearCollect(
                   colPunchDashboardSnapshotInfo,
-
+              
                   ForAll(
                       Table(_bundle.snapshotInfo),
-
+              
                       {
                           SnapshotRunId:
                               If(
                                   IsBlank(Text(Value.SnapshotRunId)) ||
                                   Lower(Text(Value.SnapshotRunId)) = "null",
-
+              
                                   Blank(),
-
+              
                                   Value(
                                       Text(Value.SnapshotRunId)
                                   )
                               ),
-
+              
                           PreviousSnapshotRunId:
                               If(
                                   IsBlank(Text(Value.PreviousSnapshotRunId)) ||
                                   Lower(Text(Value.PreviousSnapshotRunId)) = "null",
-
+              
                                   Blank(),
-
+              
                                   Value(
                                       Text(Value.PreviousSnapshotRunId)
                                   )
                               ),
-
+              
                           GeneratedOn:
                               If(
                                   IsBlank(Text(Value.GeneratedOn)) ||
                                   Lower(Text(Value.GeneratedOn)) = "null",
-
+              
                                   Blank(),
-
+              
                                   DateTimeValue(
                                       Text(Value.GeneratedOn)
                                   )
                               ),
-
+              
                           SourcePunchCount:
                               Value(
                                   Coalesce(
@@ -7368,7 +7354,7 @@ Screens:
                                       "0"
                                   )
                               ),
-
+              
                           DurationMs:
                               Value(
                                   Coalesce(
@@ -7376,7 +7362,7 @@ Screens:
                                       "0"
                                   )
                               ),
-
+              
                           DataVersion:
                               Coalesce(
                                   Text(Value.DataVersion),
@@ -7386,19 +7372,19 @@ Screens:
                       }
                   )
               );
-
-
+              
+              
               // =====================================================
               // KPI SUMMARY
               // Contract v3 property: summary
               // =====================================================
-
+              
               ClearCollect(
                   colPunchDashboardSummary,
-
+              
                   ForAll(
                       Table(_bundle.summary),
-
+              
                       {
                           StatusCode:
                               Upper(
@@ -7409,14 +7395,14 @@ Screens:
                                       )
                                   )
                               ),
-
+              
                           StatusName:
                               Coalesce(
                                   Text(Value.StatusName),
                                   Text(Value.StatusCode),
                                   "Unknown"
                               ),
-
+              
                           StatusOrder:
                               Value(
                                   Coalesce(
@@ -7424,13 +7410,13 @@ Screens:
                                       "9999"
                                   )
                               ),
-
+              
                           StatusColor:
                               Coalesce(
                                   Text(Value.StatusColor),
                                   "#64748B"
                               ),
-
+              
                           PunchCount:
                               Value(
                                   Coalesce(
@@ -7438,7 +7424,7 @@ Screens:
                                       "0"
                                   )
                               ),
-
+              
                           PreviousPunchCount:
                               Value(
                                   Coalesce(
@@ -7447,7 +7433,7 @@ Screens:
                                       "0"
                                   )
                               ),
-
+              
                           Delta:
                               Value(
                                   Coalesce(
@@ -7455,7 +7441,7 @@ Screens:
                                       "0"
                                   )
                               ),
-
+              
                           DeltaPercent:
                               Value(
                                   Coalesce(
@@ -7463,7 +7449,7 @@ Screens:
                                       "0"
                                   )
                               ),
-
+              
                           Trend:
                               Coalesce(
                                   Text(Value.Trend),
@@ -7472,25 +7458,25 @@ Screens:
                       }
                   )
               );
-
-
+              
+              
                               // =====================================================
                               // CATEGORY / STATUS MATRIX
                               // =====================================================
-
+              
                               ClearCollect(
                                   colPunchDashboardMatrix,
-
+              
                                   ForAll(
                                       Table(_bundle.matrix),
-
+              
                                       {
                                           CategoryCode:
                                               Text(Value.CategoryCode),
-
+              
                                           CategoryName:
                                               Text(Value.CategoryName),
-
+              
                                           CategoryOrder:
                                               Value(
                                                   Coalesce(
@@ -7498,13 +7484,13 @@ Screens:
                                                       "0"
                                                   )
                                               ),
-
+              
                                           StatusCode:
                                               Text(Value.StatusCode),
-
+              
                                           StatusName:
                                               Text(Value.StatusName),
-
+              
                                           StatusOrder:
                                               Value(
                                                   Coalesce(
@@ -7512,13 +7498,13 @@ Screens:
                                                       "0"
                                                   )
                                               ),
-
+              
                                           StatusColor:
                                               Coalesce(
                                                   Text(Value.StatusColor),
                                                   "#64748B"
                                               ),
-
+              
                                           PunchCount:
                                               Value(
                                                   Coalesce(
@@ -7526,7 +7512,7 @@ Screens:
                                                       "0"
                                                   )
                                               ),
-
+              
                                           Intensity:
                                               Value(
                                                   Coalesce(
@@ -7534,7 +7520,7 @@ Screens:
                                                       "0"
                                                   )
                                               ),
-
+              
                                           IntensityBand:
                                               Coalesce(
                                                   Text(Value.IntensityBand),
@@ -7543,18 +7529,18 @@ Screens:
                                       }
                                   )
                               );
-
-
+              
+              
                               // =====================================================
                               // TIMELINE
                               // =====================================================
-
+              
                               ClearCollect(
                                   colPunchDashboardTimeline,
-
+              
                                   ForAll(
                                       Table(_bundle.timeline),
-
+              
                                       {
                                           SnapshotRunId:
                                               Value(
@@ -7563,21 +7549,21 @@ Screens:
                                                       "0"
                                                   )
                                               ),
-
+              
                                           SnapshotDate:
                                               If(
                                                   IsBlank(
                                                       Text(Value.SnapshotDate)
                                                   ) ||
                                                   Text(Value.SnapshotDate) = "null",
-
+              
                                                   Blank(),
-
+              
                                                   DateTimeValue(
                                                       Text(Value.SnapshotDate)
                                                   )
                                               ),
-
+              
                                           SnapshotSequence:
                                               Value(
                                                   Coalesce(
@@ -7585,7 +7571,7 @@ Screens:
                                                       "0"
                                                   )
                                               ),
-
+              
                                           OpenCount:
                                               Value(
                                                   Coalesce(
@@ -7593,7 +7579,7 @@ Screens:
                                                       "0"
                                                   )
                                               ),
-
+              
                                           ClearedCount:
                                               Value(
                                                   Coalesce(
@@ -7601,7 +7587,7 @@ Screens:
                                                       "0"
                                                   )
                                               ),
-
+              
                                           ClosedCount:
                                               Value(
                                                   Coalesce(
@@ -7609,7 +7595,7 @@ Screens:
                                                       "0"
                                                   )
                                               ),
-
+              
                                           TotalCount:
                                               Value(
                                                   Coalesce(
@@ -7617,7 +7603,7 @@ Screens:
                                                       "0"
                                                   )
                                               ),
-
+              
                                           OpenDelta:
                                               Value(
                                                   Coalesce(
@@ -7625,7 +7611,7 @@ Screens:
                                                       "0"
                                                   )
                                               ),
-
+              
                                           OpenDeltaPercent:
                                               Value(
                                                   Coalesce(
@@ -7636,18 +7622,18 @@ Screens:
                                       }
                                   )
                               );
-
-
+              
+              
                               // =====================================================
                               // INSIGHTS
                               // =====================================================
-
+              
                               ClearCollect(
                                   colPunchDashboardInsights,
-
+              
                                   ForAll(
                                       Table(_bundle.insights),
-
+              
                                       {
                                           InsightId:
                                               Value(
@@ -7656,7 +7642,7 @@ Screens:
                                                       "0"
                                                   )
                                               ),
-
+              
                                           Priority:
                                               Value(
                                                   Coalesce(
@@ -7664,31 +7650,31 @@ Screens:
                                                       "99"
                                                   )
                                               ),
-
+              
                                           Severity:
                                               Coalesce(
                                                   Text(Value.Severity),
                                                   "INFO"
                                               ),
-
+              
                                           InsightType:
                                               Coalesce(
                                                   Text(Value.InsightType),
                                                   "GENERAL"
                                               ),
-
+              
                                           Title:
                                               Coalesce(
                                                   Text(Value.Title),
                                                   "Executive insight"
                                               ),
-
+              
                                           Message:
                                               Coalesce(
                                                   Text(Value.Message),
                                                   ""
                                               ),
-
+              
                                           MetricValue:
                                               Value(
                                                   Coalesce(
@@ -7696,31 +7682,31 @@ Screens:
                                                       "0"
                                                   )
                                               ),
-
+              
                                           MetricLabel:
                                               Coalesce(
                                                   Text(Value.MetricLabel),
                                                   ""
                                               ),
-
+              
                                           StatusCode:
                                               Coalesce(
                                                   Text(Value.StatusCode),
                                                   ""
                                               ),
-
+              
                                           CategoryCode:
                                               Coalesce(
                                                   Text(Value.CategoryCode),
                                                   ""
                                               ),
-
+              
                                           SubsystemCode:
                                               Coalesce(
                                                   Text(Value.SubsystemCode),
                                                   ""
                                               ),
-
+              
                                           SubcontractorId:
                                               Value(
                                                   Coalesce(
@@ -7728,7 +7714,7 @@ Screens:
                                                       "-1"
                                                   )
                                               ),
-
+              
                                           DisciplineCode:
                                               Coalesce(
                                                   Text(Value.DisciplineCode),
@@ -7737,37 +7723,37 @@ Screens:
                                       }
                                   )
                               );
-
-
+              
+              
                               // =====================================================
                               // SUBSYSTEM AGGREGATES
                               // =====================================================
-
+              
                               ClearCollect(
                                   colPunchDashboardSubsystems,
-
+              
                                   ForAll(
                                       Table(_bundle.subsystems),
-
+              
                                       {
                                           SubsystemCode:
                                               Text(Value.SubsystemCode),
-
+              
                                           SubsystemName:
                                               Text(Value.SubsystemName),
-
+              
                                           CategoryCode:
                                               Text(Value.CategoryCode),
-
+              
                                           CategoryName:
                                               Text(Value.CategoryName),
-
+              
                                           StatusCode:
                                               Text(Value.StatusCode),
-
+              
                                           StatusName:
                                               Text(Value.StatusName),
-
+              
                                           StatusOrder:
                                               Value(
                                                   Coalesce(
@@ -7775,13 +7761,13 @@ Screens:
                                                       "0"
                                                   )
                                               ),
-
+              
                                           StatusColor:
                                               Coalesce(
                                                   Text(Value.StatusColor),
                                                   "#64748B"
                                               ),
-
+              
                                           PunchCount:
                                               Value(
                                                   Coalesce(
@@ -7792,19 +7778,19 @@ Screens:
                                       }
                                   )
                               );
-
-
+              
+              
                               // =====================================================
                               // SUBCONTRACTOR AGGREGATES
                               // Source for the executive heatmap.
                               // =====================================================
-
+              
                               ClearCollect(
                                   colPunchDashboardSubcontractors,
-
+              
                                   ForAll(
                                       Table(_bundle.subcontractors),
-
+              
                                       {
                                           SubcontractorId:
                                               Value(
@@ -7813,51 +7799,51 @@ Screens:
                                                       "-1"
                                                   )
                                               ),
-
+              
                                           SubcontractorName:
                                               Coalesce(
                                                   Text(Value.SubcontractorName),
                                                   "No subcontractor"
                                               ),
-
+              
                                           DisciplineCode:
                                               Coalesce(
                                                   Text(Value.DisciplineCode),
                                                   ""
                                               ),
-
+              
                                           DisciplineName:
                                               Coalesce(
                                                   Text(Value.DisciplineName),
                                                   ""
                                               ),
-
+              
                                           CategoryCode:
                                               Coalesce(
                                                   Text(Value.CategoryCode),
                                                   "NO_CATEGORY"
                                               ),
-
+              
                                           CategoryName:
                                               Coalesce(
                                                   Text(Value.CategoryName),
                                                   Text(Value.CategoryCode),
                                                   "No category"
                                               ),
-
+              
                                           StatusCode:
                                               Coalesce(
                                                   Text(Value.StatusCode),
                                                   ""
                                               ),
-
+              
                                           StatusName:
                                               Coalesce(
                                                   Text(Value.StatusName),
                                                   Text(Value.StatusCode),
                                                   ""
                                               ),
-
+              
                                           StatusOrder:
                                               Value(
                                                   Coalesce(
@@ -7865,13 +7851,13 @@ Screens:
                                                       "0"
                                                   )
                                               ),
-
+              
                                           StatusColor:
                                               Coalesce(
                                                   Text(Value.StatusColor),
                                                   "#64748B"
                                               ),
-
+              
                                           PunchCount:
                                               Value(
                                                   Coalesce(
@@ -7882,19 +7868,19 @@ Screens:
                                       }
                                   )
                               );
-
-
+              
+              
                               // =====================================================
                               // EXECUTIVE PUNCH ROWS
                               // Subcontractor fields are parsed when supplied by Bundle v4.
                               // =====================================================
-
+              
                               ClearCollect(
                                   colPunchDashboardPunches,
-
+              
                                   ForAll(
                                       Table(_bundle.punches),
-
+              
                                       {
                                           PunchId:
                                               Value(
@@ -7903,55 +7889,55 @@ Screens:
                                                       "0"
                                                   )
                                               ),
-
+              
                                           PunchCode:
                                               Coalesce(
                                                   Text(Value.PunchCode),
                                                   ""
                                               ),
-
+              
                                           PunchDescription:
                                               Coalesce(
                                                   Text(Value.PunchDescription),
                                                   ""
                                               ),
-
+              
                                           StatusCode:
                                               Coalesce(
                                                   Text(Value.StatusCode),
                                                   ""
                                               ),
-
+              
                                           PunchStatus:
                                               Coalesce(
                                                   Text(Value.PunchStatus),
                                                   ""
                                               ),
-
+              
                                           CategoryCode:
                                               Coalesce(
                                                   Text(Value.CategoryCode),
                                                   ""
                                               ),
-
+              
                                           CategoryName:
                                               Coalesce(
                                                   Text(Value.CategoryName),
                                                   ""
                                               ),
-
+              
                                           SubsystemCode:
                                               Coalesce(
                                                   Text(Value.SubsystemCode),
                                                   ""
                                               ),
-
+              
                                           DisciplineCode:
                                               Coalesce(
                                                   Text(Value.DisciplineCode),
                                                   ""
                                               ),
-
+              
                                           SubcontractorId:
                                               Value(
                                                   Coalesce(
@@ -7959,51 +7945,51 @@ Screens:
                                                       "-1"
                                                   )
                                               ),
-
+              
                                           SubcontractorName:
                                               Coalesce(
                                                   Text(Value.SubcontractorName),
                                                   "No subcontractor"
                                               ),
-
+              
                                           ResponsibleCompany:
                                               Coalesce(
                                                   Text(Value.ResponsibleCompany),
                                                   "Unassigned"
                                               ),
-
+              
                                           ResponsiblePerson:
                                               Coalesce(
                                                   Text(Value.ResponsiblePerson),
                                                   "Unassigned"
                                               ),
-
+              
                                           DueDate:
                                               If(
                                                   IsBlank(
                                                       Text(Value.DueDate)
                                                   ) ||
                                                   Text(Value.DueDate) = "null",
-
+              
                                                   Blank(),
-
+              
                                                   DateValue(
                                                       Text(Value.DueDate)
                                                   )
                                               ),
-
+              
                                           PriorityCode:
                                               Coalesce(
                                                   Text(Value.PriorityCode),
                                                   "Normal"
                                               ),
-
+              
                                           PriorityColor:
                                               Coalesce(
                                                   Text(Value.PriorityColor),
                                                   "#64748B"
                                               ),
-
+              
                                           SourceOrder:
                                               Value(
                                                   Coalesce(
@@ -8014,14 +8000,14 @@ Screens:
                                       }
                                   )
                               );
-
-
+              
+              
                               // =====================================================
                               // EXECUTIVE GRID DEFAULTS
                               // =====================================================
-
+              
                               Set(varPunchExecutiveGridPage, 1);
-
+              
                               Set(
                                   varPunchExecutiveGridPageSize,
                                   Coalesce(
@@ -8029,7 +8015,7 @@ Screens:
                                       25
                                   )
                               );
-
+              
                               Set(
                                   varPunchExecutiveGridSortColumn,
                                   Coalesce(
@@ -8037,7 +8023,7 @@ Screens:
                                       "SourceOrder"
                                   )
                               );
-
+              
                               Set(
                                   varPunchExecutiveGridSortDirection,
                                   Coalesce(
@@ -8045,31 +8031,31 @@ Screens:
                                       SortOrder.Ascending
                                   )
                               );
-
+              
                               Set(
                                   varPunchExecutiveGridSelectedId,
                                   Blank()
                               );
-
-
+              
+              
                               // =====================================================
               // EXECUTIVE HEATMAP
               // X axis: Categories
               // Y axis: Subcontractors
               // Cell: OPEN punches for subcontractor × category
               // =====================================================
-
-
+              
+              
               // -----------------------------------------------------
               // SOURCE — OPEN PUNCHES ONLY
               // -----------------------------------------------------
-
+              
               ClearCollect(
                   colPunchExecutiveHeatmapSource,
-
+              
                   Filter(
                       colPunchDashboardSubcontractors,
-
+              
                       Upper(
                           Trim(
                               Coalesce(
@@ -8081,7 +8067,7 @@ Screens:
                           "OPEN",
                           "O"
                       ] ||
-
+              
                       Upper(
                           Trim(
                               Coalesce(
@@ -8092,15 +8078,15 @@ Screens:
                       ) = "OPEN"
                   )
               );
-
-
+              
+              
               // -----------------------------------------------------
               // X AXIS — CATEGORIES WITH OPEN PUNCHES
               // -----------------------------------------------------
-
+              
               ClearCollect(
                   colPunchExecutiveHeatmapColumns,
-
+              
                   SortByColumns(
                       AddColumns(
                           GroupBy(
@@ -8108,34 +8094,34 @@ Screens:
                               CategoryCode,
                               CategoryRows
                           ),
-
+              
                           CategoryName,
                               Coalesce(
                                   First(CategoryRows).CategoryName,
                                   CategoryCode,
                                   "No category"
                               ),
-
+              
                           PunchCount,
                               Sum(
                                   CategoryRows,
                                   PunchCount
                               )
                       ),
-
+              
                       "CategoryCode",
                       SortOrder.Ascending
                   )
               );
-
-
+              
+              
               // -----------------------------------------------------
               // Y AXIS — SUBCONTRACTORS WITH OPEN PUNCHES
               // -----------------------------------------------------
-
+              
               ClearCollect(
                   colPunchExecutiveHeatmapRows,
-
+              
                   SortByColumns(
                       AddColumns(
                           GroupBy(
@@ -8144,43 +8130,43 @@ Screens:
                               SubcontractorName,
                               SubcontractorRows
                           ),
-
+              
                           PunchCount,
                               Sum(
                                   SubcontractorRows,
                                   PunchCount
                               )
                       ),
-
+              
                       "PunchCount",
                       SortOrder.Descending
                   )
               );
-
-
+              
+              
               // -----------------------------------------------------
               // COMPLETE OPEN-PUNCH MATRIX
               // -----------------------------------------------------
-
+              
               Clear(
                   colPunchExecutiveHeatmapCells
               );
-
+              
               ForAll(
                   colPunchExecutiveHeatmapRows As _subcontractor,
-
+              
                   ForAll(
                       colPunchExecutiveHeatmapColumns As _category,
-
+              
                       Collect(
                           colPunchExecutiveHeatmapCells,
-
+              
                           {
                               SubcontractorId:
                                   Value(
                                       _subcontractor.SubcontractorId
                                   ),
-
+              
                               SubcontractorName:
                                   Coalesce(
                                       Text(
@@ -8188,12 +8174,12 @@ Screens:
                                       ),
                                       "No subcontractor"
                                   ),
-
+              
                               CategoryCode:
                                   Text(
                                       _category.CategoryCode
                                   ),
-
+              
                               CategoryName:
                                   Coalesce(
                                       Text(
@@ -8204,80 +8190,80 @@ Screens:
                                       ),
                                       "No category"
                                   ),
-
+              
                               PunchCount:
                                   Sum(
                                       Filter(
                                           colPunchExecutiveHeatmapSource,
-
+              
                                           Value(SubcontractorId) =
                                               Value(
                                                   _subcontractor.SubcontractorId
                                               ) &&
-
+              
                                           CategoryCode =
                                               _category.CategoryCode
                                       ),
-
+              
                                       PunchCount
                                   )
                           }
                       )
                   )
               );
-
-
+              
+              
               // -----------------------------------------------------
               // INITIAL OPEN-PUNCH CONTEXT
               // -----------------------------------------------------
-
+              
               ClearCollect(
                   colPunchExecutiveSelection,
-
+              
                   {
                       SelectedRow:
                           "All subcontractors",
-
+              
                       SelectedColumn:
                           "All categories",
-
+              
                       PunchCount:
                           Sum(
                               colPunchExecutiveHeatmapCells,
                               PunchCount
                           ),
-
+              
                       PercentOfTotal:
                           100,
-
+              
                       PercentOfRow:
                           100,
-
+              
                       IsSelection:
                           false
                   }
               );
-
+              
               Select(btnHome_BuildPunchPresentationModel);
-
+              
               // -----------------------------------------------------
               // INITIAL STATUS DISTRIBUTION
               // Heatmap scope is OPEN only.
               // -----------------------------------------------------
-
+              
               ClearCollect(
                   colPunchExecutiveDistribution,
-
+              
                   {
                       StatusCode:
                           "OPEN",
-
+              
                       StatusName:
                           "OPEN",
-
+              
                       StatusOrder:
                           1,
-
+              
                       StatusColor:
                           Coalesce(
                               LookUp(
@@ -8287,7 +8273,7 @@ Screens:
                               ),
                               "#64748B"
                           ),
-
+              
                       PunchCount:
                           Sum(
                               colPunchExecutiveHeatmapSource,
@@ -8295,17 +8281,17 @@ Screens:
                           )
                   }
               );
-
+              
                               // =====================================================
                               // DEFAULT STATUS DISTRIBUTION
                               //
                               // Before selecting a heatmap cell, the donut shows
                               // the complete dashboard distribution by status.
                               // =====================================================
-
+              
                               ClearCollect(
                                   colPunchExecutiveDistribution,
-
+              
                                   SortByColumns(
                                       AddColumns(
                                           GroupBy(
@@ -8313,135 +8299,135 @@ Screens:
                                               StatusCode,
                                               StatusRows
                                           ),
-
+              
                                           StatusName,
                                               First(StatusRows).StatusName,
-
+              
                                           StatusOrder,
                                               First(StatusRows).StatusOrder,
-
+              
                                           StatusColor,
                                               First(StatusRows).StatusColor,
-
+              
                                           PunchCount,
                                               Sum(
                                                   StatusRows,
                                                   PunchCount
                                               )
                                       ),
-
+              
                                       "StatusOrder",
                                       SortOrder.Ascending
                                   )
                               );
-
-
+              
+              
                               // =====================================================
                               // DEFAULT ANALYTICAL SELECTION
                               // =====================================================
-
+              
                               ClearCollect(
                                   colPunchExecutiveSelection,
-
+              
                                   {
                                       SelectedRow:
                                           "All subcontractors",
-
+              
                                       SelectedColumn:
                                           "All categories",
-
+              
                                       PunchCount:
                                           Sum(
                                               colPunchExecutiveHeatmapCells,
                                               PunchCount
                                           ),
-
+              
                                       PercentOfTotal:
                                           100,
-
+              
                                       PercentOfRow:
                                           100,
-
+              
                                       IsSelection:
                                           false
                                   }
                               )
                           );
-
+              
                           true
                       ),
-
+              
                       Set(
                           varPunchDashboardError,
                           FirstError.Message
                       );
-
+              
                       false
                   )
               );
-
-
+              
+              
               // =====================================================
               // FINAL SNAPSHOT STATE
               // =====================================================
-
+              
               Set(
                   varPunchDashboardSnapshotId,
-
+              
                   If(
                       CountRows(
                           colPunchDashboardSnapshotInfo
                       ) > 0,
-
+              
                       First(
                           colPunchDashboardSnapshotInfo
                       ).SnapshotRunId,
-
+              
                       Blank()
                   )
               );
-
+              
               Set(
                   varPunchDashboardLastRefresh,
-
+              
                   If(
                       CountRows(
                           colPunchDashboardSnapshotInfo
                       ) > 0,
-
+              
                       First(
                           colPunchDashboardSnapshotInfo
                       ).GeneratedOn,
-
+              
                       Blank()
                   )
               );
-
+              
               Set(
                   varPunchDashboardLoaded,
                   IsBlank(varPunchDashboardError)
               );
-
+              
               Set(
                   varPunchDashboardLoading,
                   false
               );
-
+              
               Set(
                   varExecutiveDashboardCompletedAt,
                   Now()
               );
-
+              
               Set(
                   varExecutiveDashboardStatus,
-
+              
                   If(
                       IsBlank(varPunchDashboardError),
                       "READY",
                       "ERROR"
                   )
               );
-
+              
               Set(
                   varExecutiveDashboardError,
                   Coalesce(
@@ -8449,32 +8435,34 @@ Screens:
                       ""
                   )
               );
-
+              
               If(
                   !IsBlank(varPunchDashboardError),
-
+              
                   Notify(
                       "Punch Dashboard could not be loaded: " &
                       varPunchDashboardError,
-
+              
                       NotificationType.Error
                   )
               );
-
-
+              
+              
               // =====================================================
               // RELEASE GLOBAL LOADING STATE
               // =====================================================
-
+              
               Set(varGlobalLoading, false);
               Set(varGlobalLoadingMsg, "");
               Set(varGlobalLoadingSubMsg, "");
               Set(varGlobalLoadingScope, "");
               Set(varGlobalLoadAction, "");
               Set(varGlobalLoadPending, false);
-
+              
               Set(varPunchDashboardLoading, false);
               Set(varProjectSwitching, false);
+                  )
+              )
             Visible: =false
             X: =180
             Y: =180
@@ -8526,31 +8514,18 @@ Screens:
           Control: ModernButton@1.0.0
           Properties:
             OnSelect: |-
-              =
-
-              If(
+              =If(
                   IsBlank(varProjectId) || IsBlank(varSelectedHiveNode.Discipline),
-
                   Clear(colHomePendingSubsystems);
                   Clear(colHomePendingSubsystems_Staging);
-
                   Set(varPendingSubsystemsLoading, false);
-                  Set(varHomePendingError, "");
-
-                  Exit()
-              );
-
-              If(
-                  varPendingSubsystemsLoading,
-                  Exit()
-              );
-
-              Set(varPendingSubsystemsLoading, true);
+                  Set(varHomePendingError, ""),
+                  If(varPendingSubsystemsLoading, Blank(), Set(varPendingSubsystemsLoading, true);
               Set(varHomePendingError, "");
-
+              
               Clear(colHomePendingSubsystems);
               Clear(colHomePendingSubsystems_Staging);
-
+              
               IfError(
                   With(
                       {
@@ -8560,7 +8535,7 @@ Screens:
                                   varSelectedHiveNode.Discipline
                               )
                       },
-
+              
                       ClearCollect(
                           colHomePendingSubsystems_Staging,
                           ForAll(
@@ -8574,40 +8549,40 @@ Screens:
                                               0,
                                               Value(Text(r.RowNo))
                                           ),
-
+              
                                       SubsystemCode: Text(r.SubsystemCode),
                                       Discipline: Text(r.Discipline),
-
+              
                                       Total:
                                           If(
                                               IsBlank(Text(r.Total)) || Text(r.Total) = "null",
                                               0,
                                               Value(Text(r.Total))
                                           ),
-
+              
                                       Done:
                                           If(
                                               IsBlank(Text(r.Done)) || Text(r.Done) = "null",
                                               0,
                                               Value(Text(r.Done))
                                           ),
-
+              
                                       Remaining:
                                           If(
                                               IsBlank(Text(r.Remaining)) || Text(r.Remaining) = "null",
                                               0,
                                               Value(Text(r.Remaining))
                                           ),
-
+              
                                       Progress:
                                           If(
                                               IsBlank(Text(r.Progress)) || Text(r.Progress) = "null",
                                               0,
                                               Value(Text(r.Progress))
                                           ),
-
+              
                                       ProgressStatus: Text(r.ProgressStatus),
-
+              
                                       ProgressColor:
                                           Switch(
                                               Text(r.ProgressStatus),
@@ -8622,13 +8597,13 @@ Screens:
                           )
                       )
                   ),
-
+              
                   Set(varHomePendingError, FirstError.Message)
               );
-
+              
               If(
                   IsBlank(varHomePendingError),
-
+              
                   ClearCollect(
                       colHomePendingSubsystems,
                       SortByColumns(
@@ -8637,14 +8612,15 @@ Screens:
                           SortOrder.Ascending
                       )
                   ),
-
+              
                   Notify(
                       "Pending subsystems could not be loaded.",
                       NotificationType.Warning
                   )
               );
-
-              Set(varPendingSubsystemsLoading, false)
+              
+              Set(varPendingSubsystemsLoading, false))
+              )
             Visible: =false
             X: =80
             Y: =80
@@ -8652,28 +8628,9 @@ Screens:
           Control: ModernButton@1.0.0
           Properties:
             OnSelect: |-
-              =
-
-              Set(varGlobalLoading, true);
-              Set(
-                  varGlobalLoadingMsg,
-                  If(varHomeDashboard = "TASKS", "Loading Tasks Dashboard...", "Loading Home...")
-              );
-              Set(
-                  varGlobalLoadingSubMsg,
-                  If(
-                      varHomeDashboard = "TASKS",
-                      "Preparing discipline and subsystem overview",
-                      "Loading selected project dashboard"
-                  )
-              );
-              Set(varGlobalLoadingScope, "HOME");
-
-              If(
+              =If(
                   IsBlank(varProjectId),
-
                   Notify("Please select a project first.", NotificationType.Warning);
-
                   Set(varHomeLoading, false);
                   Set(varProjectSwitching, false);
                   Set(varGlobalLoading, false);
@@ -8681,36 +8638,37 @@ Screens:
                   Set(varGlobalLoadingSubMsg, "");
                   Set(varGlobalLoadingScope, "");
                   Set(varGlobalLoadAction, "");
-                  Set(varGlobalLoadPending, false);
-
-                  //Exit()
-              );
-
-              If(
-                  varHomeLoading,
-
-                  Exit()
-              );
-
-              Set(varHomeLoading, true);
+                  Set(varGlobalLoadPending, false),
+                  If(
+                      varHomeLoading,
+                      Blank(),
+                      Set(varGlobalLoading, true);
+                  Set(varGlobalLoadingMsg, If(varHomeDashboard = "TASKS", "Loading Tasks Dashboard...", "Loading Home..."));
+                  Set(varGlobalLoadingSubMsg, If(
+                      varHomeDashboard = "TASKS",
+                      "Preparing discipline and subsystem overview",
+                      "Loading selected project dashboard"
+                  ));
+                  Set(varGlobalLoadingScope, "HOME");
+                      Set(varHomeLoading, true);
               Set(varProjectSwitching, true);
               Set(varHomeError, "");
               Set(varHomeNoData, false);
               Set(varProjectHasHomeData, false);
               Set(varProjectHasReportConfig, false);
-
+              
               Set(varHomeShowOverview, false);
               Set(varHomeShowCards, false);
               Set(varHomeShowRightPanel, false);
-
+              
               Clear(colHomeHiveNodes);
               Clear(colHomeHiveNodesSorted);
               Clear(colHomeLowestProgress);
-
+              
               Clear(colHomeHiveNodes_Staging);
               Clear(colHomeHiveNodesSorted_Staging);
               Clear(colHomeLowestProgress_Staging);
-
+              
               IfError(
                   With(
                       {
@@ -8720,19 +8678,19 @@ Screens:
                           {
                               _obj: ParseJSON(Coalesce(_resp.result, "{}"))
                           },
-
+              
                           If(
                               Text(_obj.success) = "false",
-
+              
                               Set(varHomeNoData, true);
                               Set(varProjectHasHomeData, false);
                               Set(varHomeHiveLoaded, false);
                               Set(varProjectHasReportConfig, false);
-
+              
                               Set(varHomeShowOverview, false);
                               Set(varHomeShowCards, false);
                               Set(varHomeShowRightPanel, true);
-
+              
                               Set(
                                   varAppWarning,
                                   Coalesce(
@@ -8740,7 +8698,7 @@ Screens:
                                       "This project has no published report configuration yet."
                                   )
                               ),
-
+              
                               ClearCollect(
                                   colHomeHiveNodes_Staging,
                                   ForAll(
@@ -8754,44 +8712,44 @@ Screens:
                                               NodeSubtitle: Text(r.NodeSubtitle),
                                               Discipline: Text(r.Discipline),
                                               SubsystemCode: Coalesce(Text(r.SubsystemCode), Text(r.Discipline)),
-
+              
                                               Total:
                                                   If(
                                                       IsBlank(Text(r.Total)) || Text(r.Total) = "null",
                                                       0,
                                                       Value(Text(r.Total))
                                                   ),
-
+              
                                               Done:
                                                   If(
                                                       IsBlank(Text(r.Done)) || Text(r.Done) = "null",
                                                       0,
                                                       Value(Text(r.Done))
                                                   ),
-
+              
                                               Remaining:
                                                   If(
                                                       IsBlank(Text(r.Remaining)) || Text(r.Remaining) = "null",
                                                       0,
                                                       Value(Text(r.Remaining))
                                                   ),
-
+              
                                               Progress:
                                                   If(
                                                       IsBlank(Text(r.Progress)) || Text(r.Progress) = "null",
                                                       0,
                                                       Value(Text(r.Progress))
                                                   ),
-
+              
                                               ProgressStatus: Text(r.ProgressStatus),
-
+              
                                               SortOrder:
                                                   If(
                                                       IsBlank(Text(r.SortOrder)) || Text(r.SortOrder) = "null",
                                                       0,
                                                       Value(Text(r.SortOrder))
                                                   ),
-
+              
                                               ProgressColor:
                                                   Switch(
                                                       Text(r.ProgressStatus),
@@ -8805,7 +8763,7 @@ Screens:
                                       )
                                   )
                               );
-
+              
                               ClearCollect(
                                   colHomeHiveNodesSorted_Staging,
                                   SortByColumns(
@@ -8814,7 +8772,7 @@ Screens:
                                       SortOrder.Ascending
                                   )
                               );
-
+              
                               ClearCollect(
                                   colHomeLowestProgress_Staging,
                                   FirstN(
@@ -8831,39 +8789,39 @@ Screens:
                           )
                       )
                   ),
-
+              
                   Set(varHomeError, FirstError.Message)
               );
-
+              
               If(
                   !IsBlank(varHomeError),
-
+              
                   Set(varHomeNoData, true);
                   Set(varProjectHasHomeData, false);
                   Set(varProjectHasReportConfig, false);
                   Set(varHomeHiveLoaded, false);
-
+              
                   Set(varHomeShowOverview, false);
                   Set(varHomeShowCards, false);
                   Set(varHomeShowRightPanel, true);
-
+              
                   Notify(
                       "Home dashboard could not be loaded for this project.",
                       NotificationType.Warning
                   ),
-
+              
                   If(
                       CountRows(colHomeHiveNodes_Staging) = 0,
-
+              
                       Set(varHomeNoData, true);
                       Set(varProjectHasHomeData, false);
                       Set(varProjectHasReportConfig, false);
                       Set(varHomeHiveLoaded, false);
-
+              
                       Set(varHomeShowOverview, false);
                       Set(varHomeShowCards, false);
                       Set(varHomeShowRightPanel, true);
-
+              
                       If(
                           IsBlank(varAppWarning),
                           Set(
@@ -8871,24 +8829,24 @@ Screens:
                               "This project has no published report configuration yet."
                           )
                       ),
-
+              
                       ClearCollect(colHomeHiveNodes, colHomeHiveNodes_Staging);
                       ClearCollect(colHomeHiveNodesSorted, colHomeHiveNodesSorted_Staging);
                       ClearCollect(colHomeLowestProgress, colHomeLowestProgress_Staging);
-
+              
                       Set(varHomeNoData, false);
                       Set(varProjectHasHomeData, true);
                       Set(varProjectHasReportConfig, true);
                       Set(varHomeHiveLoaded, true);
-
+              
                       Set(varHomeShowOverview, true);
                       Set(varHomeShowCards, true);
                       Set(varHomeShowRightPanel, true);
-
+              
                       Set(varHomeLastRefresh, Now())
                   )
               );
-
+              
               Set(varHomeLoading, false);
               Set(varProjectSwitching, false);
               Set(varExecutiveDashboardCompletedAt, Now());
@@ -8903,6 +8861,8 @@ Screens:
               Set(varGlobalLoadingScope, "");
               Set(varGlobalLoadAction, "");
               Set(varGlobalLoadPending, false)
+                  )
+              )
             Visible: =false
             X: =60
             Y: =60
