@@ -853,10 +853,19 @@ Screens:
                 Properties:
                   OnSelect: |-
                     =
-                    Set(varCT_DefsIsLoading, true);
-                    Set(varCT_DefsError, "");
+                    If(
+                        IsBlank(varProjectId) ||
+                        Value(varProjectId) <= 0 ||
+                        IsBlank(varDrawerEntityType),
 
-                    Clear(colCT_Defs_Admin);
+                        Clear(colCT_Defs_Admin);
+                        Set(varCT_DefsError, "Select a project and record type before loading field definitions.");
+                        Set(varCT_DefsIsLoading, false),
+
+                        Set(varCT_DefsIsLoading, true);
+                        Set(varCT_DefsError, "");
+
+                        Clear(colCT_Defs_Admin);
 
                     Set(
                         varCT_DefsResp,
@@ -921,7 +930,8 @@ Screens:
                         )
                     );
 
-                    Set(varCT_DefsIsLoading, false);
+                    Set(varCT_DefsIsLoading, false)
+                    );
                   Visible: =false
                   X: =100
                   Y: =100
@@ -1293,7 +1303,7 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           InputTextPlaceholder: ="Select template"
                                           IsSearchable: =false
-                                          ItemDisplayText: =Coalesce(ThisItem.TemplateDisplayName, ThisItem.TemplateName, ThisItem.TemplateCode, Text(ThisItem.TemplateId))
+                                          ItemDisplayText: =ThisItem.TemplateDisplayName
                                           Items: =colPunchTemplates_Filter
                                           OnChange: |-
                                             =If(
