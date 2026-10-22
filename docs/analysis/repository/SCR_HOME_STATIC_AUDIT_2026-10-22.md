@@ -42,6 +42,15 @@ A captured execution of `warroom_GetPunchDashboardBundle` returned `success=true
 
 This successful run does not reproduce the Studio “division by zero” notification seen in the recording. It rules out this specific bundle execution as the source of that notification, but does not rule out another execution, a separate flow, or a Canvas formula error. Static inspection of Home and its used component formulas found no unguarded dynamic divisor; the division-by-zero notification remains unresolved in this audit and is deferred; this does not block the static findings or next screen-design work.
 
+### Studio recording — 2026-10-22 18:10
+
+- **Observed normal-load result:** Home remained open and rendered the Punch dashboard. The blocking “Loading Punch Dashboard…” overlay was visible through approximately 24 seconds and gone by approximately 27 seconds. This is a successful normal path, not a latency benchmark; the delay is nevertheless a visible UX concern.
+- **Guard branches not exercised in the recording:** a missing project and a second request while one is active are not shown. Therefore the video does not validate the specific `Exit()` replacement paths.
+- **Dashboard state:** the visible cards show Total 13,874, Open 6,803, Closed 6,975 and Completion 50.3%. Total minus Open minus Closed is 96. The recording does not identify the status of those 96 records, so they must not be labeled `CLEARED` without the matching response payload.
+- The heatmap is initially unselected and the punch list is empty; a later heatmap selection populates the discipline distribution and rows. This supports the selection/drill-through path, but not pagination, row/bulk actions, or all toolbar actions.
+- The recording also opens the Custom Fields dialog in Punch Review and displays its field catalog. This is outside the Home loader patch and does not validate save/cancel behavior.
+- No division-by-zero banner is visible in this recording. Its cause remains unresolved; this clip does not identify or disprove the source.
+
 ## Visual risks from the screenshot
 
 - The screen is very dense: filters, four KPI cards, two analytics panels, an action toolbar and a data table share one view.
@@ -79,6 +88,6 @@ The repository source for `cmp_SidebarNav` is not byte-equivalent to the supplie
 ## Status
 
 - Static source inspection: completed for this first Home pass.
-- Studio/App Checker and interaction validation: `NOT_RUN` (manual runtime gate).
+- Home normal-load and heatmap selection in supplied recording: observed; missing-project/duplicate-load guard paths, App Checker, pagination, row/bulk actions and full toolbar validation: `NOT_RUN`.
 - Flow-contract validation: one successful bundle response captured; full contract remains `GATED` on active Flow and SQL definitions.
 - Redesign/reference-image work: deferred until the findings and functional contract are settled.
