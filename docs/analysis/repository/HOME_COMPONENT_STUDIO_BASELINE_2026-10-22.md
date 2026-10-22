@@ -20,6 +20,10 @@ The supplied `scr_Home` YAML instantiates 9 component types in 12 places.
 | `cmp_ActionToolbarPro` | 1 | [power-apps/components/cmp_ActionToolbarPro.pa.yaml](../../../power-apps/components/cmp_ActionToolbarPro.pa.yaml) |
 | `cmp_DataTableProV2` | 1 | [power-apps/components/cmp_DataTableProV2.pa.yaml](../../../power-apps/components/cmp_DataTableProV2.pa.yaml) |
 
+## Screen audit
+
+The initial static review is recorded in [SCR_HOME_STATIC_AUDIT_2026-10-22.md](SCR_HOME_STATIC_AUDIT_2026-10-22.md). It identifies table callback/pagination gaps, visual issues, and the Studio/flow gates without treating unrun behavior as validated.
+
 ## Comparison performed
 
 The six separately uploaded component exports were compared against the corresponding `main` sources after normalizing line endings and trailing whitespace:
