@@ -92,3 +92,15 @@ Cuando el usuario invoque una plantilla por nombre, el agente debe abrir la plan
 - Antes de ampliar CI, justificar qué riesgo cubre, por qué no basta la validación local y cuál es el momento mínimo en el que debe ejecutarse.
 
 Principio obligatorio: **validar localmente primero; ejecutar GitHub Actions solo como gate remoto necesario.**
+
+## Contrato de ejecución comprobable — piloto 2026-10-23
+
+Antes de modificar código, ejecutar en este orden:
+1. Resolver `AGENTS.md`, registry/routing `docs/ai/PULSE_AGENT_REGISTRY_V1.yaml`, protocolo incremental local, rama/PR realmente activas y fuente más reciente de Studio. No asumir que un archivo pegado al chat existe en GitHub.
+2. Cuando sea una pantalla, consultar `skills/precision-industrial-screen-builder/profiles/pulse.md` y `skills/precision-industrial-screen-builder/SKILL.md` en `rubensv74/rsv-ai-skills`, branch `feature/thermos-quality-gate-20261022` (PR #1 hasta su integración en `main`). Comprobar disponibilidad. Registrar `AVAILABLE_AND_READ`, `POLICY_ONLY` o `UNAVAILABLE`. Las etiquetas `PILOT_ACTIVE` no prueban que ChatGPT haya instalado skills o lanzado agentes independientes.
+3. Trabajar sobre un único defecto o incremento que cierre el gate actual, reutilizar ramas de implementación apropiadas y no duplicar código/PR sin necesidad. Para Home/Punch Review preservar navegación y Dirty Guard confirmados, además del estado de Studio, antes de recomponer.
+4. Proteger la cadena `Screen -> Flow -> SQL -> result -> consumer`: mismos nombres, parámetros, tipos, permisos, estados y manejo de reintentos. El código propuesto debe incluir archivo completo/referencia versionada, no únicamente una explicación.
+5. Ejecutar validación estática disponible y registrar `NOT_EXECUTED` para App Checker, Studio, Flow o SQL que no se hayan podido probar. No proclamar optimización ni gate PASS sin medición/evidencia.
+6. Responder únicamente con `CAMBIO` (ruta, commit y alcance), `PRUEBA` (resultado verdadero), `GATE` (qué impide promover) y `SIGUIENTE ACCIÓN` (una, concreta). No producir resúmenes de intenciones en sustitución de cambios comprobables.
+
+Esta sección se aplica dentro del método de PULSE y no altera autorizaciones, contratos ni gates funcionales.
