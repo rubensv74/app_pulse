@@ -67,3 +67,9 @@ The complete canonical screen source in `power-apps/screens/Home/scr_Home.pa.yam
 Static comparison against the branch's prior complete screen source preserved per-loader counts of `.Run()`, `IfError`, and `FirstError`. Parentheses/brackets/braces are balanced and the three modified loader formulas contain no `Exit()`. The screen source is still only a repository candidate: Power Fx compilation, App Checker, and runtime behavior have not been validated in Studio.
 
 The patch intentionally leaves snapshot retention on refresh and the table paging/sort/actions unchanged. The former needs project/template context ownership and error-path validation; the latter needs the actual detail-flow contract. Those remain explicit follow-up work rather than inferred changes.
+
+
+Static source cleanup after the review:
+- Repaired the four corrupted progress/status glyph labels in the canonical Home YAML, including the raw U+008F that made a standard YAML reader reject the source.
+- Parsed the complete candidate with PyYAML `BaseLoader`: syntax passed, root screen is `scr_Home`, and U+008F is absent. `SafeLoader` is not applicable to this PaYaml file because it interprets Power Fx's unquoted `=` scalar in event properties as a YAML value tag.
+- This proves YAML structure only. It does not compile or validate Power Fx.
