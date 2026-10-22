@@ -661,79 +661,24 @@ Screens:
           Children:
             - comp_DetailDrawer_5:
                 Control: CanvasComponent
-                ComponentName: cmp_DetailDrawer_Premium
+                ComponentName: cmp_DetailDrawer_old
                 Properties:
                   AppColors: =gblAppColors
                   CloseAction: =Set(varShowDetailDrawer, false)
                   EntityType: =varDrawerEntityType
-                  Fill: =RGBA(0,0,0,0)
-                  Height: =App.Height
                   HostHeight: =App.Height
                   HostWidth: =App.Width
                   IsLoading: =varDrawerIsLoading
                   IsOpen: =varShowDetailDrawer
                   NormalizedRecord: =varDrawerNormalized
-                  OnDeleteComment: =Set(varDrawerSelectedCommentId, 0)
                   OnManageFieldsRequested: |-
                     =
                     Set(varCT_ShowManageFields, true);
-
                     Set(varCT_DefsSearch, "");
-
                     Set(varCT_DefsError, "");
-
                     Select(btnCT_LoadDefs_5)
-                  OnPostComment: |-
-                    =
-                    If(
-                        IsBlank(Trim(varDrawerCommentDraft)),
-                        Notify("Comment is required.", NotificationType.Warning),
-                        Set(varIsLoadingComments, true);
-                        Set(varDrawerIsLoading, true);
-                        IfError(
-                            Warroom_AddTaskComment.Run(
-                                varProjectId,
-                                varDrawerRecordId,
-                                varDrawerCommentDraft,
-                                varUserEmail,
-                                varDrawerEntityType,
-                                varUserName,
-                                "Comment"
-                            );
-                            Set(varDrawerCommentDraft, "");
-                            Select(btnDrawerLoad_Comments_5);
-                            Set(varDrawerIsLoading, false),
-                            Set(varIsLoadingComments, false);
-                            Set(varDrawerIsLoading, false);
-                            Notify("The comment could not be saved.", NotificationType.Error)
-                        )
-                    )
-                  OnRefreshRequested: =Select(btnDrawerLoad_2)
-                  OnSaveFields: |-
-                    =
-                    If(
-                        CountRows(colCT_Dirty) = 0,
-                        Notify("There are no changes to save.", NotificationType.Information),
-                        Set(varCT_IsSaving, true);
-                        Set(varCT_Error, "");
-                        IfError(
-                            WarRoom_SaveCustomBulk.Run(
-                                varProjectId,
-                                varDrawerEntityType,
-                                varDrawerRecordId,
-                                JSON(colCT_Dirty, JSONFormat.Compact),
-                                varUserEmail
-                            );
-                            Clear(colCT_Dirty);
-                            Select(btnDrawerLoad_Custom_5);
-                            Set(varCT_IsSaving, false);
-                            Notify("Custom fields saved.", NotificationType.Success),
-                            Set(varCT_IsSaving, false);
-                            Set(varCT_Error, "The custom fields could not be saved.");
-                            Notify(varCT_Error, NotificationType.Error)
-                        )
-                    )
-                  OnTabChanged: =Select(btnDrawerLoad_2)
+                  OnSaveCustomField: =Select(btnCT_SaveFieldDef_5)
+                  OnToggleFieldActiveRequested: =Select(btnCT_SetActive_5)
                   ProjectId: =varProjectId
                   RecordId: =varDrawerRecordId
                   SelectedRecord: =varDrawerSelectedRecord
@@ -908,10 +853,19 @@ Screens:
                 Properties:
                   OnSelect: |-
                     =
-                    Set(varCT_DefsIsLoading, true);
-                    Set(varCT_DefsError, "");
+                    If(
+                        IsBlank(varProjectId) ||
+                        Value(varProjectId) <= 0 ||
+                        IsBlank(varDrawerEntityType),
 
-                    Clear(colCT_Defs_Admin);
+                        Clear(colCT_Defs_Admin);
+                        Set(varCT_DefsError, "Select a project and record type before loading field definitions.");
+                        Set(varCT_DefsIsLoading, false),
+
+                        Set(varCT_DefsIsLoading, true);
+                        Set(varCT_DefsError, "");
+
+                        Clear(colCT_Defs_Admin);
 
                     Set(
                         varCT_DefsResp,
@@ -976,7 +930,8 @@ Screens:
                         )
                     );
 
-                    Set(varCT_DefsIsLoading, false);
+                    Set(varCT_DefsIsLoading, false)
+                    );
                   Visible: =false
                   X: =100
                   Y: =100
@@ -1221,7 +1176,7 @@ Screens:
                                     Width: =If(Parent.Width >= 1350, 380, 330)
                                   Children:
                                     - cmbHome_ProjectSelector_2:
-                                        Control: ModernCombobox@1.1.1
+                                        Control: ModernCombobox@1.1.2
                                         Properties:
                                           BorderThickness: =0
                                           Color: =varTheme_Text
@@ -1243,11 +1198,9 @@ Screens:
                                           ItemDisplayText: =ThisItem.ProjectDisplayName
                                           Items: =colEnabledProjectsUI
                                           OnChange: |-
-                                            =
-
-
-                                            If(
-                                                !IsBlank(Self.Selected.ProjectId),
+                                            =If(
+                                                !IsBlank(Self.Selected.ProjectId) &&
+                                                Value(Self.Selected.ProjectId) <> Value(Coalesce(varProjectId, 0)),
 
                                                 Set(varPendingProjectId, Value(Self.Selected.ProjectId));
 
@@ -1332,7 +1285,7 @@ Screens:
                                           X: =16
                                           Y: =2
                                     - cmbHomePunchTemplateHeader_1:
-                                        Control: ModernCombobox@1.1.1
+                                        Control: ModernCombobox@1.1.2
                                         Properties:
                                           Appearance: =Appearance.FilledLighter
                                           BorderThickness: =1
@@ -1342,36 +1295,16 @@ Screens:
                                                 IsBlank(varPunchDashboardTemplateId),
                                                 [],
                                                 Filter(
-                                                    AddColumns(
-                                                        colPunchTemplates_Filter,
-                                                        TemplateDisplayText,
-                                                        Coalesce(
-                                                            TemplateDisplayName,
-                                                            TemplateName,
-                                                            TemplateCode,
-                                                            Text(TemplateId)
-                                                        )
-                                                    ),
-                                                    Value(TemplateId) =
-                                                        Value(varPunchDashboardTemplateId)
+                                                    colPunchTemplates_Filter,
+                                                    Value(TemplateId) = Value(varPunchDashboardTemplateId)
                                                 )
                                             )
                                           Fill: =varTheme_Surface
                                           FontWeight: =FontWeight.Semibold
                                           InputTextPlaceholder: ="Select template"
                                           IsSearchable: =false
-                                          ItemDisplayText: =ThisItem.TemplateDisplayText
-                                          Items: |-
-                                            =AddColumns(
-                                                colPunchTemplates_Filter,
-                                                TemplateDisplayText,
-                                                Coalesce(
-                                                    TemplateDisplayName,
-                                                    TemplateName,
-                                                    TemplateCode,
-                                                    Text(TemplateId)
-                                                )
-                                            )
+                                          ItemDisplayText: =ThisItem.TemplateDisplayName
+                                          Items: =colPunchTemplates_Filter
                                           OnChange: |-
                                             =If(
                                                 !IsBlank(Self.Selected.TemplateId) &&
@@ -1886,10 +1819,10 @@ Screens:
                                                             Text: |-
                                                               =Switch(
                                                                   ThisItem.ProgressStatus,
-                                                                  "Delayed", "âš   Delayed",
-                                                                  "At Risk", "âš   At Risk",
-                                                                  "In Progress", "â—  In Progress",
-                                                                  "Completed", "âœ“  Completed",
+                                                                  "Delayed", "⚠ Delayed",
+                                                                  "At Risk", "⚠ At Risk",
+                                                                  "In Progress", "● In Progress",
+                                                                  "Completed", "✓ Completed",
                                                                   ThisItem.ProgressStatus
                                                               )
                                                             Width: =96
@@ -6679,7 +6612,7 @@ Screens:
                                           Height: =60
                                           IsLoading: =varPunchExecutiveGridLoading
                                           MutedTextColor: =varTheme_TextMuted
-                                          OnAction: "=Switch(\n    Self.SelectedActionKey,\n\n    \"REVIEW\",\n        Notify(\n            \"Punch Review Workspace will open with the current grid context.\",\n            NotificationType.Information\n        ),\n\n    \"OPEN_PUNCHES\",\n        Select(\n            btnPunchExecutiveOpenInPunchList\n        ),\n\n    \"REFRESH\",\n        Select(btnPunchExecutiveLoadCellDetails),\n\n    \"EXPORT\",\n        Select(btnPunchExecutiveGridExport),\n\n    \"COMMENTS\",\n        If(\n            IsBlank(varHomePunchGridSelectedKey),\n            Notify(\n                \"Select a Punch first.\",\n                NotificationType.Warning\n            ),\n            Notify(\n                \"The selected Punch will open in the review workspace.\",\n                NotificationType.Information\n            )\n        ),\n\n    \"COLUMNS\",\n        Notify(\n            \"Use the grid gear while the column selector remains inside DataTableProV2.\",\n            NotificationType.Information\n        ),\n\n    \"DENSITY\",\n        Set(\n            varHomePunchGridDensity,\n            Switch(\n                Lower(varHomePunchGridDensity),\n                \"compact\", \"Comfortable\",\n                \"comfortable\", \"Spacious\",\n                \"Compact\"\n            )\n        ),\n\n    \"SELECT_VISIBLE\",\n        ClearCollect(\n            colHomePunchGridSelectedKeys,\n            ForAll(\n                colHomePunchGridView,\n                {\n                    RowKey: Text(RowKey)\n                }\n            )\n        ),\n\n\"CLEAR_FILTERS\",\n\n    Set(\n        varHomePunchSelectedDisciplineCode,\n        \"\"\n    );\n\n    Set(\n        varPunchDrillDisciplineCode,\n        \"\"\n    );\n\n    Set(\n        varPunchExecutiveGridPage,\n        1\n    );\n\n    Set(\n        varPunchExecutiveGridSelectedId,\n        Blank()\n    );\n\n    Set(\n        varHomePunchGridSelectedKey,\n        \"\"\n    );\n\n    Clear(\n        colHomePunchGridSelectedKeys\n    );\n\n    Set(\n        varHomePunchGridAllMatchingSelected,\n        false\n    );\n\n    Set(\n        varPunchExecutiveGridLoading,\n        true\n    );\n\n    Set(\n        varPunchExecutiveGridError,\n        \"\"\n    );\n\n    Set(\n        varPunchExecutiveGridMessage,\n        \"Loading all disciplines for the selected cell...\"\n    );\n\n    Set(\n        varPunchExecutiveGridLoadPending,\n        false\n    );\n\n    Set(\n        varPunchExecutiveGridLoadPending,\n        true\n    ),\n    \n    \"MORE\",\n        Notify(\n            \"Additional actions will be added here.\",\n            NotificationType.Information\n        )\n)"
+                                          OnAction: "=Switch(\n    Self.SelectedActionKey,\n\n    \"REVIEW\",\n        Set(varPunchReviewSource, \"HOME\");\n        Set(varPunchReviewReturnScreen, \"HOME\");\n        Set(varPunchReviewTemplateId, varPunchDashboardTemplateId);\n        Set(varPunchReviewQueueScope, \"HOME_CONTEXT\");\n        Set(varPunchReviewSearch, \"\");\n        Set(varPunchReviewQuickFilter, \"ALL\");\n        Set(varPunchReviewCurrentIndex, 1);\n        Set(varPunchReviewCurrentId, Blank());\n        Set(varPunchReviewDirty, false);\n        Set(varPunchReviewPendingAction, \"\");\n        Set(varPunchReviewPendingIndex, 0);\n        Set(varPunchReviewShowDirtyDialog, false);\n        Set(varPunchReviewInitialHydrationPending, true);\n        ClearCollect(\n            colPunchReviewQueue,\n            ForAll(\n                colHomePunchGridView As _homeRow,\n                With(\n                    {\n                        _punch: LookUp(\n                            colPunchExecutiveGridFiltered,\n                            Text(PunchId) = _homeRow.RowKey\n                        )\n                    },\n                    {\n                        ReviewOrder: _homeRow.RowIndex,\n                        RowKey: _homeRow.RowKey,\n                        PunchIdNumber: Value(_homeRow.RowKey),\n                        PunchCode: _homeRow.PunchId,\n                        Description: _homeRow.Title,\n                        AreaCode: \"\",\n                        UnitCode: \"\",\n                        SystemCode: \"\",\n                        SubsystemCode: Coalesce(_punch.SubsystemCode, _punch.SubsystemName, \"\"),\n                        ElementCode: \"\",\n                        Discipline: Coalesce(_punch.DisciplineName, _punch.DisciplineCode, _homeRow.Discipline),\n                        Category: Coalesce(_punch.CategoryName, _punch.CategoryCode, \"\"),\n                        StatusCode: Coalesce(_punch.StatusCode, \"OPEN\"),\n                        StatusLabel: Coalesce(_punch.PunchStatus, _punch.StatusName, _punch.StatusCode, \"OPEN\"),\n                        ResponsibleParty: Trim(Coalesce(_punch.ResponsibleCompany, \"\") & If(!IsBlank(_punch.ResponsiblePerson), \" · \" & _punch.ResponsiblePerson, \"\")),\n                        InspectionName: \"\",\n                        Originator: \"\",\n                        CommentCount: 0,\n                        LastCommentOn: Blank(),\n                        IsReviewedInSession: false,\n                        IsDirty: false\n                    }\n                )\n            )\n        );\n        Navigate(scr_PunchReview, ScreenTransition.None),\n\n    \"OPEN_PUNCHES\",\n        Select(\n            btnPunchExecutiveOpenInPunchList\n        ),\n\n    \"REFRESH\",\n        Select(btnPunchExecutiveLoadCellDetails),\n\n    \"EXPORT\",\n        Select(btnPunchExecutiveGridExport),\n\n    \"COMMENTS\",\n        If(\n            IsBlank(varHomePunchGridSelectedKey),\n            Notify(\n                \"Select a Punch first.\",\n                NotificationType.Warning\n            ),\n            Notify(\n                \"The selected Punch will open in the review workspace.\",\n                NotificationType.Information\n            )\n        ),\n\n    \"COLUMNS\",\n        Notify(\n            \"Use the grid gear while the column selector remains inside DataTableProV2.\",\n            NotificationType.Information\n        ),\n\n    \"DENSITY\",\n        Set(\n            varHomePunchGridDensity,\n            Switch(\n                Lower(varHomePunchGridDensity),\n                \"compact\", \"Comfortable\",\n                \"comfortable\", \"Spacious\",\n                \"Compact\"\n            )\n        ),\n\n    \"SELECT_VISIBLE\",\n        ClearCollect(\n            colHomePunchGridSelectedKeys,\n            ForAll(\n                colHomePunchGridView,\n                {\n                    RowKey: Text(RowKey)\n                }\n            )\n        ),\n\n\"CLEAR_FILTERS\",\n\n    Set(\n        varHomePunchSelectedDisciplineCode,\n        \"\"\n    );\n\n    Set(\n        varPunchDrillDisciplineCode,\n        \"\"\n    );\n\n    Set(\n        varPunchExecutiveGridPage,\n        1\n    );\n\n    Set(\n        varPunchExecutiveGridSelectedId,\n        Blank()\n    );\n\n    Set(\n        varHomePunchGridSelectedKey,\n        \"\"\n    );\n\n    Clear(\n        colHomePunchGridSelectedKeys\n    );\n\n    Set(\n        varHomePunchGridAllMatchingSelected,\n        false\n    );\n\n    Set(\n        varPunchExecutiveGridLoading,\n        true\n    );\n\n    Set(\n        varPunchExecutiveGridError,\n        \"\"\n    );\n\n    Set(\n        varPunchExecutiveGridMessage,\n        \"Loading all disciplines for the selected cell...\"\n    );\n\n    Set(\n        varPunchExecutiveGridLoadPending,\n        false\n    );\n\n    Set(\n        varPunchExecutiveGridLoadPending,\n        true\n    ),\n    \n    \"MORE\",\n        Notify(\n            \"Additional actions will be added here.\",\n            NotificationType.Information\n        )\n)"
                                           SecondaryText: |-
                                             =Text(
                                                 Coalesce(
@@ -7028,8 +6961,20 @@ Screens:
           Control: ModernButton@1.0.0
           Properties:
             OnSelect: |-
-              =
-              Set(
+              =If(
+                  IsBlank(varProjectId),
+                  Notify("Please select a project first.", NotificationType.Warning);
+                  Set(varPunchDashboardLoading, false);
+                  Set(varGlobalLoading, false);
+                  Set(varGlobalLoadingMsg, "");
+                  Set(varGlobalLoadingSubMsg, "");
+                  Set(varGlobalLoadingScope, "");
+                  Set(varGlobalLoadAction, "");
+                  Set(varGlobalLoadPending, false),
+                  If(
+                      varPunchDashboardLoading,
+                      Blank(),
+                      Set(
                   varPunchDashboardForceRefreshRequest,
                   Coalesce(
                       varPunchDashboardForceRefresh,
@@ -7041,33 +6986,7 @@ Screens:
                   varPunchDashboardForceRefresh,
                   false
               );
-
-
-              If(
-                  IsBlank(varProjectId),
-
-                  Notify(
-                      "Please select a project first.",
-                      NotificationType.Warning
-                  );
-
-                  Set(varPunchDashboardLoading, false);
-                  Set(varGlobalLoading, false);
-                  Set(varGlobalLoadingMsg, "");
-                  Set(varGlobalLoadingSubMsg, "");
-                  Set(varGlobalLoadingScope, "");
-                  Set(varGlobalLoadAction, "");
-                  Set(varGlobalLoadPending, false);
-
-                  Exit()
-              );
-
-              If(
-                  varPunchDashboardLoading,
-                  Exit()
-              );
-
-              Set(varPunchDashboardLoading, true);
+                      Set(varPunchDashboardLoading, true);
               Set(varPunchDashboardError, "");
               Set(varPunchDashboardHasSnapshot, false);
 
@@ -8492,6 +8411,8 @@ Screens:
 
               Set(varPunchDashboardLoading, false);
               Set(varProjectSwitching, false);
+                  )
+              )
             Visible: =false
             X: =180
             Y: =180
@@ -8543,26 +8464,13 @@ Screens:
           Control: ModernButton@1.0.0
           Properties:
             OnSelect: |-
-              =
-
-              If(
+              =If(
                   IsBlank(varProjectId) || IsBlank(varSelectedHiveNode.Discipline),
-
                   Clear(colHomePendingSubsystems);
                   Clear(colHomePendingSubsystems_Staging);
-
                   Set(varPendingSubsystemsLoading, false);
-                  Set(varHomePendingError, "");
-
-                  Exit()
-              );
-
-              If(
-                  varPendingSubsystemsLoading,
-                  Exit()
-              );
-
-              Set(varPendingSubsystemsLoading, true);
+                  Set(varHomePendingError, ""),
+                  If(varPendingSubsystemsLoading, Blank(), Set(varPendingSubsystemsLoading, true);
               Set(varHomePendingError, "");
 
               Clear(colHomePendingSubsystems);
@@ -8661,7 +8569,8 @@ Screens:
                   )
               );
 
-              Set(varPendingSubsystemsLoading, false)
+              Set(varPendingSubsystemsLoading, false))
+              )
             Visible: =false
             X: =80
             Y: =80
@@ -8669,28 +8578,9 @@ Screens:
           Control: ModernButton@1.0.0
           Properties:
             OnSelect: |-
-              =
-
-              Set(varGlobalLoading, true);
-              Set(
-                  varGlobalLoadingMsg,
-                  If(varHomeDashboard = "TASKS", "Loading Tasks Dashboard...", "Loading Home...")
-              );
-              Set(
-                  varGlobalLoadingSubMsg,
-                  If(
-                      varHomeDashboard = "TASKS",
-                      "Preparing discipline and subsystem overview",
-                      "Loading selected project dashboard"
-                  )
-              );
-              Set(varGlobalLoadingScope, "HOME");
-
-              If(
+              =If(
                   IsBlank(varProjectId),
-
                   Notify("Please select a project first.", NotificationType.Warning);
-
                   Set(varHomeLoading, false);
                   Set(varProjectSwitching, false);
                   Set(varGlobalLoading, false);
@@ -8698,18 +8588,19 @@ Screens:
                   Set(varGlobalLoadingSubMsg, "");
                   Set(varGlobalLoadingScope, "");
                   Set(varGlobalLoadAction, "");
-                  Set(varGlobalLoadPending, false);
-
-                  //Exit()
-              );
-
-              If(
-                  varHomeLoading,
-
-                  Exit()
-              );
-
-              Set(varHomeLoading, true);
+                  Set(varGlobalLoadPending, false),
+                  If(
+                      varHomeLoading,
+                      Blank(),
+                      Set(varGlobalLoading, true);
+                  Set(varGlobalLoadingMsg, If(varHomeDashboard = "TASKS", "Loading Tasks Dashboard...", "Loading Home..."));
+                  Set(varGlobalLoadingSubMsg, If(
+                      varHomeDashboard = "TASKS",
+                      "Preparing discipline and subsystem overview",
+                      "Loading selected project dashboard"
+                  ));
+                  Set(varGlobalLoadingScope, "HOME");
+                      Set(varHomeLoading, true);
               Set(varProjectSwitching, true);
               Set(varHomeError, "");
               Set(varHomeNoData, false);
@@ -8920,6 +8811,8 @@ Screens:
               Set(varGlobalLoadingScope, "");
               Set(varGlobalLoadAction, "");
               Set(varGlobalLoadPending, false)
+                  )
+              )
             Visible: =false
             X: =60
             Y: =60

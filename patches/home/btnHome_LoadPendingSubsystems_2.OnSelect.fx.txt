@@ -1,0 +1,113 @@
+=
+If(
+    IsBlank(varProjectId) || IsBlank(varSelectedHiveNode.Discipline),
+        Clear(colHomePendingSubsystems);
+            Clear(colHomePendingSubsystems_Staging);
+
+            Set(varPendingSubsystemsLoading, false);
+            Set(varHomePendingError, ""),
+    If(
+        varPendingSubsystemsLoading,
+        Blank(),
+        Set(varPendingSubsystemsLoading, true);
+        Set(varHomePendingError, "");
+
+        Clear(colHomePendingSubsystems);
+        Clear(colHomePendingSubsystems_Staging);
+
+        IfError(
+            With(
+                {
+                    _resp:
+                        Warroom_GetPendingSubsystemsByDiscipline.Run(
+                            varProjectId,
+                            varSelectedHiveNode.Discipline
+                        )
+                },
+
+                ClearCollect(
+                    colHomePendingSubsystems_Staging,
+                    ForAll(
+                        Table(ParseJSON(Coalesce(_resp.result, "[]"))),
+                        With(
+                            { r: ThisRecord.Value },
+                            {
+                                RowNo:
+                                    If(
+                                        IsBlank(Text(r.RowNo)) || Text(r.RowNo) = "null",
+                                        0,
+                                        Value(Text(r.RowNo))
+                                    ),
+
+                                SubsystemCode: Text(r.SubsystemCode),
+                                Discipline: Text(r.Discipline),
+
+                                Total:
+                                    If(
+                                        IsBlank(Text(r.Total)) || Text(r.Total) = "null",
+                                        0,
+                                        Value(Text(r.Total))
+                                    ),
+
+                                Done:
+                                    If(
+                                        IsBlank(Text(r.Done)) || Text(r.Done) = "null",
+                                        0,
+                                        Value(Text(r.Done))
+                                    ),
+
+                                Remaining:
+                                    If(
+                                        IsBlank(Text(r.Remaining)) || Text(r.Remaining) = "null",
+                                        0,
+                                        Value(Text(r.Remaining))
+                                    ),
+
+                                Progress:
+                                    If(
+                                        IsBlank(Text(r.Progress)) || Text(r.Progress) = "null",
+                                        0,
+                                        Value(Text(r.Progress))
+                                    ),
+
+                                ProgressStatus: Text(r.ProgressStatus),
+
+                                ProgressColor:
+                                    Switch(
+                                        Text(r.ProgressStatus),
+                                        "Excellent", "#22C55E",
+                                        "Good", "#F59E0B",
+                                        "In Progress", "#00C8FF",
+                                        "Delayed", "#EF4444",
+                                        "#64748B"
+                                    )
+                            }
+                        )
+                    )
+                )
+            ),
+
+            Set(varHomePendingError, FirstError.Message)
+        );
+
+        If(
+            IsBlank(varHomePendingError),
+
+            ClearCollect(
+                colHomePendingSubsystems,
+                SortByColumns(
+                    colHomePendingSubsystems_Staging,
+                    "RowNo",
+                    SortOrder.Ascending
+                )
+            ),
+
+            Notify(
+                "Pending subsystems could not be loaded.",
+                NotificationType.Warning
+            )
+        );
+
+        Set(varPendingSubsystemsLoading, false)
+    )
+)
