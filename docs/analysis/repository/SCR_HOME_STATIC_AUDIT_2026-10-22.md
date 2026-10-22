@@ -26,7 +26,6 @@ The screen export contains 256 controls and 12 Canvas Component instances across
 | Medium | The supplied YAML copy contains a raw control character in a status string. | A raw U+008F occurs in the `In Progress` text formula (source line 1566), and a standard YAML parser rejects the supplied file. This may be copy/encoding corruption rather than the actual Studio source; inspect the source in Studio before importing or editing this text. |
 | Low | Home retains a Tasks dashboard branch while its tabs are hidden. | The screen contains separate `TASKS` and `PUNCHES` surfaces, but the selector container has `Visible=false`. Confirm whether the Tasks branch is intentionally retired or has lost its entry point. |
 
-#
 ### Candidate code correction — loader guards
 
 The screen YAML is an exported baseline, not the tracked app source, so these are exact repair rules for the corresponding Studio formulas; they are not presented as applied or runtime-validated code.
@@ -41,7 +40,7 @@ This avoids app exit and guarantees the request prerequisites before running the
 
 A captured execution of `warroom_GetPunchDashboardBundle` returned `success=true`, `hasSnapshot=true`, and DataVersion `3.0`. It generated snapshot 54 from previous snapshot 53 in 5.384 seconds. The response reports a source count of 13,823 and status counts OPEN 6,785, CLEARED 63, CLOSED 6,975; these sum exactly to the source count.
 
-This successful run does not reproduce the Studio “division by zero” notification seen in the recording. It rules out this specific bundle execution as the source of that notification, but does not rule out another execution, a separate flow, or a Canvas formula error. Static inspection of Home and its used component formulas found no unguarded dynamic divisor; the remaining error needs the Power Apps Monitor/App Checker event or a repeatable formula trace to identify its control.
+This successful run does not reproduce the Studio “division by zero” notification seen in the recording. It rules out this specific bundle execution as the source of that notification, but does not rule out another execution, a separate flow, or a Canvas formula error. Static inspection of Home and its used component formulas found no unguarded dynamic divisor; the division-by-zero notification remains unresolved in this audit and is deferred; this does not block the static findings or next screen-design work.
 
 ## Visual risks from the screenshot
 
@@ -61,11 +60,11 @@ The repository source for `cmp_SidebarNav` is not byte-equivalent to the supplie
 
 1. Replace all active `Exit()` guard calls with guarded branches; specifically fix the missing-project path in `btnHome_LoadHive_2` so it cannot execute the flow.
 2. Wire the visible table's row, bulk and page-size callbacks, or remove/hide the unsupported affordances.
-2. Make server pagination internally consistent: current result range, page size and sort need one explicit contract between the grid, Home and the detail flow.
-3. Resolve the Open KPI trend semantic mismatch and explain any valid non-Open/non-Closed punch statuses.
-4. Match loading/error/empty states to the real Home composition; check no-project and no-template states.
-5. Improve keyboard/accessibility labels, then address density, nested scrolling and responsive widths.
-6. Validate the complete Home capability in Power Apps Studio with the checklist below.
+3. Make server pagination internally consistent: current result range, page size and sort need one explicit contract between the grid, Home and the detail flow.
+4. Resolve the Open KPI trend semantic mismatch and explain any valid non-Open/non-Closed punch statuses.
+5. Match loading/error/empty states to the real Home composition; check no-project and no-template states.
+6. Improve keyboard/accessibility labels, then address density, nested scrolling and responsive widths.
+7. Validate the complete Home capability in Power Apps Studio with the checklist below.
 
 ## Studio validation checklist — not yet run
 
