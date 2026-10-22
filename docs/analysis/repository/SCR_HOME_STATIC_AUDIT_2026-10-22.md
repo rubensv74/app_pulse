@@ -13,6 +13,9 @@ The screen export contains 256 controls and 12 Canvas Component instances across
 | Priority | Finding | Evidence / impact |
 |---|---|---|
 | High | Data-table row actions and bulk actions are exposed without host handlers. | The instance enables `ShowRowActions` and `ShowBulkActions`, supplies five `ContextActions`, but leaves `OnContextAction` and `OnBulkAction` blank. The component calls these events when the user selects an action. The visible affordances therefore have no screen behavior. |
+| High | A guard can close the whole app. | Five active `Exit()` calls appear in the Punch dashboard, pending-subsystems, and Hive loaders. Microsoft documents that `Exit()` exits the running app; it is used here for “no project/selection” or “request already running” guards. Users can be returned to the app list during normal interaction. Replace these early exits with mutually exclusive `If` branches so only the load branch runs when its prerequisites are met. See [Microsoft Power Fx Exit](https://learn.microsoft.com/en-us/power-platform/power-fx/reference/function-exit). |
+| High | The Hive/Tasks loader continues after its missing-project guard. | `btnHome_LoadHive_2` shows a warning and clears loading state when `varProjectId` is blank, but its `Exit()` is commented out. The formula then continues, sets loading back to true, and reaches the Hive flow call. Guard the entire load body with `!IsBlank(varProjectId) && !varHomeLoading`; the invalid-context branch should end after cleanup. |
+| Medium | Refresh discards the visible snapshot before the replacement is ready. | `btnHome_LoadPunchDashboard_1` sets `varPunchDashboardHasSnapshot` to false and clears the dashboard collections before requesting the bundle. A refresh therefore removes the existing view and shows the generic 280 px skeleton while the request runs; on failure the user loses the last good snapshot. Preserve the current data during same-project refreshes and replace it only after a successful response; clear it on project/template changes. |
 | High | The visible rows-per-page control has no callback. | The instance leaves `OnRowsPerPage` blank. The component invokes it from its rows-per-page selector. A separate page-size helper exists in an inactive/hidden legacy grid, but it is not wired to this component. |
 | High | Result range is hard-coded. | `VisibleStart=1` and `VisibleEnd=25` are constant inputs, while the table supports multiple server pages. Its footer will keep showing the first page range after navigation. |
 | Medium | Sort behavior is local to the fetched page. | The table's `OnSort` updates local sort variables and rebuilds `colHomePunchGridView`. The rebuild sorts `colPunchExecutiveGridFiltered`, which is the current page returned by `warroom_GetPunchDashboardCellDetails`; the flow call does not send sort key/direction. The UI suggests a result-wide sort but the source only sorts the loaded page. |
@@ -23,7 +26,18 @@ The screen export contains 256 controls and 12 Canvas Component instances across
 | Medium | The supplied YAML copy contains a raw control character in a status string. | A raw U+008F occurs in the `In Progress` text formula (source line 1566), and a standard YAML parser rejects the supplied file. This may be copy/encoding corruption rather than the actual Studio source; inspect the source in Studio before importing or editing this text. |
 | Low | Home retains a Tasks dashboard branch while its tabs are hidden. | The screen contains separate `TASKS` and `PUNCHES` surfaces, but the selector container has `Visible=false`. Confirm whether the Tasks branch is intentionally retired or has lost its entry point. |
 
-### Runtime evidence — 2026-10-22
+#
+### Candidate code correction — loader guards
+
+The screen YAML is an exported baseline, not the tracked app source, so these are exact repair rules for the corresponding Studio formulas; they are not presented as applied or runtime-validated code.
+
+- `btnHome_LoadPunchDashboard_1`: keep the existing missing-project cleanup in the first `If` result and move the complete load body (starting at `Set(varPunchDashboardLoading, true)`) into the else result. Within that else branch, guard duplicate requests with `If(!varPunchDashboardLoading, <existing load body>)` instead of `Exit()`.
+- `btnHome_LoadPendingSubsystems_2`: return from the work by making the request body the else branch of `If(IsBlank(varProjectId) || IsBlank(varSelectedHiveNode.Discipline), <cleanup>, <existing guarded load>)`; duplicate requests should be an empty/no-op branch.
+- `btnHome_LoadHive_2`: keep the missing-project warning and cleanup, then place the full Hive request under the valid-project/idle branch. Do not restore loading flags or call the flow after that validation fails.
+
+This avoids app exit and guarantees the request prerequisites before running the flow. The screenshot/video and flow response support the other listed findings; no Monitor trace was used for this pass.
+
+## Runtime evidence — 2026-10-22
 
 A captured execution of `warroom_GetPunchDashboardBundle` returned `success=true`, `hasSnapshot=true`, and DataVersion `3.0`. It generated snapshot 54 from previous snapshot 53 in 5.384 seconds. The response reports a source count of 13,823 and status counts OPEN 6,785, CLEARED 63, CLOSED 6,975; these sum exactly to the source count.
 
@@ -45,7 +59,8 @@ The repository source for `cmp_SidebarNav` is not byte-equivalent to the supplie
 
 ## Recommended order
 
-1. Wire the visible table's row, bulk and page-size callbacks, or remove/hide the unsupported affordances.
+1. Replace all active `Exit()` guard calls with guarded branches; specifically fix the missing-project path in `btnHome_LoadHive_2` so it cannot execute the flow.
+2. Wire the visible table's row, bulk and page-size callbacks, or remove/hide the unsupported affordances.
 2. Make server pagination internally consistent: current result range, page size and sort need one explicit contract between the grid, Home and the detail flow.
 3. Resolve the Open KPI trend semantic mismatch and explain any valid non-Open/non-Closed punch statuses.
 4. Match loading/error/empty states to the real Home composition; check no-project and no-template states.
