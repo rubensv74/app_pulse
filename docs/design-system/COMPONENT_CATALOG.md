@@ -21,6 +21,10 @@ When a new reusable component is needed, its canonical `.pa.yaml` source must be
 
 A required component must never exist only in chat, a construction block, temporary download or obsolete path.
 
+## Current Studio baseline reference
+
+The Home screen component inventory and Studio/source comparison captured on 2026-10-22 are recorded in [HOME_COMPONENT_STUDIO_BASELINE_2026-10-22.md](../analysis/repository/HOME_COMPONENT_STUDIO_BASELINE_2026-10-22.md). The current Studio export for `cmp_SidebarNav` is preserved there as a dated runtime snapshot because it differs from the canonical source. This snapshot is evidence of the supplied Studio state, not approval to replace the canonical component or proof of current runtime behavior. Reconcile the difference before treating the Studio export as the new canonical source.
+
 ## Lifecycle states
 
 ```text
