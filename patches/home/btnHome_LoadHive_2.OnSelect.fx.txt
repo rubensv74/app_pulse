@@ -1,0 +1,244 @@
+=
+If(
+    IsBlank(varProjectId),
+        Notify("Please select a project first.", NotificationType.Warning);
+
+            Set(varHomeLoading, false);
+            Set(varProjectSwitching, false);
+            Set(varGlobalLoading, false);
+            Set(varGlobalLoadingMsg, "");
+            Set(varGlobalLoadingSubMsg, "");
+            Set(varGlobalLoadingScope, "");
+            Set(varGlobalLoadAction, "");
+            Set(varGlobalLoadPending, false),
+    If(
+        varHomeLoading,
+        Blank(),
+        Set(varGlobalLoading, true);
+        Set(
+            varGlobalLoadingMsg,
+            If(varHomeDashboard = "TASKS", "Loading Tasks Dashboard...", "Loading Home...")
+        );
+        Set(
+            varGlobalLoadingSubMsg,
+            If(
+                varHomeDashboard = "TASKS",
+                "Preparing discipline and subsystem overview",
+                "Loading selected project dashboard"
+            )
+        );
+        Set(varGlobalLoadingScope, "HOME");
+
+        Set(varHomeLoading, true);
+        Set(varProjectSwitching, true);
+        Set(varHomeError, "");
+        Set(varHomeNoData, false);
+        Set(varProjectHasHomeData, false);
+        Set(varProjectHasReportConfig, false);
+
+        Set(varHomeShowOverview, false);
+        Set(varHomeShowCards, false);
+        Set(varHomeShowRightPanel, false);
+
+        Clear(colHomeHiveNodes);
+        Clear(colHomeHiveNodesSorted);
+        Clear(colHomeLowestProgress);
+
+        Clear(colHomeHiveNodes_Staging);
+        Clear(colHomeHiveNodesSorted_Staging);
+        Clear(colHomeLowestProgress_Staging);
+
+        IfError(
+            With(
+                {
+                    _resp: Warroom_GetHiveNodesByDiscipline.Run(varProjectId)
+                },
+                With(
+                    {
+                        _obj: ParseJSON(Coalesce(_resp.result, "{}"))
+                    },
+
+                    If(
+                        Text(_obj.success) = "false",
+
+                        Set(varHomeNoData, true);
+                        Set(varProjectHasHomeData, false);
+                        Set(varHomeHiveLoaded, false);
+                        Set(varProjectHasReportConfig, false);
+
+                        Set(varHomeShowOverview, false);
+                        Set(varHomeShowCards, false);
+                        Set(varHomeShowRightPanel, true);
+
+                        Set(
+                            varAppWarning,
+                            Coalesce(
+                                Text(_obj.message),
+                                "This project has no published report configuration yet."
+                            )
+                        ),
+
+                        ClearCollect(
+                            colHomeHiveNodes_Staging,
+                            ForAll(
+                                Table(_obj.result),
+                                With(
+                                    { r: ThisRecord.Value },
+                                    {
+                                        NodeId: Text(r.NodeId),
+                                        NodeNo: Text(r.NodeNo),
+                                        NodeTitle: Text(r.NodeTitle),
+                                        NodeSubtitle: Text(r.NodeSubtitle),
+                                        Discipline: Text(r.Discipline),
+                                        SubsystemCode: Coalesce(Text(r.SubsystemCode), Text(r.Discipline)),
+
+                                        Total:
+                                            If(
+                                                IsBlank(Text(r.Total)) || Text(r.Total) = "null",
+                                                0,
+                                                Value(Text(r.Total))
+                                            ),
+
+                                        Done:
+                                            If(
+                                                IsBlank(Text(r.Done)) || Text(r.Done) = "null",
+                                                0,
+                                                Value(Text(r.Done))
+                                            ),
+
+                                        Remaining:
+                                            If(
+                                                IsBlank(Text(r.Remaining)) || Text(r.Remaining) = "null",
+                                                0,
+                                                Value(Text(r.Remaining))
+                                            ),
+
+                                        Progress:
+                                            If(
+                                                IsBlank(Text(r.Progress)) || Text(r.Progress) = "null",
+                                                0,
+                                                Value(Text(r.Progress))
+                                            ),
+
+                                        ProgressStatus: Text(r.ProgressStatus),
+
+                                        SortOrder:
+                                            If(
+                                                IsBlank(Text(r.SortOrder)) || Text(r.SortOrder) = "null",
+                                                0,
+                                                Value(Text(r.SortOrder))
+                                            ),
+
+                                        ProgressColor:
+                                            Switch(
+                                                Text(r.ProgressStatus),
+                                                "Excellent", "#22C55E",
+                                                "Good", "#F59E0B",
+                                                "In Progress", "#00C8FF",
+                                                "Delayed", "#EF4444",
+                                                "#64748B"
+                                            )
+                                    }
+                                )
+                            )
+                        );
+
+                        ClearCollect(
+                            colHomeHiveNodesSorted_Staging,
+                            SortByColumns(
+                                colHomeHiveNodes_Staging,
+                                "SortOrder",
+                                SortOrder.Ascending
+                            )
+                        );
+
+                        ClearCollect(
+                            colHomeLowestProgress_Staging,
+                            FirstN(
+                                SortByColumns(
+                                    colHomeHiveNodes_Staging,
+                                    "Progress",
+                                    SortOrder.Ascending,
+                                    "Remaining",
+                                    SortOrder.Descending
+                                ),
+                                3
+                            )
+                        )
+                    )
+                )
+            ),
+
+            Set(varHomeError, FirstError.Message)
+        );
+
+        If(
+            !IsBlank(varHomeError),
+
+            Set(varHomeNoData, true);
+            Set(varProjectHasHomeData, false);
+            Set(varProjectHasReportConfig, false);
+            Set(varHomeHiveLoaded, false);
+
+            Set(varHomeShowOverview, false);
+            Set(varHomeShowCards, false);
+            Set(varHomeShowRightPanel, true);
+
+            Notify(
+                "Home dashboard could not be loaded for this project.",
+                NotificationType.Warning
+            ),
+
+            If(
+                CountRows(colHomeHiveNodes_Staging) = 0,
+
+                Set(varHomeNoData, true);
+                Set(varProjectHasHomeData, false);
+                Set(varProjectHasReportConfig, false);
+                Set(varHomeHiveLoaded, false);
+
+                Set(varHomeShowOverview, false);
+                Set(varHomeShowCards, false);
+                Set(varHomeShowRightPanel, true);
+
+                If(
+                    IsBlank(varAppWarning),
+                    Set(
+                        varAppWarning,
+                        "This project has no published report configuration yet."
+                    )
+                ),
+
+                ClearCollect(colHomeHiveNodes, colHomeHiveNodes_Staging);
+                ClearCollect(colHomeHiveNodesSorted, colHomeHiveNodesSorted_Staging);
+                ClearCollect(colHomeLowestProgress, colHomeLowestProgress_Staging);
+
+                Set(varHomeNoData, false);
+                Set(varProjectHasHomeData, true);
+                Set(varProjectHasReportConfig, true);
+                Set(varHomeHiveLoaded, true);
+
+                Set(varHomeShowOverview, true);
+                Set(varHomeShowCards, true);
+                Set(varHomeShowRightPanel, true);
+
+                Set(varHomeLastRefresh, Now())
+            )
+        );
+
+        Set(varHomeLoading, false);
+        Set(varProjectSwitching, false);
+        Set(varExecutiveDashboardCompletedAt, Now());
+        Set(
+            varExecutiveDashboardStatus,
+            If(IsBlank(varHomeError) && IsBlank(varAppError), "READY", "ERROR")
+        );
+        Set(varExecutiveDashboardError, Coalesce(varHomeError, varAppError, ""));
+        Set(varGlobalLoading, false);
+        Set(varGlobalLoadingMsg, "");
+        Set(varGlobalLoadingSubMsg, "");
+        Set(varGlobalLoadingScope, "");
+        Set(varGlobalLoadAction, "");
+        Set(varGlobalLoadPending, false)
+    )
+)
