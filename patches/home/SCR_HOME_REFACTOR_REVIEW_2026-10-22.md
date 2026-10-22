@@ -52,3 +52,18 @@ Comprobaciones estáticas sobre esas tres fórmulas:
 ## Gate pendiente
 
 Power Apps Studio debe confirmar compilación/App Checker después de pegar las fórmulas. La fuente de los flows y la exportación de pantalla posterior a la prueba son necesarias para modificar paginación, orden, callbacks o sincronizar la fórmula final instalada. Mientras tanto, estos artefactos son parches revisables basados en la exportación fechada; no se describen como aplicados al runtime.
+
+
+## Candidate implementation recorded in the PR branch
+
+The complete canonical screen source in `power-apps/screens/Home/scr_Home.pa.yaml` now contains a reviewable candidate implementation for the local fixes:
+
+- All three Home loaders use mutually exclusive context/loading branches; no `Exit()` remains in those three formulas.
+- The Punch loader consumes the force-refresh request only after project and duplicate-load guards pass.
+- The Hive loader sets global loading state only after a valid project and idle-state check, so a blank project cannot reach its Flow call.
+- Selecting the already active project does not start a project-switch cycle.
+- The template selector uses the existing collection directly and computes display text in `ItemDisplayText`; it no longer creates the same `AddColumns` projection for both `Items` and `DefaultSelectedItems`.
+
+Static comparison against the branch's prior complete screen source preserved per-loader counts of `.Run()`, `IfError`, and `FirstError`. Parentheses/brackets/braces are balanced and the three modified loader formulas contain no `Exit()`. The screen source is still only a repository candidate: Power Fx compilation, App Checker, and runtime behavior have not been validated in Studio.
+
+The patch intentionally leaves snapshot retention on refresh and the table paging/sort/actions unchanged. The former needs project/template context ownership and error-path validation; the latter needs the actual detail-flow contract. Those remain explicit follow-up work rather than inferred changes.
