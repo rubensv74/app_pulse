@@ -12,7 +12,7 @@ La fuente canónica de AssetPlan `cmp_AP_PageHeaderPro` (main) actualmente tiene
 
 - los tres slots de contexto PULSE (Project, Template, Last Refresh);
 - las acciones Utility/Help;
-- seis eventos públicos (tres contextos, Utility, Help; y sus reglas de interacción);
+- cinco eventos públicos (tres contextos, Utility y Help; y sus reglas de interacción);
 - el PDS PULSE de colores, selección y navegación.
 
 PULSE ya tiene `cmp_PageHeaderPro` con estas entradas y eventos. Su historial incluye un fallo anterior de inserción en Studio; la fuente no garantiza seguridad de instanciación. Por eso se ha clonado **en un candidato nuevo aislado** con el mismo contrato, añadiendo solo modalidad hero.
