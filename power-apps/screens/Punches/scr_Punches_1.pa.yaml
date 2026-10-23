@@ -1003,46 +1003,6 @@ Screens:
                                           "Subsystems · " & cmp_MultiValueFilter_3.SelectedCount & " selected"
                                       )
                                     Width: =200
-                                    X: =ddPunchSubsystem_2.X
-                                    Y: =ddPunchSubsystem_2.Y
-                              - ddPunchSubsystem_2:
-                                  Control: ModernCombobox@1.1.1
-                                  Properties:
-                                    AllowExternalSelectedItems: =false
-                                    Appearance: =Appearance.Outline
-                                    Color: =RGBA(0, 0, 0, 1)
-                                    DefaultSelectedItems: |-
-                                      =
-                                      If(
-                                          IsBlank(varFilter_Subsystem),
-                                          Blank(),
-                                          Filter(
-                                              colPunchSubsystems_Filter,
-                                              Code = varFilter_Subsystem
-                                          )
-                                      )
-                                    DisplayMode: =DisplayMode.View
-                                    Font: =Font.'Segoe UI'
-                                    FontWeight: =""
-                                    InputTextPlaceholder: ="Subsystems"
-                                    ItemDisplayText: =ThisItem.Label
-                                    Items: =colPunchSubsystems_Filter
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    OnChange: |-
-                                      =
-                                      Set(
-                                          varFilter_Subsystem,
-                                          If(
-                                              IsBlank(ddPunchSubsystem_2.Selected.Code),
-                                              Blank(),
-                                              Text(ddPunchSubsystem_2.Selected.Code)
-                                          )
-                                      )
-                                    SelectMultiple: =false
-                                    Size: =0
-                                    Visible: =false
-                                    Width: =200
                                     X: =40
                                     Y: =40
                               - ddPunchTemplate_2:
@@ -2686,14 +2646,6 @@ Screens:
                   Visible: =false
                   X: =40
                   Y: =40
-            - btnDrawerRefreshFromTab_6:
-                Control: Button@0.0.45
-                Properties:
-                  OnSelect: |-
-                    =
-                    Set(varDrawerTab, "Custom");
-                    Select(btnDrawerLoad_Custom_6)
-                  Visible: =false
             - btnCT_LoadDefs_6:
                 Control: Button@0.0.45
                 Properties:
