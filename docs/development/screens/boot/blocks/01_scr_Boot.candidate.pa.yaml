@@ -1,0 +1,301 @@
+Screens:
+  scr_Boot:
+    Properties:
+      Fill: =ColorValue("#07111F")
+      LoadingSpinnerColor: =ColorValue("#00C8FF")
+      OnVisible: |-
+        =// PULSE-BOOT-01. Startup orchestration stays in App.OnStart.
+        // Boot must never launch a second copy of the startup flows.
+        Set(varPulseBootStatus, "LOADING");
+        Set(varPulseBootMessage, "Preparing your workspace...");
+        Set(varPulseBootErrorDetail, "");
+        Set(varPulseBootStartedAt, Now());
+        Set(varPulseBootBusy, false);
+        Set(varPulseBootAutoNavigate, true)
+    Children:
+      - conPulseBoot_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderStyle: =BorderStyle.None
+            DropShadow: =DropShadow.None
+            Fill: =ColorValue("#07111F")
+            Height: =Parent.Height
+            Width: =Parent.Width
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+          Children:
+            - imgPulseBoot_Background:
+                Control: Image@2.2.3
+                Properties:
+                  BorderStyle: =BorderStyle.None
+                  Height: =Parent.Height
+                  Image: =Blank()
+                  ImagePosition: =ImagePosition.Fill
+                  Visible: =false
+                  Width: =Parent.Width
+                  X: =0
+                  Y: =0
+            - conPulseBoot_Brand:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderStyle: =BorderStyle.None
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(0, 0, 0, 0)
+                  Height: =190
+                  Width: =Min(640, Parent.Width - 32)
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =Max(44, (Parent.Height - Self.Height) * 0.39)
+                Children:
+                  - txtPulseBoot_Eyebrow:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Align: =Align.Center
+                        AutoHeight: =true
+                        Color: =ColorValue("#00C8FF")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =22
+                        Size: =11
+                        Text: ="OPERATIONAL PLATFORM"
+                        Width: =Parent.Width
+                        Wrap: =false
+                        X: =0
+                        Y: =0
+                  - txtPulseBoot_Product:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Align: =Align.Center
+                        AutoHeight: =true
+                        Color: =ColorValue("#FFFFFF")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =82
+                        Size: =If(App.Width < 600, 38, 54)
+                        Text: ="PULSE"
+                        Width: =Parent.Width
+                        Wrap: =false
+                        X: =0
+                        Y: =30
+                  - recPulseBoot_Accent:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderStyle: =BorderStyle.None
+                        Fill: =ColorValue("#00C8FF")
+                        Height: =3
+                        Width: =76
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =123
+                  - txtPulseBoot_Descriptor:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Align: =Align.Center
+                        AutoHeight: =true
+                        Color: =ColorValue("#B9C8D8")
+                        Font: =Font.'Segoe UI'
+                        Height: =28
+                        Size: =12
+                        Text: ="Project operations · Handover intelligence"
+                        Width: =Parent.Width
+                        Wrap: =false
+                        X: =0
+                        Y: =139
+            - conPulseBoot_Feedback:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderStyle: =BorderStyle.None
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(0, 0, 0, 0)
+                  Height: =146
+                  Width: =Min(600, Parent.Width - 32)
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =Max(Parent.Height * 0.65, Parent.Height - 198)
+                Children:
+                  - spnPulseBoot_Loading:
+                      Control: Spinner@1.4.6
+                      Properties:
+                        Appearance: ='Spinner.Appearance'.Primary
+                        Height: =30
+                        SpinnerColor: =ColorValue("#00C8FF")
+                        SpinnerSize: ='Spinner.SpinnerSize'.Small
+                        Visible: =varPulseBootStatus = "LOADING" || varPulseBootStatus = "RETRYING"
+                        Width: =30
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =0
+                  - txtPulseBoot_Status:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Align: =Align.Center
+                        AutoHeight: =true
+                        Color: =If(varPulseBootStatus = "ERROR", ColorValue("#FCA5A5"), ColorValue("#D4E2ED"))
+                        Font: =Font.'Segoe UI'
+                        Height: =26
+                        Size: =11
+                        Text: =Coalesce(varPulseBootMessage, "Preparing your workspace...")
+                        Width: =Parent.Width
+                        Wrap: =true
+                        X: =0
+                        Y: =36
+                  - txtPulseBoot_Explanation:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Align: =Align.Center
+                        AutoHeight: =true
+                        Color: =ColorValue("#9CB2C7")
+                        Font: =Font.'Segoe UI'
+                        Height: =36
+                        Size: =9
+                        Text: =If(varPulseBootStatus = "ERROR", "The project catalogue could not be loaded. Check the connection and try again.", If(varPulseBootStatus = "EMPTY", "You may enter Home, but no projects are currently available.", ""))
+                        Visible: =varPulseBootStatus = "ERROR" || varPulseBootStatus = "EMPTY"
+                        Width: =Parent.Width
+                        Wrap: =true
+                        X: =0
+                        Y: =62
+                  - btnPulseBoot_Retry:
+                      Control: ModernButton@1.0.0
+                      Properties:
+                        Align: =Align.Center
+                        BasePaletteColor: =ColorValue("#1677FF")
+                        DisplayMode: =If(varPulseBootBusy, DisplayMode.Disabled, DisplayMode.Edit)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =40
+                        OnSelect: |-
+                          =// Async Action Guard: retry only after startup has completed.
+                          // The retry owns ONLY the failed enabled-project catalogue request.
+                          If(
+                              varPulseBootStatus = "ERROR" && !varPulseBootBusy && varScrApp_Initialized = true,
+                              Set(varPulseBootBusy, true);
+                              Set(varPulseBootStatus, "RETRYING");
+                              Set(varPulseBootMessage, "Reconnecting to the project catalogue...");
+                              Set(varPulseBootErrorDetail, "");
+                              IfError(
+                                  Set(varEnabledProjectsRaw, WarRoom_EnabledProjects_GetActive.Run().result);
+                                  ClearCollect(
+                                      colEnabledProjects,
+                                      ForAll(
+                                          Table(ParseJSON(Coalesce(varEnabledProjectsRaw, "{}")).Table1),
+                                          {
+                                              ProjectId: Value(Value.ProjectId),
+                                              ProjectCode: Text(Value.ProjectCode),
+                                              ProjectName: Text(Value.ProjectName),
+                                              ProjectDescription: Text(Value.ProjectDescription),
+                                              IsDefault: Boolean(Value.IsDefault)
+                                          }
+                                      )
+                                  );
+                                  ClearCollect(
+                                      colEnabledProjectsUI,
+                                      AddColumns(colEnabledProjects, ProjectDisplayName, ProjectCode & " · " & ProjectName)
+                                  );
+                                  Set(varEnabledProjectsError, "");
+                                  If(
+                                      CountRows(colEnabledProjects) > 0,
+                                      Set(varPulseBootStatus, "READY");
+                                      Set(varPulseBootMessage, "Workspace ready"),
+                                      Set(varPulseBootStatus, "EMPTY");
+                                      Set(varPulseBootMessage, "No enabled projects found")
+                                  ),
+                                  Set(varEnabledProjectsError, Coalesce(FirstError.Message, "Unknown catalogue error."));
+                                  Set(varPulseBootErrorDetail, varEnabledProjectsError);
+                                  Set(varPulseBootStatus, "ERROR");
+                                  Set(varPulseBootMessage, "Unable to load the project catalogue")
+                              );
+                              Set(varPulseBootBusy, false)
+                          )
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Text: ="Try again"
+                        Visible: =varPulseBootStatus = "ERROR"
+                        Width: =140
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =99
+                  - btnPulseBoot_Continue:
+                      Control: ModernButton@1.0.0
+                      Properties:
+                        Align: =Align.Center
+                        BasePaletteColor: =ColorValue("#1677FF")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =40
+                        OnSelect: |-
+                          =If(
+                              varPulseBootStatus = "EMPTY" && varPulseBootAutoNavigate,
+                              Set(varPulseBootAutoNavigate, false);
+                              Navigate(scr_Home, ScreenTransition.Fade)
+                          )
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Text: ="Open Home"
+                        Visible: =varPulseBootStatus = "EMPTY"
+                        Width: =140
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =99
+            - txtPulseBoot_Footer:
+                Control: ModernText@1.0.0
+                Properties:
+                  Align: =Align.Center
+                  AutoHeight: =true
+                  Color: =ColorValue("#70869A")
+                  Font: =Font.'Segoe UI'
+                  Height: =22
+                  Size: =9
+                  Text: ="PULSE · Project Operations"
+                  Width: =Min(400, Parent.Width - 24)
+                  Wrap: =false
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =Parent.Height - 38
+            - tmrPulseBoot_Observe:
+                Control: Timer@2.1.0
+                Properties:
+                  AutoStart: =true
+                  Duration: =400
+                  Repeat: =true
+                  Visible: =false
+                  OnTimerEnd: |-
+                    =// Observe the existing App.OnStart contract; do not rerun its flows.
+                    If(
+                        varPulseBootStatus = "LOADING",
+                        If(
+                            varScrApp_Initialized = true,
+                            If(
+                                !IsBlank(varEnabledProjectsError),
+                                Set(varPulseBootErrorDetail, varEnabledProjectsError);
+                                Set(varPulseBootMessage, "Unable to load the project catalogue");
+                                Set(varPulseBootStatus, "ERROR"),
+                                If(
+                                    CountRows(colEnabledProjects) = 0,
+                                    Set(varPulseBootMessage, "No enabled projects found");
+                                    Set(varPulseBootStatus, "EMPTY"),
+                                    Set(varPulseBootMessage, "Workspace ready");
+                                    Set(varPulseBootStatus, "READY")
+                                )
+                            ),
+                            If(
+                                DateDiff(varPulseBootStartedAt, Now(), TimeUnit.Seconds) > 30,
+                                Set(varPulseBootMessage, "Startup is taking longer than expected...")
+                            )
+                        )
+                    )
+            - tmrPulseBoot_Ready:
+                Control: Timer@2.1.0
+                Properties:
+                  AutoStart: =false
+                  Duration: =700
+                  Repeat: =false
+                  Start: =varPulseBootStatus = "READY" && varPulseBootAutoNavigate
+                  Visible: =false
+                  OnTimerEnd: |-
+                    =If(
+                        varPulseBootStatus = "READY" && varPulseBootAutoNavigate,
+                        Set(varPulseBootAutoNavigate, false);
+                        Navigate(scr_Home, ScreenTransition.Fade)
+                    )
