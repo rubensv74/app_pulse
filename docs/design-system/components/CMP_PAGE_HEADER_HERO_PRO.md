@@ -89,3 +89,16 @@ Pixel dimensions: **1600 × 224**, intended to display at **112 px** height (2×
 - El componente existente PULSE tiene historial de cierre de Studio al instanciar versiones anteriores: una nueva variante no evita ese riesgo hasta demostrar el PASS.
 - El diseño PULSE actual sitúa contextos a la derecha y puede saturar la cabecera cuando el workspace es estrecho: validar el host por pantalla antes de desplegar.
 - `Pulse Boot` es otra pantalla: no debe depender del nuevo Page Header.
+
+
+## Actualización de dirección visual V2 — 2026-10-24
+
+**Decisión aprobada por el usuario:** conservar el estilo de la última ilustración Punch List con tuberías, pines de incidencia, personal de obra con identidad TR, fotografía industrial crepuscular y cian eléctrico. El set abstracto V1 queda descartado para instalaciones nuevas.
+
+**Recursos preparados externamente:** nueve fondos JPG 1600 × 224, nombres `pulse-hero-{home,overview,tasks,punch-list,punch-review,briefing,config,skyline,superadmin}-v2.jpg` según `power-apps/assets/heroes/pulse/v2/manifest.json`. Los archivos JPG se entregan en un ZIP local; NO están en GitHub ni en Media de Power Apps hasta que se incorporen expresamente.
+
+**Diferenciación semántica:** Home = control central; Overview = avance/entrega; Tasks = trabajador/tablet/lista; Punch List = pines de incidencias y trabajadores TR; Punch Review = evidencia/verificación; Briefing = equipo/relevo; Config = engranajes/parámetros; Skyline = vista aérea/indicadores; SuperAdmin = administración/accesos. Boot mantiene su recurso independiente.
+
+**Regla de diseño:** títulos, subtítulos, filtros, métricas reales y acciones se mantienen como controles dinámicos de Power Apps. No tomar los pequeños paneles holográficos ilustrativos como fuentes de métricas. Revisar y, si procede, limpiar microtextos residuales en el gate visual a altura 112 px antes de promoción.
+
+**Prueba adicional:** confirmar que el logotipo TR en ropa es suficientemente fiel a la identidad corporativa autorizada; si requiere precisión exacta, sustituir por el recurso oficial aprobado antes de producción.
