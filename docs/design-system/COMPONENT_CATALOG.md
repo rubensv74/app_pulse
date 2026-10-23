@@ -40,6 +40,7 @@ LEGACY_SUPPORTED  live runtime dependency awaiting validated migration; do not s
 | `cmp_HeatMapPro` | PDS_CANDIDATE | Preferred heatmap component |
 | `cmp_KpiCardPro` | PDS_CANDIDATE | Preferred KPI card for new PDS work |
 | `cmp_OperationalSkylinePro` | REVIEW_REQUIRED | Universal operational timeline/skyline for Punches, Tasks, milestones, readiness and capacity. Canonical source and PDS specification exist; Studio definition, isolated instance, public-contract and visual QA remain mandatory before screen integration. Spec: `docs/design-system/components/CMP_OPERATIONAL_SKYLINE_PRO.md` |
+| `cmp_PageHeaderHeroPro` | REVIEW_REQUIRED | Variante de hero panorámico 112px inspirada en AssetPlan que conserva el contrato completo de `cmp_PageHeaderPro`. Fuente preparada; pendiente de definición, instancia, eventos y QA en Studio. Ver `docs/design-system/components/CMP_PAGE_HEADER_HERO_PRO.md`. |
 | `cmp_PageHeaderPro` | PDS_CANDIDATE | Corrected complete Source Code passes isolated instantiation and has been accepted for progression into Home_PDS Block 03. Target-screen contract/visual QA remains mandatory during integration. Spec: `docs/design-system/components/CMP_PAGE_HEADER_PRO.md` |
 | `cmp_PieChartPro` | PDS_CANDIDATE | Preferred composition chart for Home_PDS discipline distribution |
 | `cmp_SidebarNav` | ACTIVE | Current shared navigation component |
