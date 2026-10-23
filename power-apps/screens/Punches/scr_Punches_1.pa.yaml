@@ -42,8 +42,8 @@ Screens:
                   LayoutMinWidth: =16
                   OnSelect: |-
                     =
-                    
-                    
+
+
                     // =====================================================
                     // btnPunches_LoadPage_Punches.OnSelect
                     // Load Punches safely using staging collection
@@ -65,12 +65,12 @@ Screens:
                         Set(varPunches_IsLoading, true);
                     Set(varPunches_Error, "");
                     Set(varLoadingMsg, "Loading punches...");
-                    
+
                     Set(varGlobalLoading, true);
                     Set(varGlobalLoadingMsg, "Loading Punches...");
                     Set(varGlobalLoadingSubMsg, "Preparing punch list");
                     Set(varGlobalLoadingScope, "PUNCHES");
-                    
+
                     Set(
                         varPunchCustomFiltersJson_Safe,
                         If(
@@ -81,16 +81,16 @@ Screens:
                             varPunchCustomFiltersJson
                         )
                     );
-                    
+
                     Clear(colPunches_Staging);
-                    
+
                     IfError(
                         With(
                             {
                                 resp:
                                     Warroom_Punches_Filtered_Paged.Run(
                                         Value(varProjectId),
-                    
+
                                         If(
                                             IsBlank(varFilter_SubsystemsCsv),
                                             " ",
@@ -98,19 +98,19 @@ Screens:
                                         ),
                                         If(IsBlank(varFilter_PunchDiscipline), " ", Text(varFilter_PunchDiscipline)),
                                         If(IsBlank(varFilter_Subcontractor), " ", Text(varFilter_Subcontractor)),
-                    
+
                                         Value(Coalesce(varPunches_Page, 1)),
                                         Value(Coalesce(varPunches_PageSize, 50)),
-                    
+
                                         If(
                                             IsBlank(varFilter_PunchTemplateId),
                                             0,
                                             Value(varFilter_PunchTemplateId)
                                         ),
-                    
+
                                         If(IsBlank(varFilter_PunchCategoryCode), " ", Text(varFilter_PunchCategoryCode)),
                                         If(IsBlank(varFilter_PunchStatusCode), " ", Text(varFilter_PunchStatusCode)),
-                    
+
                                         varPunchCustomFiltersJson_Safe
                                     )
                             },
@@ -132,138 +132,138 @@ Screens:
                                                 ElementCode: Text(r.ElementCode),
                                                 ElementDiscipline: Text(r.ElementDiscipline),
                                                 TypeCode: Text(r.TypeCode),
-                    
+
                                                 ProjectId:
                                                     If(
                                                         IsBlank(Text(r.ProjectId)) || Text(r.ProjectId) = "null",
                                                         varProjectId,
                                                         Value(Text(r.ProjectId))
                                                     ),
-                    
+
                                                 TemplateId:
                                                     If(
                                                         IsBlank(Text(r.TemplateId)) || Text(r.TemplateId) = "null",
                                                         Blank(),
                                                         Value(Text(r.TemplateId))
                                                     ),
-                    
+
                                                 PunchId:
                                                     If(
                                                         IsBlank(Text(r.Id)) || Text(r.Id) = "null",
                                                         0,
                                                         Value(Text(r.Id))
                                                     ),
-                    
+
                                                 PunchCode: Text(r.Code),
                                                 PunchDescription: Text(r.Description),
-                    
+
                                                 PunchCoordinator: Text(r.PunchCoordinator),
                                                 Originator: Text(r.Originator),
-                    
+
                                                 CategoryCode: Text(r.CategoryCode),
                                                 Category: Text(r.Category),
-                    
+
                                                 PunchDiscipline: Text(r.Discipline),
                                                 StatusCode: Text(r.StatusCode),
                                                 PunchStatus: Text(r.Status),
-                    
+
                                                 InspectionCode: Text(r.InspectionCode),
                                                 InspectionName: Text(r.InspectionName),
                                                 InspectionType: Text(r.InspectionType),
-                    
+
                                                 EntryType: Text(r.EntryType),
                                                 EntryTypeColor: Text(r.EntryTypeColor),
                                                 Topic: Text(r.Topic),
-                    
+
                                                 RejectCount:
                                                     If(
                                                         IsBlank(Text(r.RejectCount)) || Text(r.RejectCount) = "null",
                                                         0,
                                                         Value(Text(r.RejectCount))
                                                     ),
-                    
+
                                                 ElementCodeMapped: Text(r.ElementCodeMapped),
-                    
+
                                                 SubcontractorId:
                                                     If(
                                                         IsBlank(Text(r.SubcontractorId)) || Text(r.SubcontractorId) = "null",
                                                         Blank(),
                                                         Value(Text(r.SubcontractorId))
                                                     ),
-                    
+
                                                 SubcontractorCode: Text(r.SubcontractorCode),
                                                 SubcontractorName: Text(r.SubcontractorName),
                                                 SubcontractorShortName: Text(r.SubcontractorShortName),
-                    
+
                                                 DepartmentAction: Text(r.DepartmentAction),
-                    
+
                                                 CustomJson: Coalesce(Text(r.CustomJson), "{}"),
                                                 CustomFlag1: Boolean(r.CustomFlag1),
                                                 CustomFlag2: Boolean(r.CustomFlag2),
                                                 CustomText1: Text(r.CustomText1),
                                                 CustomText2: Text(r.CustomText2),
-                    
+
                                                 CustomDate1:
                                                     If(
                                                         IsBlank(Text(r.CustomDate1)) || Text(r.CustomDate1) = "null",
                                                         Blank(),
                                                         DateValue(Text(r.CustomDate1))
                                                     ),
-                    
+
                                                 CustomNumber1:
                                                     If(
                                                         IsBlank(Text(r.CustomNumber1)) || Text(r.CustomNumber1) = "null",
                                                         Blank(),
                                                         Value(Text(r.CustomNumber1))
                                                     ),
-                    
+
                                                 CustomLastUpdatedByEmail: Text(r.CustomLastUpdatedByEmail),
-                    
+
                                                 CustomLastUpdatedOn:
                                                     If(
                                                         IsBlank(Text(r.CustomLastUpdatedOn)) || Text(r.CustomLastUpdatedOn) = "null",
                                                         Blank(),
                                                         DateTimeValue(Text(r.CustomLastUpdatedOn))
                                                     ),
-                    
+
                                                 LastCommentOn:
                                                     If(
                                                         IsBlank(Text(r.LastCommentOn)) || Text(r.LastCommentOn) = "null",
                                                         Blank(),
                                                         DateTimeValue(Text(r.LastCommentOn))
                                                     ),
-                    
+
                                                 LastCommentText: Text(r.LastCommentText),
                                                 LastCommentByEmail: Text(r.LastCommentByEmail),
-                    
+
                                                 CommentCount:
                                                     If(
                                                         IsBlank(Text(r.CommentCount)) || Text(r.CommentCount) = "null",
                                                         0,
                                                         Value(Text(r.CommentCount))
                                                     ),
-                    
+
                                                 TotalRows:
                                                     If(
                                                         IsBlank(Text(r.TotalRows)) || Text(r.TotalRows) = "null",
                                                         0,
                                                         Value(Text(r.TotalRows))
                                                     ),
-                    
+
                                                 TotalPages:
                                                     If(
                                                         IsBlank(Text(r.TotalPages)) || Text(r.TotalPages) = "null",
                                                         0,
                                                         Value(Text(r.TotalPages))
                                                     ),
-                    
+
                                                 PageNumber:
                                                     If(
                                                         IsBlank(Text(r.PageNumber)) || Text(r.PageNumber) = "null",
                                                         varPunches_Page,
                                                         Value(Text(r.PageNumber))
                                                     ),
-                    
+
                                                 PageSize:
                                                     If(
                                                         IsBlank(Text(r.PageSize)) || Text(r.PageSize) = "null",
@@ -276,15 +276,15 @@ Screens:
                                 )
                             )
                         ),
-                    
+
                         Set(varPunches_Error, FirstError.Message)
                     );
-                    
+
                     If(
                         IsBlank(varPunches_Error),
-                    
+
                         ClearCollect(colPunches, colPunches_Staging);
-                    
+
                         Set(
                             varPunches_TotalPages,
                             If(
@@ -293,7 +293,7 @@ Screens:
                                 Coalesce(First(colPunches).TotalPages, 0)
                             )
                         );
-                    
+
                         Set(
                             varPunches_TotalRows,
                             If(
@@ -302,16 +302,16 @@ Screens:
                                 Coalesce(First(colPunches).TotalRows, 0)
                             )
                         );
-                    
+
                         Set(varPunchesLoaded, true);
                         Set(varPunches_LastRefresh, Now()),
-                    
+
                         Notify("Error loading punches: " & varPunches_Error, NotificationType.Error)
                     );
-                    
+
                     Set(varPunches_IsLoading, false);
                     Set(varLoadingMsg, "");
-                    
+
                     Set(varGlobalLoading, false);
                     Set(varGlobalLoadingMsg, "");
                     Set(varGlobalLoadingSubMsg, "");
@@ -2405,8 +2405,8 @@ Screens:
                 Properties:
                   OnSelect: |-
                     =
-                    
-                    
+
+
                     // =====================================================
                     // btnDrawerLoad_Custom_2.OnSelect
                     // Load Punch custom fields safely
@@ -2419,11 +2419,11 @@ Screens:
                         Set(varCT_Loading, true);
                     Set(varDrawerIsLoading, true);
                     Set(varCT_Error, "");
-                    
+
                     Clear(colCT_Merged_Base_Staging);
                     Clear(colCT_Merged_UI_Staging);
                     Clear(colCT_Quick_Staging);
-                    
+
                     IfError(
                         With(
                             {
@@ -2438,7 +2438,7 @@ Screens:
                                 {
                                     parsed: ParseJSON(Coalesce(resp.bundlejson, "{}"))
                                 },
-                    
+
                                 ClearCollect(
                                     colCT_Merged_Base_Staging,
                                     ForAll(
@@ -2459,7 +2459,7 @@ Screens:
                                         }
                                     )
                                 );
-                    
+
                                 ClearCollect(
                                     colCT_Merged_UI_Staging,
                                     ForAll(
@@ -2467,26 +2467,26 @@ Screens:
                                         {
                                             FieldKey: Text(Value.FieldKey),
                                             ValueText: Text(Value.ValueText),
-                    
+
                                             ValueNumber:
                                                 If(
                                                     IsBlank(Text(Value.ValueNumber)) || Text(Value.ValueNumber) = "null",
                                                     Blank(),
                                                     Value(Text(Value.ValueNumber))
                                                 ),
-                    
+
                                             ValueDate:
                                                 If(
                                                     IsBlank(Text(Value.ValueDate)) || Text(Value.ValueDate) = "null",
                                                     Blank(),
                                                     DateTimeValue(Text(Value.ValueDate))
                                                 ),
-                    
+
                                             ValueBool: Boolean(Value.ValueBool)
                                         }
                                     )
                                 );
-                    
+
                                 ClearCollect(
                                     colCT_Quick_Staging,
                                     AddColumns(
@@ -2500,23 +2500,23 @@ Screens:
                                 )
                             )
                         ),
-                    
+
                         Set(varCT_Error, FirstError.Message)
                     );
-                    
+
                     If(
                         IsBlank(varCT_Error),
-                    
+
                         ClearCollect(colCT_Merged_Base, colCT_Merged_Base_Staging);
                         ClearCollect(colCT_Merged_UI, colCT_Merged_UI_Staging);
                         ClearCollect(colCT_Quick, colCT_Quick_Staging),
-                    
+
                         Notify(
                             "Punch custom fields could not be loaded.",
                             NotificationType.Warning
                         )
                     );
-                    
+
                     Set(varCT_Loading, false);
                     Set(varDrawerIsLoading, false)
                     )
@@ -2528,7 +2528,7 @@ Screens:
                 Properties:
                   OnSelect: |-
                     =
-                    
+
                     // =====================================================
                     // btnDrawerLoad_Comments_2.OnSelect
                     // Load Punch comments safely
@@ -2540,13 +2540,13 @@ Screens:
                         Set(varDrawerIsLoading, false),
                         Set(varIsLoadingComments, true);
                     Set(varDrawerIsLoading, true);
-                    
+
                     Set(varCommentsPage, 1);
                     Set(varCommentsPageSize, Coalesce(varCommentsPageSize, 20));
                     Set(varCommentsError, "");
-                    
+
                     Clear(colComments_Staging);
-                    
+
                     IfError(
                         With(
                             {
@@ -2608,15 +2608,15 @@ Screens:
                                 )
                             )
                         ),
-                    
+
                         Set(varCommentsError, FirstError.Message)
                     );
-                    
+
                     If(
                         IsBlank(varCommentsError),
-                    
+
                         ClearCollect(colComments, colComments_Staging);
-                    
+
                         Set(
                             varCommentsTotalRows,
                             If(
@@ -2625,7 +2625,7 @@ Screens:
                                 0
                             )
                         );
-                    
+
                         Set(
                             varCommentsTotalPages,
                             If(
@@ -2634,13 +2634,13 @@ Screens:
                                 0
                             )
                         ),
-                    
+
                         Notify(
                             "Punch comments could not be loaded.",
                             NotificationType.Warning
                         )
                     );
-                    
+
                     Set(varIsLoadingComments, false);
                     Set(varDrawerIsLoading, false)
                     )
@@ -2652,7 +2652,7 @@ Screens:
                 Properties:
                   OnSelect: |-
                     =
-                    
+
                     // =====================================================
                     // btnDrawerLoad_Punches.OnSelect
                     // Drawer tab loader
@@ -2665,21 +2665,21 @@ Screens:
                         Notify("No record selected.", NotificationType.Warning),
                         Switch(
                         varDrawerTab,
-                    
+
                         "Overview",
                             Set(varDrawerIsLoading, false),
-                    
+
                         "History",
                             Set(varDrawerIsLoading, false),
-                    
+
                         "Comments",
                             Set(varDrawerIsLoading, true);
                             Select(btnDrawerLoad_Comments_6),
-                    
+
                         "Custom",
                             Set(varDrawerIsLoading, true);
                             Select(btnDrawerLoad_Custom_6),
-                    
+
                         Set(varDrawerIsLoading, false)
                     )
                     )
