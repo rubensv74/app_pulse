@@ -1,0 +1,72 @@
+Screens:
+  scr_PulseHeroHeaderLab:
+    Properties:
+      Fill: =ColorValue("#F6F8FB")
+      OnVisible: =Set(varPulseHeroLabEnabled,true)
+    Children:
+      - txtPHHLab_Intro:
+          Control: ModernText@1.0.0
+          Properties:
+            AutoHeight: =true
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Size: =18
+            Text: ="PULSE · Hero Header Validation Lab"
+            Width: =Parent.Width-32
+            Wrap: =false
+            X: =16
+            Y: =12
+      - btnPHHLab_Toggle:
+          Control: ModernButton@1.0.0
+          Properties:
+            BasePaletteColor: =ColorValue("#1677FF")
+            Height: =36
+            OnSelect: =Set(varPulseHeroLabEnabled,!varPulseHeroLabEnabled)
+            Text: =If(varPulseHeroLabEnabled,"Legacy 80 px","Hero 112 px")
+            Width: =160
+            X: =Parent.Width-Self.Width-16
+            Y: =12
+      - cmpPHHLab_Header:
+          Control: CanvasComponent
+          ComponentName: cmp_PageHeaderHeroPro
+          Properties:
+            HeroEnabled: =varPulseHeroLabEnabled
+            HeroMedia: =Blank()
+            Height: =If(varPulseHeroLabEnabled,112,80)
+            Width: =Parent.Width-32
+            X: =16
+            Y: =72
+            Title: ="Home"
+            Subtitle: ="Project operations at a glance"
+            Context1Label: ="Project"
+            Context1Value: ="No project selected"
+            Context1Visible: =true
+            Context1Interactive: =true
+            OnContext1Select: =Notify("Context 1 event",NotificationType.Information)
+            Context2Label: ="Template"
+            Context2Value: ="Not selected"
+            Context2Visible: =true
+            Context2Interactive: =true
+            OnContext2Select: =Notify("Context 2 event",NotificationType.Information)
+            Context3Label: ="Last refresh"
+            Context3Value: ="—"
+            Context3Visible: =true
+            Context3Interactive: =false
+            OnContext3Select: =Notify("Context 3 event",NotificationType.Information)
+            ShowUtility: =true
+            UtilityText: ="Refresh"
+            UtilityEnabled: =true
+            OnUtility: =Notify("Utility event",NotificationType.Information)
+            ShowHelp: =true
+            OnHelp: =Notify("Help event",NotificationType.Information)
+      - txtPHHLab_Note:
+          Control: ModernText@1.0.0
+          Properties:
+            AutoHeight: =true
+            Color: =ColorValue("#64748B")
+            Size: =10
+            Text: ="LAB ONLY · Binds no production data or workflows. Import the HOME JPG to Media and change HeroMedia when media gate is ready."
+            Width: =Parent.Width-32
+            Wrap: =true
+            X: =16
+            Y: =If(varPulseHeroLabEnabled,203,172)
