@@ -1,0 +1,1124 @@
+ComponentDefinitions:
+  cmp_CustomFieldsEditorPro:
+    DefinitionType: CanvasComponent
+    AccessAppScope: true
+    CustomProperties:
+      AccentColor:
+        PropertyKind: Input
+        DisplayName: AccentColor
+        Description: Primary interaction color
+        DataType: Color
+        Default: =ColorValue("#1677FF")
+      BackgroundColor:
+        PropertyKind: Input
+        DisplayName: BackgroundColor
+        Description: Main surface color
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        Description: Border and divider color
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      CanEdit:
+        PropertyKind: Input
+        DisplayName: CanEdit
+        Description: Enables editing actions for the current user
+        DataType: Boolean
+        Default: =true
+      DangerColor:
+        PropertyKind: Input
+        DisplayName: DangerColor
+        Description: Error-state color
+        DataType: Color
+        Default: =ColorValue("#EF4444")
+      DebugMode:
+        PropertyKind: Input
+        DisplayName: DebugMode
+        Description: Temporary CF-02 validation controls. Keep false in production.
+        DataType: Boolean
+        Default: =false
+      DirtyCount:
+        PropertyKind: Output
+        DisplayName: DirtyCount
+        Description: Number of unique dirty FieldKeys
+        DataType: Number
+      DirtyItems:
+        PropertyKind: Output
+        DisplayName: DirtyItems
+        Description: Sparse save payload with one row per changed FieldKey
+        DataType: Table
+      EditedItems:
+        PropertyKind: Output
+        DisplayName: EditedItems
+        Description: Full working table after local edits
+        DataType: Table
+      ErrorText:
+        PropertyKind: Input
+        DisplayName: ErrorText
+        Description: Host error message
+        DataType: Text
+        Default: =""
+      FieldCount:
+        PropertyKind: Output
+        DisplayName: FieldCount
+        Description: Number of fields received by the component
+        DataType: Number
+      HasFields:
+        PropertyKind: Output
+        DisplayName: HasFields
+        Description: True when Items contains at least one field
+        DataType: Boolean
+      IsDirty:
+        PropertyKind: Output
+        DisplayName: IsDirty
+        Description: True when at least one field has a local change
+        DataType: Boolean
+      IsLoading:
+        PropertyKind: Input
+        DisplayName: IsLoading
+        Description: Host is loading custom fields
+        DataType: Boolean
+        Default: =false
+      IsSaving:
+        PropertyKind: Input
+        DisplayName: IsSaving
+        Description: Host is saving custom fields
+        DataType: Boolean
+        Default: =false
+      Items:
+        PropertyKind: Input
+        DisplayName: Items
+        Description: Normalized custom-field table supplied by the host
+        DataType: Table
+        Default: |-
+          =Table(
+              {
+                  FieldKey: "sample_field",
+                  FieldLabel: "Sample field",
+                  FieldType: "Text",
+                  HelpText: "",
+                  IsRequired: false,
+                  IsPinned: true,
+                  IsEditable: true,
+                  SortOrder: 10,
+                  OptionsJson: "[]",
+                  ValueText: "Sample value",
+                  ValueNumber: 0,
+                  ValueDate: Date(2000,1,1),
+                  ValueBool: false,
+                  ValueJson: "",
+                  LastUpdatedOn: Date(2000,1,1),
+                  LastUpdatedByEmail: ""
+              }
+          )
+      LastChangedFieldKey:
+        PropertyKind: Output
+        DisplayName: LastChangedFieldKey
+        Description: FieldKey changed most recently
+        DataType: Text
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        Description: Secondary text color
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      OnRefresh:
+        PropertyKind: Event
+        DisplayName: OnRefresh
+        Description: Host refresh requested
+        ReturnType: None
+        Default: =
+      OnResetRequested:
+        PropertyKind: Event
+        DisplayName: OnResetRequested
+        Description: Host reset requested after internal reset
+        ReturnType: None
+        Default: =
+      OnSaveRequested:
+        PropertyKind: Event
+        DisplayName: OnSaveRequested
+        Description: Host save requested
+        ReturnType: None
+        Default: =
+      RecordLabel:
+        PropertyKind: Input
+        DisplayName: RecordLabel
+        Description: Current record code or label
+        DataType: Text
+        Default: ="PUNCH-000001"
+      Status:
+        PropertyKind: Input
+        DisplayName: Status
+        Description: READY, EMPTY or ERROR host state. UNSAVED is derived internally.
+        DataType: Text
+        Default: ="READY"
+      Subtitle:
+        PropertyKind: Input
+        DisplayName: Subtitle
+        Description: Optional panel subtitle
+        DataType: Text
+        Default: ="Record metadata"
+      SuccessColor:
+        PropertyKind: Input
+        DisplayName: SuccessColor
+        Description: Saved-state color
+        DataType: Color
+        Default: =ColorValue("#22C55E")
+      SurfaceAltColor:
+        PropertyKind: Input
+        DisplayName: SurfaceAltColor
+        Description: Alternate surface color
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        Description: Primary text color
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      Title:
+        PropertyKind: Input
+        DisplayName: Title
+        Description: Panel title
+        DataType: Text
+        Default: ="Custom Fields"
+      WarningColor:
+        PropertyKind: Input
+        DisplayName: WarningColor
+        Description: Unsaved-state color
+        DataType: Color
+        Default: =ColorValue("#F59E0B")
+    Properties:
+      DirtyCount: =CountRows(colCFEPro_Dirty)
+      DirtyItems: =colCFEPro_Dirty
+      EditedItems: |-
+        =If(
+            varCFEPro_Initialized,
+            colCFEPro_Working,
+            cmp_CustomFieldsEditorPro.Items
+        )
+      FieldCount: =CountRows(cmp_CustomFieldsEditorPro.Items)
+      HasFields: =CountRows(cmp_CustomFieldsEditorPro.Items) > 0
+      Height: =340
+      IsDirty: =CountRows(colCFEPro_Dirty) > 0
+      LastChangedFieldKey: =Coalesce(varCFEPro_LastChangedFieldKey, "")
+      OnReset: |-
+        =Set(varCFEPro_Initialized, false);
+        Set(varCFEPro_LastChangedFieldKey, "");
+
+        ClearCollect(
+            colCFEPro_Working,
+            cmp_CustomFieldsEditorPro.Items
+        );
+
+        ClearCollect(
+            colCFEPro_Dirty,
+            {
+                FieldKey: "",
+                FieldType: "",
+                ValueText: "",
+                ValueNumber: 0,
+                ValueDate: Date(2000,1,1),
+                ValueBool: false,
+                ValueJson: ""
+            }
+        );
+        Clear(colCFEPro_Dirty);
+
+        Set(varCFEPro_Initialized, true)
+      Width: =560
+    Children:
+      - conCFEPro_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =cmp_CustomFieldsEditorPro.BorderColor
+            BorderThickness: =1
+            DropShadow: =DropShadow.Semilight
+            Fill: =cmp_CustomFieldsEditorPro.BackgroundColor
+            Height: =Parent.Height
+            RadiusBottomLeft: =14
+            RadiusBottomRight: =14
+            RadiusTopLeft: =14
+            RadiusTopRight: =14
+            Width: =Parent.Width
+          Children:
+            - conCFEPro_Header:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_CustomFieldsEditorPro.BackgroundColor
+                  Height: =62
+                  Width: =Parent.Width
+                Children:
+                  - lblCFEPro_Title:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_CustomFieldsEditorPro.TextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =22
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =11
+                        Text: =cmp_CustomFieldsEditorPro.Title
+                        Width: =Max(100, Parent.Width - 320)
+                        X: =14
+                        Y: =7
+                  - lblCFEPro_Record:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Color: =cmp_CustomFieldsEditorPro.MutedTextColor
+                        Fill: =Color.Transparent
+                        Font: =Font.'Segoe UI'
+                        Height: =18
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =8
+                        Text: |-
+                          =If(
+                              IsBlank(cmp_CustomFieldsEditorPro.RecordLabel),
+                              cmp_CustomFieldsEditorPro.Subtitle,
+                              cmp_CustomFieldsEditorPro.RecordLabel
+                          )
+                        Width: =Max(100, Parent.Width - 320)
+                        X: =14
+                        Y: =31
+                  - conCFEPro_StatusPill:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        BorderColor: |-
+                          =If(
+                              cmp_CustomFieldsEditorPro.IsLoading || cmp_CustomFieldsEditorPro.IsSaving,
+                              cmp_CustomFieldsEditorPro.AccentColor,
+                              !IsBlank(cmp_CustomFieldsEditorPro.ErrorText) || Upper(Trim(Coalesce(cmp_CustomFieldsEditorPro.Status, "READY"))) = "ERROR",
+                              cmp_CustomFieldsEditorPro.DangerColor,
+                              cmp_CustomFieldsEditorPro.IsDirty,
+                              cmp_CustomFieldsEditorPro.WarningColor,
+                              !cmp_CustomFieldsEditorPro.HasFields || Upper(Trim(Coalesce(cmp_CustomFieldsEditorPro.Status, "READY"))) = "EMPTY",
+                              cmp_CustomFieldsEditorPro.BorderColor,
+                              cmp_CustomFieldsEditorPro.SuccessColor
+                          )
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: |-
+                          =If(
+                              cmp_CustomFieldsEditorPro.IsLoading || cmp_CustomFieldsEditorPro.IsSaving,
+                              ColorFade(cmp_CustomFieldsEditorPro.AccentColor, 92%),
+                              !IsBlank(cmp_CustomFieldsEditorPro.ErrorText) || Upper(Trim(Coalesce(cmp_CustomFieldsEditorPro.Status, "READY"))) = "ERROR",
+                              ColorFade(cmp_CustomFieldsEditorPro.DangerColor, 90%),
+                              cmp_CustomFieldsEditorPro.IsDirty,
+                              ColorFade(cmp_CustomFieldsEditorPro.WarningColor, 88%),
+                              !cmp_CustomFieldsEditorPro.HasFields || Upper(Trim(Coalesce(cmp_CustomFieldsEditorPro.Status, "READY"))) = "EMPTY",
+                              cmp_CustomFieldsEditorPro.SurfaceAltColor,
+                              ColorFade(cmp_CustomFieldsEditorPro.SuccessColor, 90%)
+                          )
+                        Height: =24
+                        RadiusBottomLeft: =12
+                        RadiusBottomRight: =12
+                        RadiusTopLeft: =12
+                        RadiusTopRight: =12
+                        Width: =72
+                        X: =Parent.Width - 270
+                        Y: =19
+                      Children:
+                        - lblCFEPro_Status:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: |-
+                                =If(
+                                    cmp_CustomFieldsEditorPro.IsSaving || cmp_CustomFieldsEditorPro.IsLoading,
+                                    cmp_CustomFieldsEditorPro.AccentColor,
+                                    !IsBlank(cmp_CustomFieldsEditorPro.ErrorText) || Upper(Trim(Coalesce(cmp_CustomFieldsEditorPro.Status, "READY"))) = "ERROR",
+                                    ColorValue("#991B1B"),
+                                    cmp_CustomFieldsEditorPro.IsDirty,
+                                    ColorValue("#92400E"),
+                                    !cmp_CustomFieldsEditorPro.HasFields || Upper(Trim(Coalesce(cmp_CustomFieldsEditorPro.Status, "READY"))) = "EMPTY",
+                                    cmp_CustomFieldsEditorPro.MutedTextColor,
+                                    ColorValue("#166534")
+                                )
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =Parent.Height
+                              PaddingBottom: =0
+                              PaddingLeft: =2
+                              PaddingRight: =2
+                              PaddingTop: =0
+                              Size: =7
+                              Text: |-
+                                =If(
+                                    cmp_CustomFieldsEditorPro.IsSaving,
+                                    "Saving...",
+                                    cmp_CustomFieldsEditorPro.IsLoading,
+                                    "Loading...",
+                                    !IsBlank(cmp_CustomFieldsEditorPro.ErrorText) || Upper(Trim(Coalesce(cmp_CustomFieldsEditorPro.Status, "READY"))) = "ERROR",
+                                    "Error",
+                                    !cmp_CustomFieldsEditorPro.HasFields || Upper(Trim(Coalesce(cmp_CustomFieldsEditorPro.Status, "READY"))) = "EMPTY",
+                                    "Empty",
+                                    cmp_CustomFieldsEditorPro.IsDirty,
+                                    "Unsaved",
+                                    "Saved"
+                                )
+                              Width: =Parent.Width
+                  - btnCFEPro_Refresh:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =cmp_CustomFieldsEditorPro.BorderColor
+                        BorderThickness: =1
+                        Color: =cmp_CustomFieldsEditorPro.AccentColor
+                        DisplayMode: |-
+                          =If(
+                              cmp_CustomFieldsEditorPro.IsLoading || cmp_CustomFieldsEditorPro.IsSaving || cmp_CustomFieldsEditorPro.IsDirty,
+                              DisplayMode.Disabled,
+                              DisplayMode.Edit
+                          )
+                        Fill: =cmp_CustomFieldsEditorPro.BackgroundColor
+                        Font: =Font.'Segoe UI'
+                        Height: =28
+                        HoverFill: =cmp_CustomFieldsEditorPro.SurfaceAltColor
+                        OnSelect: =cmp_CustomFieldsEditorPro.OnRefresh()
+                        RadiusBottomLeft: =7
+                        RadiusBottomRight: =7
+                        RadiusTopLeft: =7
+                        RadiusTopRight: =7
+                        Size: =8
+                        Text: ="↻"
+                        Width: =32
+                        X: =Parent.Width - 190
+                        Y: =17
+                  - btnCFEPro_Reset:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =cmp_CustomFieldsEditorPro.BorderColor
+                        BorderThickness: =1
+                        Color: =cmp_CustomFieldsEditorPro.MutedTextColor
+                        DisplayMode: |-
+                          =If(
+                              !cmp_CustomFieldsEditorPro.CanEdit ||
+                              cmp_CustomFieldsEditorPro.IsLoading ||
+                              cmp_CustomFieldsEditorPro.IsSaving ||
+                              !cmp_CustomFieldsEditorPro.IsDirty,
+                              DisplayMode.Disabled,
+                              DisplayMode.Edit
+                          )
+                        Fill: =cmp_CustomFieldsEditorPro.BackgroundColor
+                        Font: =Font.'Segoe UI'
+                        Height: =28
+                        HoverFill: =cmp_CustomFieldsEditorPro.SurfaceAltColor
+                        OnSelect: |-
+                          =Set(varCFEPro_Initialized, false);
+                          Set(varCFEPro_LastChangedFieldKey, "");
+                          ClearCollect(colCFEPro_Working, cmp_CustomFieldsEditorPro.Items);
+                          Clear(colCFEPro_Dirty);
+                          Set(varCFEPro_Initialized, true);
+                          cmp_CustomFieldsEditorPro.OnResetRequested()
+                        RadiusBottomLeft: =7
+                        RadiusBottomRight: =7
+                        RadiusTopLeft: =7
+                        RadiusTopRight: =7
+                        Size: =8
+                        Text: ="Reset"
+                        Width: =58
+                        X: =Parent.Width - 150
+                        Y: =17
+                  - btnCFEPro_Save:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =cmp_CustomFieldsEditorPro.AccentColor
+                        BorderThickness: =1
+                        Color: =Color.White
+                        DisplayMode: |-
+                          =If(
+                              !cmp_CustomFieldsEditorPro.CanEdit ||
+                              cmp_CustomFieldsEditorPro.IsLoading ||
+                              cmp_CustomFieldsEditorPro.IsSaving ||
+                              !cmp_CustomFieldsEditorPro.IsDirty,
+                              DisplayMode.Disabled,
+                              DisplayMode.Edit
+                          )
+                        Fill: =cmp_CustomFieldsEditorPro.AccentColor
+                        Font: =Font.'Segoe UI'
+                        Height: =28
+                        HoverFill: =ColorFade(cmp_CustomFieldsEditorPro.AccentColor, -12%)
+                        OnSelect: =cmp_CustomFieldsEditorPro.OnSaveRequested()
+                        RadiusBottomLeft: =7
+                        RadiusBottomRight: =7
+                        RadiusTopLeft: =7
+                        RadiusTopRight: =7
+                        Size: =8
+                        Text: =If(cmp_CustomFieldsEditorPro.IsSaving, "Saving...", "Save")
+                        Width: =68
+                        X: =Parent.Width - 84
+                        Y: =17
+            - rectCFEPro_HeaderDivider:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderStyle: =BorderStyle.None
+                  Fill: =cmp_CustomFieldsEditorPro.BorderColor
+                  Height: =1
+                  Width: =Parent.Width
+                  Y: =62
+            - conCFEPro_Body:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =cmp_CustomFieldsEditorPro.BackgroundColor
+                  Height: =Parent.Height - 63
+                  Width: =Parent.Width
+                  Y: =63
+                Children:
+                  - galCFEPro_Fields:
+                      Control: Gallery@2.15.0
+                      Variant: Vertical
+                      Properties:
+                        BorderColor: =RGBA(0,0,0,0)
+                        Fill: =cmp_CustomFieldsEditorPro.BackgroundColor
+                        Height: =Parent.Height
+                        Items: |-
+                          =SortByColumns(
+                              If(
+                                  varCFEPro_Initialized,
+                                  colCFEPro_Working,
+                                  cmp_CustomFieldsEditorPro.Items
+                              ),
+                              "SortOrder",
+                              SortOrder.Ascending
+                          )
+                        TemplateFill: =cmp_CustomFieldsEditorPro.BackgroundColor
+                        TemplatePadding: =0
+                        TemplateSize: =122
+                        Visible: |-
+                          =!cmp_CustomFieldsEditorPro.IsLoading &&
+                          IsBlank(cmp_CustomFieldsEditorPro.ErrorText) &&
+                          cmp_CustomFieldsEditorPro.HasFields
+                        Width: =Parent.Width
+                      Children:
+                        - conCFEPro_FieldRow:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: |-
+                                =If(
+                                    !IsBlank(LookUp(colCFEPro_Dirty, FieldKey = ThisItem.FieldKey)),
+                                    ColorFade(cmp_CustomFieldsEditorPro.WarningColor, 55%),
+                                    cmp_CustomFieldsEditorPro.BorderColor
+                                )
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: |-
+                                =If(
+                                    !IsBlank(LookUp(colCFEPro_Dirty, FieldKey = ThisItem.FieldKey)),
+                                    ColorFade(cmp_CustomFieldsEditorPro.WarningColor, 97%),
+                                    cmp_CustomFieldsEditorPro.BackgroundColor
+                                )
+                              Height: =Parent.TemplateHeight - 8
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                              Width: =Parent.TemplateWidth - 20
+                              X: =10
+                              Y: =4
+                            Children:
+                              - lblCFEPro_FieldLabel:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =cmp_CustomFieldsEditorPro.TextColor
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =20
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    Text: =ThisItem.FieldLabel & If(ThisItem.IsRequired, " *", "")
+                                    Width: =Max(90, Parent.Width - 214)
+                                    Wrap: =false
+                                    X: =12
+                                    Y: =8
+                              - lblCFEPro_FieldKey:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0,0,0,0)
+                                    Color: =cmp_CustomFieldsEditorPro.MutedTextColor
+                                    Fill: =Color.Transparent
+                                    Font: =Font.'Segoe UI'
+                                    Height: =16
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =7
+                                    Text: |-
+                                      =ThisItem.FieldKey &
+                                      If(
+                                          IsBlank(Trim(Coalesce(ThisItem.HelpText, ""))),
+                                          "",
+                                          " · " & ThisItem.HelpText
+                                      )
+                                    Width: =Parent.Width - 24
+                                    Wrap: =false
+                                    X: =12
+                                    Y: =29
+                              - conCFEPro_TypePill:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: =cmp_CustomFieldsEditorPro.BorderColor
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =cmp_CustomFieldsEditorPro.SurfaceAltColor
+                                    Height: =21
+                                    RadiusBottomLeft: =10
+                                    RadiusBottomRight: =10
+                                    RadiusTopLeft: =10
+                                    RadiusTopRight: =10
+                                    Width: =78
+                                    X: =Parent.Width - 174
+                                    Y: =7
+                                  Children:
+                                    - lblCFEPro_Type:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          Color: =cmp_CustomFieldsEditorPro.MutedTextColor
+                                          Fill: =Color.Transparent
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =Parent.Height
+                                          PaddingBottom: =0
+                                          PaddingLeft: =2
+                                          PaddingRight: =2
+                                          PaddingTop: =0
+                                          Size: =6
+                                          Text: =Upper(ThisItem.FieldType)
+                                          Width: =Parent.Width
+                              - conCFEPro_ModifiedPill:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    BorderColor: =ColorFade(cmp_CustomFieldsEditorPro.WarningColor, 35%)
+                                    BorderThickness: =1
+                                    DropShadow: =DropShadow.None
+                                    Fill: =ColorFade(cmp_CustomFieldsEditorPro.WarningColor, 90%)
+                                    Height: =21
+                                    RadiusBottomLeft: =10
+                                    RadiusBottomRight: =10
+                                    RadiusTopLeft: =10
+                                    RadiusTopRight: =10
+                                    Visible: =!IsBlank(LookUp(colCFEPro_Dirty, FieldKey = ThisItem.FieldKey))
+                                    Width: =82
+                                    X: =Parent.Width - 90
+                                    Y: =7
+                                  Children:
+                                    - lblCFEPro_Modified:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          BorderColor: =RGBA(0,0,0,0)
+                                          Color: =ColorValue("#92400E")
+                                          Fill: =Color.Transparent
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =Parent.Height
+                                          PaddingBottom: =0
+                                          PaddingLeft: =2
+                                          PaddingRight: =2
+                                          PaddingTop: =0
+                                          Size: =6
+                                          Text: ="Modified"
+                                          Width: =Parent.Width
+                              - txtCFEPro_Text:
+                                  Control: ModernTextInput@1.1.2
+                                  Properties:
+                                    Appearance: =Appearance.Outline
+                                    BorderColor: =cmp_CustomFieldsEditorPro.BorderColor
+                                    Default: =ThisItem.ValueText
+                                    DisplayMode: |-
+                                      =If(
+                                          cmp_CustomFieldsEditorPro.CanEdit && ThisItem.IsEditable,
+                                          DisplayMode.Edit,
+                                          DisplayMode.View
+                                      )
+                                    Fill: =cmp_CustomFieldsEditorPro.BackgroundColor
+                                    Height: =52
+                                    OnChange: |-
+                                      =If(
+                                          !varCFEPro_Initialized,
+                                          ClearCollect(colCFEPro_Working, cmp_CustomFieldsEditorPro.Items);
+                                          Set(varCFEPro_Initialized, true)
+                                      );
+
+                                      Patch(
+                                          colCFEPro_Working,
+                                          LookUp(colCFEPro_Working, FieldKey = ThisItem.FieldKey),
+                                          {ValueText: Self.Text}
+                                      );
+
+                                      RemoveIf(colCFEPro_Dirty, FieldKey = ThisItem.FieldKey);
+                                      Collect(
+                                          colCFEPro_Dirty,
+                                          {
+                                              FieldKey: ThisItem.FieldKey,
+                                              FieldType: ThisItem.FieldType,
+                                              ValueText: Self.Text,
+                                              ValueNumber: Blank(),
+                                              ValueDate: Blank(),
+                                              ValueBool: false,
+                                              ValueJson: ""
+                                          }
+                                      );
+                                      Set(varCFEPro_LastChangedFieldKey, ThisItem.FieldKey)
+                                    Placeholder: ="Enter value..."
+                                    Type: =TextInputType.Multiline
+                                    Visible: =Lower(Trim(ThisItem.FieldType)) = "text"
+                                    Width: =Parent.Width - 24
+                                    X: =12
+                                    Y: =51
+                              - numCFEPro_Number:
+                                  Control: ModernNumberInput@1.1.2
+                                  Properties:
+                                    Default: =If(IsBlank(ThisItem.ValueNumber), Blank(), Text(ThisItem.ValueNumber))
+                                    DisplayMode: |-
+                                      =If(
+                                          cmp_CustomFieldsEditorPro.CanEdit && ThisItem.IsEditable,
+                                          DisplayMode.Edit,
+                                          DisplayMode.View
+                                      )
+                                    Height: =38
+                                    OnChange: |-
+                                      =If(
+                                          !varCFEPro_Initialized,
+                                          ClearCollect(colCFEPro_Working, cmp_CustomFieldsEditorPro.Items);
+                                          Set(varCFEPro_Initialized, true)
+                                      );
+
+                                      Patch(
+                                          colCFEPro_Working,
+                                          LookUp(colCFEPro_Working, FieldKey = ThisItem.FieldKey),
+                                          {ValueNumber: If(IsBlank(Self.Value), Blank(), Value(Self.Value))}
+                                      );
+
+                                      RemoveIf(colCFEPro_Dirty, FieldKey = ThisItem.FieldKey);
+                                      Collect(
+                                          colCFEPro_Dirty,
+                                          {
+                                              FieldKey: ThisItem.FieldKey,
+                                              FieldType: ThisItem.FieldType,
+                                              ValueText: "",
+                                              ValueNumber: If(IsBlank(Self.Value), Blank(), Value(Self.Value)),
+                                              ValueDate: Blank(),
+                                              ValueBool: false,
+                                              ValueJson: ""
+                                          }
+                                      );
+                                      Set(varCFEPro_LastChangedFieldKey, ThisItem.FieldKey)
+                                    Visible: =Lower(Trim(ThisItem.FieldType)) = "number"
+                                    Width: =Parent.Width - 24
+                                    X: =12
+                                    Y: =58
+                              - dpCFEPro_Date:
+                                  Control: ModernDatePicker@1.0.2
+                                  Properties:
+                                    Appearance: =Appearance.Outline
+                                    DefaultDate: =ThisItem.ValueDate
+                                    DisplayMode: |-
+                                      =If(
+                                          cmp_CustomFieldsEditorPro.CanEdit && ThisItem.IsEditable,
+                                          DisplayMode.Edit,
+                                          DisplayMode.View
+                                      )
+                                    Height: =38
+                                    OnChange: |-
+                                      =If(
+                                          !varCFEPro_Initialized,
+                                          ClearCollect(colCFEPro_Working, cmp_CustomFieldsEditorPro.Items);
+                                          Set(varCFEPro_Initialized, true)
+                                      );
+
+                                      Patch(
+                                          colCFEPro_Working,
+                                          LookUp(colCFEPro_Working, FieldKey = ThisItem.FieldKey),
+                                          {ValueDate: Self.SelectedDate}
+                                      );
+
+                                      RemoveIf(colCFEPro_Dirty, FieldKey = ThisItem.FieldKey);
+                                      Collect(
+                                          colCFEPro_Dirty,
+                                          {
+                                              FieldKey: ThisItem.FieldKey,
+                                              FieldType: ThisItem.FieldType,
+                                              ValueText: "",
+                                              ValueNumber: Blank(),
+                                              ValueDate: Self.SelectedDate,
+                                              ValueBool: false,
+                                              ValueJson: ""
+                                          }
+                                      );
+                                      Set(varCFEPro_LastChangedFieldKey, ThisItem.FieldKey)
+                                    Visible: =Lower(Trim(ThisItem.FieldType)) = "date"
+                                    Width: =Parent.Width - 24
+                                    X: =12
+                                    Y: =58
+                              - tglCFEPro_YesNo:
+                                  Control: Toggle@1.1.5
+                                  Properties:
+                                    Checked: =ThisItem.ValueBool
+                                    DisplayMode: |-
+                                      =If(
+                                          cmp_CustomFieldsEditorPro.CanEdit && ThisItem.IsEditable,
+                                          DisplayMode.Edit,
+                                          DisplayMode.View
+                                      )
+                                    Height: =38
+                                    Label: =If(ThisItem.ValueBool, "Yes", "No")
+                                    OnCheck: |-
+                                      =If(
+                                          !varCFEPro_Initialized,
+                                          ClearCollect(colCFEPro_Working, cmp_CustomFieldsEditorPro.Items);
+                                          Set(varCFEPro_Initialized, true)
+                                      );
+
+                                      Patch(
+                                          colCFEPro_Working,
+                                          LookUp(colCFEPro_Working, FieldKey = ThisItem.FieldKey),
+                                          {ValueBool: true}
+                                      );
+
+                                      RemoveIf(colCFEPro_Dirty, FieldKey = ThisItem.FieldKey);
+                                      Collect(
+                                          colCFEPro_Dirty,
+                                          {
+                                              FieldKey: ThisItem.FieldKey,
+                                              FieldType: ThisItem.FieldType,
+                                              ValueText: "",
+                                              ValueNumber: Blank(),
+                                              ValueDate: Blank(),
+                                              ValueBool: true,
+                                              ValueJson: ""
+                                          }
+                                      );
+                                      Set(varCFEPro_LastChangedFieldKey, ThisItem.FieldKey)
+                                    OnUncheck: |-
+                                      =If(
+                                          !varCFEPro_Initialized,
+                                          ClearCollect(colCFEPro_Working, cmp_CustomFieldsEditorPro.Items);
+                                          Set(varCFEPro_Initialized, true)
+                                      );
+
+                                      Patch(
+                                          colCFEPro_Working,
+                                          LookUp(colCFEPro_Working, FieldKey = ThisItem.FieldKey),
+                                          {ValueBool: false}
+                                      );
+
+                                      RemoveIf(colCFEPro_Dirty, FieldKey = ThisItem.FieldKey);
+                                      Collect(
+                                          colCFEPro_Dirty,
+                                          {
+                                              FieldKey: ThisItem.FieldKey,
+                                              FieldType: ThisItem.FieldType,
+                                              ValueText: "",
+                                              ValueNumber: Blank(),
+                                              ValueDate: Blank(),
+                                              ValueBool: false,
+                                              ValueJson: ""
+                                          }
+                                      );
+                                      Set(varCFEPro_LastChangedFieldKey, ThisItem.FieldKey)
+                                    Visible: =Lower(Trim(ThisItem.FieldType)) = "yesno"
+                                    Width: =Parent.Width - 24
+                                    X: =12
+                                    Y: =58
+                              - cmbCFEPro_Choice:
+                                  Control: Classic/ComboBox@2.4.0
+                                  Properties:
+                                    BorderColor: =cmp_CustomFieldsEditorPro.BorderColor
+                                    ChevronBackground: =cmp_CustomFieldsEditorPro.SurfaceAltColor
+                                    ChevronDisabledBackground: =cmp_CustomFieldsEditorPro.SurfaceAltColor
+                                    ChevronDisabledFill: =cmp_CustomFieldsEditorPro.MutedTextColor
+                                    ChevronFill: =cmp_CustomFieldsEditorPro.TextColor
+                                    ChevronHoverBackground: =ColorFade(cmp_CustomFieldsEditorPro.AccentColor, 92%)
+                                    ChevronHoverFill: =cmp_CustomFieldsEditorPro.AccentColor
+                                    Color: =cmp_CustomFieldsEditorPro.TextColor
+                                    DefaultSelectedItems: |-
+                                      =If(
+                                          Lower(Trim(ThisItem.FieldType)) = "choice",
+                                          If(
+                                              IsBlank(ThisItem.ValueText),
+                                              Blank(),
+                                              Table({Value: ThisItem.ValueText})
+                                          ),
+                                          If(
+                                              Lower(Trim(ThisItem.FieldType)) = "multichoice",
+                                              If(
+                                                  IsBlank(ThisItem.ValueJson),
+                                                  Blank(),
+                                                  ForAll(
+                                                      Table(ParseJSON(ThisItem.ValueJson)),
+                                                      {Value: Text(Value)}
+                                                  )
+                                              ),
+                                              Blank()
+                                          )
+                                      )
+                                    DisabledBorderColor: =cmp_CustomFieldsEditorPro.BorderColor
+                                    DisabledColor: =cmp_CustomFieldsEditorPro.MutedTextColor
+                                    DisabledFill: =cmp_CustomFieldsEditorPro.SurfaceAltColor
+                                    DisplayFields: =["Value"]
+                                    DisplayMode: |-
+                                      =If(
+                                          cmp_CustomFieldsEditorPro.CanEdit && ThisItem.IsEditable,
+                                          DisplayMode.Edit,
+                                          DisplayMode.View
+                                      )
+                                    Fill: =cmp_CustomFieldsEditorPro.BackgroundColor
+                                    Font: =Font.'Segoe UI'
+                                    Height: =38
+                                    HoverBorderColor: =cmp_CustomFieldsEditorPro.AccentColor
+                                    HoverColor: =cmp_CustomFieldsEditorPro.TextColor
+                                    HoverFill: =cmp_CustomFieldsEditorPro.SurfaceAltColor
+                                    Items: |-
+                                      =ForAll(
+                                          Table(ParseJSON(Coalesce(ThisItem.OptionsJson, "[]"))),
+                                          {Value: Text(Value)}
+                                      )
+                                    OnChange: |-
+                                      =If(
+                                          !varCFEPro_Initialized,
+                                          ClearCollect(colCFEPro_Working, cmp_CustomFieldsEditorPro.Items);
+                                          Set(varCFEPro_Initialized, true)
+                                      );
+
+                                      RemoveIf(colCFEPro_Dirty, FieldKey = ThisItem.FieldKey);
+
+                                      If(
+                                          Lower(Trim(ThisItem.FieldType)) = "choice",
+
+                                          Patch(
+                                              colCFEPro_Working,
+                                              LookUp(colCFEPro_Working, FieldKey = ThisItem.FieldKey),
+                                              {ValueText: Coalesce(Self.Selected.Value, "")}
+                                          );
+                                          Collect(
+                                              colCFEPro_Dirty,
+                                              {
+                                                  FieldKey: ThisItem.FieldKey,
+                                                  FieldType: ThisItem.FieldType,
+                                                  ValueText: Coalesce(Self.Selected.Value, ""),
+                                                  ValueNumber: Blank(),
+                                                  ValueDate: Blank(),
+                                                  ValueBool: false,
+                                                  ValueJson: ""
+                                              }
+                                          ),
+
+                                          With(
+                                              {
+                                                  encoded:
+                                                      "[" &
+                                                      Concat(
+                                                          Self.SelectedItems,
+                                                          "\"" & Substitute(Value, "\"", "\\\"") & "\"",
+                                                          ","
+                                                      ) &
+                                                      "]"
+                                              },
+                                              Patch(
+                                                  colCFEPro_Working,
+                                                  LookUp(colCFEPro_Working, FieldKey = ThisItem.FieldKey),
+                                                  {ValueJson: encoded}
+                                              );
+                                              Collect(
+                                                  colCFEPro_Dirty,
+                                                  {
+                                                      FieldKey: ThisItem.FieldKey,
+                                                      FieldType: ThisItem.FieldType,
+                                                      ValueText: "",
+                                                      ValueNumber: Blank(),
+                                                      ValueDate: Blank(),
+                                                      ValueBool: false,
+                                                      ValueJson: encoded
+                                                  }
+                                              )
+                                          )
+                                      );
+                                      Set(varCFEPro_LastChangedFieldKey, ThisItem.FieldKey)
+                                    PressedBorderColor: =cmp_CustomFieldsEditorPro.AccentColor
+                                    PressedColor: =Color.White
+                                    PressedFill: =cmp_CustomFieldsEditorPro.AccentColor
+                                    SearchFields: =["Value"]
+                                    SelectMultiple: =Lower(Trim(ThisItem.FieldType)) = "multichoice"
+                                    SelectionColor: =Color.White
+                                    SelectionFill: =cmp_CustomFieldsEditorPro.AccentColor
+                                    Visible: |-
+                                      =Lower(Trim(ThisItem.FieldType)) = "choice" ||
+                                      Lower(Trim(ThisItem.FieldType)) = "multichoice"
+                                    Width: =Parent.Width - 24
+                                    X: =12
+                                    Y: =58
+                  - conCFEPro_LoadingState:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        Fill: =cmp_CustomFieldsEditorPro.BackgroundColor
+                        Height: =Parent.Height
+                        Visible: =cmp_CustomFieldsEditorPro.IsLoading
+                        Width: =Parent.Width
+                      Children:
+                        - lblCFEPro_LoadingTitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =cmp_CustomFieldsEditorPro.TextColor
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =24
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =9
+                              Text: ="Loading custom fields..."
+                              Width: =Parent.Width - 40
+                              X: =20
+                              Y: =Max(30, (Parent.Height - 46) / 2)
+                        - lblCFEPro_LoadingBody:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =cmp_CustomFieldsEditorPro.MutedTextColor
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              Height: =20
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =7
+                              Text: ="Definitions and current values are being prepared."
+                              Width: =Parent.Width - 40
+                              X: =20
+                              Y: =lblCFEPro_LoadingTitle.Y + 25
+                  - conCFEPro_ErrorState:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        Fill: =cmp_CustomFieldsEditorPro.BackgroundColor
+                        Height: =Parent.Height
+                        Visible: =!cmp_CustomFieldsEditorPro.IsLoading && !IsBlank(cmp_CustomFieldsEditorPro.ErrorText)
+                        Width: =Parent.Width
+                      Children:
+                        - lblCFEPro_ErrorTitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =cmp_CustomFieldsEditorPro.DangerColor
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =24
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =9
+                              Text: ="Custom fields unavailable"
+                              Width: =Parent.Width - 40
+                              X: =20
+                              Y: =Max(24, (Parent.Height - 70) / 2)
+                        - lblCFEPro_ErrorBody:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =cmp_CustomFieldsEditorPro.MutedTextColor
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              Height: =44
+                              PaddingBottom: =0
+                              PaddingLeft: =12
+                              PaddingRight: =12
+                              PaddingTop: =0
+                              Size: =7
+                              Text: =cmp_CustomFieldsEditorPro.ErrorText
+                              VerticalAlign: =VerticalAlign.Top
+                              Width: =Parent.Width - 60
+                              X: =30
+                              Y: =lblCFEPro_ErrorTitle.Y + 27
+                  - conCFEPro_EmptyState:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        Fill: =cmp_CustomFieldsEditorPro.BackgroundColor
+                        Height: =Parent.Height
+                        Visible: |-
+                          =!cmp_CustomFieldsEditorPro.IsLoading &&
+                          IsBlank(cmp_CustomFieldsEditorPro.ErrorText) &&
+                          !cmp_CustomFieldsEditorPro.HasFields
+                        Width: =Parent.Width
+                      Children:
+                        - lblCFEPro_EmptyTitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =cmp_CustomFieldsEditorPro.TextColor
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =24
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =9
+                              Text: ="No custom fields"
+                              Width: =Parent.Width - 40
+                              X: =20
+                              Y: =Max(30, (Parent.Height - 46) / 2)
+                        - lblCFEPro_EmptyBody:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0,0,0,0)
+                              Color: =cmp_CustomFieldsEditorPro.MutedTextColor
+                              Fill: =Color.Transparent
+                              Font: =Font.'Segoe UI'
+                              Height: =20
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =7
+                              Text: ="This record has no configured custom fields."
+                              Width: =Parent.Width - 40
+                              X: =20
+                              Y: =lblCFEPro_EmptyTitle.Y + 25
