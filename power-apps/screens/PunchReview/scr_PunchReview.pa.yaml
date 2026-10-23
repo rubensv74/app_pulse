@@ -6250,13 +6250,33 @@ Screens:
                   OnAddRequested: =
                   OnCancelRequested: =
                   OnClose: |-
-                    =If(
-                        Coalesce(cmpPR_CustomFieldsEditor.DraftDirty, false),
-                        Notify(
-                            "Hay cambios sin guardar. Guarda o cancela el borrador antes de cerrar.",
-                            NotificationType.Warning
-                        ),
-                        Set(varPunchReviewFieldDefsModalVisible, false)
+                    =With(
+                        {
+                            hasUnsavedDefinitionDraft:
+                                Coalesce(cmpPR_CustomFieldsEditor.DraftDirty, false) &&
+                                (
+                                    cmpPR_CustomFieldsEditor.EditMode = "ADD" ||
+                                    (
+                                        cmpPR_CustomFieldsEditor.EditMode = "EDIT" &&
+                                        !IsBlank(
+                                            Trim(
+                                                Coalesce(
+                                                    First(cmpPR_CustomFieldsEditor.DraftDefinition).FieldKey,
+                                                    ""
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                        },
+                        If(
+                            hasUnsavedDefinitionDraft,
+                            Notify(
+                                "Hay cambios sin guardar. Guarda o cancela el borrador antes de cerrar.",
+                                NotificationType.Warning
+                            ),
+                            Set(varPunchReviewFieldDefsModalVisible, false)
+                        )
                     )
                   OnRefresh: |-
                     =If(
