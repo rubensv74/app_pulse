@@ -52,35 +52,17 @@ Screens:
                     // PageNumber, PageSize, TemplateId, CategoryCode,
                     // StatusCode, CustomFiltersJson
                     // =====================================================
-
                     If(
+                        varPunches_IsLoading,
+                        Notify("Punches are already loading.", NotificationType.Information),
                         IsBlank(varProjectId),
-
                         Notify("Please select a project first.", NotificationType.Warning);
-
                         Set(varPunches_IsLoading, false);
                         Set(varGlobalLoading, false);
                         Set(varGlobalLoadingMsg, "");
                         Set(varGlobalLoadingSubMsg, "");
-                        Set(varGlobalLoadingScope, "");
-
-                        Exit()
-                    );
-
-                    If(
-                        varPunches_IsLoading,
-
-                        Notify("Punches are already loading.", NotificationType.Information);
-
-                        Set(varGlobalLoading, false);
-                        Set(varGlobalLoadingMsg, "");
-                        Set(varGlobalLoadingSubMsg, "");
-                        Set(varGlobalLoadingScope, "");
-
-                        Exit()
-                    );
-
-                    Set(varPunches_IsLoading, true);
+                        Set(varGlobalLoadingScope, ""),
+                        Set(varPunches_IsLoading, true);
                     Set(varPunches_Error, "");
                     Set(varLoadingMsg, "Loading punches...");
 
@@ -333,7 +315,8 @@ Screens:
                     Set(varGlobalLoading, false);
                     Set(varGlobalLoadingMsg, "");
                     Set(varGlobalLoadingSubMsg, "");
-                    Set(varGlobalLoadingScope, "");
+                    Set(varGlobalLoadingScope, "")
+                    )
                   PaddingBottom: =5
                   PaddingLeft: =12
                   PaddingRight: =12
@@ -1019,46 +1002,6 @@ Screens:
                                           "Subsystems",
                                           "Subsystems · " & cmp_MultiValueFilter_3.SelectedCount & " selected"
                                       )
-                                    Width: =200
-                                    X: =ddPunchSubsystem_2.X
-                                    Y: =ddPunchSubsystem_2.Y
-                              - ddPunchSubsystem_2:
-                                  Control: ModernCombobox@1.1.1
-                                  Properties:
-                                    AllowExternalSelectedItems: =false
-                                    Appearance: =Appearance.Outline
-                                    Color: =RGBA(0, 0, 0, 1)
-                                    DefaultSelectedItems: |-
-                                      =
-                                      If(
-                                          IsBlank(varFilter_Subsystem),
-                                          Blank(),
-                                          Filter(
-                                              colPunchSubsystems_Filter,
-                                              Code = varFilter_Subsystem
-                                          )
-                                      )
-                                    DisplayMode: =DisplayMode.View
-                                    Font: =Font.'Segoe UI'
-                                    FontWeight: =""
-                                    InputTextPlaceholder: ="Subsystems"
-                                    ItemDisplayText: =ThisItem.Label
-                                    Items: =colPunchSubsystems_Filter
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    OnChange: |-
-                                      =
-                                      Set(
-                                          varFilter_Subsystem,
-                                          If(
-                                              IsBlank(ddPunchSubsystem_2.Selected.Code),
-                                              Blank(),
-                                              Text(ddPunchSubsystem_2.Selected.Code)
-                                          )
-                                      )
-                                    SelectMultiple: =false
-                                    Size: =0
-                                    Visible: =false
                                     Width: =200
                                     X: =40
                                     Y: =40
@@ -2428,19 +2371,12 @@ Screens:
                     // btnDrawerLoad_Custom_2.OnSelect
                     // Load Punch custom fields safely
                     // =====================================================
-
                     If(
                         IsBlank(varProjectId) || IsBlank(varDrawerRecordId) || IsBlank(varDrawerEntityType),
-
                         Notify("No punch selected.", NotificationType.Warning);
-
                         Set(varCT_Loading, false);
-                        Set(varDrawerIsLoading, false);
-
-                        Exit()
-                    );
-
-                    Set(varCT_Loading, true);
+                        Set(varDrawerIsLoading, false),
+                        Set(varCT_Loading, true);
                     Set(varDrawerIsLoading, true);
                     Set(varCT_Error, "");
 
@@ -2542,7 +2478,8 @@ Screens:
                     );
 
                     Set(varCT_Loading, false);
-                    Set(varDrawerIsLoading, false);
+                    Set(varDrawerIsLoading, false)
+                    )
                   Visible: =false
                   X: =60
                   Y: =60
@@ -2556,19 +2493,12 @@ Screens:
                     // btnDrawerLoad_Comments_2.OnSelect
                     // Load Punch comments safely
                     // =====================================================
-
                     If(
                         IsBlank(varProjectId) || IsBlank(varDrawerRecordId),
-
                         Notify("No punch selected.", NotificationType.Warning);
-
                         Set(varIsLoadingComments, false);
-                        Set(varDrawerIsLoading, false);
-
-                        Exit()
-                    );
-
-                    Set(varIsLoadingComments, true);
+                        Set(varDrawerIsLoading, false),
+                        Set(varIsLoadingComments, true);
                     Set(varDrawerIsLoading, true);
 
                     Set(varCommentsPage, 1);
@@ -2672,7 +2602,8 @@ Screens:
                     );
 
                     Set(varIsLoadingComments, false);
-                    Set(varDrawerIsLoading, false);
+                    Set(varDrawerIsLoading, false)
+                    )
                   Visible: =false
                   X: =80
                   Y: =80
@@ -2686,26 +2617,13 @@ Screens:
                     // btnDrawerLoad_Punches.OnSelect
                     // Drawer tab loader
                     // =====================================================
-
                     If(
                         !varShowDetailDrawer,
-                        Exit()
-                    );
-
-                    If(
+                        Set(varDrawerIsLoading, false),
                         IsBlank(varDrawerRecordId),
-
                         Set(varDrawerIsLoading, false);
-
-                        Notify(
-                            "No record selected.",
-                            NotificationType.Warning
-                        );
-
-                        Exit()
-                    );
-
-                    Switch(
+                        Notify("No record selected.", NotificationType.Warning),
+                        Switch(
                         varDrawerTab,
 
                         "Overview",
@@ -2723,18 +2641,11 @@ Screens:
                             Select(btnDrawerLoad_Custom_6),
 
                         Set(varDrawerIsLoading, false)
-                    );
+                    )
+                    )
                   Visible: =false
                   X: =40
                   Y: =40
-            - btnDrawerRefreshFromTab_6:
-                Control: Button@0.0.45
-                Properties:
-                  OnSelect: |-
-                    =
-                    Set(varDrawerTab, "Custom");
-                    Select(btnDrawerLoad_Custom_6)
-                  Visible: =false
             - btnCT_LoadDefs_6:
                 Control: Button@0.0.45
                 Properties:
