@@ -1,0 +1,489 @@
+ComponentDefinitions:
+  cmp_ReviewProgressPro:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      BackgroundColor:
+        PropertyKind: Input
+        DisplayName: BackgroundColor
+        Description: Fondo principal del componente.
+        DataType: Color
+        Default: =ColorValue("#FFFFFF")
+      BorderColor:
+        PropertyKind: Input
+        DisplayName: BorderColor
+        Description: Color del borde exterior.
+        DataType: Color
+        Default: =ColorValue("#E2E8F0")
+      CenterFillColorHex:
+        PropertyKind: Input
+        DisplayName: CenterFillColorHex
+        Description: Color HEX del centro del donut.
+        DataType: Text
+        Default: ="#FFFFFF"
+      CurrentPosition:
+        PropertyKind: Input
+        DisplayName: CurrentPosition
+        Description: Posición actual dentro de la cola completa.
+        DataType: Number
+        Default: =12
+      CurrentPositionLabel:
+        PropertyKind: Input
+        DisplayName: CurrentPositionLabel
+        Description: Etiqueta para la posición actual.
+        DataType: Text
+        Default: ="Current Position"
+      EmptyText:
+        PropertyKind: Input
+        DisplayName: EmptyText
+        Description: Mensaje cuando no existe cola de revisión.
+        DataType: Text
+        Default: ="No punches in the review queue."
+      ErrorText:
+        PropertyKind: Input
+        DisplayName: ErrorText
+        Description: Mensaje del estado de error.
+        DataType: Text
+        Default: ="Review progress unavailable."
+      MutedTextColor:
+        PropertyKind: Input
+        DisplayName: MutedTextColor
+        Description: Color de texto secundario.
+        DataType: Color
+        Default: =ColorValue("#64748B")
+      RemainingColorHex:
+        PropertyKind: Input
+        DisplayName: RemainingColorHex
+        Description: Color HEX del segmento pendiente.
+        DataType: Text
+        Default: ="#94A3B8"
+      RemainingCount:
+        PropertyKind: Output
+        DataType: Number
+      RemainingLabel:
+        PropertyKind: Input
+        DisplayName: RemainingLabel
+        Description: Etiqueta del número de Punches pendientes de revisar.
+        DataType: Text
+        Default: ="Remaining"
+      ReviewedColorHex:
+        PropertyKind: Input
+        DisplayName: ReviewedColorHex
+        Description: Color HEX del segmento revisado.
+        DataType: Text
+        Default: ="#1677FF"
+      ReviewedCount:
+        PropertyKind: Input
+        DisplayName: ReviewedCount
+        Description: Número de Punches revisados durante la sesión.
+        DataType: Number
+        Default: =18
+      ReviewedLabel:
+        PropertyKind: Input
+        DisplayName: ReviewedLabel
+        Description: Etiqueta del número de Punches revisados.
+        DataType: Text
+        Default: ="Reviewed in Session"
+      ReviewedPercentage:
+        PropertyKind: Output
+        DataType: Number
+      State:
+        PropertyKind: Input
+        DisplayName: State
+        Description: ready, loading, empty o error.
+        DataType: Text
+        Default: ="ready"
+      SurfaceAltColor:
+        PropertyKind: Input
+        DisplayName: SurfaceAltColor
+        Description: Superficie secundaria para divisores y estados.
+        DataType: Color
+        Default: =ColorValue("#F8FAFC")
+      TextColor:
+        PropertyKind: Input
+        DisplayName: TextColor
+        Description: Color principal del texto.
+        DataType: Color
+        Default: =ColorValue("#0F172A")
+      Title:
+        PropertyKind: Input
+        DisplayName: Title
+        Description: Título del componente.
+        DataType: Text
+        Default: ="Review Progress"
+      TotalCount:
+        PropertyKind: Input
+        DisplayName: TotalCount
+        Description: Número total de Punches en la cola de revisión.
+        DataType: Number
+        Default: =48
+    Properties:
+      Height: =140
+      RemainingCount: =Max(0, Coalesce(cmp_ReviewProgressPro.TotalCount, 0) - Coalesce(cmp_ReviewProgressPro.ReviewedCount, 0))
+      ReviewedPercentage: |-
+        =If(
+            Coalesce(cmp_ReviewProgressPro.TotalCount, 0) <= 0,
+            0,
+            Min(
+                1,
+                Max(
+                    0,
+                    Coalesce(cmp_ReviewProgressPro.ReviewedCount, 0) /
+                    cmp_ReviewProgressPro.TotalCount
+                )
+            )
+        )
+      Width: =280
+    Children:
+      - conRPP_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderColor: =cmp_ReviewProgressPro.BorderColor
+            BorderThickness: =1
+            DropShadow: =DropShadow.None
+            Fill: =cmp_ReviewProgressPro.BackgroundColor
+            Height: =Parent.Height
+            RadiusBottomLeft: =12
+            RadiusBottomRight: =12
+            RadiusTopLeft: =12
+            RadiusTopRight: =12
+            Width: =Parent.Width
+          Children:
+            - lblRPP_Title:
+                Control: Label@2.5.1
+                Properties:
+                  Color: =cmp_ReviewProgressPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Bold
+                  Height: =22
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =10
+                  Text: =cmp_ReviewProgressPro.Title
+                  Width: =Parent.Width - 24
+                  X: =12
+                  Y: =8
+            - rectRPP_HeaderDivider:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderStyle: =BorderStyle.None
+                  Fill: =cmp_ReviewProgressPro.BorderColor
+                  Height: =1
+                  Width: =Parent.Width - 24
+                  X: =12
+                  Y: =34
+            - imgRPP_Donut:
+                Control: Image@2.2.3
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  BorderStyle: =BorderStyle.None
+                  Fill: =Color.Transparent
+                  Height: =82
+                  Image: |-
+                    =With(
+                        {
+                            _total: Max(0, Coalesce(cmp_ReviewProgressPro.TotalCount, 0)),
+                            _reviewed:
+                                Min(
+                                    Max(0, Coalesce(cmp_ReviewProgressPro.ReviewedCount, 0)),
+                                    Max(0, Coalesce(cmp_ReviewProgressPro.TotalCount, 0))
+                                )
+                        },
+                        With(
+                            {
+                                _pct: If(_total <= 0, 0, _reviewed / _total),
+                                _angle:
+                                    -1.5707963267948966 +
+                                    (6.283185307179586 * If(_total <= 0, 0, _reviewed / _total))
+                            },
+                            With(
+                                {
+                                    _endX: 50 + (32 * Cos(_angle)),
+                                    _endY: 50 + (32 * Sin(_angle)),
+                                    _largeArc: If(_pct > 0.5, "1", "0")
+                                },
+                                "data:image/svg+xml;utf8," &
+                                EncodeUrl(
+                                    "<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'>" &
+
+                                    "<circle cx='50' cy='50' r='32' fill='none' stroke='" &
+                                    cmp_ReviewProgressPro.RemainingColorHex &
+                                    "' stroke-width='18'/>" &
+
+                                    If(
+                                        _pct <= 0,
+                                        "",
+                                        If(
+                                            _pct >= 0.9999,
+                                            "<circle cx='50' cy='50' r='32' fill='none' stroke='" &
+                                            cmp_ReviewProgressPro.ReviewedColorHex &
+                                            "' stroke-width='18'/>",
+                                            "<path d='M 50 18 A 32 32 0 " &
+                                            _largeArc &
+                                            " 1 " &
+                                            Text(_endX, "[$-en-US]0.####") &
+                                            " " &
+                                            Text(_endY, "[$-en-US]0.####") &
+                                            "' fill='none' stroke='" &
+                                            cmp_ReviewProgressPro.ReviewedColorHex &
+                                            "' stroke-width='18' stroke-linecap='butt'/>"
+                                        )
+                                    ) &
+
+                                    "<circle cx='50' cy='50' r='22' fill='" &
+                                    cmp_ReviewProgressPro.CenterFillColorHex &
+                                    "'/>" &
+
+                                    "<text x='50' y='47' text-anchor='middle' dominant-baseline='middle' font-family='Segoe UI,Arial,sans-serif' font-size='17' font-weight='700' fill='#0F172A'>" &
+                                    Text(_total, "[$-en-US]#,##0") &
+                                    "</text>" &
+
+                                    "<text x='50' y='63' text-anchor='middle' dominant-baseline='middle' font-family='Segoe UI,Arial,sans-serif' font-size='7.5' font-weight='600' fill='#64748B'>TOTAL</text>" &
+                                    "</svg>"
+                                )
+                            )
+                        )
+                    )
+                  Visible: |-
+                    =Lower(cmp_ReviewProgressPro.State) = "ready" &&
+                    Coalesce(cmp_ReviewProgressPro.TotalCount, 0) > 0
+                  Width: =82
+                  X: =12
+                  Y: =43
+            - btnRPP_ReviewedDot:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =Color.Transparent
+                  BorderThickness: =0
+                  DisplayMode: =DisplayMode.View
+                  Fill: =ColorValue(cmp_ReviewProgressPro.ReviewedColorHex)
+                  Height: =8
+                  RadiusBottomLeft: =5
+                  RadiusBottomRight: =5
+                  RadiusTopLeft: =5
+                  RadiusTopRight: =5
+                  Text: =""
+                  Visible: =Lower(cmp_ReviewProgressPro.State) = "ready"
+                  Width: =8
+                  X: =104
+                  Y: =50
+            - lblRPP_ReviewedLabel:
+                Control: Label@2.5.1
+                Properties:
+                  Color: =cmp_ReviewProgressPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: =cmp_ReviewProgressPro.ReviewedLabel
+                  Visible: =Lower(cmp_ReviewProgressPro.State) = "ready"
+                  Width: =Max(52, Parent.Width - 205)
+                  Wrap: =false
+                  X: =118
+                  Y: =45
+            - lblRPP_ReviewedValue:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Right
+                  Color: =cmp_ReviewProgressPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: |-
+                    =Text(
+                        Min(
+                            Max(0, Coalesce(cmp_ReviewProgressPro.ReviewedCount, 0)),
+                            Max(0, Coalesce(cmp_ReviewProgressPro.TotalCount, 0))
+                        ),
+                        "[$-en-US]#,##0"
+                    ) &
+                    "  (" &
+                    Text(
+                        100 * cmp_ReviewProgressPro.ReviewedPercentage,
+                        "[$-en-US]0"
+                    ) &
+                    "%)"
+                  Visible: =Lower(cmp_ReviewProgressPro.State) = "ready"
+                  Width: =68
+                  X: =Parent.Width - 78
+                  Y: =45
+            - btnRPP_RemainingDot:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =Color.Transparent
+                  BorderThickness: =0
+                  DisplayMode: =DisplayMode.View
+                  Fill: =ColorValue(cmp_ReviewProgressPro.RemainingColorHex)
+                  Height: =8
+                  RadiusBottomLeft: =5
+                  RadiusBottomRight: =5
+                  RadiusTopLeft: =5
+                  RadiusTopRight: =5
+                  Size: =8
+                  Text: =""
+                  Visible: =Lower(cmp_ReviewProgressPro.State) = "ready"
+                  Width: =9
+                  X: =104
+                  Y: =79
+            - lblRPP_RemainingLabel:
+                Control: Label@2.5.1
+                Properties:
+                  Color: =cmp_ReviewProgressPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: =cmp_ReviewProgressPro.RemainingLabel
+                  Visible: =Lower(cmp_ReviewProgressPro.State) = "ready"
+                  Width: =Max(52, Parent.Width - 205)
+                  Wrap: =false
+                  X: =118
+                  Y: =74
+            - lblRPP_RemainingValue:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Right
+                  Color: =cmp_ReviewProgressPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: |-
+                    =Text(
+                        cmp_ReviewProgressPro.RemainingCount,
+                        "[$-en-US]#,##0"
+                    ) &
+                    "  (" &
+                    Text(
+                        100 * (1 - cmp_ReviewProgressPro.ReviewedPercentage),
+                        "[$-en-US]0"
+                    ) &
+                    "%)"
+                  Visible: =Lower(cmp_ReviewProgressPro.State) = "ready"
+                  Width: =68
+                  X: =Parent.Width - 78
+                  Y: =74
+            - icoRPP_CurrentPosition:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0,0,0,0)
+                  Color: =ColorValue(cmp_ReviewProgressPro.ReviewedColorHex)
+                  Height: =11
+                  Icon: =Icon.ArrowRight
+                  Visible: =Lower(cmp_ReviewProgressPro.State) = "ready"
+                  Width: =11
+                  X: =103
+                  Y: =107
+            - lblRPP_CurrentPositionLabel:
+                Control: Label@2.5.1
+                Properties:
+                  Color: =cmp_ReviewProgressPro.MutedTextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: =cmp_ReviewProgressPro.CurrentPositionLabel
+                  Visible: =Lower(cmp_ReviewProgressPro.State) = "ready"
+                  Width: =Max(52, Parent.Width - 205)
+                  Wrap: =false
+                  X: =118
+                  Y: =102
+            - lblRPP_CurrentPositionValue:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Right
+                  Color: =cmp_ReviewProgressPro.TextColor
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =18
+                  PaddingBottom: =0
+                  PaddingLeft: =0
+                  PaddingRight: =0
+                  PaddingTop: =0
+                  Size: =7
+                  Text: |-
+                    =If(
+                        Coalesce(cmp_ReviewProgressPro.TotalCount, 0) <= 0,
+                        "0 of 0",
+                        Text(
+                            Min(
+                                Max(1, Coalesce(cmp_ReviewProgressPro.CurrentPosition, 1)),
+                                cmp_ReviewProgressPro.TotalCount
+                            ),
+                            "[$-en-US]#,##0"
+                        ) &
+                        " of " &
+                        Text(cmp_ReviewProgressPro.TotalCount, "[$-en-US]#,##0")
+                    )
+                  Visible: =Lower(cmp_ReviewProgressPro.State) = "ready"
+                  Width: =68
+                  X: =Parent.Width - 78
+                  Y: =102
+            - lblRPP_State:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  Color: |-
+                    =If(
+                        Lower(cmp_ReviewProgressPro.State) = "error",
+                        ColorValue("#DC2626"),
+                        cmp_ReviewProgressPro.MutedTextColor
+                    )
+                  Fill: =Color.Transparent
+                  Font: =Font.'Segoe UI'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =64
+                  PaddingBottom: =0
+                  PaddingLeft: =16
+                  PaddingRight: =16
+                  PaddingTop: =0
+                  Size: =8
+                  Text: |-
+                    =Switch(
+                        Lower(cmp_ReviewProgressPro.State),
+                        "loading", "Updating review progress...",
+                        "error", cmp_ReviewProgressPro.ErrorText,
+                        "empty", cmp_ReviewProgressPro.EmptyText,
+                        If(
+                            Coalesce(cmp_ReviewProgressPro.TotalCount, 0) <= 0,
+                            cmp_ReviewProgressPro.EmptyText,
+                            ""
+                        )
+                    )
+                  Visible: |-
+                    =Lower(cmp_ReviewProgressPro.State) <> "ready" ||
+                    Coalesce(cmp_ReviewProgressPro.TotalCount, 0) <= 0
+                  Width: =Parent.Width - 32
+                  X: =16
+                  Y: =48
