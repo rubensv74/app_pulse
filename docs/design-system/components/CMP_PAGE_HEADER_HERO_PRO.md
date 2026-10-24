@@ -102,3 +102,17 @@ Pixel dimensions: **1600 × 224**, intended to display at **112 px** height (2×
 **Regla de diseño:** títulos, subtítulos, filtros, métricas reales y acciones se mantienen como controles dinámicos de Power Apps. No tomar los pequeños paneles holográficos ilustrativos como fuentes de métricas. Revisar y, si procede, limpiar microtextos residuales en el gate visual a altura 112 px antes de promoción.
 
 **Prueba adicional:** confirmar que el logotipo TR en ropa es suficientemente fiel a la identidad corporativa autorizada; si requiere precisión exacta, sustituir por el recurso oficial aprobado antes de producción.
+
+
+## Actualización V3 — Objeto protagonista y brand overlay
+
+La referencia visual V3 sustituye V1 y V2 para nuevas pantallas. Ver `docs/design-system/components/PULSE_HERO_OBJECT_V3_STUDIO_GATE.md` y `power-apps/assets/heroes/pulse/v3/manifest.json`.
+
+**Nuevos inputs de la variante candidata**:
+
+- `BrandVisible : Boolean` (default `false`)
+- `BrandMedia : Image` (default `Blank()`)
+
+El logotipo PULSE **no debe estar incorporado a los JPG**: se suministra desde Media a `BrandMedia`, con `BrandVisible=true` únicamente después de obtener el maestro correcto. Así se evita perpetuar interpretaciones incorrectas de la marca en nueve imágenes distintas.
+
+Todos los contextos y eventos anteriores permanecen intactos. No promover a `ACTIVE` sin confirmar inserción en Studio, `DataType: Image`, responsive 80/112px y el comportamiento de cinco eventos. Los 9 JPG están entregados en un ZIP fuera del repositorio; el repositorio solo guarda el manifiesto.
