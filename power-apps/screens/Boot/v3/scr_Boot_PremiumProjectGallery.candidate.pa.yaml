@@ -1,0 +1,531 @@
+Screens:
+  scr_Boot:
+    Properties:
+      Fill: =ColorValue("#07111F")
+      LoadingSpinnerColor: =ColorValue("#00C8FF")
+      OnVisible: |-
+        =// PULSE-BOOT-03. App.OnStart owns session/security/catalogue.
+        // Project data loads in the existing scr_Home PROJECT_CHANGE pipeline.
+        Set(varPulseBootStatus, "LOADING");
+        Set(varPulseBootMessage, "Preparando el catálogo de proyectos...");
+        Set(varPulseBootErrorDetail, "");
+        Set(varPulseBootSelectedProjectId, Blank());
+        Set(varPulseBootSortDescending, false);
+        Set(varPulseBootStartedAt, Now());
+        Set(varPulseBootBusy, false)
+    Children:
+      - conPulseBoot_Root:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            BorderStyle: =BorderStyle.None
+            DropShadow: =DropShadow.None
+            Fill: =ColorValue("#07111F")
+            Height: =Parent.Height
+            Width: =Parent.Width
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+          Children:
+            - imgPulseBoot_Background:
+                Control: Image@2.2.3
+                Properties:
+                  BorderStyle: =BorderStyle.None
+                  Height: =Parent.Height
+                  Image: =pulse_boot_background_v3
+                  ImagePosition: =ImagePosition.Fill
+                  Width: =Parent.Width
+                  X: =0
+                  Y: =0
+            - recPulseBoot_BackgroundTint:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderStyle: =BorderStyle.None
+                  Fill: =RGBA(3, 10, 24, 0.12)
+                  Height: =Parent.Height
+                  Width: =Parent.Width
+                  X: =0
+                  Y: =0
+            - conPulseBoot_Brand:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderStyle: =BorderStyle.None
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(0, 0, 0, 0)
+                  Height: =Min(232, Max(160, Parent.Height * 0.27))
+                  Width: =Min(660, Parent.Width - 24)
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =Max(9, Parent.Height * 0.028)
+                Children:
+                  - imgPulseBoot_Wave:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderStyle: =BorderStyle.None
+                        Height: =55
+                        Image: =pulse_boot_wave_v3
+                        ImagePosition: =ImagePosition.Fit
+                        Width: =160
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =0
+                  - txtPulseBoot_Product:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Align: =Align.Center
+                        Color: =Color.White
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =68
+                        Size: =If(Parent.Height < 200, 34, 46)
+                        Text: ="P U L S E"
+                        Width: =Parent.Width
+                        Wrap: =false
+                        X: =0
+                        Y: =50
+                  - recPulseBoot_Accent:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderStyle: =BorderStyle.None
+                        Fill: =ColorValue("#00C8FF")
+                        Height: =3
+                        Width: =78
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =122
+                  - txtPulseBoot_Eyebrow:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Align: =Align.Center
+                        Color: =ColorValue("#E7F4FF")
+                        Font: =Font.'Segoe UI'
+                        Height: =26
+                        Size: =11
+                        Text: ="O P E R A T I O N A L   P L A T F O R M"
+                        Width: =Parent.Width
+                        Wrap: =false
+                        X: =0
+                        Y: =133
+                  - txtPulseBoot_Descriptor:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Align: =Align.Center
+                        Color: =ColorValue("#BAD2E6")
+                        Font: =Font.'Segoe UI'
+                        Height: =26
+                        Size: =11
+                        Text: ="Project operations · Handover intelligence"
+                        Width: =Parent.Width
+                        Wrap: =false
+                        X: =0
+                        Y: =159
+            - conPulseBoot_Panel:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#55738C")
+                  BorderThickness: =1
+                  DropShadow: =DropShadow.Regular
+                  Fill: =RGBA(3, 17, 35, 0.96)
+                  Height: =Min(600, Parent.Height - Self.Y - 16)
+                  Width: =Min(630, Parent.Width - 28)
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =Min(280, Max(192, Parent.Height * 0.31))
+                  RadiusTopLeft: =14
+                  RadiusTopRight: =14
+                  RadiusBottomLeft: =14
+                  RadiusBottomRight: =14
+                Children:
+                  - icoPulseBoot_Folder:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        Color: =ColorValue("#00C8FF")
+                        Height: =33
+                        Icon: =Icon.Folder
+                        Width: =33
+                        X: =28
+                        Y: =22
+                  - txtPulseBoot_CardTitle:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Color: =ColorValue("#F3F8FC")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =29
+                        Size: =16
+                        Text: ="Selecciona un proyecto"
+                        Width: =Parent.Width - 115
+                        X: =78
+                        Y: =19
+                  - txtPulseBoot_CardSubtitle:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Color: =ColorValue("#AEC5D8")
+                        Font: =Font.'Segoe UI'
+                        Height: =22
+                        Size: =10
+                        Text: ="Accede a tu espacio de trabajo para comenzar"
+                        Width: =Parent.Width - 116
+                        X: =78
+                        Y: =48
+                  - txtPulseBoot_Search:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#33526E")
+                        BorderThickness: =1
+                        Color: =ColorValue("#FFFFFF")
+                        Default: =""
+                        DelayOutput: =true
+                        Fill: =RGBA(12, 39, 67, 0.94)
+                        Font: =Font.'Segoe UI'
+                        Height: =47
+                        HintText: ="Buscar proyecto..."
+                        HoverBorderColor: =ColorValue("#00C8FF")
+                        HoverFill: =RGBA(14, 52, 84, 0.96)
+                        PaddingLeft: =43
+                        RadiusTopLeft: =9
+                        RadiusTopRight: =9
+                        RadiusBottomLeft: =9
+                        RadiusBottomRight: =9
+                        Size: =12
+                        Visible: =varPulseBootStatus = "SELECT_PROJECT"
+                        Width: =Parent.Width - 115
+                        X: =28
+                        Y: =81
+                  - icoPulseBoot_Search:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        Color: =ColorValue("#D6E8F5")
+                        Height: =20
+                        Icon: =Icon.Search
+                        Width: =20
+                        X: =43
+                        Y: =94
+                  - btnPulseBoot_Sort:
+                      Control: ModernButton@1.0.0
+                      Properties:
+                        BasePaletteColor: =ColorValue("#1677FF")
+                        DisplayMode: =If(varPulseBootStatus = "SELECT_PROJECT" && !varPulseBootBusy, DisplayMode.Edit, DisplayMode.Disabled)
+                        Height: =47
+                        OnSelect: =Set(varPulseBootSortDescending, !varPulseBootSortDescending)
+                        Text: =If(varPulseBootSortDescending,"Z-A","A-Z")
+                        Visible: =varPulseBootStatus = "SELECT_PROJECT"
+                        Width: =59
+                        X: =Parent.Width - 76
+                        Y: =81
+                  - galPulseBoot_Projects:
+                      Control: Gallery@2.15.0
+                      Variant: Vertical
+                      Properties:
+                        BorderColor: =ColorValue("#25445F")
+                        BorderThickness: =0
+                        Height: =Max(90, Parent.Height - 215)
+                        Items: |-
+                          =SortByColumns(
+                              Filter(
+                                  colEnabledProjectsUI,
+                                  IsBlank(Trim(txtPulseBoot_Search.Text)) ||
+                                  Lower(Trim(txtPulseBoot_Search.Text)) in Lower(
+                                      Coalesce(ProjectCode, "") & " " &
+                                      Coalesce(ProjectName, "") & " " &
+                                      Coalesce(ProjectDescription, "")
+                                  )
+                              ),
+                              "ProjectDisplayName",
+                              If(varPulseBootSortDescending, SortOrder.Descending, SortOrder.Ascending)
+                          )
+                        NavigationStep: =1
+                        ShowNavigation: =false
+                        ShowScrollbar: =true
+                        TemplatePadding: =4
+                        TemplateSize: =74
+                        Transition: =Transition.None
+                        Visible: =varPulseBootStatus = "SELECT_PROJECT"
+                        Width: =Parent.Width - 34
+                        X: =17
+                        Y: =138
+                      Children:
+                        - conPulseBoot_ProjectCard:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =If(varPulseBootSelectedProjectId = ThisItem.ProjectId, ColorValue("#00C8FF"), ColorValue("#2B4E6D"))
+                              BorderThickness: =If(varPulseBootSelectedProjectId = ThisItem.ProjectId, 2, 1)
+                              DropShadow: =DropShadow.None
+                              Fill: =If(varPulseBootSelectedProjectId = ThisItem.ProjectId, RGBA(0, 69, 117, 0.87), RGBA(5, 28, 51, 0.97))
+                              Height: =68
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              Width: =Parent.TemplateWidth - 6
+                              X: =3
+                              Y: =1
+                            Children:
+                              - imgPulseBoot_RowThumb:
+                                  Control: Image@2.2.3
+                                  Properties:
+                                    Height: =53
+                                    Image: |-
+                                      =Switch(
+                                          Text(ThisItem.ProjectCode),
+                                          "02200", pulse_boot_thumb_02200_v3,
+                                          "03010", pulse_boot_thumb_03010_v3,
+                                          "05000", pulse_boot_thumb_05000_v3,
+                                          "06010", pulse_boot_thumb_06010_v3,
+                                          pulse_boot_project_placeholder_v3
+                                      )
+                                    ImagePosition: =ImagePosition.Fill
+                                    Width: =89
+                                    X: =8
+                                    Y: =7
+                              - txtPulseBoot_RowCode:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Color: =ColorValue("#9FC7E3")
+                                    Font: =Font.'Segoe UI'
+                                    Height: =16
+                                    Size: =9
+                                    Text: =Coalesce(ThisItem.ProjectCode, "")
+                                    Width: =Parent.Width - 154
+                                    Wrap: =false
+                                    X: =109
+                                    Y: =7
+                              - txtPulseBoot_RowName:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Color: =Color.White
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =22
+                                    Size: =12
+                                    Text: =Coalesce(ThisItem.ProjectName, "")
+                                    Width: =Parent.Width - 160
+                                    Wrap: =false
+                                    X: =109
+                                    Y: =23
+                              - txtPulseBoot_RowDescription:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Color: =ColorValue("#A6BED1")
+                                    Font: =Font.'Segoe UI'
+                                    Height: =18
+                                    Size: =9
+                                    Text: =Coalesce(ThisItem.ProjectDescription, "")
+                                    Width: =Parent.Width - 160
+                                    Wrap: =false
+                                    X: =109
+                                    Y: =46
+                              - icoPulseBoot_RowNext:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    Color: =If(varPulseBootSelectedProjectId = ThisItem.ProjectId, ColorValue("#00C8FF"), ColorValue("#E5F3FE"))
+                                    Height: =20
+                                    Icon: =If(varPulseBootSelectedProjectId = ThisItem.ProjectId, Icon.Check, Icon.ChevronRight)
+                                    Width: =20
+                                    X: =Parent.Width - 30
+                                    Y: =25
+                              - btnPulseBoot_RowSelect:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderStyle: =BorderStyle.None
+                                    BorderThickness: =0
+                                    Fill: =RGBA(0,0,0,0)
+                                    HoverFill: =RGBA(0,200,255,0.10)
+                                    PressedFill: =RGBA(0,200,255,0.15)
+                                    Height: =Parent.Height
+                                    OnSelect: |-
+                                      =If(
+                                          varPulseBootStatus = "SELECT_PROJECT" &&
+                                          !varPulseBootBusy &&
+                                          !Coalesce(varProjectSwitching, false) &&
+                                          !Coalesce(varGlobalLoadPending, false),
+                                          Set(varPulseBootSelectedProjectId, ThisItem.ProjectId)
+                                      )
+                                    Text: =""
+                                    Width: =Parent.Width
+                                    X: =0
+                                    Y: =0
+                  - txtPulseBoot_NoMatches:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Align: =Align.Center
+                        Color: =ColorValue("#AEC8DE")
+                        Font: =Font.'Segoe UI'
+                        Height: =50
+                        Size: =11
+                        Text: ="No se encontraron proyectos con ese criterio."
+                        Visible: =varPulseBootStatus = "SELECT_PROJECT" && CountRows(galPulseBoot_Projects.AllItems) = 0
+                        Width: =Parent.Width - 50
+                        X: =25
+                        Y: =177
+                  - txtPulseBoot_Status:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Align: =Align.Center
+                        Color: =If(varPulseBootStatus = "ERROR", ColorValue("#FDA4AF"), ColorValue("#E4F4FF"))
+                        Font: =Font.'Segoe UI'
+                        Height: =56
+                        Size: =12
+                        Text: =Coalesce(varPulseBootMessage, "Preparando PULSE...")
+                        Visible: =varPulseBootStatus <> "SELECT_PROJECT"
+                        Width: =Parent.Width - 64
+                        X: =32
+                        Y: =156
+                  - spnPulseBoot_Loading:
+                      Control: Spinner@1.4.6
+                      Properties:
+                        Appearance: ='Spinner.Appearance'.Primary
+                        Height: =32
+                        SpinnerColor: =ColorValue("#00C8FF")
+                        SpinnerSize: ='Spinner.SpinnerSize'.Small
+                        Visible: =varPulseBootStatus = "LOADING" || varPulseBootStatus = "RETRYING" || varPulseBootStatus = "OPENING"
+                        Width: =32
+                        X: =(Parent.Width - Self.Width)/2
+                        Y: =220
+                  - btnPulseBoot_Retry:
+                      Control: ModernButton@1.0.0
+                      Properties:
+                        BasePaletteColor: =ColorValue("#1677FF")
+                        DisplayMode: =If(!varPulseBootBusy && varScrApp_Initialized = true, DisplayMode.Edit, DisplayMode.Disabled)
+                        Height: =42
+                        OnSelect: |-
+                          =If(
+                              (varPulseBootStatus = "ERROR" || varPulseBootStatus = "EMPTY") &&
+                              !varPulseBootBusy &&
+                              varScrApp_Initialized = true,
+                              Set(varPulseBootBusy,true);
+                              Set(varPulseBootStatus,"RETRYING");
+                              Set(varPulseBootMessage,"Actualizando proyectos...");
+                              Set(varPulseBootErrorDetail,"");
+                              IfError(
+                                  Set(varEnabledProjectsRaw, WarRoom_EnabledProjects_GetActive.Run().result);
+                                  ClearCollect(
+                                      colEnabledProjects,
+                                      ForAll(
+                                          Table(ParseJSON(Coalesce(varEnabledProjectsRaw,"{}")).Table1),
+                                          {
+                                              ProjectId: Value(Value.ProjectId),
+                                              ProjectCode: Text(Value.ProjectCode),
+                                              ProjectName: Text(Value.ProjectName),
+                                              ProjectDescription: Text(Value.ProjectDescription),
+                                              IsDefault: Boolean(Value.IsDefault)
+                                          }
+                                      )
+                                  );
+                                  ClearCollect(
+                                      colEnabledProjectsUI,
+                                      AddColumns(colEnabledProjects, ProjectDisplayName, ProjectCode & " · " & ProjectName)
+                                  );
+                                  Set(varEnabledProjectsError,"");
+                                  If(
+                                      CountRows(colEnabledProjectsUI) > 0,
+                                      Set(varPulseBootSelectedProjectId,Blank());
+                                      Set(varPulseBootStatus,"SELECT_PROJECT");
+                                      Set(varPulseBootMessage,"Selecciona un proyecto"),
+                                      Set(varPulseBootStatus,"EMPTY");
+                                      Set(varPulseBootMessage,"No hay proyectos habilitados")
+                                  ),
+                                  Set(varEnabledProjectsError,Coalesce(FirstError.Message,"Error del catálogo"));
+                                  Set(varPulseBootErrorDetail,varEnabledProjectsError);
+                                  Set(varPulseBootStatus,"ERROR");
+                                  Set(varPulseBootMessage,"No se pudo cargar el catálogo")
+                              );
+                              Set(varPulseBootBusy,false)
+                          )
+                        Text: ="Reintentar"
+                        Visible: =varPulseBootStatus = "ERROR" || varPulseBootStatus = "EMPTY"
+                        Width: =146
+                        X: =(Parent.Width - Self.Width)/2
+                        Y: =264
+                  - recPulseBoot_Divider:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderStyle: =BorderStyle.None
+                        Fill: =ColorValue("#23435C")
+                        Height: =1
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =Parent.Height - 69
+                  - txtPulseBoot_Footer:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Color: =ColorValue("#A9C5D9")
+                        Font: =Font.'Segoe UI'
+                        Height: =28
+                        Size: =9
+                        Text: =If(varPulseBootStatus = "SELECT_PROJECT", If(IsBlank(varPulseBootSelectedProjectId), "Selecciona un proyecto para acceder a Control Tower", "Proyecto seleccionado · listo para continuar"), "PULSE · Project Operations")
+                        Width: =Parent.Width - 239
+                        X: =27
+                        Y: =Parent.Height - 56
+                  - btnPulseBoot_Enter:
+                      Control: ModernButton@1.0.0
+                      Properties:
+                        BasePaletteColor: =ColorValue("#00C8FF")
+                        DisplayMode: =If(varPulseBootStatus = "SELECT_PROJECT" && !varPulseBootBusy && !IsBlank(varPulseBootSelectedProjectId) && !Coalesce(varProjectSwitching,false) && !Coalesce(varGlobalLoadPending,false), DisplayMode.Edit, DisplayMode.Disabled)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =42
+                        OnSelect: |-
+                          =// Do not duplicate project-switch logic. Dispatch existing Home pipeline.
+                          If(
+                              varPulseBootStatus = "SELECT_PROJECT" &&
+                              !varPulseBootBusy &&
+                              !IsBlank(varPulseBootSelectedProjectId) &&
+                              !Coalesce(varProjectSwitching,false) &&
+                              !Coalesce(varGlobalLoadPending,false) &&
+                              !IsBlank(LookUp(colEnabledProjectsUI, ProjectId = varPulseBootSelectedProjectId)),
+                              Set(varPulseBootBusy,true);
+                              Set(varPulseBootStatus,"OPENING");
+                              Set(varPulseBootMessage,"Preparando Control Tower...");
+                              Set(varPendingProjectId,Value(varPulseBootSelectedProjectId));
+                              Set(varGlobalLoading,true);
+                              Set(varGlobalLoadingMsg,"Cargando proyecto...");
+                              Set(varGlobalLoadingSubMsg,"Preparando los datos de operaciones");
+                              Set(varGlobalLoadingScope,"HOME");
+                              Set(varProjectSwitching,true);
+                              Set(varHomeLoading,false);
+                              Set(varGlobalLoadAction,"PROJECT_CHANGE");
+                              Set(varGlobalLoadPending,true);
+                              Navigate(scr_Home,ScreenTransition.Fade)
+                          )
+                        RadiusTopLeft: =9
+                        RadiusTopRight: =9
+                        RadiusBottomLeft: =9
+                        RadiusBottomRight: =9
+                        Text: ="Abrir proyecto  →"
+                        Visible: =varPulseBootStatus = "SELECT_PROJECT"
+                        Width: =184
+                        X: =Parent.Width - Self.Width - 24
+                        Y: =Parent.Height - 58
+            - tmrPulseBoot_Observe:
+                Control: Timer@2.1.0
+                Properties:
+                  AutoStart: =true
+                  Duration: =400
+                  Repeat: =true
+                  Visible: =false
+                  OnTimerEnd: |-
+                    =// App.OnStart must set varScrApp_Initialized false first, true at end.
+                    If(
+                        varPulseBootStatus = "LOADING",
+                        If(
+                            varScrApp_Initialized = true,
+                            If(
+                                !IsBlank(varEnabledProjectsError),
+                                Set(varPulseBootErrorDetail,varEnabledProjectsError);
+                                Set(varPulseBootStatus,"ERROR");
+                                Set(varPulseBootMessage,"No se pudo cargar el catálogo"),
+                                If(
+                                    CountRows(colEnabledProjectsUI) = 0,
+                                    Set(varPulseBootStatus,"EMPTY");
+                                    Set(varPulseBootMessage,"No hay proyectos habilitados"),
+                                    Set(varPulseBootStatus,"SELECT_PROJECT");
+                                    Set(varPulseBootMessage,"Selecciona un proyecto")
+                                )
+                            ),
+                            If(
+                                DateDiff(varPulseBootStartedAt, Now(), TimeUnit.Seconds) > 30,
+                                Set(varPulseBootMessage,"La inicialización está tardando más de lo esperado...")
+                            )
+                        )
+                    )
