@@ -2,6 +2,18 @@ ComponentDefinitions:
   cmp_PageHeaderHeroPro:
     DefinitionType: CanvasComponent
     CustomProperties:
+      BrandVisible:
+        PropertyKind: Input
+        DisplayName: BrandVisible
+        Description: Displays the approved PULSE mark as a separate Power Apps media image, never baked into a generated hero.
+        DataType: Boolean
+        Default: =false
+      BrandMedia:
+        PropertyKind: Input
+        DisplayName: BrandMedia
+        Description: Approved PULSE image supplied by host, subject to the branding gate.
+        DataType: Image
+        Default: =Blank()
       HeroEnabled:
         PropertyKind: Input
         DisplayName: HeroEnabled
@@ -253,6 +265,17 @@ ComponentDefinitions:
                   Width: =Parent.Width
                   X: =0
                   Y: =0
+            - imgPHH_Brand:
+                Control: Image@2.2.3
+                Properties:
+                  BorderStyle: =BorderStyle.None
+                  Height: =64
+                  Image: =cmp_PageHeaderHeroPro.BrandMedia
+                  ImagePosition: =ImagePosition.Fit
+                  Visible: =cmp_PageHeaderHeroPro.HeroEnabled && cmp_PageHeaderHeroPro.BrandVisible && !IsBlank(cmp_PageHeaderHeroPro.BrandMedia)
+                  Width: =94
+                  X: =16
+                  Y: =(Parent.Height-Self.Height)/2
             - conPH_Identity:
                 Control: GroupContainer@1.5.0
                 Variant: ManualLayout
@@ -264,8 +287,8 @@ ComponentDefinitions:
                   RadiusBottomRight: =0
                   RadiusTopLeft: =0
                   RadiusTopRight: =0
-                  Width: =Max(250,conPH_Context1.X-28)
-                  X: =16
+                  Width: =Max(130,conPH_Context1.X-Self.X-16)
+                  X: =If(cmp_PageHeaderHeroPro.HeroEnabled && cmp_PageHeaderHeroPro.BrandVisible,122,16)
                   Y: =(Parent.Height-Self.Height)/2
                 Children:
                   - lblPH_Title:
