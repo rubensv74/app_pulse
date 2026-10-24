@@ -61,3 +61,13 @@ cmp_PageHeaderHeroPro.Width = Parent.Width
 - Los renders de 1600×224 se obtienen de una composición previa de ocho banners (no fotografías fuente independientes), por lo que podrían tener limitaciones de nitidez a escala superior.
 - El contexto a derecha del header PULSE y `BrandVisible` pueden competir por ancho. No instalar globalmente hasta que Studio confirme.
 - Los recursos TR provienen de marca corporativa; verificar política interna de distribución/publicación antes de subirlos a un repositorio público.
+
+## Fix PA2231 — eventos del componente (2026-10-24)
+
+**Incidencia real reportada por Studio:** `Custom input property of kind 'Event' requires a non-empty 'Default' formula`, cinco líneas del componente `cmp_PageHeaderHeroPro`.
+
+**Corrección aplicada en la fuente íntegra versionada** `power-apps/components/cmp_PageHeaderHeroPro.pa.yaml`: `Default: =false` para `OnContext1Select`, `OnContext2Select`, `OnContext3Select`, `OnUtility` y `OnHelp` (las cinco propiedades `PropertyKind: Event`). Sin alteración de sus llamadas `OnSelect` ni del contrato de 32 propiedades heredadas.
+
+**Validación estática:** 5/5 defaults no vacíos; 0 defaults vacíos en el fichero; 36/36 propiedades públicas presentes; sin nombres de control duplicados; no se introducen llamadas SQL/Power Automate.
+
+**Gate sin cerrar:** debe importarse esta versión (no la anterior) y verificar en Power Apps Studio que **PA2231 desaparece**. No afirmar `STUDIO_PASS` ni fusionar PR hasta ejecutar esa validación, los cinco eventos y el diseño responsive.
