@@ -1,0 +1,7 @@
+// PULSE BOOT 03 — NO sustituir todo App.OnStart.
+// Añadir como PRIMERA expresión del OnStart real si todavía no existe:
+Set(varScrApp_Initialized, false);
+// Mantener llamadas existentes a seguridad y WarRoom_EnabledProjects_GetActive.
+// Al terminar correctamente la inicialización de todas las dependencias:
+Set(varScrApp_Initialized, true);
+// En App.StartScreen, verificar =scr_Boot antes de dar por válida la navegación.
