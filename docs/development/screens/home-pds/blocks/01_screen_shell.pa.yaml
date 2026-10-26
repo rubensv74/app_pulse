@@ -1,13 +1,13 @@
 # HOME_PDS — BLOCK 01 — BLANK SCREEN SHELL
 #
-# Status: RESTART READY — PENDING POWER APPS STUDIO VALIDATION
-# Operation: REPLACE COMPLETE SOURCE OF EXISTING EMPTY scr_Home_PDS
+# Status: IMPLEMENTATION SOURCE READY — SCREEN MUST BE CREATED IN STUDIO
+# Operation: CREATE scr_Home_PDS IN STUDIO, THEN APPLY THIS COMPLETE SCREEN SOURCE
 # Target screen: scr_Home_PDS
 # Restart baseline: docs/development/screens/home-pds/RESTART_BASELINE_2026-08-11.md
 # Dependencies: cmp_SidebarNav must already exist in the app.
 #
 # Primary responsibility:
-# - rebuild the validated shell on the intentionally empty scr_Home_PDS;
+# - create the parallel scr_Home_PDS shell from the approved Control Tower direction;
 # - create the root horizontal AutoLayout;
 # - reuse the shared PULSE sidebar;
 # - create an empty PDS content shell;
@@ -24,9 +24,9 @@
 # - Punch Review navigation;
 # - StartScreen or production navigation changes.
 #
-# Validation after replace/save in Power Apps Studio:
+# Studio sequence: create a Blank screen named scr_Home_PDS, open Source Code, replace the complete screen source with this artifact, then save.
 # 1. scr_Home_PDS opens without formula errors.
-# 2. The existing PULSE sidebar is visible at the left.
+# 2. The shared PULSE sidebar is visible at the left (manually insert it if Source Code hydration fails).
 # 3. Home remains the active sidebar business key.
 # 4. The remaining area is an empty #F6F8FB content surface.
 # 5. No project selection is reset.
