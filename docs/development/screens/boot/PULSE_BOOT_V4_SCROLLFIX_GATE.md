@@ -49,3 +49,16 @@ Este candidato se basa en el código íntegro facilitado por el usuario, **Paste
 - [ ] Adaptación visual 1366×768, 1600×900, 1920×1080.
 
 **La PR es candidata; no está validada en Studio y no debe fusionarse a main todavía.**
+
+
+## Corrección posterior — PA2108 (26 octubre 2026)
+
+Studio reportó error `PA2108` en la línea 344: `Unknown property 'AccessibleLabel' for control type 'Classic/Button@2.2.0'`.
+
+**Causa localizada**: V4 incorporó `AccessibleLabel` en `btnPulseBoot_RowSelect` pese a no estar permitida en el esquema de Source Code de este tipo/versionado de control.
+
+**Solución versionada**: se elimina solo esa propiedad de la definición íntegra en `power-apps/screens/Boot/v4/scr_Boot_PremiumProjectGallery_V4_SCROLLFIX.candidate.pa.yaml`. No se cambian imágenes Media, estructura de controles, fórmula `OnSelect`, ni contrato `PROJECT_CHANGE`.
+
+**Validaciones estáticas**: una sola propiedad eliminada; sin otras apariciones de `AccessibleLabel`; YAML parseable; mismo número de controles. **Queda pendiente** comprobar que Studio deja de informar `PA2108` y que la selección responde a clics con teclado y ratón. La eliminación evita el fallo del parser, pero la accesibilidad semántica del botón invisible no queda certificada.
+
+El paquete de entrega autónomo es `PULSE_BOOT_V4_1_PA2108_CORREGIDO_COMPLETO.zip`, facilitado en el hilo. PR permanece draft.
