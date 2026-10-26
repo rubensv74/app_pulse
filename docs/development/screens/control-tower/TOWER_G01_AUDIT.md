@@ -35,7 +35,7 @@ The post-load Boot-to-Control-Tower handoff and one-effective-load behavior rema
 
 - Reuse `cmp_SidebarNav`; configure its public inputs on a manually inserted Studio instance if the existing source-created instance hydration issue recurs.
 - Use existing PDS candidates only after their actual input/event contracts are checked against the screen host.
-- Keep `cmp_PageHeaderHeroPro` out of the screen until its PR candidate passes definition, manual insertion, save/reopen, public event and visual checks in Studio. The reference image may show the desired hero appearance; that does not claim the component is validated.
+- The source uses a screen-local inline SVG for the approved industrial object-protagonist treatment. It does not depend on a new hero component. The shared `cmp_PageHeaderPro` remains available for future use only if its visual contract fits the approved reference.
 - Build `scr_Home_PDS` as a parallel screen. Do not alter `scr_Home` or the app start route during construction.
 
 ## Gate status
