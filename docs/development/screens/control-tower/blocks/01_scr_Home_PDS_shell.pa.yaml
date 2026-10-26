@@ -1,0 +1,121 @@
+# HOME_PDS — BLOCK 01 — BLANK SCREEN SHELL
+#
+# Status: IMPLEMENTATION SOURCE READY — SCREEN MUST BE CREATED IN STUDIO
+# Operation: CREATE scr_Home_PDS IN STUDIO, THEN APPLY THIS COMPLETE SCREEN SOURCE
+# Target screen: scr_Home_PDS
+# Restart baseline: docs/development/screens/home-pds/RESTART_BASELINE_2026-08-11.md
+# Dependencies: cmp_SidebarNav must already exist in the app.
+#
+# Primary responsibility:
+# - create the parallel scr_Home_PDS screen from the approved Control Tower direction;
+# - create the root horizontal AutoLayout;
+# - reuse the shared PULSE sidebar;
+# - create an empty PDS content shell;
+# - leave all later modules out until this gate passes.
+#
+# Explicitly OUT OF SCOPE:
+# - Page Header;
+# - KPIs;
+# - Heatmap;
+# - Pie / discipline bars;
+# - Data Explorer;
+# - business collections;
+# - remote reads / flows;
+# - Punch Review navigation;
+# - StartScreen or production navigation changes.
+#
+# Studio sequence: create a Blank screen named scr_Home_PDS, open its Source Code, replace the complete screen source with this artifact, then save.
+# 1. scr_Home_PDS opens without formula errors.
+# 2. The existing PULSE sidebar is visible at the left.
+# 3. Home remains the active sidebar business key.
+# 4. The remaining area is an empty #F6F8FB content surface.
+# 5. No project selection is reset.
+# 6. App Checker reports no new PA1001 / PA2108 attributable to Block 01.
+# 7. scr_Home still opens and behaves as before.
+#
+# Acceptance result to report: BLOCK 01 OK
+
+Screens:
+  scr_Home_PDS:
+    Properties:
+      Fill: =varTheme_PageBg
+      LoadingSpinnerColor: =varTheme_ActionPrimary
+      OnVisible: |-
+        =
+        // =====================================================
+        // HOME_PDS — BLOCK 01
+        // Minimum PDS-safe shell initialization only.
+        // No flows. No business collections. No project reset.
+        // =====================================================
+
+        // -----------------------------------------------------
+        // PDS safety fallbacks required by this block only.
+        // Canonical ownership will remain in the PDS bootstrap.
+        // -----------------------------------------------------
+        If(IsBlank(varTheme_PageBg), Set(varTheme_PageBg, ColorValue("#F6F8FB")));
+        If(IsBlank(varTheme_Surface), Set(varTheme_Surface, ColorValue("#FFFFFF")));
+        If(IsBlank(varTheme_Border), Set(varTheme_Border, ColorValue("#E2E8F0")));
+        If(IsBlank(varTheme_Text), Set(varTheme_Text, ColorValue("#0F172A")));
+        If(IsBlank(varTheme_TextMuted), Set(varTheme_TextMuted, ColorValue("#64748B")));
+        If(IsBlank(varTheme_BrandDark), Set(varTheme_BrandDark, ColorValue("#07111F")));
+        If(IsBlank(varTheme_ActionPrimary), Set(varTheme_ActionPrimary, ColorValue("#1677FF")));
+        If(IsBlank(varTheme_SpaceM), Set(varTheme_SpaceM, 12));
+
+        // -----------------------------------------------------
+        // Page identity only.
+        // Home_PDS remains the Home business module.
+        // -----------------------------------------------------
+        Set(varAppView, "Home");
+        Set(varPageKey, "HOME_PDS");
+        Set(varPageTitle, "Punch Control Tower");
+        Set(varPageSubtitle, "Open punch concentration, discipline distribution and operational drill-through");
+    Children:
+      - conHPDS_ScreenRoot:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =varTheme_PageBg
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutGap: =0
+            Width: =Parent.Width
+          Children:
+            - cmpHPDS_Sidebar:
+                Control: CanvasComponent
+                ComponentName: cmp_SidebarNav
+                Properties:
+                  ActiveKey: ="Home"
+                  AppVersion: ="PULSE"
+                  EnvironmentLabel: ="ENV.PRE.TR.162"
+                  Fill: =varTheme_BrandDark
+                  Height: =Parent.Height
+                  IsCollapsed: =true
+                  Items: =colSidebarNavItems
+                  NavItems: =colSidebarNavItems
+                  ProjectCode: =Coalesce(varSelectedProject.ProjectCode, "")
+                  ProjectName: =Coalesce(varSelectedProject.ProjectName, "")
+                  UserRole: =Coalesce(varUserRole, "reader")
+                  Width: =154
+            - conHPDS_ContentShell:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.Stretch
+                  DropShadow: =DropShadow.None
+                  Fill: =varTheme_PageBg
+                  FillPortions: =1
+                  Height: =Parent.Height
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =varTheme_SpaceM
+                  LayoutMinHeight: =320
+                  LayoutMinWidth: =320
+                  PaddingBottom: =varTheme_SpaceM
+                  PaddingLeft: =varTheme_SpaceM
+                  PaddingRight: =varTheme_SpaceM
+                  PaddingTop: =varTheme_SpaceM
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
