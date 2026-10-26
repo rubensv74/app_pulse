@@ -1,13 +1,13 @@
 # PULSE Control Tower — TOWER-G01 audit
 
 **Date:** 2026-10-26  
-**Repository baseline:** `rubensv74/app_pulse`, `main` at `6d3297ca32d60e537a72b2f0cc3a672b02bf9e9e`  
+**Repository baseline:** `rubensv74/app_pulse`, canonical sources read from `main` on 2026-10-26  
 **Screen:** `scr_Home_PDS`  
 **Result:** `PASS_STATIC / STUDIO_SCREEN_CONFIRMED_ABSENT`
 
 ## Executive result
 
-The user confirmed that `scr_Home_PDS` does not exist in the current Power Apps application. The parallel screen will therefore be created from a blank screen, while `scr_Home` remains the production reference and rollback path. The repository contains prior construction notes and a shell block, but those are not a screen installed in Studio.
+The user confirmed that `scr_Home_PDS` is absent from the current Power Apps application. Create it in Studio as a new Blank screen, then apply Block 01 from the canonical block path below. `scr_Home` remains the production reference and rollback path. Repository screen notes and PaYaml are construction artifacts, not proof of an installed screen.
 
 No change to `App.StartScreen`, production navigation, `scr_Home`, flows, SQL, or component source is included in this audit.
 
@@ -21,7 +21,7 @@ No change to `App.StartScreen`, production navigation, `scr_Home`, flows, SQL, o
 6. The bundle call is `warroom_GetPunchDashboardBundle.Run(Value(varProjectId), Value(varPunchDashboardTemplateId), If(varPunchDashboardForceRefreshRequest, 1, 0))`.
 7. The cell-detail call has seven arguments in this order: project ID, template ID, subcontractor ID, category code, page, page size, discipline code. Power Apps source is verified; the active flow and SQL runtime still remain the authority for the downstream contract.
 8. `cmp_SidebarNav` is `ACTIVE`. KPI, HeatMap, PieChart, ActionToolbar, DataTable, EmptyState and SkeletonLoader are existing PDS candidates whose consuming instances still need validation.
-9. `cmp_PageHeaderHeroPro` exists only on open draft PR #22. It is not in `main` and has no confirmed Studio validation. Do not treat it as an installed dependency.
+9. The current component catalog lists `cmp_PageHeaderPro` as a `PDS_CANDIDATE`; retained Home_PDS records show definition and isolated-instance passes, while target-screen integration still requires manual Studio insertion and validation. The approved reference's industrial hero is not represented by the current shared component; Block 01 intentionally stops before that header decision.
 10. The older Boot candidate in PR #21 is superseded by today's `scr_Boot_PremiumProjectGallery_V4_1_PA2108_CORREGIDO.pa.yaml` artifact. The V4.1 source selects a project, sets `varPendingProjectId`, dispatches `PROJECT_CHANGE`, and navigates to `scr_Home` so the existing Home timer/commit owns the switch. This is a Library source artifact, not proof of the version currently installed in Studio.
 11. V4.1 does not yet hand the user from `scr_Home` to `scr_Home_PDS` after the existing load completes. That post-load landing is a separate integration requirement; it must not trigger another initial bundle load.
 
@@ -42,7 +42,7 @@ The post-load Boot-to-Control-Tower handoff and one-effective-load behavior rema
 
 | Check | Status | Evidence |
 |---|---|---|
-| `scr_Home_PDS` exists in current Studio | `PASS — ABSENT` | User confirmed absence; new screen starts blank |
+| `scr_Home_PDS` exists in current Studio | `PASS — ABSENT` | User confirmed absence; create a new blank screen before applying the source |
 | `scr_Home` remains functional reference/fallback | `PASS_STATIC` | Canonical Home source and approved specification |
 | Project-change source contract recovered | `PASS_STATIC` | Home selector, timer and commit source |
 | Boot project-selection source | `PASS_STATIC` | V4.1 artifact stages `varPendingProjectId` and reuses Home's `PROJECT_CHANGE` pipeline |
@@ -55,7 +55,7 @@ The post-load Boot-to-Control-Tower handoff and one-effective-load behavior rema
 
 The companion reference presents the whole Control Tower at desktop scale: PULSE navigation, industrial object-protagonist header, project/template context, four Punch KPIs, subcontractor-by-category concentration heatmap, discipline pie plus matching comparison bars, active context with actions, and a server-paged Punch explorer. Values and record names are visibly identified as illustrative. PULSE cyan remains brand, blue remains interaction/selection, and discipline colors remain data encoding.
 
-The reference is a visual target for user review, not an assertion that the current components or data are installed. No functional body implementation should begin until this reference is approved.
+**User approved this reference on 2026-10-26.** It is the visual target, not an assertion that the current components or data are installed. Block 01 is now the first implementation artifact and remains limited to the sidebar + empty content shell until the screen renders in Studio.
 
 ## Sources
 
