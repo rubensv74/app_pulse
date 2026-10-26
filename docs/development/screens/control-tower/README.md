@@ -3,41 +3,44 @@
 **Workstream:** `PULSE-TOWER-01`  
 **Screen:** `scr_Home_PDS`  
 **Visual gate:** `TOWER-G02 — APPROVED 2026-10-26`  
-**Implementation gate:** `BLOCK 01 — SOURCE READY / STUDIO APPLY REQUIRED`
+**Implementation source:** `BLOCK 01 — COMPLETE VISUAL SCREEN DEFINITION`
 
 ## Artifacts
 
 - `TOWER_G01_AUDIT.md` — architecture, data contracts and runtime gates.
 - `PULSE_Control_Tower_G02_Reference.svg` — user-approved desktop visual target.
-- `../home-pds/blocks/01_screen_shell.pa.yaml` — executable source for the initial screen shell.
+- `../home-pds/blocks/01_screen_shell.pa.yaml` — complete `Screens.scr_Home_PDS` PaYaml definition for Studio paste.
 
-## What Block 01 creates
+## What the complete source defines
 
-A new parallel `scr_Home_PDS` screen with the shared `cmp_SidebarNav` and an empty PDS content surface. It establishes screen identity and safe theme fallbacks only. It contains no flow calls, business collections, project reset or production navigation change.
+- Shared `cmp_SidebarNav` with Home active and current project context.
+- Dark industrial hero with inline valve SVG, page identity and utility actions.
+- Four PDS KPI cards.
+- Subcontractor × category concentration panel.
+- Discipline distribution panel with a shared-selection contract.
+- Active context and Review / Punch List actions.
+- Punch explorer with column headers and paging controls.
 
-The approved reference shows the complete target: industrial object-protagonist header, project/template context, four Punch KPIs, subcontractor/category heatmap, discipline pie with matching comparison bars, active context/actions and server-paged Punch explorer. Those modules follow after the shell and header pass Studio validation.
+The source uses neutral empty states and disabled actions. It does not display invented counts or records, call a flow, reset the selected project, or fetch data. The bundle and SQL-authoritative paging must be connected in later blocks after their current Studio contracts are confirmed.
 
-The existing shared sidebar has a narrower, different footer/navigation composition from the reference. Keep its canonical navigation and surface the project/template context in the header. Do not add a second project-selection path to the sidebar.
+## Paste into Power Apps Studio
 
-## Apply Block 01 in Power Apps Studio
+1. Add a **Blank screen** and name it exactly `scr_Home_PDS`.
+2. Open the screen's **Source Code** and replace the complete screen source with `docs/development/screens/home-pds/blocks/01_screen_shell.pa.yaml`.
+3. Save and resolve any formula or component hydration issue in Studio.
+4. Confirm the sidebar and complete visual tree render; confirm the values remain neutral rather than fabricated.
+5. Run App Checker and confirm `scr_Home` is unchanged.
 
-1. Add a new **Blank screen** and name it exactly `scr_Home_PDS`.
-2. Open that screen's **Source Code** and replace the complete screen source with `docs/development/screens/home-pds/blocks/01_screen_shell.pa.yaml`.
-3. Save, wait for formula validation, and open `scr_Home_PDS`.
-4. If the source-created sidebar does not hydrate its public inputs, insert `cmp_SidebarNav` manually in Studio and set the inputs specified in `blocks/01A_sidebar_manual_instance.md`.
-5. Confirm Home is active, the selected project is not reset, the PDS surface fills the remaining area, and no new App Checker errors appear. Confirm `scr_Home` still opens unchanged.
+The artifact is prepared, but this workspace has not edited Power Apps Studio; runtime acceptance is still open. Keep `App.StartScreen`, production navigation, flows and SQL unchanged during this paste.
 
-The repository source is ready; Studio is the remaining creation and acceptance surface. Do not change `App.StartScreen`, `scr_Home`, production navigation, flows or SQL during this block.
-
-## Next gates
+## Remaining implementation gates
 
 | Gate | Scope | Status |
 |---|---|---|
 | G01 | Source and contract audit | Complete |
 | G02 | Visual reference | Approved |
-| Block 01 | New screen shell + shared sidebar | Source ready; Studio apply required |
-| Block 03 | Page header / approved hero direction | Pending after Block 01 |
-| Block 04+ | Dashboard structure, local state, data and interaction blocks | Pending |
+| Block 01 | Complete visual screen definition | Source ready; Studio paste and acceptance required |
+| Data integration | Existing bundle, heatmap, discipline and paged results | Pending |
+| Interaction | Shared context, actions and drill-through | Pending |
 | Final | Boot → Tower, one effective load, cutover decision | Runtime gated |
 
-Every block advances only after a meaningful Power Apps Studio validation. `scr_Home` remains the fallback until final acceptance.
