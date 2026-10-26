@@ -22,13 +22,14 @@ No change to `App.StartScreen`, production navigation, `scr_Home`, flows, SQL, o
 7. The cell-detail call has seven arguments in this order: project ID, template ID, subcontractor ID, category code, page, page size, discipline code. Power Apps source is verified; the active flow and SQL runtime still remain the authority for the downstream contract.
 8. `cmp_SidebarNav` is `ACTIVE`. KPI, HeatMap, PieChart, ActionToolbar, DataTable, EmptyState and SkeletonLoader are existing PDS candidates whose consuming instances still need validation.
 9. `cmp_PageHeaderHeroPro` exists only on open draft PR #22. It is not in `main` and has no confirmed Studio validation. Do not treat it as an installed dependency.
-10. PR #21's Boot candidate says Boot does not select a project and navigates to Home. This conflicts with the new brief's decision that Boot is the project-selection point.
+10. The older Boot candidate in PR #21 is superseded by today's `scr_Boot_PremiumProjectGallery_V4_1_PA2108_CORREGIDO.pa.yaml` artifact. The V4.1 source selects a project, sets `varPendingProjectId`, dispatches `PROJECT_CHANGE`, and navigates to `scr_Home` so the existing Home timer/commit owns the switch. This is a Library source artifact, not proof of the version currently installed in Studio.
+11. V4.1 does not yet hand the user from `scr_Home` to `scr_Home_PDS` after the existing load completes. That post-load landing is a separate integration requirement; it must not trigger another initial bundle load.
 
 ## Architecture decision for the rebuild
 
-Use the existing Home project-change commit as the single owner of context mutation and initial data loading. Boot may stage the selected ID in `varPendingProjectId`, but it must hand off to the existing Home commit path. Control Tower must consume that committed project context and loaded presentation data; it must not independently repeat the same project-change or initial bundle request.
+Keep Boot as the project-selection point, using the V4.1 handoff: stage the selected ID in `varPendingProjectId`, then let the existing Home timer and commit own context mutation and initial data loading. After the existing load succeeds, route to Control Tower using the already committed context and presentation data; do not repeat the project-change or initial bundle request.
 
-The Boot-to-Control-Tower handoff and one-effective-load behavior remain a mandatory runtime gate. Keep `App.StartScreen` unchanged until that gate passes. The current Boot candidate must be reconciled with the new project-selection requirement before being considered for installation.
+The post-load Boot-to-Control-Tower handoff and one-effective-load behavior remain mandatory runtime gates. Keep `App.StartScreen` unchanged until that gate passes. PR #21 is historical candidate evidence; use V4.1 as the latest Boot source candidate, then verify the actual Studio copy before integration.
 
 ## Component and Studio boundaries
 
@@ -44,7 +45,9 @@ The Boot-to-Control-Tower handoff and one-effective-load behavior remain a manda
 | `scr_Home_PDS` exists in current Studio | `PASS — ABSENT` | User confirmed absence; new screen starts blank |
 | `scr_Home` remains functional reference/fallback | `PASS_STATIC` | Canonical Home source and approved specification |
 | Project-change source contract recovered | `PASS_STATIC` | Home selector, timer and commit source |
-| Boot selection contract aligned | `GATED` | PR #21 candidate conflicts with the new requirement |
+| Boot project-selection source | `PASS_STATIC` | V4.1 artifact stages `varPendingProjectId` and reuses Home's `PROJECT_CHANGE` pipeline |
+| Boot V4.1 currently installed in Studio | `GATED` | Current runtime version not independently observed |
+| Post-load landing on Control Tower | `NOT_IMPLEMENTED` | Current V4.1 navigates to `scr_Home`; no PDS post-load route exists yet |
 | Studio component compatibility | `GATED` | Source and catalog are not Studio proof |
 | Boot → Control Tower, one effective load | `NOT_RUN` | Requires Power Apps Studio runtime |
 
