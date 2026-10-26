@@ -1,58 +1,14 @@
-# HOME_PDS — BLOCK 01 — BLANK SCREEN SHELL
-#
-# Status: IMPLEMENTATION SOURCE READY — SCREEN MUST BE CREATED IN STUDIO
-# Operation: CREATE scr_Home_PDS IN STUDIO, THEN APPLY THIS COMPLETE SCREEN SOURCE
-# Target screen: scr_Home_PDS
-# Restart baseline: docs/development/screens/home-pds/RESTART_BASELINE_2026-08-11.md
-# Dependencies: cmp_SidebarNav must already exist in the app.
-#
-# Primary responsibility:
-# - create the parallel scr_Home_PDS shell from the approved Control Tower direction;
-# - create the root horizontal AutoLayout;
-# - reuse the shared PULSE sidebar;
-# - create an empty PDS content shell;
-# - leave all later modules out until this gate passes.
-#
-# Explicitly OUT OF SCOPE:
-# - Page Header;
-# - KPIs;
-# - Heatmap;
-# - Pie / discipline bars;
-# - Data Explorer;
-# - business collections;
-# - remote reads / flows;
-# - Punch Review navigation;
-# - StartScreen or production navigation changes.
-#
-# Studio sequence: create a Blank screen named scr_Home_PDS, open Source Code, replace the complete screen source with this artifact, then save.
-# 1. scr_Home_PDS opens without formula errors.
-# 2. The shared PULSE sidebar is visible at the left (manually insert it if Source Code hydration fails).
-# 3. Home remains the active sidebar business key.
-# 4. The remaining area is an empty #F6F8FB content surface.
-# 5. No project selection is reset.
-# 6. App Checker reports no new PA1001 / PA2108 attributable to Block 01.
-# 7. scr_Home still opens and behaves as before.
-#
-# Acceptance result to report: BLOCK 01 OK
-
+# PULSE Control Tower — screen visual source.
+# Complete screen/control tree for Studio paste.
+# The analytics and Data Explorer deliberately show neutral empty states until
+# they are connected to the existing dashboard bundle and server-paging contract.
 Screens:
   scr_Home_PDS:
     Properties:
-      Fill: =varTheme_PageBg
-      LoadingSpinnerColor: =varTheme_ActionPrimary
+      Fill: =ColorValue("#F6F8FB")
+      LoadingSpinnerColor: =ColorValue("#1677FF")
       OnVisible: |-
-        =
-        // =====================================================
-        // HOME_PDS — BLOCK 01
-        // Minimum PDS-safe shell initialization only.
-        // No flows. No business collections. No project reset.
-        // =====================================================
-
-        // -----------------------------------------------------
-        // PDS safety fallbacks required by this block only.
-        // Canonical ownership will remain in the PDS bootstrap.
-        // -----------------------------------------------------
-        If(IsBlank(varTheme_PageBg), Set(varTheme_PageBg, ColorValue("#F6F8FB")));
+        =If(IsBlank(varTheme_PageBg), Set(varTheme_PageBg, ColorValue("#F6F8FB")));
         If(IsBlank(varTheme_Surface), Set(varTheme_Surface, ColorValue("#FFFFFF")));
         If(IsBlank(varTheme_Border), Set(varTheme_Border, ColorValue("#E2E8F0")));
         If(IsBlank(varTheme_Text), Set(varTheme_Text, ColorValue("#0F172A")));
@@ -60,11 +16,6 @@ Screens:
         If(IsBlank(varTheme_BrandDark), Set(varTheme_BrandDark, ColorValue("#07111F")));
         If(IsBlank(varTheme_ActionPrimary), Set(varTheme_ActionPrimary, ColorValue("#1677FF")));
         If(IsBlank(varTheme_SpaceM), Set(varTheme_SpaceM, 12));
-
-        // -----------------------------------------------------
-        // Page identity only.
-        // Home_PDS remains the Home business module.
-        // -----------------------------------------------------
         Set(varAppView, "Home");
         Set(varPageKey, "HOME_PDS");
         Set(varPageTitle, "Punch Control Tower");
@@ -93,8 +44,8 @@ Screens:
                   IsCollapsed: =true
                   Items: =colSidebarNavItems
                   NavItems: =colSidebarNavItems
-                  ProjectCode: =Coalesce(varSelectedProject.ProjectCode, "")
-                  ProjectName: =Coalesce(varSelectedProject.ProjectName, "")
+                  ProjectCode: =Coalesce(varProjectCode, varSelectedProject.ProjectCode, "")
+                  ProjectName: =Coalesce(varProjectName, varSelectedProject.ProjectName, "")
                   UserRole: =Coalesce(varUserRole, "reader")
                   Width: =154
             - conHPDS_ContentShell:
@@ -108,14 +59,1201 @@ Screens:
                   Height: =Parent.Height
                   LayoutAlignItems: =LayoutAlignItems.Stretch
                   LayoutDirection: =LayoutDirection.Vertical
-                  LayoutGap: =varTheme_SpaceM
+                  LayoutGap: =10
                   LayoutMinHeight: =320
-                  LayoutMinWidth: =320
-                  PaddingBottom: =varTheme_SpaceM
-                  PaddingLeft: =varTheme_SpaceM
-                  PaddingRight: =varTheme_SpaceM
-                  PaddingTop: =varTheme_SpaceM
+                  LayoutMinWidth: =420
+                  PaddingBottom: =12
+                  PaddingLeft: =16
+                  PaddingRight: =16
+                  PaddingTop: =12
                   RadiusBottomLeft: =0
                   RadiusBottomRight: =0
                   RadiusTopLeft: =0
                   RadiusTopRight: =0
+                Children:
+                  - conHPDS_Hero:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        AlignInContainer: =AlignInContainer.Stretch
+                        DropShadow: =DropShadow.None
+                        Fill: =varTheme_BrandDark
+                        FillPortions: =0
+                        Height: =124
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =12
+                        LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                        LayoutMinHeight: =132
+                        LayoutMinWidth: =320
+                        PaddingBottom: =14
+                        PaddingLeft: =20
+                        PaddingRight: =20
+                        PaddingTop: =14
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                      Children:
+                        - conHPDS_HeroIdentity:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Stretch
+                              DropShadow: =DropShadow.None
+                              Fill: =Color.Transparent
+                              FillPortions: =1
+                              Height: =Parent.Height
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =2
+                              LayoutMinHeight: =90
+                              LayoutMinWidth: =400
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =3
+                              RadiusBottomLeft: =0
+                              RadiusBottomRight: =0
+                              RadiusTopLeft: =0
+                              RadiusTopRight: =0
+                            Children:
+                              - txtHPDS_Eyebrow:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =true
+                                    Color: =ColorValue("#73DFF5")
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =16
+                                    Size: =9
+                                    Text: ="PROJECT OPERATIONS  /  PUNCH CONTROL"
+                                    Width: =Parent.Width
+                                    Wrap: =false
+                              - txtHPDS_Title:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =true
+                                    Color: =varTheme_TextWhite
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =34
+                                    Size: =24
+                                    Text: ="Punch Control Tower"
+                                    Width: =Parent.Width
+                                    Wrap: =false
+                              - txtHPDS_Subtitle:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =true
+                                    Color: =ColorValue("#C0D4DF")
+                                    Height: =20
+                                    Size: =10
+                                    Text: ="Concentración de pendientes, distribución por disciplina e investigación operativa"
+                                    Width: =Parent.Width
+                                    Wrap: =false
+                              - conHPDS_HeroContext:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    AlignInContainer: =AlignInContainer.Start
+                                    DropShadow: =DropShadow.None
+                                    Fill: =Color.Transparent
+                                    FillPortions: =0
+                                    Height: =28
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =8
+                                    LayoutMinHeight: =28
+                                    LayoutMinWidth: =280
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    RadiusBottomLeft: =0
+                                    RadiusBottomRight: =0
+                                    RadiusTopLeft: =0
+                                    RadiusTopRight: =0
+                                  Children:
+                                    - conHPDS_ProjectContext:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          AlignInContainer: =AlignInContainer.Center
+                                          DropShadow: =DropShadow.None
+                                          Fill: =varTheme_BrandDarkAlt
+                                          FillPortions: =0
+                                          Height: =26
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =6
+                                          LayoutMinHeight: =26
+                                          LayoutMinWidth: =210
+                                          PaddingBottom: =2
+                                          PaddingLeft: =10
+                                          PaddingRight: =10
+                                          PaddingTop: =2
+                                          RadiusBottomLeft: =6
+                                          RadiusBottomRight: =6
+                                          RadiusTopLeft: =6
+                                          RadiusTopRight: =6
+                                          Width: =260
+                                        Children:
+                                          - txtHPDS_ProjectContext:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                AutoHeight: =false
+                                                Color: =ColorValue("#E4F3F8")
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =20
+                                                Size: =9
+                                                Text: =If(IsBlank(varProjectId), "Sin proyecto seleccionado", Coalesce(varProjectCode, varSelectedProject.ProjectCode, "Proyecto") & " · " & Coalesce(varProjectName, varSelectedProject.ProjectName, ""))
+                                                Width: =Parent.Width-20
+                                                Wrap: =false
+                                    - conHPDS_TemplateContext:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          AlignInContainer: =AlignInContainer.Center
+                                          DropShadow: =DropShadow.None
+                                          Fill: =varTheme_BrandDarkAlt
+                                          FillPortions: =0
+                                          Height: =26
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =4
+                                          LayoutMinHeight: =26
+                                          LayoutMinWidth: =140
+                                          PaddingBottom: =2
+                                          PaddingLeft: =10
+                                          PaddingRight: =10
+                                          PaddingTop: =2
+                                          RadiusBottomLeft: =6
+                                          RadiusBottomRight: =6
+                                          RadiusTopLeft: =6
+                                          RadiusTopRight: =6
+                                          Width: =196
+                                        Children:
+                                          - txtHPDS_TemplateContext:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                AutoHeight: =false
+                                                Color: =ColorValue("#E4F3F8")
+                                                Height: =20
+                                                Size: =9
+                                                Text: =If(IsBlank(varPunchDashboardTemplateId), "Sin plantilla seleccionada", "Plantilla activa")
+                                                Width: =Parent.Width-20
+                                                Wrap: =false
+                        - conHPDS_HeroObject:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Stretch
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_BrandDarkAlt
+                              FillPortions: =0
+                              Height: =Parent.Height
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              LayoutJustifyContent: =LayoutJustifyContent.Center
+                              LayoutMinHeight: =88
+                              LayoutMinWidth: =180
+                              PaddingBottom: =6
+                              PaddingLeft: =10
+                              PaddingRight: =10
+                              PaddingTop: =6
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Width: =220
+                            Children:
+                              - imgHPDS_Valve:
+                                  Control: Image@2.2.3
+                                  Properties:
+                                    Height: =92
+                                    Image: ="data:image/svg+xml;utf8," & EncodeUrl("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 120'><defs><linearGradient id='m' x1='0' y1='0' x2='0' y2='1'><stop stop-color='#9DB5C2'/><stop offset='.5' stop-color='#355267'/><stop offset='1' stop-color='#1B3447'/></linearGradient></defs><path d='M0 34h45v22h24M0 90h45V68h24M135 56h45M135 68h45' fill='none' stroke='#7694A5' stroke-width='8'/><path d='M63 47h54l15 8v17l-15 8H63l-14-8V55z' fill='url(#m)' stroke='#B7C9D2' stroke-width='2'/><circle cx='90' cy='64' r='20' fill='#183247' stroke='#9DB5C2' stroke-width='3'/><circle cx='90' cy='64' r='11' fill='#0A1C2B' stroke='#00C8FF' stroke-width='2'/><path d='M90 43V20m-22 0h44m-35-7h26' fill='none' stroke='#BDD0D8' stroke-width='4' stroke-linecap='round'/><path d='M52 50v28m76-28v28' stroke='#00C8FF' stroke-opacity='.55' stroke-width='2'/><circle cx='24' cy='34' r='4' fill='#00C8FF'/><circle cx='156' cy='56' r='4' fill='#F5B84B'/></svg>")
+                                    Width: =Parent.Width
+                              - conHPDS_HeroObjectLabel:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    AlignInContainer: =AlignInContainer.Center
+                                    DropShadow: =DropShadow.None
+                                    Fill: =Color.Transparent
+                                    FillPortions: =1
+                                    Height: =54
+                                    LayoutAlignItems: =LayoutAlignItems.Start
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =3
+                                    LayoutMinHeight: =50
+                                    LayoutMinWidth: =90
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    RadiusBottomLeft: =0
+                                    RadiusBottomRight: =0
+                                    RadiusTopLeft: =0
+                                    RadiusTopRight: =0
+                                  Children:
+                                    - txtHPDS_HeroObjectTitle:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =varTheme_TextWhite
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =20
+                                          Size: =10
+                                          Text: ="VALVE ASSEMBLY"
+                                          Width: =Parent.Width
+                                          Wrap: =false
+                                    - txtHPDS_HeroObjectState:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =true
+                                          Color: =ColorValue("#9AB4C3")
+                                          Height: =18
+                                          Size: =8
+                                          Text: ="PULSE · FIELD OPERATIONS"
+                                          Width: =Parent.Width
+                                          Wrap: =true
+                        - conHPDS_HeroActions:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Center
+                              DropShadow: =DropShadow.None
+                              Fill: =Color.Transparent
+                              FillPortions: =0
+                              Height: =38
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =6
+                              LayoutMinHeight: =38
+                              LayoutMinWidth: =78
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              RadiusBottomLeft: =0
+                              RadiusBottomRight: =0
+                              RadiusTopLeft: =0
+                              RadiusTopRight: =0
+                            Children:
+                              - btnHPDS_Refresh:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =ColorValue("#426176")
+                                    BorderStyle: =BorderStyle.Solid
+                                    BorderThickness: =1
+                                    Color: =ColorValue("#AFC6D3")
+                                    DisabledColor: =ColorValue("#AFC6D3")
+                                    DisabledFill: =varTheme_BrandDarkAlt
+                                    DisplayMode: =DisplayMode.Disabled
+                                    Fill: =varTheme_BrandDarkAlt
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =34
+                                    RadiusBottomLeft: =7
+                                    RadiusBottomRight: =7
+                                    RadiusTopLeft: =7
+                                    RadiusTopRight: =7
+                                    Size: =9
+                                    Text: ="Refresh"
+                                    Width: =68
+                              - btnHPDS_Help:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =ColorValue("#426176")
+                                    BorderStyle: =BorderStyle.Solid
+                                    BorderThickness: =1
+                                    Color: =ColorValue("#AFC6D3")
+                                    DisabledColor: =ColorValue("#AFC6D3")
+                                    DisabledFill: =varTheme_BrandDarkAlt
+                                    DisplayMode: =DisplayMode.Disabled
+                                    Fill: =varTheme_BrandDarkAlt
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =34
+                                    RadiusBottomLeft: =7
+                                    RadiusBottomRight: =7
+                                    RadiusTopLeft: =7
+                                    RadiusTopRight: =7
+                                    Size: =10
+                                    Text: ="?"
+                                    Width: =34
+                  - conHPDS_Performance:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        AlignInContainer: =AlignInContainer.Stretch
+                        DropShadow: =DropShadow.None
+                        Fill: =Color.Transparent
+                        FillPortions: =0
+                        Height: =100
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =6
+                        LayoutMinHeight: =96
+                        LayoutMinWidth: =320
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        RadiusBottomLeft: =0
+                        RadiusBottomRight: =0
+                        RadiusTopLeft: =0
+                        RadiusTopRight: =0
+                      Children:
+                        - txtHPDS_PerformanceLabel:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              AutoHeight: =false
+                              Color: =varTheme_TextMuted
+                              FontWeight: =FontWeight.Semibold
+                              Height: =18
+                              Size: =9
+                              Text: ="PUNCH PERFORMANCE  ·  ESTRUCTURA VISUAL, DATOS PENDIENTES"
+                              Width: =Parent.Width
+                              Wrap: =false
+                        - conHPDS_KpiStrip:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Stretch
+                              DropShadow: =DropShadow.None
+                              Fill: =Color.Transparent
+                              FillPortions: =1
+                              Height: =76
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =10
+                              LayoutMinHeight: =72
+                              LayoutMinWidth: =320
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              RadiusBottomLeft: =0
+                              RadiusBottomRight: =0
+                              RadiusTopLeft: =0
+                              RadiusTopRight: =0
+                            Children:
+                              - conHPDS_KpiTotal:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_TextWhite
+                                    FillPortions: =1
+                                    LayoutAlignItems: =LayoutAlignItems.Start
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    LayoutMinHeight: =72
+                                    LayoutMinWidth: =130
+                                    PaddingBottom: =8
+                                    PaddingLeft: =12
+                                    PaddingRight: =12
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                  Children:
+                                    - txtHPDS_KpiTotalLabel:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =false
+                                          Color: =varTheme_TextMuted
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =17
+                                          Size: =9
+                                          Text: ="TOTAL PUNCHES"
+                                          Width: =Parent.Width
+                                          Wrap: =false
+                                    - txtHPDS_KpiTotalValue:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =false
+                                          Color: =varTheme_Text
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =30
+                                          Size: =22
+                                          Text: ="—"
+                                          Width: =Parent.Width
+                                          Wrap: =false
+                                    - txtHPDS_KpiTotalFoot:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =false
+                                          Color: =varTheme_TextSoft
+                                          Height: =14
+                                          Size: =8
+                                          Text: ="Esperando snapshot"
+                                          Width: =Parent.Width
+                                          Wrap: =false
+                              - conHPDS_KpiOpen:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_TextWhite
+                                    FillPortions: =1
+                                    LayoutAlignItems: =LayoutAlignItems.Start
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    LayoutMinHeight: =72
+                                    LayoutMinWidth: =130
+                                    PaddingBottom: =8
+                                    PaddingLeft: =12
+                                    PaddingRight: =12
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                  Children:
+                                    - txtHPDS_KpiOpenLabel:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =false
+                                          Color: =varTheme_TextMuted
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =17
+                                          Size: =9
+                                          Text: ="OPEN PUNCHES"
+                                          Width: =Parent.Width
+                                          Wrap: =false
+                                    - txtHPDS_KpiOpenValue:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =false
+                                          Color: =varTheme_Text
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =30
+                                          Size: =22
+                                          Text: ="—"
+                                          Width: =Parent.Width
+                                          Wrap: =false
+                                    - txtHPDS_KpiOpenFoot:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =false
+                                          Color: =varTheme_TextSoft
+                                          Height: =14
+                                          Size: =8
+                                          Text: ="Esperando snapshot"
+                                          Width: =Parent.Width
+                                          Wrap: =false
+                              - conHPDS_KpiClosed:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_TextWhite
+                                    FillPortions: =1
+                                    LayoutAlignItems: =LayoutAlignItems.Start
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    LayoutMinHeight: =72
+                                    LayoutMinWidth: =130
+                                    PaddingBottom: =8
+                                    PaddingLeft: =12
+                                    PaddingRight: =12
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                  Children:
+                                    - txtHPDS_KpiClosedLabel:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =false
+                                          Color: =varTheme_TextMuted
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =17
+                                          Size: =9
+                                          Text: ="CLOSED PUNCHES"
+                                          Width: =Parent.Width
+                                          Wrap: =false
+                                    - txtHPDS_KpiClosedValue:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =false
+                                          Color: =varTheme_Text
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =30
+                                          Size: =22
+                                          Text: ="—"
+                                          Width: =Parent.Width
+                                          Wrap: =false
+                                    - txtHPDS_KpiClosedFoot:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =false
+                                          Color: =varTheme_TextSoft
+                                          Height: =14
+                                          Size: =8
+                                          Text: ="Esperando snapshot"
+                                          Width: =Parent.Width
+                                          Wrap: =false
+                              - conHPDS_KpiCompletion:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_TextWhite
+                                    FillPortions: =1
+                                    LayoutAlignItems: =LayoutAlignItems.Start
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    LayoutMinHeight: =72
+                                    LayoutMinWidth: =130
+                                    PaddingBottom: =8
+                                    PaddingLeft: =12
+                                    PaddingRight: =12
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                  Children:
+                                    - txtHPDS_KpiCompletionLabel:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =false
+                                          Color: =varTheme_TextMuted
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =17
+                                          Size: =9
+                                          Text: ="COMPLETION"
+                                          Width: =Parent.Width
+                                          Wrap: =false
+                                    - txtHPDS_KpiCompletionValue:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =false
+                                          Color: =varTheme_Text
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =30
+                                          Size: =22
+                                          Text: ="—"
+                                          Width: =Parent.Width
+                                          Wrap: =false
+                                    - txtHPDS_KpiCompletionFoot:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =false
+                                          Color: =varTheme_TextSoft
+                                          Height: =14
+                                          Size: =8
+                                          Text: ="Esperando snapshot"
+                                          Width: =Parent.Width
+                                          Wrap: =false
+                  - conHPDS_AnalyticsGrid:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        AlignInContainer: =AlignInContainer.Stretch
+                        DropShadow: =DropShadow.None
+                        Fill: =Color.Transparent
+                        FillPortions: =0
+                        Height: =220
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =12
+                        LayoutMinHeight: =220
+                        LayoutMinWidth: =420
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        RadiusBottomLeft: =0
+                        RadiusBottomRight: =0
+                        RadiusTopLeft: =0
+                        RadiusTopRight: =0
+                      Children:
+                        - conHPDS_HeatmapPanel:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_TextWhite
+                              FillPortions: =3
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =8
+                              LayoutMinHeight: =220
+                              LayoutMinWidth: =300
+                              PaddingBottom: =12
+                              PaddingLeft: =14
+                              PaddingRight: =14
+                              PaddingTop: =12
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                            Children:
+                              - txtHPDS_HeatmapTitle:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =false
+                                    Color: =varTheme_Text
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =22
+                                    Size: =13
+                                    Text: ="Open punch concentration"
+                                    Width: =Parent.Width
+                                    Wrap: =false
+                              - txtHPDS_HeatmapSubtitle:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =false
+                                    Color: =varTheme_TextMuted
+                                    Height: =18
+                                    Size: =9
+                                    Text: ="Subcontractor × category · seleccionar una celda crea contexto"
+                                    Width: =Parent.Width
+                                    Wrap: =false
+                              - conHPDS_HeatmapPlaceholder:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    AlignInContainer: =AlignInContainer.Stretch
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_SurfaceAlt
+                                    FillPortions: =1
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =4
+                                    LayoutJustifyContent: =LayoutJustifyContent.Center
+                                    LayoutMinHeight: =130
+                                    LayoutMinWidth: =240
+                                    PaddingBottom: =8
+                                    PaddingLeft: =8
+                                    PaddingRight: =8
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =7
+                                    RadiusBottomRight: =7
+                                    RadiusTopLeft: =7
+                                    RadiusTopRight: =7
+                                  Children:
+                                    - txtHPDS_HeatmapEmpty:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Align: =Align.Center
+                                          AutoHeight: =true
+                                          Color: =ColorValue("#334155")
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =24
+                                          Size: =11
+                                          Text: ="El heatmap aparecerá al conectar el snapshot"
+                                          Width: =Parent.Width
+                                          Wrap: =true
+                                    - txtHPDS_HeatmapContract:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Align: =Align.Center
+                                          AutoHeight: =true
+                                          Color: =varTheme_TextMuted
+                                          Height: =32
+                                          Size: =9
+                                          Text: ="Se conservará la dimensión existente de contratista × categoría y la paginación seguirá en servidor."
+                                          Width: =Parent.Width-24
+                                          Wrap: =true
+                        - conHPDS_DisciplinePanel:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_TextWhite
+                              FillPortions: =2
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =8
+                              LayoutMinHeight: =220
+                              LayoutMinWidth: =260
+                              PaddingBottom: =12
+                              PaddingLeft: =14
+                              PaddingRight: =14
+                              PaddingTop: =12
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                            Children:
+                              - txtHPDS_DisciplineTitle:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =false
+                                    Color: =varTheme_Text
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =22
+                                    Size: =13
+                                    Text: ="Discipline distribution"
+                                    Width: =Parent.Width
+                                    Wrap: =false
+                              - txtHPDS_DisciplineSubtitle:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =false
+                                    Color: =varTheme_TextMuted
+                                    Height: =18
+                                    Size: =9
+                                    Text: ="Pie y barras compartirán una única selección"
+                                    Width: =Parent.Width
+                                    Wrap: =false
+                              - conHPDS_DisciplinePlaceholder:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    AlignInContainer: =AlignInContainer.Stretch
+                                    DropShadow: =DropShadow.None
+                                    Fill: =varTheme_SurfaceAlt
+                                    FillPortions: =1
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =4
+                                    LayoutJustifyContent: =LayoutJustifyContent.Center
+                                    LayoutMinHeight: =130
+                                    LayoutMinWidth: =200
+                                    PaddingBottom: =8
+                                    PaddingLeft: =8
+                                    PaddingRight: =8
+                                    PaddingTop: =8
+                                    RadiusBottomLeft: =7
+                                    RadiusBottomRight: =7
+                                    RadiusTopLeft: =7
+                                    RadiusTopRight: =7
+                                  Children:
+                                    - txtHPDS_DisciplineEmpty:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Align: =Align.Center
+                                          AutoHeight: =true
+                                          Color: =ColorValue("#334155")
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =24
+                                          Size: =11
+                                          Text: ="La distribución se mostrará con el bundle"
+                                          Width: =Parent.Width
+                                          Wrap: =true
+                                    - txtHPDS_DisciplineContract:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Align: =Align.Center
+                                          AutoHeight: =true
+                                          Color: =varTheme_TextMuted
+                                          Height: =34
+                                          Size: =9
+                                          Text: ="El pie y las barras serán dos lecturas de la misma dimensión y estado de selección."
+                                          Width: =Parent.Width-20
+                                          Wrap: =true
+                  - conHPDS_ActiveContext:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        AlignInContainer: =AlignInContainer.Stretch
+                        DropShadow: =DropShadow.None
+                        Fill: =varTheme_TextWhite
+                        FillPortions: =0
+                        Height: =54
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =10
+                        LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                        LayoutMinHeight: =50
+                        LayoutMinWidth: =320
+                        PaddingBottom: =8
+                        PaddingLeft: =14
+                        PaddingRight: =14
+                        PaddingTop: =8
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - conHPDS_ContextIdentity:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Stretch
+                              DropShadow: =DropShadow.None
+                              Fill: =Color.Transparent
+                              FillPortions: =1
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =1
+                              LayoutMinHeight: =38
+                              LayoutMinWidth: =240
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              RadiusBottomLeft: =0
+                              RadiusBottomRight: =0
+                              RadiusTopLeft: =0
+                              RadiusTopRight: =0
+                            Children:
+                              - txtHPDS_ContextLabel:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =false
+                                    Color: =varTheme_TextMuted
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =15
+                                    Size: =8
+                                    Text: ="ACTIVE CONTEXT"
+                                    Width: =Parent.Width
+                                    Wrap: =false
+                              - txtHPDS_ContextValue:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =false
+                                    Color: =ColorValue("#334155")
+                                    Height: =19
+                                    Size: =10
+                                    Text: ="Sin selección analítica"
+                                    Width: =Parent.Width
+                                    Wrap: =false
+                        - btnHPDS_Review:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderStyle: =BorderStyle.Solid
+                              BorderThickness: =0
+                              Color: =varTheme_TextWhite
+                              DisabledColor: =varTheme_TextSoft
+                              DisabledFill: =varTheme_Border
+                              DisplayMode: =DisplayMode.Disabled
+                              Fill: =varTheme_ActionPrimary
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =32
+                              HoverFill: =ColorValue("#1268E8")
+                              RadiusBottomLeft: =7
+                              RadiusBottomRight: =7
+                              RadiusTopLeft: =7
+                              RadiusTopRight: =7
+                              Size: =9
+                              Text: ="Review"
+                              Width: =92
+                        - btnHPDS_OpenPunchList:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =varTheme_BorderStrong
+                              BorderStyle: =BorderStyle.Solid
+                              BorderThickness: =1
+                              Color: =varTheme_TextMuted
+                              DisabledColor: =varTheme_TextSoft
+                              DisabledFill: =varTheme_TextWhite
+                              DisplayMode: =DisplayMode.Disabled
+                              Fill: =varTheme_TextWhite
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =32
+                              HoverFill: =varTheme_SurfaceAlt
+                              RadiusBottomLeft: =7
+                              RadiusBottomRight: =7
+                              RadiusTopLeft: =7
+                              RadiusTopRight: =7
+                              Size: =9
+                              Text: ="Open Punch List"
+                              Width: =132
+                  - conHPDS_DataExplorer:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        AlignInContainer: =AlignInContainer.Stretch
+                        DropShadow: =DropShadow.None
+                        Fill: =varTheme_TextWhite
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =8
+                        LayoutMinHeight: =150
+                        LayoutMinWidth: =320
+                        PaddingBottom: =10
+                        PaddingLeft: =14
+                        PaddingRight: =14
+                        PaddingTop: =10
+                        RadiusBottomLeft: =9
+                        RadiusBottomRight: =9
+                        RadiusTopLeft: =9
+                        RadiusTopRight: =9
+                      Children:
+                        - conHPDS_ExplorerHeader:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Stretch
+                              DropShadow: =DropShadow.None
+                              Fill: =Color.Transparent
+                              FillPortions: =0
+                              Height: =42
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                              LayoutMinHeight: =38
+                              LayoutMinWidth: =300
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              RadiusBottomLeft: =0
+                              RadiusBottomRight: =0
+                              RadiusTopLeft: =0
+                              RadiusTopRight: =0
+                            Children:
+                              - conHPDS_ExplorerIdentity:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    AlignInContainer: =AlignInContainer.Stretch
+                                    DropShadow: =DropShadow.None
+                                    Fill: =Color.Transparent
+                                    FillPortions: =1
+                                    LayoutAlignItems: =LayoutAlignItems.Start
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =0
+                                    LayoutMinHeight: =36
+                                    LayoutMinWidth: =220
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    RadiusBottomLeft: =0
+                                    RadiusBottomRight: =0
+                                    RadiusTopLeft: =0
+                                    RadiusTopRight: =0
+                                  Children:
+                                    - txtHPDS_ExplorerTitle:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =false
+                                          Color: =varTheme_Text
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =21
+                                          Size: =13
+                                          Text: ="Punch explorer"
+                                          Width: =Parent.Width
+                                          Wrap: =false
+                                    - txtHPDS_ExplorerSubtitle:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          AutoHeight: =false
+                                          Color: =varTheme_TextMuted
+                                          Height: =15
+                                          Size: =8
+                                          Text: ="Registros paginados por el servidor · filtrados por el contexto activo"
+                                          Width: =Parent.Width
+                                          Wrap: =false
+                              - txtHPDS_ExplorerState:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Align: =Align.Right
+                                    AutoHeight: =false
+                                    Color: =varTheme_TextMuted
+                                    Height: =22
+                                    Size: =9
+                                    Text: ="Esperando bundle"
+                                    Width: =140
+                                    Wrap: =false
+                        - conHPDS_GridHeader:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Stretch
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_SurfaceAlt
+                              FillPortions: =0
+                              Height: =30
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              LayoutMinHeight: =28
+                              LayoutMinWidth: =300
+                              PaddingBottom: =4
+                              PaddingLeft: =8
+                              PaddingRight: =8
+                              PaddingTop: =4
+                              RadiusBottomLeft: =4
+                              RadiusBottomRight: =4
+                              RadiusTopLeft: =4
+                              RadiusTopRight: =4
+                            Children:
+                              - txtHPDS_ColPunch:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =false
+                                    Color: =varTheme_TextMuted
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    Size: =8
+                                    Text: ="PUNCH"
+                                    Width: =(Parent.Width-48)*0.14
+                                    Wrap: =false
+                              - txtHPDS_ColDescription:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =false
+                                    Color: =varTheme_TextMuted
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    Size: =8
+                                    Text: ="DESCRIPTION"
+                                    Width: =(Parent.Width-48)*0.40
+                                    Wrap: =false
+                              - txtHPDS_ColDiscipline:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =false
+                                    Color: =varTheme_TextMuted
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    Size: =8
+                                    Text: ="DISCIPLINE"
+                                    Width: =(Parent.Width-48)*0.16
+                                    Wrap: =false
+                              - txtHPDS_ColContractor:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =false
+                                    Color: =varTheme_TextMuted
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    Size: =8
+                                    Text: ="CONTRACTOR"
+                                    Width: =(Parent.Width-48)*0.16
+                                    Wrap: =false
+                              - txtHPDS_ColStatus:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    AutoHeight: =false
+                                    Color: =varTheme_TextMuted
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    Size: =8
+                                    Text: ="STATUS"
+                                    Width: =(Parent.Width-48)*0.11
+                                    Wrap: =false
+                        - conHPDS_GridEmpty:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Stretch
+                              DropShadow: =DropShadow.None
+                              Fill: =varTheme_TextWhite
+                              FillPortions: =1
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =4
+                              LayoutJustifyContent: =LayoutJustifyContent.Center
+                              LayoutMinHeight: =70
+                              LayoutMinWidth: =260
+                              PaddingBottom: =8
+                              PaddingLeft: =8
+                              PaddingRight: =8
+                              PaddingTop: =8
+                              RadiusBottomLeft: =0
+                              RadiusBottomRight: =0
+                              RadiusTopLeft: =0
+                              RadiusTopRight: =0
+                            Children:
+                              - txtHPDS_GridEmptyTitle:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    Color: =ColorValue("#334155")
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =24
+                                    Size: =10
+                                    Text: ="No hay registros cargados"
+                                    Width: =Parent.Width
+                                    Wrap: =false
+                              - txtHPDS_GridEmptyBody:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Align: =Align.Center
+                                    AutoHeight: =true
+                                    Color: =varTheme_TextMuted
+                                    Height: =20
+                                    Size: =9
+                                    Text: ="Este bloque define la pantalla. La conexión reutilizará el bundle y la paginación ya existentes."
+                                    Width: =Parent.Width-24
+                                    Wrap: =true
+                        - conHPDS_GridPager:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Stretch
+                              DropShadow: =DropShadow.None
+                              Fill: =Color.Transparent
+                              FillPortions: =0
+                              Height: =24
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =6
+                              LayoutJustifyContent: =LayoutJustifyContent.End
+                              LayoutMinHeight: =24
+                              LayoutMinWidth: =200
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              RadiusBottomLeft: =0
+                              RadiusBottomRight: =0
+                              RadiusTopLeft: =0
+                              RadiusTopRight: =0
+                            Children:
+                              - txtHPDS_PageStatus:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Align: =Align.Right
+                                    AutoHeight: =false
+                                    Color: =varTheme_TextMuted
+                                    Height: =20
+                                    Size: =8
+                                    Text: ="Página — · — registros"
+                                    Width: =130
+                                    Wrap: =false
+                              - btnHPDS_PagePrevious:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =varTheme_Border
+                                    BorderStyle: =BorderStyle.Solid
+                                    BorderThickness: =1
+                                    Color: =varTheme_TextSoft
+                                    DisabledColor: =varTheme_TextSoft
+                                    DisabledFill: =varTheme_TextWhite
+                                    DisplayMode: =DisplayMode.Disabled
+                                    Fill: =varTheme_TextWhite
+                                    Height: =22
+                                    RadiusBottomLeft: =5
+                                    RadiusBottomRight: =5
+                                    RadiusTopLeft: =5
+                                    RadiusTopRight: =5
+                                    Size: =8
+                                    Text: ="‹"
+                                    Width: =28
+                              - btnHPDS_PageNext:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =varTheme_Border
+                                    BorderStyle: =BorderStyle.Solid
+                                    BorderThickness: =1
+                                    Color: =varTheme_TextSoft
+                                    DisabledColor: =varTheme_TextSoft
+                                    DisabledFill: =varTheme_TextWhite
+                                    DisplayMode: =DisplayMode.Disabled
+                                    Fill: =varTheme_TextWhite
+                                    Height: =22
+                                    RadiusBottomLeft: =5
+                                    RadiusBottomRight: =5
+                                    RadiusTopLeft: =5
+                                    RadiusTopRight: =5
+                                    Size: =8
+                                    Text: ="›"
+                                    Width: =28
