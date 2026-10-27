@@ -1,5 +1,5 @@
 ComponentDefinitions:
-  cmp_DetailDrawer_old:
+  cmp_DetailDrawer_1:
     DefinitionType: CanvasComponent
     AccessAppScope: true
     CustomProperties:
@@ -62,25 +62,25 @@ ComponentDefinitions:
         DisplayName: OnManageFieldsRequested
         Description: A custom property
         ReturnType: None
-        Default: =
+        Default: =If(false, Notify("", NotificationType.Information))
       OnSaveCustomField:
         PropertyKind: Event
         DisplayName: OnSaveCustomField
         Description: A custom property
         ReturnType: None
-        Default: =
+        Default: =If(false, Notify("", NotificationType.Information))
       OnSaved:
         PropertyKind: Event
         DisplayName: OnSaved
         Description: A custom property
         ReturnType: None
-        Default: =
+        Default: =If(false, Notify("", NotificationType.Information))
       OnToggleFieldActiveRequested:
         PropertyKind: Event
         DisplayName: OnToggleFieldActiveRequested
         Description: A custom property
         ReturnType: None
-        Default: =
+        Default: =If(false, Notify("", NotificationType.Information))
       ProjectId:
         PropertyKind: Input
         DisplayName: ProjectId
@@ -173,18 +173,18 @@ ComponentDefinitions:
             Height: |-
               =With(
                   { pad: 12 },
-                  cmp_DetailDrawer_old.HostHeight - 2*pad
+                  cmp_DetailDrawer_1.HostHeight - 2*pad
               )
             Width: |-
               =With(
-                  { pad: 12, mode: If(cmp_DetailDrawer_old.HostWidth < 1100 || cmp_DetailDrawer_old.HostHeight < 750, "Overlay", "Side") },
-                  Min(720, cmp_DetailDrawer_old.HostWidth - 2*pad)
+                  { pad: 12, mode: If(cmp_DetailDrawer_1.HostWidth < 1100 || cmp_DetailDrawer_1.HostHeight < 750, "Overlay", "Side") },
+                  Min(720, cmp_DetailDrawer_1.HostWidth - 2*pad)
               )
             X: =(Parent.Width - Self.Width) / 2
             Y: |-
               =With(
                   { pad: 12 },
-                  RoundDown((cmp_DetailDrawer_old.HostHeight - Self.Height)/2, 0)
+                  RoundDown((cmp_DetailDrawer_1.HostHeight - Self.Height)/2, 0)
               )
           Children:
             - conDrawerSurface:
@@ -224,7 +224,7 @@ ComponentDefinitions:
                             Control: Text@0.0.51
                             Properties:
                               Align: ='TextCanvas.Align'.Center
-                              FontColor: =cmp_DetailDrawer_old.AppColors.TextPrimary
+                              FontColor: =cmp_DetailDrawer_1.AppColors.TextPrimary
                               Height: =31
                               Text: ="Loading details..."
                               VerticalAlign: =VerticalAlign.Middle
@@ -255,7 +255,7 @@ ComponentDefinitions:
                         RadiusBottomRight: =16
                         RadiusTopLeft: =16
                         RadiusTopRight: =16
-                        Visible: =!cmp_DetailDrawer_old.IsLoading
+                        Visible: =!cmp_DetailDrawer_1.IsLoading
                         Width: '=Parent.Width '
                       Children:
                         - lblTitle:
@@ -277,11 +277,11 @@ ComponentDefinitions:
                               Text: |
                                 =
 
-                                Text(cmp_DetailDrawer_old.SelectedRecord.ElementCode) & "  •  " &
+                                Text(cmp_DetailDrawer_1.SelectedRecord.ElementCode) & "  •  " &
 
-                                cmp_DetailDrawer_old.EntityType & " #" & 
+                                cmp_DetailDrawer_1.EntityType & " #" & 
 
-                                Text(cmp_DetailDrawer_old.SelectedRecord.PunchId) 
+                                Text(cmp_DetailDrawer_1.SelectedRecord.PunchId) 
                               VerticalAlign: =VerticalAlign.Top
                               Width: |+
                                 =Parent.Width - 50
@@ -297,7 +297,7 @@ ComponentDefinitions:
                               FocusedBorderThickness: =4
                               Height: =20
                               HoverBorderColor: =RGBA(0, 0, 0, 0)
-                              HoverColor: =cmp_DetailDrawer_old.AppColors.TextPrimary
+                              HoverColor: =cmp_DetailDrawer_1.AppColors.TextPrimary
                               HoverFill: =RGBA(0, 0, 0, 0)
                               Icon: =Icon.Cancel
                               LayoutMinHeight: =16
@@ -305,14 +305,14 @@ ComponentDefinitions:
                               OnSelect: |-
                                 =
 
-                                cmp_DetailDrawer_old.CloseAction();
+                                cmp_DetailDrawer_1.CloseAction();
 
                                 Set(varCT_LoadKey, "");
                                 Clear(colCT_Merged);
                                 Clear(colCT_Quick);
                                 Clear(colCT_Dirty);
                               PressedBorderColor: =RGBA(0, 0, 0, 0)
-                              PressedColor: =cmp_DetailDrawer_old.AppColors.TextPrimary
+                              PressedColor: =cmp_DetailDrawer_1.AppColors.TextPrimary
                               PressedFill: =RGBA(0, 0, 0, 0)
                               Width: =20
                   - tabDetail:
@@ -322,13 +322,13 @@ ComponentDefinitions:
                         BasePaletteColor: =RGBA(95, 121, 151, 1)
                         DefaultSelectedItems: =[varDrawerTab]
                         Font: =Font.'Segoe UI'
-                        FontColor: =cmp_DetailDrawer_old.AppColors.TextPrimary
+                        FontColor: =cmp_DetailDrawer_1.AppColors.TextPrimary
                         FontSize: =16
                         Height: =40
                         Items: =["Overview","Comments","Custom","History"]
                         LayoutMinHeight: =16
                         LayoutMinWidth: =16
-                        OnChange: "=\r\n\r\nSet(varDrawerTab, Coalesce(tabDetail.Selected.Value, \"Overview\"));\r\n\r\nIf(\r\n    IsBlank(cmp_DetailDrawer_old.RecordId) || Value(cmp_DetailDrawer_old.RecordId) = 0,\r\n    Notify(\"No record selected.\", NotificationType.Warning\r\n),\r\n\r\n    Switch(\r\n        \r\n        varDrawerTab,\r\n\r\n        // =========================\r\n        // COMMENTS TAB\r\n        // =========================\r\n        \"Comments\",\r\n\r\n            Set(varIsLoadingComments, true);\r\n            Set(varCommentsPageSize, Coalesce(varCommentsPageSize, 20));\r\n            Set(varCommentsPage, 1);\r\n\r\n            // Asegura schema tipado de colComments (1 vez)\r\n            If(\r\n                IsEmpty(colComments),\r\n                ClearCollect(\r\n                    colComments,\r\n                    Table(\r\n                        {\r\n                            CommentId: 0,\r\n                            TaskId: 0,\r\n                            CommentText: \"\",\r\n                            CommentType: \"\",\r\n                            CreatedOn: Now(),\r\n                            CreatedByEmail: \"\",\r\n                            CreatedByName: \"\",\r\n                            ModifiedOn: Now(),\r\n                            ModifiedByEmail: \"\",\r\n                            TotalRows: 0,\r\n                            TotalPages: 0,\r\n                            PageNumber: 1,\r\n                            PageSize: 20\r\n                        }\r\n                    )\r\n                );\r\n                Clear(colComments)\r\n            );\r\n\r\n            Set(\r\n                varCommResp,\r\n                Warroom_GetTaskCommentsPaged.Run(\r\n                    cmp_DetailDrawer_old.ProjectId,\r\n                    cmp_DetailDrawer_old.RecordId,\r\n                    varCommentsPage,\r\n                    varCommentsPageSize,\r\n                    cmp_DetailDrawer_old.EntityType\r\n                )\r\n            );\r\n\r\n            Set(varCommResultText, Coalesce(Text(varCommResp.result), \"\"));\r\n\r\n            If(\r\n                varCommResultText = \"\",\r\n                Clear(colComments);\r\n                Set(varCommentsTotalRows, 0);\r\n                Set(varCommentsTotalPages, 0),\r\n                \r\n                ClearCollect(\r\n                    colComments,\r\n                    ForAll(\r\n                        Table(ParseJSON(varCommResultText)),\r\n                        {\r\n                            CommentId: Value(ThisRecord.Value.CommentId),\r\n                            TaskId: Value(ThisRecord.Value.TaskId),\r\n                            CommentType: Text(ThisRecord.Value.CommentType),\r\n                            CreatedOn: DateTimeValue(Text(ThisRecord.Value.CreatedOn)),\r\n                            CreatedByEmail: Text(ThisRecord.Value.CreatedByEmail),\r\n                            CreatedByName: Text(ThisRecord.Value.CreatedByName),\r\n                            ModifiedOn: DateTimeValue(Text(ThisRecord.Value.ModifiedOn)),\r\n                            ModifiedByEmail: Text(ThisRecord.Value.ModifiedByEmail),\r\n                            CommentText: Text(ThisRecord.Value.CommentText),\r\n                            TotalRows: Value(ThisRecord.Value.TotalRows),\r\n                            TotalPages: Value(ThisRecord.Value.TotalPages),\r\n                            PageNumber: Value(ThisRecord.Value.PageNumber),\r\n                            PageSize: Value(ThisRecord.Value.PageSize)\r\n                        }\r\n                    )\r\n                );\r\n\r\n                Set(varCommentsTotalRows,  Coalesce(First(colComments).TotalRows, 0));\r\n                Set(varCommentsTotalPages, Coalesce(First(colComments).TotalPages, 0))\r\n            );\r\n\r\n            Set(varIsLoadingComments, false),\r\n\r\n        // =========================\r\n        // CUSTOM TAB\r\n        // =========================\r\n            \"Custom\",\r\n            If(\r\n                IsBlank(cmp_DetailDrawer_old.RecordId) || cmp_DetailDrawer_old.RecordId = 0,\r\n                Notify(\"No record selected.\", NotificationType.Warning),\r\n                Select(btnCT_Load)\r\n            ),\r\n\r\n        // =========================\r\n        // DEFAULT: no action\r\n        // =========================\r\n        true\r\n    )\r\n);"
+                        OnChange: "=\r\n\r\nSet(varDrawerTab, Coalesce(tabDetail.Selected.Value, \"Overview\"));\r\n\r\nIf(\r\n    IsBlank(cmp_DetailDrawer_1.RecordId) || Value(cmp_DetailDrawer_1.RecordId) = 0,\r\n    Notify(\"No record selected.\", NotificationType.Warning\r\n),\r\n\r\n    Switch(\r\n        \r\n        varDrawerTab,\r\n\r\n        // =========================\r\n        // COMMENTS TAB\r\n        // =========================\r\n        \"Comments\",\r\n\r\n            Set(varIsLoadingComments, true);\r\n            Set(varCommentsPageSize, Coalesce(varCommentsPageSize, 20));\r\n            Set(varCommentsPage, 1);\r\n\r\n            // Asegura schema tipado de colComments (1 vez)\r\n            If(\r\n                IsEmpty(colComments),\r\n                ClearCollect(\r\n                    colComments,\r\n                    Table(\r\n                        {\r\n                            CommentId: 0,\r\n                            TaskId: 0,\r\n                            CommentText: \"\",\r\n                            CommentType: \"\",\r\n                            CreatedOn: Now(),\r\n                            CreatedByEmail: \"\",\r\n                            CreatedByName: \"\",\r\n                            ModifiedOn: Now(),\r\n                            ModifiedByEmail: \"\",\r\n                            TotalRows: 0,\r\n                            TotalPages: 0,\r\n                            PageNumber: 1,\r\n                            PageSize: 20\r\n                        }\r\n                    )\r\n                );\r\n                Clear(colComments)\r\n            );\r\n\r\n            Set(\r\n                varCommResp,\r\n                Warroom_GetTaskCommentsPaged.Run(\r\n                    cmp_DetailDrawer_1.ProjectId,\r\n                    cmp_DetailDrawer_1.RecordId,\r\n                    varCommentsPage,\r\n                    varCommentsPageSize,\r\n                    cmp_DetailDrawer_1.EntityType\r\n                )\r\n            );\r\n\r\n            Set(varCommResultText, Coalesce(Text(varCommResp.result), \"\"));\r\n\r\n            If(\r\n                varCommResultText = \"\",\r\n                Clear(colComments);\r\n                Set(varCommentsTotalRows, 0);\r\n                Set(varCommentsTotalPages, 0),\r\n                \r\n                ClearCollect(\r\n                    colComments,\r\n                    ForAll(\r\n                        Table(ParseJSON(varCommResultText)),\r\n                        {\r\n                            CommentId: Value(ThisRecord.Value.CommentId),\r\n                            TaskId: Value(ThisRecord.Value.TaskId),\r\n                            CommentType: Text(ThisRecord.Value.CommentType),\r\n                            CreatedOn: DateTimeValue(Text(ThisRecord.Value.CreatedOn)),\r\n                            CreatedByEmail: Text(ThisRecord.Value.CreatedByEmail),\r\n                            CreatedByName: Text(ThisRecord.Value.CreatedByName),\r\n                            ModifiedOn: DateTimeValue(Text(ThisRecord.Value.ModifiedOn)),\r\n                            ModifiedByEmail: Text(ThisRecord.Value.ModifiedByEmail),\r\n                            CommentText: Text(ThisRecord.Value.CommentText),\r\n                            TotalRows: Value(ThisRecord.Value.TotalRows),\r\n                            TotalPages: Value(ThisRecord.Value.TotalPages),\r\n                            PageNumber: Value(ThisRecord.Value.PageNumber),\r\n                            PageSize: Value(ThisRecord.Value.PageSize)\r\n                        }\r\n                    )\r\n                );\r\n\r\n                Set(varCommentsTotalRows,  Coalesce(First(colComments).TotalRows, 0));\r\n                Set(varCommentsTotalPages, Coalesce(First(colComments).TotalPages, 0))\r\n            );\r\n\r\n            Set(varIsLoadingComments, false),\r\n\r\n        // =========================\r\n        // CUSTOM TAB\r\n        // =========================\r\n            \"Custom\",\r\n            If(\r\n                IsBlank(cmp_DetailDrawer_1.RecordId) || cmp_DetailDrawer_1.RecordId = 0,\r\n                Notify(\"No record selected.\", NotificationType.Warning),\r\n                Select(btnCT_Load)\r\n            ),\r\n\r\n        // =========================\r\n        // DEFAULT: no action\r\n        // =========================\r\n        true\r\n    )\r\n);"
                         OnSelect: |-
                           =
 
@@ -367,7 +367,7 @@ ComponentDefinitions:
                         RadiusBottomRight: =8
                         RadiusTopLeft: =8
                         RadiusTopRight: =8
-                        Visible: =!cmp_DetailDrawer_old.IsLoading
+                        Visible: =!cmp_DetailDrawer_1.IsLoading
                         Width: =Parent.Width
                       Children:
                         - conOverview:
@@ -375,7 +375,7 @@ ComponentDefinitions:
                             Variant: AutoLayout
                             Properties:
                               DropShadow: =DropShadow.None
-                              Fill: =cmp_DetailDrawer_old.AppColors.Background
+                              Fill: =cmp_DetailDrawer_1.AppColors.Background
                               Height: =Parent.Height
                               LayoutAlignItems: =LayoutAlignItems.Center
                               LayoutDirection: =LayoutDirection.Vertical
@@ -417,7 +417,7 @@ ComponentDefinitions:
                                           BorderThickness: =0
                                           FontColor: =RGBA(0, 0, 0, 1)
                                           Height: =28
-                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.AreaCode
+                                          Text: =cmp_DetailDrawer_1.NormalizedRecord.AreaCode
                                           VerticalAlign: =VerticalAlign.Middle
                                           Width: =280
                                           X: =182
@@ -429,7 +429,7 @@ ComponentDefinitions:
                                           BorderThickness: =0
                                           FontColor: =RGBA(0, 0, 0, 1)
                                           Height: =28
-                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.UnitCode
+                                          Text: =cmp_DetailDrawer_1.NormalizedRecord.UnitCode
                                           VerticalAlign: =VerticalAlign.Middle
                                           Width: =280
                                           X: =182
@@ -441,7 +441,7 @@ ComponentDefinitions:
                                           BorderThickness: =0
                                           FontColor: =RGBA(0, 0, 0, 1)
                                           Height: =28
-                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.SystemCode
+                                          Text: =cmp_DetailDrawer_1.NormalizedRecord.SystemCode
                                           VerticalAlign: =VerticalAlign.Middle
                                           Width: =280
                                           X: =182
@@ -453,7 +453,7 @@ ComponentDefinitions:
                                           BorderThickness: =0
                                           FontColor: =RGBA(0, 0, 0, 1)
                                           Height: =28
-                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.SubsystemCode
+                                          Text: =cmp_DetailDrawer_1.NormalizedRecord.SubsystemCode
                                           VerticalAlign: =VerticalAlign.Middle
                                           Width: =280
                                           X: =182
@@ -465,7 +465,7 @@ ComponentDefinitions:
                                           BorderThickness: =0
                                           FontColor: =RGBA(0, 0, 0, 1)
                                           Height: =28
-                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.TypeCode
+                                          Text: =cmp_DetailDrawer_1.NormalizedRecord.TypeCode
                                           VerticalAlign: =VerticalAlign.Middle
                                           Width: =280
                                           X: =182
@@ -477,7 +477,7 @@ ComponentDefinitions:
                                           BorderThickness: =0
                                           FontColor: =RGBA(0, 0, 0, 1)
                                           Height: =28
-                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.ElementCode
+                                          Text: =cmp_DetailDrawer_1.NormalizedRecord.ElementCode
                                           VerticalAlign: =VerticalAlign.Middle
                                           Width: =280
                                           X: =182
@@ -489,7 +489,7 @@ ComponentDefinitions:
                                           BorderThickness: =0
                                           FontColor: =RGBA(0, 0, 0, 1)
                                           Height: =28
-                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.DisciplineValue
+                                          Text: =cmp_DetailDrawer_1.NormalizedRecord.DisciplineValue
                                           VerticalAlign: =VerticalAlign.Middle
                                           Width: =280
                                           X: =182
@@ -537,7 +537,7 @@ ComponentDefinitions:
                                     - txtElementDiscipline:
                                         Control: Text@0.0.51
                                         Properties:
-                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.DisciplineLabel
+                                          Text: =cmp_DetailDrawer_1.NormalizedRecord.DisciplineLabel
                                           VerticalAlign: =VerticalAlign.Middle
                                           Weight: ='TextCanvas.Weight'.Semibold
                                           Width: =130
@@ -575,7 +575,7 @@ ComponentDefinitions:
                                         Properties:
                                           Height: =28
                                           Text: |-
-                                            =cmp_DetailDrawer_old.NormalizedRecord.TitleLabel  //"Form Code: "
+                                            =cmp_DetailDrawer_1.NormalizedRecord.TitleLabel  //"Form Code: "
                                           VerticalAlign: =VerticalAlign.Middle
                                           Weight: ='TextCanvas.Weight'.Semibold
                                           Width: =130
@@ -588,7 +588,7 @@ ComponentDefinitions:
                                           BorderThickness: =0
                                           FontColor: =RGBA(0, 0, 0, 1)
                                           Height: =28
-                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.TitleValue
+                                          Text: =cmp_DetailDrawer_1.NormalizedRecord.TitleValue
                                           VerticalAlign: =VerticalAlign.Middle
                                           Width: =280
                                           X: =182
@@ -597,7 +597,7 @@ ComponentDefinitions:
                                         Control: Text@0.0.51
                                         Properties:
                                           Text: |-
-                                            = cmp_DetailDrawer_old.NormalizedRecord.DescLabel   //"Form Description: "
+                                            = cmp_DetailDrawer_1.NormalizedRecord.DescLabel   //"Form Description: "
                                           VerticalAlign: =VerticalAlign.Middle
                                           Weight: ='TextCanvas.Weight'.Semibold
                                           Width: =130
@@ -610,7 +610,7 @@ ComponentDefinitions:
                                           BorderThickness: =0
                                           FontColor: =RGBA(0, 0, 0, 1)
                                           Height: =160
-                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.DescValue
+                                          Text: =cmp_DetailDrawer_1.NormalizedRecord.DescValue
                                           VerticalAlign: =VerticalAlign.Top
                                           Width: =477
                                           X: =182
@@ -622,7 +622,7 @@ ComponentDefinitions:
                                           BorderThickness: =0
                                           FontColor: =RGBA(0, 0, 0, 1)
                                           Height: =28
-                                          Text: =cmp_DetailDrawer_old.NormalizedRecord.StatusValue
+                                          Text: =cmp_DetailDrawer_1.NormalizedRecord.StatusValue
                                           VerticalAlign: =VerticalAlign.Middle
                                           Width: =130
                                           X: =182
@@ -664,7 +664,7 @@ ComponentDefinitions:
                                     BorderColor: =RGBA(214, 221, 224, 1)
                                     BorderThickness: =1
                                     DropShadow: =DropShadow.None
-                                    Fill: =cmp_DetailDrawer_old.AppColors.Surface
+                                    Fill: =cmp_DetailDrawer_1.AppColors.Surface
                                     FillPortions: =0
                                     Height: =56
                                     LayoutMinHeight: =16
@@ -680,19 +680,19 @@ ComponentDefinitions:
                                     - lblCommentsMeta:
                                         Control: Text@0.0.51
                                         Properties:
-                                          FontColor: =cmp_DetailDrawer_old.AppColors.TextPrimary
+                                          FontColor: =cmp_DetailDrawer_1.AppColors.TextPrimary
                                           Height: =28
                                           Size: =16
                                           Text: |-
                                             =
                                             Coalesce(
-                                                cmp_DetailDrawer_old.FormCodeText,
-                                                "Record " & Text(cmp_DetailDrawer_old.RecordId)
+                                                cmp_DetailDrawer_1.FormCodeText,
+                                                "Record " & Text(cmp_DetailDrawer_1.RecordId)
                                             )
                                             &
                                             If(
-                                                !IsBlank(cmp_DetailDrawer_old.StatusText),
-                                                "  •  " & cmp_DetailDrawer_old.StatusText,
+                                                !IsBlank(cmp_DetailDrawer_1.StatusText),
+                                                "  •  " & cmp_DetailDrawer_1.StatusText,
                                                 ""
                                             )
                                           VerticalAlign: =VerticalAlign.Middle
@@ -702,7 +702,7 @@ ComponentDefinitions:
                                     - lblCommentsTitle:
                                         Control: Text@0.0.51
                                         Properties:
-                                          FontColor: =cmp_DetailDrawer_old.AppColors.TextPrimary
+                                          FontColor: =cmp_DetailDrawer_1.AppColors.TextPrimary
                                           Height: =28
                                           Text: ="Comments"
                                           VerticalAlign: =VerticalAlign.Middle
@@ -715,7 +715,7 @@ ComponentDefinitions:
                                         Properties:
                                           Align: ='TextCanvas.Align'.Center
                                           BorderRadius: =14
-                                          Fill: =cmp_DetailDrawer_old.AppColors.Primary
+                                          Fill: =cmp_DetailDrawer_1.AppColors.Primary
                                           FontColor: =RGBA(255, 255, 255, 1)
                                           Height: =28
                                           PaddingBottom: =4
@@ -735,7 +735,7 @@ ComponentDefinitions:
                                     BorderColor: =RGBA(214, 221, 224, 1)
                                     BorderThickness: =1
                                     DropShadow: =DropShadow.None
-                                    Fill: =cmp_DetailDrawer_old.AppColors.Surface
+                                    Fill: =cmp_DetailDrawer_1.AppColors.Surface
                                     FillPortions: =0
                                     Height: =300
                                     LayoutAlignItems: =LayoutAlignItems.Center
@@ -817,7 +817,7 @@ ComponentDefinitions:
                                                 DisplayMode: |
                                                   =
                                                   If(
-                                                      varIsLoadingComments || IsBlank(Trim(txtNewComment.HtmlText)) || IsBlank(ddCommentType.Selected.Value) || cmp_DetailDrawer_old.IsOpen && cmp_DetailDrawer_old.IsLoading, 
+                                                      varIsLoadingComments || IsBlank(Trim(txtNewComment.HtmlText)) || IsBlank(ddCommentType.Selected.Value) || cmp_DetailDrawer_1.IsOpen && cmp_DetailDrawer_1.IsLoading, 
                                                       DisplayMode.Disabled, 
                                                       DisplayMode.Edit
                                                       )
@@ -829,11 +829,11 @@ ComponentDefinitions:
                                                   Set(
                                                       varAddResp,
                                                       Warroom_AddTaskComment.Run(
-                                                          cmp_DetailDrawer_old.ProjectId,
-                                                          cmp_DetailDrawer_old.RecordId,
+                                                          cmp_DetailDrawer_1.ProjectId,
+                                                          cmp_DetailDrawer_1.RecordId,
                                                           txtNewComment.HtmlText,
                                                           User().Email,
-                                                          cmp_DetailDrawer_old.EntityType,
+                                                          cmp_DetailDrawer_1.EntityType,
                                                           User().FullName,
                                                           ddCommentType.Selected.Value
 
@@ -849,11 +849,11 @@ ComponentDefinitions:
                                                   Set(
                                                       varCommResp,
                                                       Warroom_GetTaskCommentsPaged.Run(
-                                                          cmp_DetailDrawer_old.ProjectId,
-                                                          cmp_DetailDrawer_old.RecordId,
+                                                          cmp_DetailDrawer_1.ProjectId,
+                                                          cmp_DetailDrawer_1.RecordId,
                                                           varCommentsPage,
                                                           varCommentsPageSize,
-                                                          cmp_DetailDrawer_old.EntityType
+                                                          cmp_DetailDrawer_1.EntityType
                                                       )
                                                   );
 
@@ -894,7 +894,7 @@ ComponentDefinitions:
                                     BorderColor: =RGBA(214, 221, 224, 1)
                                     BorderThickness: =1
                                     DropShadow: =DropShadow.None
-                                    Fill: =cmp_DetailDrawer_old.AppColors.Surface
+                                    Fill: =cmp_DetailDrawer_1.AppColors.Surface
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Vertical
                                     LayoutMinHeight: =200
@@ -914,7 +914,7 @@ ComponentDefinitions:
                                         Control: ModernText@1.0.0
                                         Properties:
                                           Align: =Align.Center
-                                          Color: =cmp_DetailDrawer_old.AppColors.TextPrimary
+                                          Color: =cmp_DetailDrawer_1.AppColors.TextPrimary
                                           Height: =Parent.Height
                                           LayoutMinHeight: =16
                                           LayoutMinWidth: =16
@@ -968,7 +968,7 @@ ComponentDefinitions:
                                                 BorderColor: =RGBA(214, 221, 224, 1)
                                                 BorderThickness: =1
                                                 DropShadow: =DropShadow.None
-                                                Fill: =cmp_DetailDrawer_old.AppColors.Surface
+                                                Fill: =cmp_DetailDrawer_1.AppColors.Surface
                                                 Height: =htmlComment.Y + htmlComment.Height + 24
                                                 PaddingBottom: =12
                                                 PaddingLeft: =12
@@ -1046,7 +1046,7 @@ ComponentDefinitions:
                                                 - lblUserEmail:
                                                     Control: ModernText@1.0.0
                                                     Properties:
-                                                      Color: =cmp_DetailDrawer_old.AppColors.TextPrimary
+                                                      Color: =cmp_DetailDrawer_1.AppColors.TextPrimary
                                                       Height: =28
                                                       PaddingBottom: =0
                                                       PaddingLeft: =0
@@ -1085,7 +1085,7 @@ ComponentDefinitions:
                                                     Properties:
                                                       Align: =Align.Center
                                                       Color: =Color.White
-                                                      Fill: =cmp_DetailDrawer_old.AppColors.Primary
+                                                      Fill: =cmp_DetailDrawer_1.AppColors.Primary
                                                       FontWeight: =FontWeight.Semibold
                                                       Height: =44
                                                       PaddingBottom: =0
@@ -1122,8 +1122,8 @@ ComponentDefinitions:
                                                         Set(
                                                             varDelResp,
                                                             'PowerAppV2->Executestoredprocedure(V2),RespondtoaPowerApp...'.Run(
-                                                                cmp_DetailDrawer_old.ProjectId,
-                                                                cmp_DetailDrawer_old.EntityType,
+                                                                cmp_DetailDrawer_1.ProjectId,
+                                                                cmp_DetailDrawer_1.EntityType,
                                                                 ThisItem.CommentId,
                                                                 User().Email
                                                             )
@@ -1133,11 +1133,11 @@ ComponentDefinitions:
                                                         Set(
                                                             varCommResp,
                                                             Warroom_GetTaskCommentsPaged.Run(
-                                                                cmp_DetailDrawer_old.ProjectId,
-                                                                cmp_DetailDrawer_old.RecordId,
+                                                                cmp_DetailDrawer_1.ProjectId,
+                                                                cmp_DetailDrawer_1.RecordId,
                                                                 varCommentsPage,
                                                                 varCommentsPageSize,
-                                                                cmp_DetailDrawer_old.EntityType
+                                                                cmp_DetailDrawer_1.EntityType
                                                             )
                                                         );
 
@@ -1158,7 +1158,7 @@ ComponentDefinitions:
                                   Control: GroupContainer@1.5.0
                                   Variant: ManualLayout
                                   Properties:
-                                    Fill: =cmp_DetailDrawer_old.AppColors.Surface
+                                    Fill: =cmp_DetailDrawer_1.AppColors.Surface
                                     Height: =0
                                     RadiusBottomLeft: =12
                                     RadiusBottomRight: =12
@@ -1220,9 +1220,9 @@ ComponentDefinitions:
                                             Set(
                                                 varCommResp,
                                                 Warroom_GetTaskCommentsPaged.Run(
-                                                    cmp_DetailDrawer_old.ProjectId,
-                                                    cmp_DetailDrawer_old.EntityType,
-                                                    cmp_DetailDrawer_old.RecordId,
+                                                    cmp_DetailDrawer_1.ProjectId,
+                                                    cmp_DetailDrawer_1.EntityType,
+                                                    cmp_DetailDrawer_1.RecordId,
                                                     varCommentsPage,
                                                     varCommentsPageSize
                                                 )
@@ -1265,9 +1265,9 @@ ComponentDefinitions:
                                             Set(
                                                 varCommResp,
                                                 Warroom_GetTaskCommentsPaged.Run(
-                                                    cmp_DetailDrawer_old.ProjectId,
-                                                    cmp_DetailDrawer_old.EntityType,
-                                                    cmp_DetailDrawer_old.RecordId,
+                                                    cmp_DetailDrawer_1.ProjectId,
+                                                    cmp_DetailDrawer_1.EntityType,
+                                                    cmp_DetailDrawer_1.RecordId,
                                                     varCommentsPage,
                                                     varCommentsPageSize
                                                 )
@@ -1430,11 +1430,11 @@ ComponentDefinitions:
                                                     Set(
                                                         varCT_SaveResp,
                                                         WarRoom_SaveCustomBulk.Run(
-                                                            cmp_DetailDrawer_old.ProjectId,
-                                                            cmp_DetailDrawer_old.EntityType,
-                                                            cmp_DetailDrawer_old.RecordId,
+                                                            cmp_DetailDrawer_1.ProjectId,
+                                                            cmp_DetailDrawer_1.EntityType,
+                                                            cmp_DetailDrawer_1.RecordId,
                                                             varCT_SaveJson,
-                                                            cmp_DetailDrawer_old.UserEmail
+                                                            cmp_DetailDrawer_1.UserEmail
                                                         )
                                                     );
 
@@ -1532,7 +1532,7 @@ ComponentDefinitions:
                                           RadiusTopRight: =4
                                           Text: ="Save"
                                           VerticalAlign: =VerticalAlign.Middle
-                                          Visible: =Lower(Coalesce(cmp_DetailDrawer_old.UserRole, "reader")) = "manager"
+                                          Visible: =Lower(Coalesce(cmp_DetailDrawer_1.UserRole, "reader")) = "manager"
                                           Width: =80
                                     - btnCustomReset:
                                         Control: Button@0.0.45
@@ -1575,7 +1575,7 @@ ComponentDefinitions:
                                             Set(varCT_Error, "");
                                             Set(varCT_IsDirty, false);
                                           Text: ="Reset"
-                                          Visible: =Lower(Coalesce(cmp_DetailDrawer_old.UserRole, "reader")) = "manager"
+                                          Visible: =Lower(Coalesce(cmp_DetailDrawer_1.UserRole, "reader")) = "manager"
                                           Width: =80
                                     - btnManageFields:
                                         Control: Button@0.0.45
@@ -1597,9 +1597,9 @@ ComponentDefinitions:
                                             Set(varCT_DefsSearch, "");
                                             Set(varCT_DefsError, "");
 
-                                            cmp_DetailDrawer_old.OnManageFieldsRequested()
+                                            cmp_DetailDrawer_1.OnManageFieldsRequested()
                                           Text: ="Manage fields"
-                                          Visible: =cmp_DetailDrawer_old.UserRole = "manager"
+                                          Visible: =cmp_DetailDrawer_1.UserRole = "manager"
                                           Width: =150
                                     - lblCustomError:
                                         Control: ModernText@1.0.0
@@ -1703,9 +1703,9 @@ ComponentDefinitions:
                                                       Set(
                                                           varCT_Resp,
                                                           WarRoom_GetCustomBundle.Run(
-                                                              cmp_DetailDrawer_old.ProjectId,
-                                                              cmp_DetailDrawer_old.EntityType,
-                                                              cmp_DetailDrawer_old.RecordId
+                                                              cmp_DetailDrawer_1.ProjectId,
+                                                              cmp_DetailDrawer_1.EntityType,
+                                                              cmp_DetailDrawer_1.RecordId
                                                           )
                                                       );
 
@@ -1812,7 +1812,7 @@ ComponentDefinitions:
                                                 Width: =Parent.Width
                                               Children:
                                                 - txtFieldNumber:
-                                                    Control: ModernNumberInput@1.1.1
+                                                    Control: ModernNumberInput@1.1.2
                                                     Properties:
                                                       Default: =If(IsBlank(ThisItem.ValueNumber), Blank(), Text(ThisItem.ValueNumber))
                                                       Height: =36
@@ -1851,7 +1851,7 @@ ComponentDefinitions:
                                                     Properties:
                                                       DisplayMode: |-
                                                         =If(
-                                                            Lower(Coalesce(cmp_DetailDrawer_old.UserRole, "reader")) = "manager",
+                                                            Lower(Coalesce(cmp_DetailDrawer_1.UserRole, "reader")) = "manager",
                                                             DisplayMode.Edit,
                                                             DisplayMode.View
                                                         )
@@ -1913,14 +1913,14 @@ ComponentDefinitions:
                                                       X: =260
                                                       Y: =22
                                                 - txtFieldText:
-                                                    Control: ModernTextInput@1.1.1
+                                                    Control: ModernTextInput@1.1.2
                                                     Properties:
                                                       Appearance: =Appearance.Outline
                                                       BorderColor: =RGBA(209,213,219,1)
                                                       Default: =ThisItem.ValueText
                                                       DisplayMode: |-
                                                         =If(
-                                                            Lower(Coalesce(cmp_DetailDrawer_old.UserRole, "reader")) = "manager",
+                                                            Lower(Coalesce(cmp_DetailDrawer_1.UserRole, "reader")) = "manager",
                                                             DisplayMode.Edit,
                                                             DisplayMode.View
                                                         )
@@ -1958,7 +1958,7 @@ ComponentDefinitions:
                                                       Y: |+
                                                         =10
                                                 - dpFieldDate:
-                                                    Control: ModernDatePicker@1.0.1
+                                                    Control: ModernDatePicker@1.0.2
                                                     Properties:
                                                       Appearance: =Appearance.Outline
                                                       DefaultDate: =ThisItem.ValueDate
@@ -2224,7 +2224,7 @@ ComponentDefinitions:
                         Set(varCT_ShowManageFields, false)
                     )
                   PressedFill: =RGBA(161, 159, 157, 1)
-                  Visible: =cmp_DetailDrawer_old.IsOpen && (varCT_ShowManageFields || varShowCustomAddFields)
+                  Visible: =cmp_DetailDrawer_1.IsOpen && (varCT_ShowManageFields || varShowCustomAddFields)
                   Width: =719
             - conManageFieldsModal:
                 Control: GroupContainer@1.5.0
@@ -2287,7 +2287,7 @@ ComponentDefinitions:
                         X: =24
                         Y: =12
                   - txtManageFieldsSearch:
-                      Control: ModernTextInput@1.1.1
+                      Control: ModernTextInput@1.1.2
                       Properties:
                         Appearance: =Appearance.Outline
                         Default: =varCT_DefsSearch
@@ -2315,7 +2315,7 @@ ComponentDefinitions:
                         OnChange: |-
                           =
                           Set(varCT_ShowInactiveDefs, Self.Value);
-                          cmp_DetailDrawer_old.OnManageFieldsRequested()
+                          cmp_DetailDrawer_1.OnManageFieldsRequested()
                         PressedBorderColor: =RGBA(0, 0, 0, 0)
                         TrueFill: =RGBA(0, 120, 212, 1)
                         TrueHoverFill: =RGBA(16, 110, 190, 1)
@@ -2328,7 +2328,7 @@ ComponentDefinitions:
                       Properties:
                         BasePaletteColor: =RGBA(95,121,151,0.4)
                         Height: =36
-                        OnSelect: =cmp_DetailDrawer_old.OnManageFieldsRequested()
+                        OnSelect: =cmp_DetailDrawer_1.OnManageFieldsRequested()
                         Text: ="Refresh"
                         Width: =90
                         X: =Parent.Width - 218
@@ -2344,7 +2344,7 @@ ComponentDefinitions:
                           =
                           If(
                               IsEmpty(colCT_Defs_Admin),
-                              cmp_DetailDrawer_old.OnManageFieldsRequested()
+                              cmp_DetailDrawer_1.OnManageFieldsRequested()
                           );
 
                           Set(varCT_FieldEditMode, "Add");
@@ -2444,7 +2444,7 @@ ComponentDefinitions:
 
                                       Set(varCT_Toggle_FieldKey, ThisItem.FieldKey);
                                       Set(varCT_Toggle_IsActive, !ThisItem.IsActive);
-                                      cmp_DetailDrawer_old.OnToggleFieldActiveRequested()
+                                      cmp_DetailDrawer_1.OnToggleFieldActiveRequested()
                                     Text: =If(ThisItem.IsActive, "Disable", "Enable")
                                     Width: =70
                                     X: =530
@@ -2741,7 +2741,7 @@ ComponentDefinitions:
                               RadiusTopRight: =14
                             Children:
                               - txtCT_FieldLabel_1:
-                                  Control: ModernTextInput@1.1.1
+                                  Control: ModernTextInput@1.1.2
                                   Properties:
                                     Appearance: =Appearance.Outline
                                     Default: =varCT_Edit_Label
@@ -2752,7 +2752,7 @@ ComponentDefinitions:
                                     Placeholder: ="Label or name of the column"
                                     Width: =Parent.Width - 20
                               - txtCT_FieldKey_1:
-                                  Control: ModernTextInput@1.1.1
+                                  Control: ModernTextInput@1.1.2
                                   Properties:
                                     Appearance: =Appearance.Outline
                                     Default: =varCT_Edit_FieldKey
@@ -2793,7 +2793,7 @@ ComponentDefinitions:
                                     LayoutMinWidth: =16
                                     OnChange: =Set(varCT_Edit_FieldType, ddCT_FieldType_1.Selected.Value)
                               - txtCT_OptionsJson_1:
-                                  Control: ModernTextInput@1.1.1
+                                  Control: ModernTextInput@1.1.2
                                   Properties:
                                     Appearance: =Appearance.Outline
                                     Default: =varCT_Edit_OptionsJson
@@ -2823,7 +2823,7 @@ ComponentDefinitions:
                                     Type: =TextInputType.Multiline
                                     Visible: =varCT_Edit_FieldType = "Choice" || varCT_Edit_FieldType = "MultiChoice" || varCT_Edit_FieldType = "Json"
                               - txtCT_HelpText_1:
-                                  Control: ModernTextInput@1.1.1
+                                  Control: ModernTextInput@1.1.2
                                   Properties:
                                     Appearance: =Appearance.Outline
                                     Default: =varCT_Edit_HelpText
@@ -2959,7 +2959,7 @@ ComponentDefinitions:
                                     TrueText: ="Active"
                                     Width: =180
                               - numCT_SortOrder_1:
-                                  Control: ModernNumberInput@1.1.1
+                                  Control: ModernNumberInput@1.1.2
                                   Properties:
                                     Appearance: =Appearance.Outline
                                     Default: =varCT_Edit_SortOrder
@@ -3084,7 +3084,7 @@ ComponentDefinitions:
                                                 )
                                             );
 
-                                            cmp_DetailDrawer_old.OnSaveCustomField();
+                                            cmp_DetailDrawer_1.OnSaveCustomField();
                                           PaddingBottom: =5
                                           PaddingLeft: =12
                                           PaddingRight: =12

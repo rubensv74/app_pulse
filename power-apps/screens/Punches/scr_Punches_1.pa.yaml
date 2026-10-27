@@ -780,36 +780,34 @@ Screens:
                                     IconStyle: =IconStyle.Filled
                                     LayoutMinHeight: =16
                                     LayoutMinWidth: =16
-                                    OnSelect: |-
+                                                                        OnSelect: |-
                                       =
-
 
                                       If(
                                           IsBlank(varProjectId),
+                                          Notify(
+                                              "Please select a project first.",
+                                              NotificationType.Warning
+                                          ),
 
-                                          Notify("Please select a project first.", NotificationType.Warning),
+                                          varPunches_IsLoading || varPunchCatalogs_IsLoading,
+                                          Notify(
+                                              "Please wait until the current operation has finished.",
+                                              NotificationType.Information
+                                          ),
 
                                           Set(varPunches_Page, 1);
                                           Set(varPunches_PageSize, 50);
                                           Set(varPunches_HasSearched, true);
 
-                                          Set(varGlobalLoading, true);
-                                          Set(varGlobalLoadingMsg, "Loading Punches...");
-                                          Set(varGlobalLoadingSubMsg, "Applying selected filters");
-                                          Set(varGlobalLoadingScope, "PUNCHES");
+                                          Set(
+                                              varFilter_SubsystemsCsv,
+                                              Coalesce(cmp_MultiValueFilter_3.SelectedCodesCSV, "")
+                                          );
 
-                                          Set(varGlobalLoadAction, "LOAD_PUNCHES");
-                                          Set(varGlobalLoadPending, true);
-
-                                      Set(
-                                          varFilter_SubsystemsCsv,
-                                          Coalesce(cmp_MultiValueFilter_3.SelectedCodesCSV, "")
-                                      );
-
-                                      Select(btnPunches_LoadPage_Punches_2)
-
+                                          Select(btnPunches_LoadPage_Punches_2)
                                       )
-                                    PaddingBottom: =5
+PaddingBottom: =5
                                     PaddingLeft: =12
                                     PaddingRight: =12
                                     PaddingTop: =5
@@ -1697,7 +1695,7 @@ Screens:
                                                   Clear(colCT_Dirty);
 
                                                   // 4) Reset del componente (solo si tu diseño lo necesita)
-                                                  Reset(comp_DetailDrawer);
+                                                  Reset(comp_DetailDrawer_6);
 
                                                   // 5) Disparar carga del drawer (tu loader central)
                                                   Select(btnDrawerLoad_Punches_2);
@@ -2373,7 +2371,7 @@ Screens:
           Children:
             - comp_DetailDrawer_6:
                 Control: CanvasComponent
-                ComponentName: cmp_DetailDrawer_old
+                ComponentName: cmp_DetailDrawer_1
                 Properties:
                   AppColors: =gblAppColors
                   CloseAction: =Set(varShowDetailDrawer, false)

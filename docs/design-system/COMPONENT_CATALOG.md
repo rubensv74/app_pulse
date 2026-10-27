@@ -46,7 +46,7 @@ LEGACY_SUPPORTED  live runtime dependency awaiting validated migration; do not s
 | `cmp_SkeletonLoader` | PDS_CANDIDATE | Preferred loading placeholder base |
 | `cmp_DashboardSectionHeader` | LEGACY_SUPPORTED | Used by current `scr_Home`; target replacement is the PDS panel/header pattern |
 | `cmp_ExecutiveAlertBanner` | LEGACY_SUPPORTED | Used by current `scr_Home`; remove after Home_PDS cutover/stabilization if no other dependency remains |
-| `cmp_DetailDrawer_old` | LEGACY_SUPPORTED | Used by current `scr_Punches` as `comp_DetailDrawer_6`; replace through an explicit Punches migration before removal |
+| `cmp_DetailDrawer_1` | ACTIVE | Punch detail drawer for `scr_Punches`; component definition, host contract and runtime behavior validated. Spec: `docs/design-system/components/CMP_DETAIL_DRAWER_1.md` |
 
 ## Rules
 
@@ -65,7 +65,7 @@ LEGACY_SUPPORTED  live runtime dependency awaiting validated migration; do not s
 
 The parallel Home_PDS strategy preserves `scr_Home` as fallback during construction, so its two legacy component dependencies remain temporarily.
 
-Punches currently depends on `cmp_DetailDrawer_old`; it remains until a replacement is implemented and Studio-validated.
+Punches now uses `cmp_DetailDrawer_1`; the previous drawer source was removed after Studio and target-screen validation.
 
 `cmp_PageHeaderPro` is now approved for controlled Home_PDS integration. Any regression found in Block 03 must be attributed and corrected before Block 04 advances.
 
