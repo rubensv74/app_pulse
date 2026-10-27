@@ -1,19 +1,30 @@
 # cmp_DetailDrawer_1
 
-## Evidencia
+## Evidence
 
-- Tipo: `component`
-- Source: `Components/cmp_DetailDrawer_1.pa.yaml`
-- Baseline: `baseline_pulse_1_0_0_5.zip`
-- Hash SHA-256: `7ea6f304a3a309682c12bd65e42336709cdbf53fd2ba6ff84fb5c059c28f3b5d`
-- Controles detectados: 9
+- Type: `component`
+- Source: `power-apps/components/cmp_DetailDrawer_1.pa.yaml`
+- Baseline: Studio component migration and `scr_Punches` target integration, 2026-10-27
+- Hash SHA-256: `89265a6cb13572719c1e1917abaaa71e672b2b71004bd85823239214ceb59cf7`
+- Controls detected: 129
 
-## Flows invocados
+## Flows invoked
 
-- Ninguno observado.
+- `WarRoom_GetCustomBundle`
+- `WarRoom_SaveCustomBulk`
+- `Warroom_AddTaskComment`
+- `Warroom_GetTaskCommentsPaged`
 
-## Navegación observada
+## Navigation observed
 
-- Ninguno observado.
+- None observed.
 
-Estado: `SOURCE_INVENTORIED`.
+## Validation
+
+- Source Code YAML static parse: PASS
+- Host property contract: PASS (20/20 custom properties used by the screen are declared)
+- Legacy component references in migrated source and screen: 0
+- Power Apps Studio compilation: PASS (user confirmed)
+- Punch detail, comments and custom-field behavior: PASS (user confirmed)
+
+State: `TARGET_SCREEN_VALIDATED`.
