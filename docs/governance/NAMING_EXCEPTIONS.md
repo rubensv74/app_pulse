@@ -13,7 +13,7 @@ This register documents live Power Apps identities that do not match preferred n
 | Identity/path | Reason | Current action | Exit condition |
 |---|---|---|---|
 | `power-apps/screens/Punches/scr_Punches_1.pa.yaml` / `scr_Punches` | Canonical Punch List source retains a legacy filename suffix. | Keep as-is temporarily. | Rename only in an explicit Punches screen migration with Studio validation. |
-| `power-apps/components/cmp_DetailDrawer_old.pa.yaml` / `cmp_DetailDrawer_old` | Despite `_old`, the component is still instantiated by canonical `scr_Punches` as `comp_DetailDrawer_6`. | Keep as `LEGACY_SUPPORTED`; do not reuse in new work. | Replace the drawer, validate the replacement in Studio, then delete the old component. |
+
 
 ## Rules
 
